@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Linux 是一套免费使用和自由传播的类Unix操作系统,是一个基于POSIX和UNIX的多用户、多任务、支持多线程和多CPU的操作系统.它能运行主要的UNIX工具软件、应用程序和网络协议.它支持32位和64位硬件.Linux继承了Unix以网络为核心的设计思想,是一个性能稳定的多用户网络操作系统. 当你的 Linux 系统出现不明原因的问题时,你需要查阅一下系统日志才能够知道系统出了什么问题了,">
+<meta name="keywords" content="Linux 系统管理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux系统日志分析与管理(14)">
+<meta property="og:url" content="https://www.mkdirs.com/2018/11/28/Linux 系统管理/Linux系统日志分析与管理-14/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="Linux 是一套免费使用和自由传播的类Unix操作系统,是一个基于POSIX和UNIX的多用户、多任务、支持多线程和多CPU的操作系统.它能运行主要的UNIX工具软件、应用程序和网络协议.它支持32位和64位硬件.Linux继承了Unix以网络为核心的设计思想,是一个性能稳定的多用户网络操作系统. 当你的 Linux 系统出现不明原因的问题时,你需要查阅一下系统日志才能够知道系统出了什么问题了,">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-04-16T12:34:56.950Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux系统日志分析与管理(14)">
+<meta name="twitter:description" content="Linux 是一套免费使用和自由传播的类Unix操作系统,是一个基于POSIX和UNIX的多用户、多任务、支持多线程和多CPU的操作系统.它能运行主要的UNIX工具软件、应用程序和网络协议.它支持32位和64位硬件.Linux继承了Unix以网络为核心的设计思想,是一个性能稳定的多用户网络操作系统. 当你的 Linux 系统出现不明原因的问题时,你需要查阅一下系统日志才能够知道系统出了什么问题了,">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/11/28/Linux 系统管理/Linux系统日志分析与管理-14/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Linux系统日志分析与管理(14) | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/11/28/Linux 系统管理/Linux系统日志分析与管理-14/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Linux系统日志分析与管理(14)
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-11-28 13:14:37" itemprop="dateCreated datePublished" datetime="2018-11-28T13:14:37+08:00">2018-11-28</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-16 20:34:56" itemprop="dateModified" datetime="2019-04-16T20:34:56+08:00">2019-04-16</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Linux-系统管理/" itemprop="url" rel="index"><span itemprop="name">Linux 系统管理</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Linux 是一套免费使用和自由传播的类Unix操作系统,是一个基于POSIX和UNIX的多用户、多任务、支持多线程和多CPU的操作系统.它能运行主要的UNIX工具软件、应用程序和网络协议.它支持32位和64位硬件.Linux继承了Unix以网络为核心的设计思想,是一个性能稳定的多用户网络操作系统.</p>
+<p>当你的 Linux 系统出现不明原因的问题时,你需要查阅一下系统日志才能够知道系统出了什么问题了,所以说了解系统日志是很重要的事情,系统日志可以记录系统在什么时间、哪个主机、哪个服务、出现了什么信息等,这些信息也包括使用者识别数据、系统故障排除等,如果你能够善用这些日志文件信息的话,你的系统出现错误时,你将可以在第一时间发现,而且也能够从中找到解决的方案.</p>
+<p>Linux系统内核和许多程序会产生各种错误信息、警告信息和其他的提示信息,这些信息对管理员了解系统的运行状态是非常有用的,所以应该把它们写到日志文件中去,完成这个过程的程序就是syslog,syslog可以根据日志的类别和优先级将日志保存到不同的文件中.</p>
+<a id="more"></a>
+<p><strong>关于Linux常见的日志文件名及作用</strong></p>
+<p>日志文件可以帮助我们了解很多系统重要的事件,包括登陆者的部分信息,因此日志文件的权限通常是配置为仅有 root 能够读取而已,而由于日志文件可以记录很多的系统详细信息,所以,一个有经验的Linux管理员会随时随地查阅一下自己的日志文件,以随时掌握系统的最新动态,那么常见的日志文件有哪些呢？ 一般而言有下面几个：</p>
+<blockquote>
+<p>● /var/log/cron</p>
+<blockquote>
+<p>主要记录关于crontab计划任务的相关信息,比如,系统计划任务的错误配置,计划任务的修改等.</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>● /var/log/btmp</p>
+<blockquote>
+<p>记录错误登陆日志,这个文件是二进制的,不能使用cat命令查看,而要使用lastb命令查看.</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>● /var/run/utmp</p>
+<blockquote>
+<p>记录当前一登陆用户的信息,同样不能使用cat命令查看,而要使用w,who,users命令来查询.</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>● /var/log/dmesg</p>
+<blockquote>
+<p>主要记录系统在开机时内核检测过程所产生的信息,默认情况下RHEL系统关闭了开机回显,如果你要查看则需要在这个文件下查阅即可.</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>● /var/log/lastlog</p>
+<blockquote>
+<p>记录了系统上面所有账户最近一次登陆系统时的相关信息,lastlog命令就是读取这个文件里的记录来显示的.</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>● /var/log/malilog or /var/log/mail/*</p>
+<blockquote>
+<p>记录着邮件的往来信息,默认是postfix邮件服务器的一些信息.</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>● /var/log/messages</p>
+<blockquote>
+<p>这个文件非常重要,几乎系统发生的错误信息,或者重要信息都会被记录在这里.</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>● /var/log/secure</p>
+<blockquote>
+<p>只要涉及到需要用户名和密码的操作,那么当登陆系统是(不论正确错误),都会记录到这里.</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>● /var/log/wtmp or /var/log/faillog</p>
+<blockquote>
+<p>这两个文件可以记录正确登陆系统者的账户信息(wtmp),与错误登陆时所使用的账户信息,last命令就是读取wtmp文件来获取的.</p>
+</blockquote>
+</blockquote>
+<p>常见的日志文件就是这几个,但是不同的 Linux 发行版,通常日志文件的名称和存储目录都不会相同,但此处除了/var/log/messages 之外,所以说你还是得要查阅你 Linux 主机上面的日志文件配置数据,才能知道你的日志文件主要是放在哪里了.</p>
+<p><strong>日志文件所需相关服务与进程</strong></p>
+<p>其实日志文件的产生,基本上有两种方式：一种是有软件开发商自定义写入的日志文件与相关格式,另一种则是由Linux发行商提供的日志文件管理服务来统一管理,你只要将这个信息丢给这个服务,它就会自己分门别类的放置到相关的日志文件中去,RHEL系统提供syslogd这个服务来统一管理日志文件.</p>
+<p>除了syslogd这个服务之外,内核也需要额外的登陆服务来记录内核产生的各项信息,这个专门用来记录内核日志的服务就是klogd.所以说,日志文件所需的服务主要是syslogd与klogd这两者.</p>
+<p>不过需要注意的是,由于系统每天都在产生大量的日志,如果日志文件量太大,就会影响系统的正常运转,这时候我们可以通过logrtate来自动处理日志文件与切割更新的问题.</p>
+<p>所谓logrotate(日志轮询),基本上就是将旧的文件改变名称,然后新建一个空文件,如此一来新的日志文件将重新开始记录,这样就可以实现日志轮询啦,总结一下,针对日志文件所需的功能,我们需要的服务与程序有以下几个：</p>
+<blockquote>
+<p>syslogd：主要登陆系统与网络等服务的信息<br>klogd：主要登陆内核产生的各项信息<br>logrotate：主要进行日志文件的轮询</p>
+</blockquote>
+<p>以上就是关于日志相关的常用常识,下面我们将开始实际看一下日志服务的应用技巧.<br><br></p>
+<h2 id="SYSlog日志文件的格式"><a href="#SYSlog日志文件的格式" class="headerlink" title="SYSlog日志文件的格式"></a>SYSlog日志文件的格式</h2><p>一般情况下,系统产生的信息经过syslog而记录下来的数据中,每条信息均会记录下面的几个数据.</p>
+<blockquote>
+<p>● 事件发生的日期与时间<br>● 发生此事件的主机名<br>● 启动此事件的服务名,或函数名<br>● 该信息的实际数据内容</p>
+</blockquote>
+<p>当然这些信息日志的详细程度也是可以修改的,而且这些信息可以作为系统的排错之用,下面我们来看一下 <code>/var/log/secure</code> 这个日志文件,来简单介绍一下它的记录格式吧.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cat /var/log/secure | head -n 5</span></span><br><span class="line">Oct 13 12:39:27 localhost polkitd[733]: Loading rules from directory /etc/polkit-1/rules.d</span><br><span class="line">Oct 13 12:39:27 localhost polkitd[733]: Acquired the name org.freedesktop.PolicyKit1 on the system bus</span><br><span class="line">Oct 13 12:39:33 localhost sshd[1082]: Server listening on 0.0.0.0 port 22.</span><br><span class="line">Nov 28 09:36:41 localhost sshd[1364]: Accepted password <span class="keyword">for</span> root from 192.168.1.20 port 63704 ssh2</span><br><span class="line">Nov 28 05:36:41 localhost sshd[1364]: pam_unix(sshd:session): session opened <span class="keyword">for</span> user root by (uid=0)</span><br></pre></td></tr></table></figure></p>
+<p>我们拿最后一条数据来说,该数据是说：在11月28号的下午5点36分,由localhost这台主机,通过sshd服务pid号是1364传来的消息,这个消息是通过pam_unix这个模块产生的,内容为session opened for user root by (uid=0),root开启了活动.<br><br></p>
+<h2 id="SYSlog配置文件的解析"><a href="#SYSlog配置文件的解析" class="headerlink" title="SYSlog配置文件的解析"></a>SYSlog配置文件的解析</h2><p>其实日志文件也有配置文件,它的目录是 <code>/etc/rsyslog.conf</code> 基本上syslog针对各种服务于信息的记录保存在这个配置文件里,这个文件规定了什么服务什么等级信息,以及需要被记录在哪里,这三个东西,所以它的语法会是下面的样子：<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[服务名称] .=! [信息等级]            [记录到哪里]</span><br><span class="line"></span><br><span class="line">authpriv.*                       /var/<span class="built_in">log</span>/secure</span><br><span class="line">mail.info                        -/var/<span class="built_in">log</span>/maillog</span><br><span class="line">cron.*                           /var/<span class="built_in">log</span>/cron</span><br></pre></td></tr></table></figure></p>
+<p>好了,接下来我们分成三个部分来解释这几信息的含义.</p>
+<p><strong>[服务名称]</strong></p>
+<p>syslog本身有设置一些服务,你可以通过这些服务来存储系统信息,syslog涉及的服务主要有以下这些：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">服 务 类 型</th>
+<th style="text-align:center">说      明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">auth(authpriv)</td>
+<td style="text-align:center">与认证有关的机制,例如login,ssh,su等需要账号密码</td>
+</tr>
+<tr>
+<td style="text-align:left">cron</td>
+<td style="text-align:center">例行工作调度,cron/at等生成信息日志的地方</td>
+</tr>
+<tr>
+<td style="text-align:left">daemon</td>
+<td style="text-align:center">与这个daemon有关的信息</td>
+</tr>
+<tr>
+<td style="text-align:left">kern</td>
+<td style="text-align:center">内核产生的信息</td>
+</tr>
+<tr>
+<td style="text-align:left">lpr</td>
+<td style="text-align:center">打印相关的信息</td>
+</tr>
+<tr>
+<td style="text-align:left">mail</td>
+<td style="text-align:center">只要与邮件有关的信息都记录在这里</td>
+</tr>
+<tr>
+<td style="text-align:left">news</td>
+<td style="text-align:center">与新闻组服务器有关的东西</td>
+</tr>
+<tr>
+<td style="text-align:left">syslog</td>
+<td style="text-align:center">syslogd本身生成的信息</td>
+</tr>
+<tr>
+<td style="text-align:left">user,uucp,local0-local7</td>
+<td style="text-align:center">与Unix-Like机器本身有关的一些信息</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>对配置文件的几点说明：</p>
+<blockquote>
+<p>● 日志类型和优先级由点号(.)分开,例如 kern.debug 表示由内核产生的调试信息<br>● kern.debug 的优先级大于 debug<br>● 星号(<em>)表示所有,例如 </em>.debug 表示所有类型的调试信息,kern.* 表示由内核产生的所有消息<br>● 可以使用逗号(,)分隔多个日志类型,使用分号(;)分隔多个选择器</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>对日志的操作包括：</p>
+<blockquote>
+<p>● 将日志输出到文件,例如 /var/log/maillog 或 /dev/console<br>● 将消息发送给用户,多个用户用逗号(,)分隔,例如 root,amrood<br>● 通过管道将消息发送给用户程序,注意程序要放在管道符(|)后面<br>● 将消息发送给其他主机上的 syslog 进程,这时 /etc/syslog.conf文件后面一列为以@开头的主机名(IP)</p>
+</blockquote>
+</blockquote>
+<p><strong>[信息等级]</strong></p>
+<p>同一个服务所产生的信息也是有差别的,有启动时仅通知系统而已的一般信息(information),有出现还不至于影响到正常运行的警告信息 (warn),还有系统硬件发生严重错误时,所产生的重大问题信息(error),基本上syslog将信息分为七个主要的等级,依序是这样的(由不重要排列到重要信息等级).</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">等 级 信 息</th>
+<th style="text-align:center">说  明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">debug</td>
+<td style="text-align:center">一般调试信息</td>
+</tr>
+<tr>
+<td style="text-align:left">info</td>
+<td style="text-align:center">基本通知信息</td>
+</tr>
+<tr>
+<td style="text-align:left">notice</td>
+<td style="text-align:center">普通通知信息</td>
+</tr>
+<tr>
+<td style="text-align:left">warning(warn)</td>
+<td style="text-align:center">警告信息,但不影响正常使用</td>
+</tr>
+<tr>
+<td style="text-align:left">err(error)</td>
+<td style="text-align:center">错误信息,可能影响系统服务</td>
+</tr>
+<tr>
+<td style="text-align:left">crit</td>
+<td style="text-align:center">比错误信息还严重的错误信息</td>
+</tr>
+<tr>
+<td style="text-align:left">alert</td>
+<td style="text-align:center">警告,比crit还严重的警告</td>
+</tr>
+<tr>
+<td style="text-align:left">emerg(panic)</td>
+<td style="text-align:center">疼痛等级,系统已经完蛋了</td>
+</tr>
+<tr>
+<td style="text-align:left">*</td>
+<td style="text-align:center">代表所有日志等级</td>
+</tr>
+</tbody>
+</table>
+<p>好了,上面的介绍足够生产环境的使用啦,如果想配置自定义日志位置,我想你能够搞定了.<br><br></p>
+<h2 id="SYSlog日志服务器配置"><a href="#SYSlog日志服务器配置" class="headerlink" title="SYSlog日志服务器配置"></a>SYSlog日志服务器配置</h2><p>想像一个环境,你的办公室内有一百台 Linux 主机,每一台负责一个网络服务,你为了要了解每台主机的状态,因此你常常需要登陆这一百主机去检查你的日志文件,想想是不是很骚,幸好我们的日志服务可以集中管理,这样我们只需要一台服务器当作日志服务器,其他客户端主动同步数据就好啦,是不是很方便啊.</p>
+<p>我们的RHEL系统,默认的syslog本身就已经具有这个日志文件服务器的功能了,只是默认并没有启动该功能而已,既然是日志服务器那么我们的 Linux 主机当然会启动一个端口来监听了,那个默认的端口就是 UDP 的 514 啊.</p>
+<h3 id="◆接收端配置◆"><a href="#◆接收端配置◆" class="headerlink" title="◆接收端配置◆"></a>◆接收端配置◆</h3><p>1.首先编辑日志服务器的配置文件,开启相应的注释,此处既可以使用TCP也可以使用UDP,两者都可.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/rsyslog.conf</span></span><br><span class="line"></span><br><span class="line"> 14 <span class="comment"># Provides UDP syslog reception</span></span><br><span class="line"> 15 <span class="variable">$ModLoad</span> imudp                  <span class="comment">#此处我们开启UDP的即可</span></span><br><span class="line"> 16 <span class="variable">$UDPServerRun</span> 514</span><br><span class="line"> 17</span><br><span class="line"> 18 <span class="comment"># Provides TCP syslog reception</span></span><br><span class="line"> 19 <span class="comment">#$ModLoad imtcp</span></span><br><span class="line"> 20 <span class="comment">#$InputTCPServerRun 514</span></span><br></pre></td></tr></table></figure></p>
+<p>2.重启日志服务器,即可配置完成<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># systemctl restart rsyslog</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl status rsyslog</span></span><br><span class="line"></span><br><span class="line">● rsyslog.service - System Logging Service</span><br><span class="line">   Loaded: loaded (/usr/lib/systemd/system/rsyslog.service; enabled; vendor preset: enabled)</span><br><span class="line">   Active: active (running) since Wed 2018-11-28 10:33:26 EST; 6s ago</span><br><span class="line">     Docs: man:rsyslogd(8)</span><br><span class="line">           http://www.rsyslog.com/doc/</span><br><span class="line"> Main PID: 13746 (rsyslogd)</span><br><span class="line">   CGroup: /system.slice/rsyslog.service</span><br><span class="line">           └─13746 /usr/sbin/rsyslogd -n</span><br></pre></td></tr></table></figure></p>
+<p>通过这个简单的操作,你的 Linux 主机已经可以接收来自其他主机的日志文件了,这里还要进行防火墙的规则放行制定端口,此处略过.</p>
+<h3 id="◆发送端配置◆"><a href="#◆发送端配置◆" class="headerlink" title="◆发送端配置◆"></a>◆发送端配置◆</h3><p>至于发送端的配置就简单多了,只要指定某个信息传送到这部主机即可,举例来说,我们的日志服务器 IP=192.168.1.10 ,而客户端希望所有的数据都送给主机,我们可以进行一下操作.</p>
+<p>1.修改日志配置文件,添加以下数据,保存退出即可.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"> 90 <span class="comment">#*.* @@remote-host:514</span></span><br><span class="line"> 91 <span class="comment"># ### end of the forwarding rule ###</span></span><br><span class="line"> 92</span><br><span class="line"> 93 *.* @192.168.1.10</span><br><span class="line"></span><br><span class="line">注意：可以使用 UDP 用一个@</span><br><span class="line">     可以使用 TCP 用两个@@</span><br></pre></td></tr></table></figure></p>
+<p>2.重启日志工具,即可配置完成<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># systemctl restart rsyslog</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl status rsyslog</span></span><br><span class="line"></span><br><span class="line">● rsyslog.service - System Logging Service</span><br><span class="line">   Loaded: loaded (/usr/lib/systemd/system/rsyslog.service; enabled; vendor preset: enabled)</span><br><span class="line">   Active: active (running) since Wed 2018-11-28 10:33:26 EST; 6s ago</span><br><span class="line">     Docs: man:rsyslogd(8)</span><br><span class="line">           http://www.rsyslog.com/doc/</span><br><span class="line"> Main PID: 13746 (rsyslogd)</span><br><span class="line">   CGroup: /system.slice/rsyslog.service</span><br><span class="line">           └─13746 /usr/sbin/rsyslogd -n</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="SYSlog日志的轮替功能"><a href="#SYSlog日志的轮替功能" class="headerlink" title="SYSlog日志的轮替功能"></a>SYSlog日志的轮替功能</h2><p>syslog 利用的是 daemon 的方式来启动的,当有需求的时候立刻就会被运行的,但是 logrotate 却是在规定的时间到了之后才来进行日志文件的轮替,所以这个 logrotate 程序当然就是挂在 cron 底下进行的,仔细看一下 /etc/cron.daily/里面的文件,/etc/cron.daily/logrotate 就是记录了每天要进行的日志文件轮替的行为啦.</p>
+<p>一般情况下,日志的轮替会用到两个配置文件,分别是 <code>/etc/logrotate.conf</code> 和 <code>/etc/logrotate.d/</code> 这两个目录,首先我们来看一下,<code>/etc/logrotate.conf</code>这个文件里的内容吧.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cat /etc/logrotate.conf</span></span><br><span class="line"></span><br><span class="line">weekly                     <span class="comment">#默认每个礼拜进行轮询</span></span><br><span class="line">rotate 4                   <span class="comment">#保留几个日志文件</span></span><br><span class="line">create                     <span class="comment">#日志文件被重命名,新建日志文件存储</span></span><br><span class="line">dateext</span><br><span class="line"><span class="comment">#compress                  #压缩轮询后的日志</span></span><br><span class="line">include /etc/logrotate.d   <span class="comment">#导入其他日志配置文件</span></span><br><span class="line"></span><br><span class="line">/var/<span class="built_in">log</span>/wtmp &#123;            <span class="comment">#针对/var/log/wtmp所设置的参数</span></span><br><span class="line">    monthly                <span class="comment">#每月轮替</span></span><br><span class="line">    create 0664 root utmp  <span class="comment">#指定新建文件的权限,以及所有者和所属组</span></span><br><span class="line">        minsize 1M         <span class="comment">#大于1M后轮询</span></span><br><span class="line">    rotate 1               <span class="comment">#仅保留一个wtmp.1而已</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/var/<span class="built_in">log</span>/btmp &#123;</span><br><span class="line">    missingok</span><br><span class="line">    monthly</span><br><span class="line">    create 0600 root utmp</span><br><span class="line">    rotate 1</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>其他的常用格式如下,我们可以自行自由发挥的.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">参 数 信 息</th>
+<th style="text-align:center">说  明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">daily</td>
+<td style="text-align:center">每天轮替</td>
+</tr>
+<tr>
+<td style="text-align:left">weekly</td>
+<td style="text-align:center">每周轮替</td>
+</tr>
+<tr>
+<td style="text-align:left">monthly</td>
+<td style="text-align:center">每月轮替</td>
+</tr>
+<tr>
+<td style="text-align:left">rotate 数字</td>
+<td style="text-align:center">保留日志文件个数</td>
+</tr>
+<tr>
+<td style="text-align:left">compress</td>
+<td style="text-align:center">旧日志启用压缩</td>
+</tr>
+<tr>
+<td style="text-align:left">mail address</td>
+<td style="text-align:center">轮替时发送邮件提示</td>
+</tr>
+<tr>
+<td style="text-align:left">missingok</td>
+<td style="text-align:center">日志不存在忽略警告</td>
+</tr>
+<tr>
+<td style="text-align:left">notifempty</td>
+<td style="text-align:center">日志为空不进行轮替</td>
+</tr>
+<tr>
+<td style="text-align:left">minsize 大小</td>
+<td style="text-align:center">日志轮替最小值</td>
+</tr>
+<tr>
+<td style="text-align:left">size 大小</td>
+<td style="text-align:center">多大进行轮替</td>
+</tr>
+<tr>
+<td style="text-align:left">dateext</td>
+<td style="text-align:center">使用日期格式后缀 secure-20181010</td>
+</tr>
+</tbody>
+</table>
+<p>系统自动定期进行日志轮替的原因:</p>
+<p>1./etc/cron.daily/有一个脚本,每天都会运行,查看是否有符合轮替的日志,然后进行相应处理<br>2.我们尝试在rsyslog配置文件中添加自己的日志记录,然后并且强制执行轮替,看会不会产生轮替文件<br>3.先在配置文件中写入自己的日志轮替规则<br>4.强制执行日志轮替<code>logrotate –vf /etc/logrotate.conf</code><br><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/11/28/Linux 系统管理/Linux系统日志分析与管理-14/">Linux系统日志分析与管理(14)</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年11月28日 - 13:11</p>
+  <p><span>最后更新:</span>2019年04月16日 - 20:04</p>
+  <p><span>原始链接:</span><a href="/2018/11/28/Linux 系统管理/Linux系统日志分析与管理-14/" title="Linux系统日志分析与管理(14)">https://www.mkdirs.com/2018/11/28/Linux 系统管理/Linux系统日志分析与管理-14/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux-系统管理/" rel="tag"> <i class="fa fa-tag"></i> Linux 系统管理</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/26/Linux 系统管理/Linux例行工作与系统管理-13/" rel="next" title="Linux例行工作与系统管理(13)">
+                <i class="fa fa-chevron-left"></i> Linux例行工作与系统管理(13)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/11/29/Linux 系统管理/Linux启动流程与模块管理-15/" rel="prev" title="Linux启动流程与模块管理(15)">
+                Linux启动流程与模块管理(15) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#SYSlog日志文件的格式"><span class="nav-text">SYSlog日志文件的格式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SYSlog配置文件的解析"><span class="nav-text">SYSlog配置文件的解析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SYSlog日志服务器配置"><span class="nav-text">SYSlog日志服务器配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆接收端配置◆"><span class="nav-text">◆接收端配置◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆发送端配置◆"><span class="nav-text">◆发送端配置◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SYSlog日志的轮替功能"><span class="nav-text">SYSlog日志的轮替功能</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

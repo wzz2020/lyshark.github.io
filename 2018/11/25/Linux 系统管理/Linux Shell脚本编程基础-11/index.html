@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Linux 是一套免费使用和自由传播的类Unix操作系统,是一个基于POSIX和UNIX的多用户、多任务、支持多线程和多CPU的操作系统.它能运行主要的UNIX工具软件、应用程序和网络协议.它支持32位和64位硬件.Linux继承了Unix以网络为核心的设计思想,是一个性能稳定的多用户网络操作系统. 实际上Shell是一个命令解释器,它解释由用户输入的命令并且把它们送到内核,不仅如此,Shell有">
+<meta name="keywords" content="Linux 系统管理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux Shell脚本编程基础(11)">
+<meta property="og:url" content="https://www.mkdirs.com/2018/11/25/Linux 系统管理/Linux Shell脚本编程基础-11/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="Linux 是一套免费使用和自由传播的类Unix操作系统,是一个基于POSIX和UNIX的多用户、多任务、支持多线程和多CPU的操作系统.它能运行主要的UNIX工具软件、应用程序和网络协议.它支持32位和64位硬件.Linux继承了Unix以网络为核心的设计思想,是一个性能稳定的多用户网络操作系统. 实际上Shell是一个命令解释器,它解释由用户输入的命令并且把它们送到内核,不仅如此,Shell有">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20181125153902.jpg">
+<meta property="og:updated_time" content="2019-04-16T12:35:35.970Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux Shell脚本编程基础(11)">
+<meta name="twitter:description" content="Linux 是一套免费使用和自由传播的类Unix操作系统,是一个基于POSIX和UNIX的多用户、多任务、支持多线程和多CPU的操作系统.它能运行主要的UNIX工具软件、应用程序和网络协议.它支持32位和64位硬件.Linux继承了Unix以网络为核心的设计思想,是一个性能稳定的多用户网络操作系统. 实际上Shell是一个命令解释器,它解释由用户输入的命令并且把它们送到内核,不仅如此,Shell有">
+<meta name="twitter:image" content="https://www.mkdirs.com/picture/20181125153902.jpg">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/11/25/Linux 系统管理/Linux Shell脚本编程基础-11/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Linux Shell脚本编程基础(11) | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/11/25/Linux 系统管理/Linux Shell脚本编程基础-11/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Linux Shell脚本编程基础(11)
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-11-25 14:35:46" itemprop="dateCreated datePublished" datetime="2018-11-25T14:35:46+08:00">2018-11-25</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-16 20:35:35" itemprop="dateModified" datetime="2019-04-16T20:35:35+08:00">2019-04-16</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Linux-系统管理/" itemprop="url" rel="index"><span itemprop="name">Linux 系统管理</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Linux 是一套免费使用和自由传播的类Unix操作系统,是一个基于POSIX和UNIX的多用户、多任务、支持多线程和多CPU的操作系统.它能运行主要的UNIX工具软件、应用程序和网络协议.它支持32位和64位硬件.Linux继承了Unix以网络为核心的设计思想,是一个性能稳定的多用户网络操作系统.</p>
+<p>实际上Shell是一个命令解释器,它解释由用户输入的命令并且把它们送到内核,不仅如此,Shell有自己的编程语言用于对命令的编辑,它允许用户编写由shell命令组成的程序.Shel编程语言具有普通编程语言的很多特点,比如它也有循环结构和分支控制结构等,用这种编程语言编写的Shell程序与其他应用程序具有同样的效果,下面我们会介绍Shell-Script的编写.</p>
+<a id="more"></a>
+<h2 id="Echo-标准输出"><a href="#Echo-标准输出" class="headerlink" title="Echo 标准输出"></a>Echo 标准输出</h2><p>echo命令用于在shell中打印shell变量的值,或者直接输出指定的字符串,linux的echo命令,在shell编程中极为常用,在终端下打印变量value的时候也是常常用到的,因此有必要了解下echo的用法echo命令的功能是在显示器上显示一段文字,一般起到一个提示的作用.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># echo --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ <span class="built_in">echo</span> [选项] [输出内容] ]</span><br><span class="line"></span><br><span class="line">        -e              <span class="comment">#支持反斜线控制的字符转换</span></span><br><span class="line">        -n              <span class="comment">#取消输出后行尾的换行符号</span></span><br><span class="line">-----------------------------------------------------------------------------------------</span><br><span class="line">控制字符：</span><br><span class="line"></span><br><span class="line">        \\              <span class="comment">#输出\本身</span></span><br><span class="line">        \a              <span class="comment">#输出警告音 </span></span><br><span class="line">        \b              <span class="comment">#退格键,也就是向左删除键 </span></span><br><span class="line">        \c              <span class="comment">#取消输出行末的换行符,和"-n"选项一致 </span></span><br><span class="line">        \e              <span class="comment">#ESCAPE键 	</span></span><br><span class="line">        \f              <span class="comment">#换页符 	 </span></span><br><span class="line">        \n              <span class="comment">#换行符 	   </span></span><br><span class="line">        \r              <span class="comment">#回车键 	</span></span><br><span class="line">        \t              <span class="comment">#制表符,也就是Tab键 </span></span><br><span class="line">        \v              <span class="comment">#垂直制表符 </span></span><br><span class="line">        \0nnn           <span class="comment">#按照八进制ASCII码输出字符,其中0为数字零,nnn是三位八进制数</span></span><br><span class="line">        \xhh            <span class="comment">#按照十六进制ASCII码表输出字符,其中hh是两位十六进制数 </span></span><br><span class="line">-----------------------------------------------------------------------------------------</span><br><span class="line">特殊格式：</span><br><span class="line"></span><br><span class="line">        \\              <span class="comment">#输出\本身</span></span><br><span class="line">        <span class="string">"\e[1"</span>          <span class="comment">#代表颜色输入开始</span></span><br><span class="line">        <span class="string">"\e[0m"</span>         <span class="comment">#代表颜色输入结束</span></span><br><span class="line">        \e[0m           <span class="comment">#关闭所有属性</span></span><br><span class="line">        \e[1m           <span class="comment">#设置高亮度</span></span><br><span class="line">        \e[4m           <span class="comment">#下划线 </span></span><br><span class="line">        \e[5m           <span class="comment">#闪烁</span></span><br><span class="line">        \e[7m           <span class="comment">#反显 </span></span><br><span class="line">        \e[8m           <span class="comment">#消隐</span></span><br><span class="line">        \e[nA           <span class="comment">#光标上移n行 </span></span><br><span class="line">        \e[nB           <span class="comment">#光标下移n行 </span></span><br><span class="line">        \e[nC           <span class="comment">#光标右移n行 </span></span><br><span class="line">        \e[nD           <span class="comment">#光标左移n行 </span></span><br><span class="line">        \e[y;xH         <span class="comment">#设置光标位置 </span></span><br><span class="line">        \e[2J           <span class="comment">#清屏 </span></span><br><span class="line">        \e[K            <span class="comment">#清除从光标到行尾的内容 </span></span><br><span class="line">        \e[s            <span class="comment">#保存光标位置 </span></span><br><span class="line">        \e[u            <span class="comment">#恢复光标位置 </span></span><br><span class="line">        \e[25l          <span class="comment">#隐藏光标 </span></span><br><span class="line">        \e[25h          <span class="comment">#显示光标</span></span><br><span class="line">-----------------------------------------------------------------------------------------</span><br><span class="line">文字颜色和底纹颜色：</span><br><span class="line"></span><br><span class="line">文字颜色代码：30=黑色，31=红色，32=绿色，33=黄色，34=蓝色，35=洋红，36=青色，37=白色，39=结束</span><br><span class="line">底纹颜色代码：40=黑色，41=红色，42=绿色，43=黄色，44=蓝色，45=洋红，46=青色，47=白色，49=结束</span><br><span class="line">-----------------------------------------------------------------------------------------</span><br></pre></td></tr></table></figure>
+<p><strong>实例1：</strong> 输出一个红字,并且黄底的”hello world”<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># echo -e "\e[31;43m hello world \e[0m"</span></span><br><span class="line"></span><br><span class="line">hello world</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例2：</strong> 输出\a本身<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># echo -e "\\\a"</span></span><br><span class="line"></span><br><span class="line">\a</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="Read-标准输入"><a href="#Read-标准输入" class="headerlink" title="Read 标准输入"></a>Read 标准输入</h2><p>read命令从键盘读取变量的值,通常用在shell脚本中与用户进行交互的场合,该命令可以一次读取多个变量的值,变量和输入的值都需要使用空格隔开.在read命令后面,如果没有指定变量名,读取的数据将被自动赋值给特定的变量REPLY.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># read --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ <span class="built_in">read</span> [选项] [输出内容] ]</span><br><span class="line"></span><br><span class="line">        -p              <span class="comment">#"提示信息",指定读取值时的提示符</span></span><br><span class="line">        -t              <span class="comment">#指定读取值时等待的时间(秒),read等待的秒数</span></span><br><span class="line">        -n              <span class="comment">#指定最多能接收的字符数(达到即执行)</span></span><br><span class="line">        -s              <span class="comment">#隐藏输入信息</span></span><br></pre></td></tr></table></figure>
+<p><strong>实例1：</strong> 通过Read命令读取一个值<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># read temp</span></span><br><span class="line">hello Lyshark</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $temp</span></span><br><span class="line">hello Lyshark</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例2：</strong> 通过read命令读取,并输出一段提示信息,且10秒等待输入时间<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># read -p "please input name" -t 10 temp</span></span><br><span class="line">wangrui</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $temp</span></span><br><span class="line">wangrui</span><br></pre></td></tr></table></figure></p>
+<p><strong>小脚本：</strong><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">read</span> -p <span class="string">"请输入你的名字："</span> name</span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$name</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">read</span> -t 30 -p <span class="string">"请在30秒内完成输入,输入你的年龄："</span> age</span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$age</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">read</span> -s -t 30 <span class="string">"隐藏输入您的性别(m/w)："</span> sex</span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$sex</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="Bash-变量"><a href="#Bash-变量" class="headerlink" title="Bash 变量"></a>Bash 变量</h2><p>变量是计算机语言中能储存计算结果或能表示值抽象概念,变量可以通过变量名访问,在指令式语言中,变量通常是可变的.</p>
+<p>变量是 bash 环境中非常重要的一个东西,我们知道 Linux 是多人多任务的环境,每个人登陆系统都能取得一个 bash 每个人都能够使用 bash 下达 mail 这个命令来收受『自己』的邮件,问题是 bash 是如何得知你的邮件信箱是哪个文件？这就需要『变量』的帮助啦,所以你说变量重不重要呢？ 下面我们将介绍重要的环境变量、变量的取用与配置等数据。</p>
+<blockquote>
+<p>关于变量名定义</p>
+<blockquote>
+<p>● 变量名可以自定义,如果不指定变量名,会把输入保存入默认变量REPLY.<br>● 如果只提供了一个变量名,则整个输入行赋予该变量.<br>● 如果提供了一个以上的变量名,则输入行分为若干字,一个接一个地赋予各个变量,而命令行上的最后一个变量取得剩余的所有值.</p>
+</blockquote>
+</blockquote>
+<h3 id="◆变量定义的规范◆"><a href="#◆变量定义的规范◆" class="headerlink" title="◆变量定义的规范◆"></a>◆变量定义的规范◆</h3><p><strong>规范1：</strong> 变量名称可以由字母、数字和下划线组成,但是不能以数字开头,变量中间不能有空格<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># name=lyshark</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $name</span></span><br><span class="line">lyshark</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># 1name=lyshark</span></span><br><span class="line">-bash: 1name=lyshark: <span class="built_in">command</span> not found</span><br></pre></td></tr></table></figure></p>
+<p><strong>规范2：</strong> 在bash中变量的默认类型都是字符串型,如果要进行数值运算,则必修指定变量类型为数值型<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># x=10</span></span><br><span class="line">[root@localhost ~]<span class="comment"># y=20</span></span><br><span class="line">[root@localhost ~]<span class="comment"># sum=$x+$y</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $sum</span></span><br><span class="line">10+20</span><br></pre></td></tr></table></figure></p>
+<p><strong>规范3：</strong> 变量用等号连接值,等号左右两侧不能有空格<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># name=lyshark</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $name</span></span><br><span class="line">lyshark</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># name =lyshark</span></span><br><span class="line">-bash: name: <span class="built_in">command</span> not found</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># name= lyshark</span></span><br><span class="line">-bash: lyshark: <span class="built_in">command</span> not found</span><br></pre></td></tr></table></figure></p>
+<p><strong>规范4：</strong> 变量的值如果有空格,需要使用单引号或双引号包括</p>
+<p>1.双引号：下面输出一段 “hello world”<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># temp="hello world"</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $temp</span></span><br><span class="line">hello world</span><br></pre></td></tr></table></figure></p>
+<p>2.\脱意字符：输出$name本身<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># name=lyshark</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "$name"</span></span><br><span class="line">lyshark</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "\$name"</span></span><br><span class="line"><span class="variable">$name</span></span><br></pre></td></tr></table></figure></p>
+<p>3.反引号与双引号：输出结果相同<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># echo `date`</span></span><br><span class="line">Sun Sep 23 23:51:38 EDT 2018</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "`date`"</span></span><br><span class="line">Sun Sep 23 23:51:45 EDT 2018</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "$(date)"</span></span><br><span class="line">Sun Sep 23 23:51:52 EDT 2018</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "\$(date)"</span></span><br><span class="line">$(date)</span><br></pre></td></tr></table></figure></p>
+<p>4.单引号括起来的都是普通字符<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># echo '`date`'</span></span><br><span class="line">`date`</span><br><span class="line">[root@localhost ~]<span class="comment"># echo '$name'</span></span><br><span class="line"><span class="variable">$name</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>规范5：</strong> 变量叠加：如果需要增加变量的值,那么可以进行变量值的叠加</p>
+<p>1.变量需要用双引号包含 “$变量名” 或用 ${变量名} 包含变量名,才可以实现叠加.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># name=lyshark</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $name</span></span><br><span class="line">lyshark</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># temp="$name is"</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $temp</span></span><br><span class="line">lyshark is</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># end="$&#123;temp&#125; hack"</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $end</span></span><br><span class="line">lyshark is hack</span><br></pre></td></tr></table></figure></p>
+<p>2.将命令结果赋值给一个变量,则需要使用反引号或$()包含命令.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ntp=`date`</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $ntp</span></span><br><span class="line">Mon Sep 24 00:01:50 EDT 2018</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># temp=$(pwd)</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $temp</span></span><br><span class="line">/root</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆用户自定义变量◆"><a href="#◆用户自定义变量◆" class="headerlink" title="◆用户自定义变量◆"></a>◆用户自定义变量◆</h3><p>用户自定义变量是最常见的变量,由用户自由定义变量名和变量的值.</p>
+<p><strong>显示变量：</strong>set 显示系统中所有的变量(自定义变量,与系统变量等)<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># set</span></span><br><span class="line">BASH=/bin/bash</span><br><span class="line">BASHOPTS=checkwinsize:cmdhist:expand_aliases:extquote...</span><br><span class="line">BASH_ALIASES=()</span><br><span class="line">BASH_ARGC=()</span><br><span class="line">BASH_ARGV=()</span><br><span class="line">BASH_CMDS=()</span><br><span class="line">....</span><br></pre></td></tr></table></figure></p>
+<p><strong>变量调用：</strong>使用 $调用变量<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># name=lyshark</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $name</span></span><br><span class="line">....省略....</span><br></pre></td></tr></table></figure></p>
+<p><strong>变量删除：</strong>删除一个正在使用的变量<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># name=lyshark</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $name</span></span><br><span class="line">lyshark</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># unset name</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $name</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>set -u：</strong>当执行时使用到未定义过的变量,则显示错误信息<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># echo $age</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># set -u</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $age</span></span><br><span class="line">-bash: age: unbound variable</span><br></pre></td></tr></table></figure></p>
+<p><strong>set -x：</strong>调用命令执行前,会先把命令输出一次<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># set -x</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ls -l /</span></span><br><span class="line">+ ls --color=auto -l /</span><br><span class="line">total 16</span><br><span class="line">lrwxrwxrwx.   1 root root    7 Sep 18 09:05 bin -&gt; usr/bin</span><br><span class="line">dr-xr-xr-x.   5 root root 4096 Sep 18 09:12 boot</span><br><span class="line">....省略....</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆系统的环境变量◆"><a href="#◆系统的环境变量◆" class="headerlink" title="◆系统的环境变量◆"></a>◆系统的环境变量◆</h3><p>环境变量可以帮我们达到很多功能,包括家目录的变换、提示字符的显示、运行文件搜寻的路径等,那么既然环境变量有那么多的功能,我们可以利用两个命令来查阅分别是 env 与 export ,这种变量中主要保存的是和系统操作环境相关的数据,比如当前登录用户,用户的家目录,命令的提示符等.环境变量的变量名可以自由定义,但是一般对系统起作用的环境变量的变量名是系统预先设定好的.</p>
+<p><strong>[环境变量]：环境变量的设置</strong><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># export AGE=22</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $AGE</span></span><br><span class="line">22</span><br></pre></td></tr></table></figure></p>
+<p>⦁环境变量的查询与删除<br>解释：env和set的区别：set命令可以查看所有变量，而env命令只能查看环境变量。<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># export NAME="LyShark"</span></span><br><span class="line">[root@localhost ~]<span class="comment"># env |grep NAME</span></span><br><span class="line">NAME=LyShark</span><br><span class="line">LOGNAME=root</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># unset NAME</span></span><br><span class="line">[root@localhost ~]<span class="comment"># env |grep NAME</span></span><br><span class="line">LOGNAME=root</span><br></pre></td></tr></table></figure></p>
+<p><strong>[env变量]：实现所有环境变量查询</strong><br>解释：env命令可以查询到所有的环境变量，可是还有一些变量虽然不是环境变量，却是和Bash操作接口相关的变量，这些变量也对我们的Bash操作终端起到了重要的作用。这些变量就只能用set命令来查看了。<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># env</span></span><br><span class="line">XDG_SESSION_ID=4</span><br><span class="line">HOSTNAME=localhost.localdomain</span><br><span class="line">TERM=cygwin</span><br><span class="line">SHELL=/bin/bash</span><br><span class="line">HISTSIZE=1000</span><br><span class="line">....省略....</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># set</span></span><br><span class="line">BASH=/bin/bash</span><br><span class="line">BASHOPTS=checkwinsize:cmdhist:expand_aliases:</span><br><span class="line">BASH_ALIASES=()</span><br><span class="line">BASH_ARGC=()</span><br><span class="line">BASH_ARGV=()</span><br><span class="line">BASH_CMDS=()</span><br><span class="line">....省略....</span><br></pre></td></tr></table></figure></p>
+<p><strong>[PATH变量]：系统查找命令的路径</strong><br>解释：PATH变量的值是用“：”分割的路径，这些路径就是系统查找命令的路径。也就是说当我们输入了一个程序名，如果没有写入路径，系统就会到PATH变量定义的路径中去寻找，是否有可以执行的程序。如果找到则执行，否则会报“命令没有发现”的错误。<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># echo $PATH</span></span><br><span class="line">/usr/<span class="built_in">local</span>/sbin:/usr/<span class="built_in">local</span>/bin:/usr/sbin:/usr/bin:/root/bin</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ./wang.sh</span></span><br><span class="line">hello world</span><br><span class="line">[root@localhost ~]<span class="comment"># PATH="$PATH":/root/wang.sh     #命令的叠加</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $PATH</span></span><br><span class="line">/usr/<span class="built_in">local</span>/sbin:/usr/<span class="built_in">local</span>/bin:/usr/sbin:/usr/bin:/root/bin:/root/wang.sh</span><br></pre></td></tr></table></figure></p>
+<p><strong>[PS1变量]：命令提示符设置</strong><br>解释：PS1是用来定义命令行的提示符的，可以安装我们自己的需求来定义自己    喜欢的提示符。PS1可以支持以下这些选项：<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">⦁	\d：显示日期，格式为“星期月日”</span><br><span class="line">⦁	\H：显示完整的主机名。如默认主机名“localhost.localdomain” </span><br><span class="line">⦁	\h：显示简写主机名。如默认主机名“localhost” </span><br><span class="line">⦁	\t：显示24小时制时间，格式为“HH:MM:SS” </span><br><span class="line">⦁	\T：显示12小时制时间，格式为“HH:MM:SS” </span><br><span class="line">⦁	\A：显示24小时制时间，格式为“HH:MM” </span><br><span class="line">⦁	\@：显示12小时制时间，格式为“HH:MM am/pm” </span><br><span class="line">⦁	\u：显示当前用户名</span><br><span class="line">⦁	\v：显示Bash的版本信息</span><br><span class="line">⦁	\w：显示当前所在目录的完整名称</span><br><span class="line">⦁	\W：显示当前所在目录的最后一个目录</span><br><span class="line">⦁	\<span class="comment">#：执行的第几个命令</span></span><br><span class="line">⦁	\$：提示符。如果是root提示符为“<span class="comment">#”，如果是普通用户提示符为“$”</span></span><br></pre></td></tr></table></figure></p>
+<p>想要使用这些必须先知道定义的规范，来看下官方的PS1<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># echo $PS1</span></span><br><span class="line"></span><br><span class="line">[\u@\h \W]\$</span><br></pre></td></tr></table></figure></p>
+<p>定义ps1的值时需要注意单引号，否则不生效<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># PS1='[\u@\t \w]$'</span></span><br><span class="line">[root@00:49:09 ~]$</span><br><span class="line">[root@00:49:10 ~]$ PS1=<span class="string">'[\u@\h \W]\$'</span></span><br><span class="line">[root@localhost ~]<span class="comment">#</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>LANG 语系变量</strong></p>
+<p>LANG定义的是Linux 的主语系环境变量：<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment">#echo $LANG</span></span><br><span class="line">en_US.UTF-8</span><br></pre></td></tr></table></figure></p>
+<p>这是因为我们Linux安装时，选择的是英文安装，所以默认的主语系变量是“en_US.UTF-8”。那么Linux中到底支持多少语系呢？我们可以使用以下命令查询：<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment">#locale -a |more</span></span><br><span class="line">aa_DJ</span><br><span class="line">aa_DJ.iso88591</span><br><span class="line">aa_DJ.utf8</span><br><span class="line">aa_ER</span><br><span class="line">aa_ER@saaho</span><br><span class="line">aa_ER.utf8</span><br><span class="line">aa_ER.utf8@saaho</span><br><span class="line">aa_ET</span><br><span class="line">aa_ET.utf8</span><br><span class="line">....省略....</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment">#locale -a |wc -l</span></span><br><span class="line">789</span><br></pre></td></tr></table></figure></p>
+<p>我们当前是什么语系可以用locale 直接查询:<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment">#locale</span></span><br><span class="line">LANG=en_US.UTF-8</span><br><span class="line">LC_CTYPE=<span class="string">"en_US.UTF-8"</span></span><br><span class="line">LC_NUMERIC=<span class="string">"en_US.UTF-8"</span></span><br><span class="line">LC_TIME=<span class="string">"en_US.UTF-8"</span></span><br><span class="line">LC_COLLATE=<span class="string">"en_US.UTF-8"</span></span><br><span class="line">....省略....</span><br></pre></td></tr></table></figure></p>
+<p>这是当前系统语系，又是默认语系，有没有快晕倒的感觉。解释下吧，我们可以这样理解，默认语系是下次重启之后系统所使用的语系，而当前系统语系是当前系统使用的语系。如果系统重启，会从默认语系配置文件/etc/sysconfig/i18n中读出语系，然后赋予变量LANG让这个语系生效。也就是说，LANG定义的语系只对当前系统生效，要想永久生效就要修改/etc/sysconfig/i18n文件了。<br>说到这里，我们需要解释下Linux中文支持的问题。是不是我们只要定义了语系为中文语系，如zh_CN.UTF-8就可以正确显示中文了呢？这要分情况，如果我们是在图形界面中，或者是使用远程连接工具（如SecureCRT），只要正确设置了语系，那么是可以正确显示中文的。当然远程连接工具也要配置正确的语系环境，具体配置方式可以参考Linux系统安装章节。</p>
+<p>那么如果是纯字符界面（本地终端tty1-tty6）是不能显示中文的，因为Linux的纯字符界面时不能显示中文这么复杂的编码的。如果我们非要在纯字符界面显示中文，那么只能安装中文插件，如zhcon等。</p>
+<h3 id="◆位置参数变量◆"><a href="#◆位置参数变量◆" class="headerlink" title="◆位置参数变量◆"></a>◆位置参数变量◆</h3><p>解释：这种变量主要是用来向脚本当中传递参数或数据的,变量名不能自定义,变量作用是固定的.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">位置参数变量</th>
+<th style="text-align:left">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">$n</td>
+<td style="text-align:left">n代表数字,$0代表命令本身,$1-$9代表第一到第九个参数,十以上参数需要用大括号包含,如：${10}.</td>
+</tr>
+<tr>
+<td style="text-align:center">$*</td>
+<td style="text-align:left">这个变量代表命令行中的所有参数,$*把所有参数看成一个整体.</td>
+</tr>
+<tr>
+<td style="text-align:center">$@</td>
+<td style="text-align:left">这个变量也代表命令行中所有参数,不过$@把每个参数区分对待.</td>
+</tr>
+<tr>
+<td style="text-align:center">$#</td>
+<td style="text-align:left">这个变量代表命令行中所有参数的个数.</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cat a.sh</span></span><br><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> -e <span class="string">"脚本名称："</span> <span class="variable">$0</span></span><br><span class="line"><span class="built_in">echo</span> -e <span class="string">"参数1："</span> <span class="variable">$1</span></span><br><span class="line"><span class="built_in">echo</span> -e <span class="string">"参数2: "</span> <span class="variable">$2</span></span><br><span class="line"><span class="built_in">echo</span> -e <span class="string">"参数3: "</span> <span class="variable">$3</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># bash a.sh a b c</span></span><br><span class="line">脚本名称： a.sh</span><br><span class="line">参数1： a</span><br><span class="line">参数2:  b</span><br><span class="line">参数3:  c</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cat b.sh</span></span><br><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> $((<span class="variable">$1</span><span class="variable">$2</span><span class="variable">$3</span>))</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># bash b.sh 10+10</span></span><br><span class="line">20</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cat c.sh</span></span><br><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> -e <span class="string">"显示所有参数(作为一个整体显示): $*"</span></span><br><span class="line"><span class="built_in">echo</span> -e <span class="string">"显示所有参数(分页显示/分开接收): <span class="variable">$@</span>"</span></span><br><span class="line"><span class="built_in">echo</span> -e <span class="string">"显示参数个数: <span class="variable">$#</span>"</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># bash c.sh A B C D</span></span><br><span class="line">显示所有参数(作为一个整体显示): A B C D</span><br><span class="line">显示所有参数(分页显示/分开接收): A B C D</span><br><span class="line">显示参数个数: 4</span><br></pre></td></tr></table></figure>
+<h3 id="◆系统预定义变量◆"><a href="#◆系统预定义变量◆" class="headerlink" title="◆系统预定义变量◆"></a>◆系统预定义变量◆</h3><p>解释：预定义变量是Bash中已经定义好的变量,变量名不能自定义,变量作用也是固定的.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">预定义变量</th>
+<th style="text-align:left">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">$?</td>
+<td style="text-align:left">最后一次执行命令的返回状态,正确返回0,错误返回非0</td>
+</tr>
+<tr>
+<td style="text-align:center">$$</td>
+<td style="text-align:left">当前进程的进程号(PID)</td>
+</tr>
+<tr>
+<td style="text-align:center">$!</td>
+<td style="text-align:left">后台运行的最后一个进程的进程号(PID)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>实例1：</strong> <code>$?</code> 判断上一条命令执行状态,成功返回0,失败返回非0<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ls -l</span></span><br><span class="line">total 12</span><br><span class="line">-rw-r--r-- 1 root root 112 Sep 24 01:25 a.sh</span><br><span class="line">-rw-r--r-- 1 root root  30 Sep 24 01:26 b.sh</span><br><span class="line">-rw-r--r-- 1 root root 165 Sep 24 01:29 c.sh</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $?   ←上条执行成功返0</span></span><br><span class="line">0</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># lss</span></span><br><span class="line">-bash: lss: <span class="built_in">command</span> not found</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $?   ←上条执行失败返非0</span></span><br><span class="line">127</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例2：</strong> <code>$$</code> 返回自身进程号<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cat d.sh</span></span><br><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"本脚本的进程号是: $$"</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># bash d.sh</span></span><br><span class="line">本脚本的进程号是: 1540</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例3：</strong> <code>$!</code> 返回最后一个后台执行的命令进程ID号<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cat e.sh</span></span><br><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line">find / -name <span class="string">"*.log"</span> &amp;</span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"最后一个后台执行的命令进程是： $!"</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># bash e.sh</span></span><br><span class="line">最后一个后台执行的命令进程是： 1546</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="Bash-数值与运算符"><a href="#Bash-数值与运算符" class="headerlink" title="Bash 数值与运算符"></a>Bash 数值与运算符</h2><p>declare命令用于声明和显示已存在的shell变量,当不提供变量名参数时显示所有shell变量,declare命令若不带任何参数选项,则会显示所有shell变量及其值,declare的功能与typeset命令的功能是相同的.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># declare --help</span></span><br><span class="line"></span><br><span class="line">[语法格式]: <span class="built_in">declare</span> [选项] [变量名]</span><br><span class="line"></span><br><span class="line">            -           <span class="comment">#给变量设定类型</span></span><br><span class="line">            +           <span class="comment">#取消变量的类型</span></span><br><span class="line">            -a          <span class="comment">#将变量声明成数组</span></span><br><span class="line">            -i          <span class="comment">#将变量声明成整数型</span></span><br><span class="line">            -r          <span class="comment">#将变量声明成只读</span></span><br><span class="line">            -x          <span class="comment">#将变量声明成环境变量</span></span><br><span class="line">            -p          <span class="comment">#显示指定变量的类型及内容</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>声明整数型：</strong> 声明整数型并使用<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># declare -i temp   #此处我们声明了temp变量为整数型</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># temp=100          #赋值整形数据可打印</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $temp</span></span><br><span class="line">100</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># temp=a            #赋值一个字符打印自动归0</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $temp</span></span><br><span class="line">0</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># unset temp        #使用结束,撤销变量</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>声明定义数组：</strong> 声明数组并定义元素,打印<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># declare -a name           #声明name为数组</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># name[0]="hello world"     #给数组name[0]赋值</span></span><br><span class="line">[root@localhost ~]<span class="comment"># name[1]="hello lyshark"   #给数组name[1]赋值</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $name                #默认打印name[0],因为下标从0开始</span></span><br><span class="line">hello world</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># name[2]="hello myblog"    #给数组name[2]赋值</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "$&#123;name[*]&#125;"         #打印数组全部元素</span></span><br><span class="line"></span><br><span class="line">hello world hello lyshark hello myblog</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $&#123;#name[*]&#125;          #统计数组元素个数</span></span><br><span class="line">3</span><br><span class="line">[root@localhost ~]<span class="comment"># echo $&#123;#name[@]&#125;          #统计数组元素个数</span></span><br><span class="line">3</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># declare -p name           #打印数组元素</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">declare</span> -a name=<span class="string">'([0]="hello world" [1]="hello lyshark" [2]="hello myblog")'</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># unset name                #使用结束,撤销数组</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>声明定义数组：</strong> 声明数组,并在声明时定义元素内容<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># declare -a num=(1 2 3 4 5)   #声明num为数组,并在声明是赋值</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $&#123;#num[*]&#125;              #正确,一共有5个元素</span></span><br><span class="line">5</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># declare -p num               #分别打印数组中的元素</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">declare</span> -a num=<span class="string">'([0]="1" [1]="2" [2]="3" [3]="4" [4]="5")'</span></span><br><span class="line">[root@localhost ~]<span class="comment"># unset num                    #使用结束,撤销数组</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>定义初始化数组：</strong> 数组定义的多种方法(定义并初始化)<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">----------------------------------------------------------------------------------------------------</span><br><span class="line">[方法1]</span><br><span class="line">[root@localhost ~]<span class="comment"># declare -a array_name=(Jerry Alice David LyShark)           #通过命令行一部到位</span></span><br><span class="line">[root@localhost ~]<span class="comment"># declare -p array_name                                       #打印查看结果</span></span><br><span class="line"><span class="built_in">declare</span> -a array_name=<span class="string">'([0]="Jerry" [1]="Alice" [2]="David" [3]="LyShark")'</span></span><br><span class="line">----------------------------------------------------------------------------------------------------</span><br><span class="line">[方法2]</span><br><span class="line">[root@localhost ~]<span class="comment"># declare -a array_name                                       #先声明array_name数组</span></span><br><span class="line">[root@localhost ~]<span class="comment"># array_name=(Jerry Alice David LyShark)                      #紧接着打印</span></span><br><span class="line">[root@localhost ~]<span class="comment"># declare -p array_name</span></span><br><span class="line"><span class="built_in">declare</span> -a array_name=<span class="string">'([0]="Jerry" [1]="Alice" [2]="David" [3]="LyShark")'</span></span><br><span class="line">----------------------------------------------------------------------------------------------------</span><br><span class="line">[方法3]</span><br><span class="line">[root@localhost ~]<span class="comment"># string="Jerry Alice Daid LyShark"                           #声明一个字符串</span></span><br><span class="line">[root@localhost ~]<span class="comment"># array_name=($string)                                        #直接转换成数组</span></span><br><span class="line">[root@localhost ~]<span class="comment"># declare -p array_name</span></span><br><span class="line"><span class="built_in">declare</span> -a array_name=<span class="string">'([0]="Jerry" [1]="Alice" [2]="Daid" [3]="LyShark")'</span></span><br><span class="line">----------------------------------------------------------------------------------------------------</span><br><span class="line">[方法4]</span><br><span class="line">[root@localhost ~]<span class="comment"># declare -a array_name                                         #声明一个字符串</span></span><br><span class="line">[root@localhost ~]<span class="comment"># array_name=([0]="LyShark" [1]="Daid" [2]="Alice" [3]="Jerry") #直接转换成数组</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $&#123;array_name[@]&#125;                                        #查询数组元素</span></span><br><span class="line">LyShark Daid Alice Jerry</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># declare -p array_name                                        #命令行查询</span></span><br><span class="line"><span class="built_in">declare</span> -a array_name=<span class="string">'([0]="LyShark" [1]="Daid" [2]="Alice" [3]="Jerry")'</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># unset array_name                                             #使用结束,撤销数组</span></span><br><span class="line">----------------------------------------------------------------------------------------------------</span><br></pre></td></tr></table></figure></p>
+<p><strong>求数组长度：</strong> 求数组长度,和单个数组元素长度.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># declare -a array_name=(Jerry Alice David LyShark)            #声明测试数组</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $&#123;array_name[*]&#125;                                        #打印全部数组元素</span></span><br><span class="line">Jerry Alice David LyShark</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $&#123;#array_name[*]&#125;                                       #显示全部数组数</span></span><br><span class="line">4</span><br><span class="line">[root@localhost ~]<span class="comment"># echo $&#123;#array_name[@]&#125;                                       #显示全部数组数</span></span><br><span class="line">4</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $&#123;#array_name[0]&#125;                                       #显示name[0]字符个数</span></span><br><span class="line">5</span><br><span class="line">[root@localhost ~]<span class="comment"># echo $&#123;#array_name[3]&#125;                                       #显示name[3]字符个数</span></span><br><span class="line">7</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># unset array_name                                             #使用结束,撤销数组</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>声明实现算数：</strong> 通过声明实现,整数计算<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># x=10</span></span><br><span class="line">[root@localhost ~]<span class="comment"># y=20</span></span><br><span class="line">[root@localhost ~]<span class="comment">#</span></span><br><span class="line">[root@localhost ~]<span class="comment"># declare -i temp=$x+$y</span></span><br><span class="line">[root@localhost ~]<span class="comment">#</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $temp</span></span><br><span class="line">30</span><br></pre></td></tr></table></figure></p>
+<p><strong>声明环境变量：</strong> 通过declare声明环境变量,和export是同样的效果<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># declare -x NAMES="LyShark"</span></span><br><span class="line">[root@localhost ~]<span class="comment"># env |grep NAMES</span></span><br><span class="line">NAMES=LyShark</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># unset NAMES</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>设置只读变量：</strong> 设置只读变量,只能读取变量,无法改变其数值<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># declare -r test="hello world"</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $test</span></span><br><span class="line">hello world</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># test=1234           #这里由于设置了只读属性,所以无法修改</span></span><br><span class="line">-bash: <span class="built_in">test</span>: <span class="built_in">readonly</span> variable</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="expr-或-let-数值运算"><a href="#expr-或-let-数值运算" class="headerlink" title="expr 或 let 数值运算"></a>expr 或 let 数值运算</h2><p>expr命令是一款表达式计算工具,使用它完成表达式的求值操作.let命令是bash中用于计算的工具,提供常用运算符还提供了方幂运算符,在变量的房屋计算中不需要加上$来表示变量,如果表达式的值是非0,那么返回的状态值是0.否则,返回的状态值是1.</p>
+<p><strong>expr加法乘法运算：</strong> 使用expr完成一次加法和乘法运算,(需要注意的是,运算符两边必须要有空格,否则不会运算)<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># declare -i x=10</span></span><br><span class="line">[root@localhost ~]<span class="comment"># declare -i y=20</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># temp=$(expr $x + $y )</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $temp</span></span><br><span class="line">30</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># temp=$(expr $x * $y )</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $temp</span></span><br><span class="line">200</span><br></pre></td></tr></table></figure></p>
+<p><strong>let加法乘法运算：</strong> 使用let完成一次加法与乘法运算,(此处并没有严格规定运算符两边的距离)<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># declare -i x=100</span></span><br><span class="line">[root@localhost ~]<span class="comment"># declare -i y=200</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># let temp=$x+$y</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $temp</span></span><br><span class="line">300</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># let temp=$x*$y</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $temp</span></span><br><span class="line">20000</span><br></pre></td></tr></table></figure></p>
+<p><strong>let ++ –：</strong> let实现数值每次递增或递减1,类似C语言中的 x++<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># declare -i num=1</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># let num++</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $num</span></span><br><span class="line">2</span><br><span class="line">[root@localhost ~]<span class="comment"># let num++</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $num</span></span><br><span class="line">3</span><br><span class="line">[root@localhost ~]<span class="comment"># let num--</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $num</span></span><br><span class="line">2</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># let --num</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $num</span></span><br><span class="line">1</span><br></pre></td></tr></table></figure></p>
+<p><strong>let x+=y：</strong> let数值每次递增或递减x,类似C语言中的 x+=y<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># declare -i num=1</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># let num+=1</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $num</span></span><br><span class="line">2</span><br><span class="line">[root@localhost ~]<span class="comment"># let num-=1</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $num</span></span><br><span class="line">1</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># let num+=10</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $num</span></span><br><span class="line">11</span><br></pre></td></tr></table></figure></p>
+<p><strong>特殊格式运算：</strong> 使用”$((运算式))” 或 “$[运算式]” 格式进行算数运算<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># declare -i x=100</span></span><br><span class="line">[root@localhost ~]<span class="comment"># declare -i y=150</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># temp=$(( $x+$y ))</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $temp</span></span><br><span class="line">250</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># temp=$[ $x*$y ]</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $temp</span></span><br><span class="line">15000</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="Shell-运算符优先级"><a href="#Shell-运算符优先级" class="headerlink" title="Shell 运算符优先级"></a>Shell 运算符优先级</h2><p>运算符的优先级,就是当有多个运算符同时存在时,谁先进行数值计算,但是有时也是有特殊情况,下面分别解释一下吧.</p>
+<p><img src="/picture/20181125153902.jpg" alt="blockchain"></p>
+<p>按照表格的优先级是乘除优先于加减,但是由于加减被（）调用所以,括号的优先级高于乘除.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># declare -i temp</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># temp=$(( (10+20)*2/4 ))</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $temp</span></span><br><span class="line">15</span><br></pre></td></tr></table></figure></p>
+<p>取模运算和取余运算绝大部分是重叠的,但是一个是计算机术语,一个是数学概念,区别在于取模运算对负数处理不太一样.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># declare -i temp</span></span><br><span class="line">[root@localhost ~]<span class="comment">#</span></span><br><span class="line">[root@localhost ~]<span class="comment"># temp=$(( 14%3 ))</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $temp</span></span><br><span class="line">2</span><br><span class="line">[root@localhost ~]<span class="comment"># temp=$(( -14%3 ))</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $temp</span></span><br><span class="line">-2</span><br><span class="line">[root@localhost ~]<span class="comment"># temp=$(( -14%-3 ))</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $temp</span></span><br><span class="line">-2</span><br><span class="line">[root@localhost ~]<span class="comment"># temp=$(( 14%-3 ))</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $temp</span></span><br><span class="line">2</span><br><span class="line">[root@localhost ~]<span class="comment"># unset temp</span></span><br></pre></td></tr></table></figure></p>
+<p>逻辑与,只有两边同时为真,才会返回真.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># declare -i temp</span></span><br><span class="line">[root@localhost ~]<span class="comment">#</span></span><br><span class="line">[root@localhost ~]<span class="comment"># temp=$(( 0 &amp;&amp; 1 ))</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $temp</span></span><br><span class="line">0</span><br><span class="line">[root@localhost ~]<span class="comment">#</span></span><br><span class="line">[root@localhost ~]<span class="comment"># temp=$(( 1 &amp;&amp; 1 ))</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $temp</span></span><br><span class="line">1</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/11/25/Linux 系统管理/Linux Shell脚本编程基础-11/">Linux Shell脚本编程基础(11)</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年11月25日 - 14:11</p>
+  <p><span>最后更新:</span>2019年04月16日 - 20:04</p>
+  <p><span>原始链接:</span><a href="/2018/11/25/Linux 系统管理/Linux Shell脚本编程基础-11/" title="Linux Shell脚本编程基础(11)">https://www.mkdirs.com/2018/11/25/Linux 系统管理/Linux Shell脚本编程基础-11/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux-系统管理/" rel="tag"> <i class="fa fa-tag"></i> Linux 系统管理</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/23/Linux 系统管理/Linux正则与文本处理工具-10/" rel="next" title="Linux正则与文本处理工具(10)">
+                <i class="fa fa-chevron-left"></i> Linux正则与文本处理工具(10)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/11/25/Linux 系统管理/Linux Shell脚本编程提高-12/" rel="prev" title="Linux Shell脚本编程提高(12)">
+                Linux Shell脚本编程提高(12) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Echo-标准输出"><span class="nav-text">Echo 标准输出</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Read-标准输入"><span class="nav-text">Read 标准输入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Bash-变量"><span class="nav-text">Bash 变量</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆变量定义的规范◆"><span class="nav-text">◆变量定义的规范◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆用户自定义变量◆"><span class="nav-text">◆用户自定义变量◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆系统的环境变量◆"><span class="nav-text">◆系统的环境变量◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆位置参数变量◆"><span class="nav-text">◆位置参数变量◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆系统预定义变量◆"><span class="nav-text">◆系统预定义变量◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Bash-数值与运算符"><span class="nav-text">Bash 数值与运算符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#expr-或-let-数值运算"><span class="nav-text">expr 或 let 数值运算</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Shell-运算符优先级"><span class="nav-text">Shell 运算符优先级</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

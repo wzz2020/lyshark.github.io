@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Ansible是新出现的自动化运维工具,基于Python开发,集合了众多运维工具（puppet、cfengine、chef、func、fabric）的优点,实现了批量系统配置、批量程序部署、批量运行命令等功能,ansible是基于模块工作的,本身没有批量部署的能力,真正具有批量部署的是ansible所运行的模块,ansible只是提供一种框架. 在大规模的配置管理工作中我们需要管理不同业务的不同机">
+<meta name="keywords" content="Ansible">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ansible 清单与命令解析(2)">
+<meta property="og:url" content="https://www.mkdirs.com/2018/12/01/Ansible/Ansible-清单与命令解析-2/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="Ansible是新出现的自动化运维工具,基于Python开发,集合了众多运维工具（puppet、cfengine、chef、func、fabric）的优点,实现了批量系统配置、批量程序部署、批量运行命令等功能,ansible是基于模块工作的,本身没有批量部署的能力,真正具有批量部署的是ansible所运行的模块,ansible只是提供一种框架. 在大规模的配置管理工作中我们需要管理不同业务的不同机">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-12-09T01:25:44.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Ansible 清单与命令解析(2)">
+<meta name="twitter:description" content="Ansible是新出现的自动化运维工具,基于Python开发,集合了众多运维工具（puppet、cfengine、chef、func、fabric）的优点,实现了批量系统配置、批量程序部署、批量运行命令等功能,ansible是基于模块工作的,本身没有批量部署的能力,真正具有批量部署的是ansible所运行的模块,ansible只是提供一种框架. 在大规模的配置管理工作中我们需要管理不同业务的不同机">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/12/01/Ansible/Ansible-清单与命令解析-2/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Ansible 清单与命令解析(2) | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/12/01/Ansible/Ansible-清单与命令解析-2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Ansible 清单与命令解析(2)
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-01 10:54:14" itemprop="dateCreated datePublished" datetime="2018-12-01T10:54:14+08:00">2018-12-01</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-12-09 09:25:44" itemprop="dateModified" datetime="2018-12-09T09:25:44+08:00">2018-12-09</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Ansible/" itemprop="url" rel="index"><span itemprop="name">Ansible</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Ansible是新出现的自动化运维工具,基于Python开发,集合了众多运维工具（puppet、cfengine、chef、func、fabric）的优点,实现了批量系统配置、批量程序部署、批量运行命令等功能,ansible是基于模块工作的,本身没有批量部署的能力,真正具有批量部署的是ansible所运行的模块,ansible只是提供一种框架.</p>
+<p>在大规模的配置管理工作中我们需要管理不同业务的不同机器,这些机器的信息都存放在 Ansible 的 Inventory 组件里面,在我们工作中配置部署针对的主机必须先存放在 Invento 组里面,这样才能使用 Ansible 对它进行操作，默认 Ansible 的 Inventory 是一个静态的 INI 格式的文件/etc/ansible/hosts 当然,还可以通过 ANSIBLE_HOSTS 环境变量指定或者运行 ansible 和 ansible-playbook 的时候用 -i 参数临时设置.</p>
+<a id="more"></a>
+<p><br></p>
+<h2 id="主机和组"><a href="#主机和组" class="headerlink" title="主机和组"></a>主机和组</h2><p>我们可以通过配置<code>/etc/ansible/hosts</code>这个文件来定义主机和主机组,例如下面的代码.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cat -n /etc/ansible/hosts</span></span><br><span class="line"></span><br><span class="line">1 192.168.1.10 ansible_ssh_pass=<span class="string">'123123'</span></span><br><span class="line">2 192.168.1.20 ansible_ssh_pass=<span class="string">'123123'</span></span><br><span class="line">3 </span><br><span class="line">4 [docker]</span><br><span class="line">5 172.168.1.10[1:9]</span><br><span class="line"></span><br><span class="line">6 [docker:vars]</span><br><span class="line">7 ansible_ssh_pass=<span class="string">'123123'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">8 [web_server]</span><br><span class="line">9  192.168.10.10</span><br><span class="line">10 192.168.10.20</span><br><span class="line">11 192.168.10.30</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>上图的参数解析：<br>● 第1-2行：定义了两台主机,并且使用内置变量给予了SSH登陆密码.<br>● 第4-5行：定义了一个docker组,且组内有101-109这9台机器的定义.<br>● 第6-7行：定义为上面的docker组统一赋值一个密码.<br>● 第8-11行：定义了一个web_server组,其中有三台主机.</p>
+</blockquote>
+<p>这就是,常用的组的定义与声明部分啦.<br><br></p>
+<h2 id="端口与别名"><a href="#端口与别名" class="headerlink" title="端口与别名"></a>端口与别名</h2><p>ssh默认的端口是22 (此时的Ansible主机配置文件可以省略),但是如果某些主机的ssh运行在自定义的端口上,Ansible使用Paramiko进行ssh连接时不会使用你ssh配置文件中列出的端口,但是如果修改ansible使用openssh进行ssh连接时将会使用：</p>
+<p>1.在Client客户端上ssh开启2个端口连接,下面一段话随意加入到指定配置文件里即可.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@Client ~]<span class="comment"># vim /etc/ssh/sshd_config</span></span><br><span class="line">Port 10086</span><br><span class="line">Port 22</span><br><span class="line"></span><br><span class="line">[root@Client ~]<span class="comment"># systemctl restart sshd</span></span><br></pre></td></tr></table></figure></p>
+<p>2.在Ansible服务端的配置,配置主机清单列表同时指定一个主机端口即可.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@Ansible ~]<span class="comment"># vim /etc/ansible/hosts</span></span><br><span class="line"></span><br><span class="line">[web_server]</span><br><span class="line">192.168.10.10:10086</span><br><span class="line">192.168.10.20:10086</span><br><span class="line"></span><br><span class="line">[web_server:vars]</span><br><span class="line">ansible_ssh_pass=<span class="string">'123123'</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="使用主机变量"><a href="#使用主机变量" class="headerlink" title="使用主机变量"></a>使用主机变量</h2><p>这里介绍 Ansible Invento 的内置的一些参数,这些参数我们在实际工作中也会经常使用到.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">内置参数</th>
+<th style="text-align:left">参数说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">ansible_ssh_host</td>
+<td style="text-align:left">指定被管理的主机的真实IP</td>
+</tr>
+<tr>
+<td style="text-align:left">ansible_ssh_port</td>
+<td style="text-align:left">指定连接到被管理主机的ssh端口号,默认是22</td>
+</tr>
+<tr>
+<td style="text-align:left">ansible_ssh_user</td>
+<td style="text-align:left">ssh连接时默认使用的用户名</td>
+</tr>
+<tr>
+<td style="text-align:left">ansible_ssh_pass</td>
+<td style="text-align:left">ssh连接时的密码</td>
+</tr>
+<tr>
+<td style="text-align:left">ansible_sudo_pass</td>
+<td style="text-align:left">使用sudo连接用户时的密码</td>
+</tr>
+<tr>
+<td style="text-align:left">ansible_sudo_exec</td>
+<td style="text-align:left">如果sudo命令不在默认路径,需要指定sudo命令路径</td>
+</tr>
+<tr>
+<td style="text-align:left">ansible_ssh_private_key_file</td>
+<td style="text-align:left">秘钥文件路径,秘钥文件如果不想使用ssh-agent管理时可以使用此选项</td>
+</tr>
+<tr>
+<td style="text-align:left">ansible_shell_type</td>
+<td style="text-align:left">目标系统的shell的类型，默认sh</td>
+</tr>
+<tr>
+<td style="text-align:left">ansible_connection</td>
+<td style="text-align:left">SSH 连接的类型：local,ssh,paramiko</td>
+</tr>
+<tr>
+<td style="text-align:left">ansible_python_interpreter</td>
+<td style="text-align:left">用来指定python解释器的路径</td>
+</tr>
+</tbody>
+</table>
+<p>上面的实例也可以配置直接使用用户名和密码进行连接<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/ansible/hosts</span></span><br><span class="line"></span><br><span class="line">[web_server]</span><br><span class="line">192.168.10.10 ansible_ssh_port=10086 ansible_ssh_user=root ansible_ssh_pass=<span class="string">'123123'</span></span><br><span class="line"></span><br><span class="line">[docker_server]</span><br><span class="line">192.168.10.10</span><br><span class="line">192.168.10.20</span><br><span class="line"></span><br><span class="line">[docker_server:vars]</span><br><span class="line">ansible_ssh_port=10086</span><br><span class="line">ansible_ssh_user=root</span><br><span class="line">ansible_ssh_pass=<span class="string">'123123'</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="Ansible配置文件解析"><a href="#Ansible配置文件解析" class="headerlink" title="Ansible配置文件解析"></a>Ansible配置文件解析</h2><p>Ansible 配置文件是以 ini 格式存储配置数据的,在 Ansible 中,几乎所有的配置项都可以通过 Ansible 的 playbook 或环境变量来重新赋值,在运行 Ansible 命令时,命令将会按照预先设定的顺序查找配置文件,具体的ansible配置文件包括以下两个部分：</p>
+<blockquote>
+<p>/etc/ansible/ansible.cfg 和 /etc/ansible/hosts</p>
+<blockquote>
+<p>● /etc/ansible/ansible.cfg 主要配置Ansible的一些参数信息<br>● /etc/ansible/hosts 主机清单(被控主机文件),或分组管理<br>● /usr/bin/ansible* 记录了Ansible的命令</p>
+</blockquote>
+</blockquote>
+<p>如果你通过操作系统软件包管理工具或 pip 安装,那么你在/etc/ansiblc目录下应该已经有了 ansible.cfg 配置文件.如果你是通过 GitHub 仓库安装的,在你复制的仓库中 examples 目录下可以找到 ansible.cfg 你可以把它拷贝到/etc/ansible目录下.</p>
+<p>接下来看一下Ansible的主配置文件 <code>/etc/ansible/ansible.cfg</code> 里面的参数解析,并说明每个参数代表的含义.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">配 置 参 数</th>
+<th style="text-align:left">参 数 的 说 明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">inventory = /etc/ansible/hosts</td>
+<td style="text-align:left">Ansible存放可通信主机的列表</td>
+</tr>
+<tr>
+<td style="text-align:center">library = /usr/share/my_modules/</td>
+<td style="text-align:left">Ansible默认搜寻模块的位置</td>
+</tr>
+<tr>
+<td style="text-align:center">remote_tmp = $HOME/.ansible/tmp</td>
+<td style="text-align:left">Ansible通过远程传输模块到远程主机,默认传输路径</td>
+</tr>
+<tr>
+<td style="text-align:center">log_path = /var/log/ansible.log</td>
+<td style="text-align:left">Ansible默认日志文件保存位置</td>
+</tr>
+<tr>
+<td style="text-align:center">pattern = *</td>
+<td style="text-align:left">如没有提供主机列表,则默认值是对所有主机通信</td>
+</tr>
+<tr>
+<td style="text-align:center">forks = 5</td>
+<td style="text-align:left">默认执行线程数量</td>
+</tr>
+<tr>
+<td style="text-align:center">poll_interval = 15</td>
+<td style="text-align:left">多久回查一下这些任务的状态,默认值是15秒</td>
+</tr>
+<tr>
+<td style="text-align:center">sudo_user = root</td>
+<td style="text-align:left">sudo使用的默认用户,默认是root</td>
+</tr>
+<tr>
+<td style="text-align:center">ask_sudo_pass = True</td>
+<td style="text-align:left">控制playbook在执行sudo之前是否询问sudo密码.默认no</td>
+</tr>
+<tr>
+<td style="text-align:center">transport = smart</td>
+<td style="text-align:left">通信机制.默认值为smart</td>
+</tr>
+<tr>
+<td style="text-align:center">remote_port = 22</td>
+<td style="text-align:left">远程SSH端口,默认是22</td>
+</tr>
+<tr>
+<td style="text-align:center">module_lang = C</td>
+<td style="text-align:left">模块和系统之间通信的计算机语言,默认是C语言</td>
+</tr>
+<tr>
+<td style="text-align:center">host_key_checking=false</td>
+<td style="text-align:left">设置是否检查SSH主机密钥</td>
+</tr>
+</tbody>
+</table>
+<p>就介绍这些,这是最常用的,其他的文本请参考</p>
+<p><a href="http://www.ansible.com.cn/docs/intro_configuration.html#environmental-configuration" target="_blank" rel="noopener">http://www.ansible.com.cn/docs/intro_configuration.html#environmental-configuration</a><br><br></p>
+<h2 id="Ansible命令参数解析"><a href="#Ansible命令参数解析" class="headerlink" title="Ansible命令参数解析"></a>Ansible命令参数解析</h2><p>看完了上面的配置文件的解析,我们再来看一下,Ansible命令的常用语法格式依旧常用命令参数吧.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible --help</span></span><br><span class="line"></span><br><span class="line">命令语法：[ ansible [选项] [模块] [参数] [主机列表] ]</span><br><span class="line"></span><br><span class="line">        -m              <span class="comment">#要执行的模块,默认为command</span></span><br><span class="line">        -a              <span class="comment">#指定模块的参数</span></span><br><span class="line">        -u              <span class="comment">#ssh连接的用户名,默认是root</span></span><br><span class="line">        -k              <span class="comment">#提示输入ssh登录密码,当使用密码验证的时候用</span></span><br><span class="line">        -s              <span class="comment">#sudo权限运行</span></span><br><span class="line">        -U              <span class="comment">#sudo到哪个用户,默认为root</span></span><br><span class="line">        -K              <span class="comment">#提示输入sudo密码,当不是NOPASSWD模式时使用</span></span><br><span class="line">        -C              <span class="comment">#只是测试一下会改变什么内容,不会真正去执行</span></span><br><span class="line">        -c              <span class="comment">#指定连接类型(default=smart)</span></span><br><span class="line">        -f              <span class="comment">#fork指定进程并发数,默认为5个</span></span><br><span class="line">        -i              <span class="comment">#指定hosts文件路径,默认default=/etc/ansible/hosts</span></span><br><span class="line">        -I              <span class="comment">#指定pattern对已匹配的主机中再过滤一次</span></span><br><span class="line">        --list-host     <span class="comment">#打印主机列表</span></span><br><span class="line">        -M              <span class="comment">#要执行的模块路径,默认为/usr/share/ansible</span></span><br><span class="line">        -o              <span class="comment">#压缩输出摘要输出</span></span><br><span class="line">        --private-key   <span class="comment">#指定一个私钥路径</span></span><br><span class="line">        -T              <span class="comment">#ssh连接超时时间,默认是10秒</span></span><br><span class="line">        -t              <span class="comment">#日志输出到该目录,日志文件名以主机命名</span></span><br><span class="line">        -v              <span class="comment">#显示详细日志</span></span><br></pre></td></tr></table></figure>
+<p><br></p>
+<h2 id="PlayBook命令参数解析"><a href="#PlayBook命令参数解析" class="headerlink" title="PlayBook命令参数解析"></a>PlayBook命令参数解析</h2><p>该指令对于需反复执行的、较为复杂的任务,我们可以通过定义 Playbook 来搞定,它允许使用变量、条件、循环、以及模板,也能通过角色及包含指令来重用既有内容,其通过读取playbook 文件后执行相应的动作.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible-playbook -h</span></span><br><span class="line"></span><br><span class="line">命令语法：[ ansible-playbook [选项] [参数] .yml ]</span><br><span class="line"></span><br><span class="line">        -m                             <span class="comment">#要执行的模块,默认为command</span></span><br><span class="line">        -C                             <span class="comment">#测试运行效果</span></span><br><span class="line">        --flush-cache                  <span class="comment">#清除fact缓存</span></span><br><span class="line">        --syntax-check                 <span class="comment">#语法检查</span></span><br><span class="line">        --force-handlers               <span class="comment">#如果任务失败,也要运行handlers</span></span><br><span class="line">        --list-tags                    <span class="comment">#列出所有可用的标签</span></span><br><span class="line">        --list-tasks                   <span class="comment">#列出将要执行的所有任务</span></span><br><span class="line">        --skip-tags=SKIP_TAGS          <span class="comment">#跳过运行标记此标签的任务</span></span><br><span class="line">        --start-at-task=START_AT_TASK  <span class="comment">#在此任务处开始运行</span></span><br><span class="line">        --step                         <span class="comment">#一步一步在运行之前确认每个任务</span></span><br><span class="line">        -t TAGS,--tags=TAGS            <span class="comment">#只运行标记此标签的任务</span></span><br></pre></td></tr></table></figure>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/12/01/Ansible/Ansible-清单与命令解析-2/">Ansible 清单与命令解析(2)</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年12月01日 - 10:12</p>
+  <p><span>最后更新:</span>2018年12月09日 - 09:12</p>
+  <p><span>原始链接:</span><a href="/2018/12/01/Ansible/Ansible-清单与命令解析-2/" title="Ansible 清单与命令解析(2)">https://www.mkdirs.com/2018/12/01/Ansible/Ansible-清单与命令解析-2/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Ansible/" rel="tag"> <i class="fa fa-tag"></i> Ansible</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/01/Ansible/Ansible 系统概述与部署-1/" rel="next" title="Ansible 系统概述与部署(1)">
+                <i class="fa fa-chevron-left"></i> Ansible 系统概述与部署(1)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/01/Ansible/Ansible 常用模块详解-3/" rel="prev" title="Ansible 常用模块详解(3)">
+                Ansible 常用模块详解(3) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#主机和组"><span class="nav-text">主机和组</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#端口与别名"><span class="nav-text">端口与别名</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用主机变量"><span class="nav-text">使用主机变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Ansible配置文件解析"><span class="nav-text">Ansible配置文件解析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Ansible命令参数解析"><span class="nav-text">Ansible命令参数解析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PlayBook命令参数解析"><span class="nav-text">PlayBook命令参数解析</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

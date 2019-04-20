@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Linux 是一套免费使用和自由传播的类Unix操作系统,是一个基于POSIX和UNIX的多用户、多任务、支持多线程和多CPU的操作系统.它能运行主要的UNIX工具软件、应用程序和网络协议.它支持32位和64位硬件.Linux继承了Unix以网络为核心的设计思想,是一个性能稳定的多用户网络操作系统. 实际上Shell是一个命令解释器,它解释由用户输入的命令并且把它们送到内核,不仅如此,Shell有">
+<meta name="keywords" content="Linux 系统管理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux Shell脚本编程提高(12)">
+<meta property="og:url" content="https://www.mkdirs.com/2018/11/25/Linux 系统管理/Linux Shell脚本编程提高-12/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="Linux 是一套免费使用和自由传播的类Unix操作系统,是一个基于POSIX和UNIX的多用户、多任务、支持多线程和多CPU的操作系统.它能运行主要的UNIX工具软件、应用程序和网络协议.它支持32位和64位硬件.Linux继承了Unix以网络为核心的设计思想,是一个性能稳定的多用户网络操作系统. 实际上Shell是一个命令解释器,它解释由用户输入的命令并且把它们送到内核,不仅如此,Shell有">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20180926091931.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20180926092858.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20180926093721.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20180926094218.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20180926094617.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20180926095702.jpg">
+<meta property="og:updated_time" content="2019-04-16T12:35:31.878Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux Shell脚本编程提高(12)">
+<meta name="twitter:description" content="Linux 是一套免费使用和自由传播的类Unix操作系统,是一个基于POSIX和UNIX的多用户、多任务、支持多线程和多CPU的操作系统.它能运行主要的UNIX工具软件、应用程序和网络协议.它支持32位和64位硬件.Linux继承了Unix以网络为核心的设计思想,是一个性能稳定的多用户网络操作系统. 实际上Shell是一个命令解释器,它解释由用户输入的命令并且把它们送到内核,不仅如此,Shell有">
+<meta name="twitter:image" content="https://www.mkdirs.com/picture/20180926091931.jpg">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/11/25/Linux 系统管理/Linux Shell脚本编程提高-12/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Linux Shell脚本编程提高(12) | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/11/25/Linux 系统管理/Linux Shell脚本编程提高-12/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Linux Shell脚本编程提高(12)
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-11-25 15:51:09" itemprop="dateCreated datePublished" datetime="2018-11-25T15:51:09+08:00">2018-11-25</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-16 20:35:31" itemprop="dateModified" datetime="2019-04-16T20:35:31+08:00">2019-04-16</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Linux-系统管理/" itemprop="url" rel="index"><span itemprop="name">Linux 系统管理</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Linux 是一套免费使用和自由传播的类Unix操作系统,是一个基于POSIX和UNIX的多用户、多任务、支持多线程和多CPU的操作系统.它能运行主要的UNIX工具软件、应用程序和网络协议.它支持32位和64位硬件.Linux继承了Unix以网络为核心的设计思想,是一个性能稳定的多用户网络操作系统.</p>
+<p>实际上Shell是一个命令解释器,它解释由用户输入的命令并且把它们送到内核,不仅如此,Shell有自己的编程语言用于对命令的编辑,它允许用户编写由shell命令组成的程序.Shel编程语言具有普通编程语言的很多特点,比如它也有循环结构和分支控制结构等,用这种编程语言编写的Shell程序与其他应用程序具有同样的效果,下面我们会介绍Shell-Script的编写.</p>
+<a id="more"></a>
+<p><br></p>
+<h2 id="Shell-条件判断"><a href="#Shell-条件判断" class="headerlink" title="Shell 条件判断"></a>Shell 条件判断</h2><h3 id="◆按文件类型判断◆"><a href="#◆按文件类型判断◆" class="headerlink" title="◆按文件类型判断◆"></a>◆按文件类型判断◆</h3><p><img src="/picture/20180926091931.jpg"></p>
+<p>1.使用 [] 来执行判断,并使用echo $? 判断执行结果<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ls</span></span><br><span class="line">lyshark.log  passwd.awk</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># [ -e ./lyshark.log ]</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $?              #返回0表示文件 ./lyshark.log 存在</span></span><br><span class="line">0</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># [ -e ./shar ]        #返回1表示文件 ./shar 不存在</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $?</span></span><br><span class="line">1</span><br></pre></td></tr></table></figure></p>
+<p>2.我们可以结合之前所学的 &amp;&amp; 和 || 实现判断后输出判断结果<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ls</span></span><br><span class="line">lyshark.log  passwd.awk</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># [ -e ./lyshark.log ] &amp;&amp; echo "check ok" || echo "None"</span></span><br><span class="line">check ok</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># [ -e ./shar ] &amp;&amp; echo "check on" || echo "None"</span></span><br><span class="line">None</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆按文件权限判断◆"><a href="#◆按文件权限判断◆" class="headerlink" title="◆按文件权限判断◆"></a>◆按文件权限判断◆</h3><p><img src="/picture/20180926092858.jpg"></p>
+<p>1.使用 -r 判断文件是否可读,和可执行<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ls</span></span><br><span class="line">lyshark.log passwd.awk</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># [ -r ./lyshark.log ] &amp;&amp; echo "check ok" || echo "None"</span></span><br><span class="line">check ok</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># [ -x ./lyshark.log ] &amp;&amp; echo "check ok" || echo "None"</span></span><br><span class="line">None</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># [ -r ./lyshark.log ] &amp;&amp; [ -x ./lyshark.log ] &amp;&amp; echo "可读,可执行" || echo "可读,不可执行" || echo</span></span><br><span class="line"><span class="string">"不可读,不可执行"</span></span><br><span class="line"></span><br><span class="line">可读,不可执行</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆两文件之间的比较◆"><a href="#◆两文件之间的比较◆" class="headerlink" title="◆两文件之间的比较◆"></a>◆两文件之间的比较◆</h3><p><img src="/picture/20180926093721.jpg"></p>
+<p>1.通过 -ef 判断是否是相同的I节点<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ls -li</span></span><br><span class="line">total 0</span><br><span class="line">8409155 -rw-r--r-- 2 root root 0 Sep 25 21:39 lyshark_ln.log</span><br><span class="line">8409155 -rw-r--r-- 2 root root 0 Sep 25 21:39 lyshark.log</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># [ ./lyshark.log -ef lyshark_ln.log ] &amp;&amp; echo "ok" || echo "no"</span></span><br><span class="line">ok</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆数值之间的比较◆"><a href="#◆数值之间的比较◆" class="headerlink" title="◆数值之间的比较◆"></a>◆数值之间的比较◆</h3><p><img src="/picture/20180926094218.jpg"></p>
+<p>1.比较两数字,大小关系<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># [ 23 -ge 24 ] &amp;&amp; echo "23 &gt;= 24 " || echo "23 &lt;= 24"</span></span><br><span class="line">23 &lt;= 24</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># [ 30 -ge 24 ] &amp;&amp; echo "30 &gt;= 24 " || echo "30 &lt;= 24"</span></span><br><span class="line">30 &gt;= 24</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆字符串之间的比较◆"><a href="#◆字符串之间的比较◆" class="headerlink" title="◆字符串之间的比较◆"></a>◆字符串之间的比较◆</h3><p><img src="/picture/20180926094617.jpg"></p>
+<p>1.字符串之间的比较例子,字符串是否为空<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># name=LyShark</span></span><br><span class="line">[root@localhost ~]<span class="comment"># age=""</span></span><br><span class="line">[root@localhost ~]<span class="comment"># unset sex</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># [ -z "$name" ] &amp;&amp; echo "字符串空" || echo "不为空"</span></span><br><span class="line">不为空</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># [ -z "$age" ] &amp;&amp; echo "字符串空" || echo "不为空"</span></span><br><span class="line">字符串空</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># [ -z "$sex" ] &amp;&amp; echo "字符串空" || echo "不为空"</span></span><br><span class="line">字符串空</span><br></pre></td></tr></table></figure></p>
+<p>2.两个字符串相等比较<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># x=100</span></span><br><span class="line">[root@localhost ~]<span class="comment"># y=200</span></span><br><span class="line">[root@localhost ~]<span class="comment"># z=100</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># [ "x" == "y" ] &amp;&amp; echo "yes" || echo "no"</span></span><br><span class="line">no</span><br><span class="line">[root@localhost ~]<span class="comment"># [ "$x" == "$y" ] &amp;&amp; echo "yes" || echo "no"</span></span><br><span class="line">no</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># [ "$x" == "$z" ] &amp;&amp; echo "yes" || echo "no"</span></span><br><span class="line">yes</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆多重条件判断◆"><a href="#◆多重条件判断◆" class="headerlink" title="◆多重条件判断◆"></a>◆多重条件判断◆</h3><p><img src="/picture/20180926095702.jpg"></p>
+<p>1.逻辑与：判断变量x不为空,并且x大于20<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># declare -i x=10</span></span><br><span class="line">[root@localhost ~]<span class="comment"># [ -n "$x" -a "$x" -gt 20 ] &amp;&amp; echo "yes" || echo "no"</span></span><br><span class="line">no</span><br><span class="line">[root@localhost ~]<span class="comment"># declare -i x=30</span></span><br><span class="line">[root@localhost ~]<span class="comment"># [ -n "$x" -a "$x" -gt 20 ] &amp;&amp; echo "yes" || echo "no"</span></span><br><span class="line">yes</span><br></pre></td></tr></table></figure></p>
+<p>2.逻辑非：判断x变量不为空,或！取反<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># declare -i x=30</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># [ -n "$x" ] &amp;&amp; echo "yes" || echo "no"</span></span><br><span class="line">yes</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># [ ! -n "$x" ] &amp;&amp; echo "yes" || echo "no"</span></span><br><span class="line">no</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="IF条件判断"><a href="#IF条件判断" class="headerlink" title="IF条件判断"></a>IF条件判断</h2><p>if、then、else语句用于判断给定的条件是否满足,并根据测试条件的真假来选择相应的操作.if/else仅仅用于两分支判断,多分支的选择时需要用到if/else语句嵌套、if/elif/else和case多分支选择判断结构.</p>
+<p><strong>IF结构例子:</strong> 一个就简单的单分支结构.测试条件后如果没有”;”则then语句要换行.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/sh</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"Please input a Number:"</span></span><br><span class="line"><span class="built_in">read</span> Num</span><br><span class="line"> </span><br><span class="line"><span class="keyword">if</span> [ <span class="string">"<span class="variable">$Num</span>"</span> -lt 15 ]</span><br><span class="line"><span class="keyword">then</span></span><br><span class="line">	<span class="built_in">echo</span> <span class="string">"<span class="variable">$Num</span> &lt;= 15"</span></span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>IF/IF-ELSE结构:</strong> 一个双分支结构,如下执行删除文件,成功返回then是否返回else.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/sh</span></span><br><span class="line"> </span><br><span class="line"><span class="built_in">echo</span> <span class="string">"Please input the file which you want to delete:"</span></span><br><span class="line"><span class="built_in">read</span> file</span><br><span class="line"> </span><br><span class="line"><span class="keyword">if</span> rm -f <span class="string">"<span class="variable">$file</span>"</span></span><br><span class="line"><span class="keyword">then</span></span><br><span class="line">  <span class="built_in">echo</span> <span class="string">"Delete the file <span class="variable">$file</span>  sucessfully!"</span></span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">  <span class="built_in">echo</span> <span class="string">"Delete the file <span class="variable">$file</span> failed!"</span></span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>IF/ELSE嵌套:</strong> 可同时判断三个或三个以上条件,但要注意if与else配对关系,else语句总是与它上面最近的未配对的if配对.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"><span class="comment">#提示用户输入分数（0-100）</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"Please Input a integer(0-100): "</span></span><br><span class="line"><span class="built_in">read</span> score</span><br><span class="line"></span><br><span class="line"><span class="comment">#判断学生的分数类别</span></span><br><span class="line"><span class="keyword">if</span> [ <span class="string">"<span class="variable">$score</span>"</span> -lt 0 -o <span class="string">"<span class="variable">$score</span>"</span> -gt 100 ]</span><br><span class="line"><span class="keyword">then</span></span><br><span class="line">   <span class="built_in">echo</span> <span class="string">"The score what you input is not integer or the score is not in (0-100)."</span></span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">     <span class="keyword">if</span> [ <span class="string">"<span class="variable">$score</span>"</span> -ge 90 ]</span><br><span class="line">     <span class="keyword">then</span></span><br><span class="line">         <span class="built_in">echo</span> <span class="string">"The grade is A!"</span></span><br><span class="line">     <span class="keyword">else</span></span><br><span class="line">          <span class="keyword">if</span> [ <span class="string">"<span class="variable">$score</span>"</span> -ge 80 ]</span><br><span class="line">          <span class="keyword">then</span></span><br><span class="line">              <span class="built_in">echo</span> <span class="string">"The grade is B!"</span></span><br><span class="line">          <span class="keyword">else</span></span><br><span class="line">               <span class="keyword">if</span> [ <span class="string">"<span class="variable">$score</span>"</span> -ge 70 ]</span><br><span class="line">              <span class="keyword">then</span></span><br><span class="line">                   <span class="built_in">echo</span> <span class="string">"The grade is C!"</span></span><br><span class="line">              <span class="keyword">else</span></span><br><span class="line">                   <span class="keyword">if</span> [ <span class="string">"<span class="variable">$score</span>"</span> -ge 60 ]</span><br><span class="line">                   <span class="keyword">then</span></span><br><span class="line">                        <span class="built_in">echo</span> <span class="string">"The grade is D!"</span></span><br><span class="line">                   <span class="keyword">else</span></span><br><span class="line">                        <span class="built_in">echo</span> <span class="string">"The grade is E!"</span></span><br><span class="line">                   <span class="keyword">fi</span></span><br><span class="line">              <span class="keyword">fi</span></span><br><span class="line">         <span class="keyword">fi</span></span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>IF/ELIF/ELSE结构:</strong> if/else嵌套在编程中很容易漏掉then或fi产生错误,而且可读性很差,因此引入if/elif/else结构针对某一事件的多种情况进行处理,fi只出现一次,可读性也提高了.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash  </span></span><br><span class="line"> </span><br><span class="line"><span class="built_in">echo</span> <span class="string">"Please Input a integer(0-100): "</span></span><br><span class="line"><span class="built_in">read</span> score</span><br><span class="line"> </span><br><span class="line"><span class="keyword">if</span> [ <span class="string">"<span class="variable">$score</span>"</span> -lt 0 -o <span class="string">"<span class="variable">$score</span>"</span> -gt 100 ]</span><br><span class="line"><span class="keyword">then</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"The score what you input is not integer or the score is not in (0-100)."</span></span><br><span class="line"><span class="keyword">elif</span> [ <span class="string">"<span class="variable">$score</span>"</span> -ge 90 ]</span><br><span class="line"><span class="keyword">then</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"The grade is A!"</span></span><br><span class="line"><span class="keyword">elif</span> [ <span class="string">"<span class="variable">$score</span>"</span> -ge 80 ]</span><br><span class="line"><span class="keyword">then</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"The grade is B!"</span></span><br><span class="line"><span class="keyword">elif</span> [ <span class="string">"<span class="variable">$score</span>"</span> -ge 70 ]</span><br><span class="line"><span class="keyword">then</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"The grade is C!"</span></span><br><span class="line"><span class="keyword">elif</span> [ <span class="string">"<span class="variable">$score</span>"</span> -ge 60 ]</span><br><span class="line"><span class="keyword">then</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"The grade is D!"</span></span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"The grade is E!"</span></span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>实例1:</strong> 通过单分支判断磁盘是否已满.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cat if.sh</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line">ret=$( df -h | grep <span class="string">"/dev/sda1"</span> | awk <span class="string">'&#123;printf $5&#125;'</span> | cut -d <span class="string">"%"</span> -f 1 )</span><br><span class="line"><span class="keyword">if</span> [ <span class="variable">$ret</span> -ge 80 ]</span><br><span class="line"><span class="keyword">then</span></span><br><span class="line">        <span class="built_in">echo</span> -e　<span class="string">"/dev/sda1 is full !!"</span></span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>实例2:</strong> 通过多分支判断磁盘是否已满.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cat if.sh</span></span><br><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line">ret=$( df -h | grep <span class="string">"/dev/sda1"</span> | awk <span class="string">'&#123;printf $5&#125;'</span> | cut -d <span class="string">"%"</span> -f 1 )</span><br><span class="line"><span class="keyword">if</span> [ <span class="variable">$ret</span> -ge 80 ]</span><br><span class="line"><span class="keyword">then</span></span><br><span class="line">        <span class="built_in">echo</span> -e <span class="string">"/dev/sda1 is full !"</span></span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">        <span class="built_in">echo</span> -e <span class="string">"/dev/sda1 is not full !"</span></span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>实例3:</strong> 多分支判断小例子.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cat if.sh</span></span><br><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">read</span> -p <span class="string">"输入一个数字:"</span> num</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> [ <span class="string">"<span class="variable">$num</span>"</span> -gt <span class="string">"100"</span> ]</span><br><span class="line"><span class="keyword">then</span></span><br><span class="line">        <span class="built_in">echo</span> -e <span class="string">"这个数大于100"</span></span><br><span class="line"><span class="keyword">elif</span> [ <span class="string">"<span class="variable">$num</span>"</span> -lt <span class="string">"100"</span> ]</span><br><span class="line"><span class="keyword">then</span></span><br><span class="line">        <span class="built_in">echo</span> -e <span class="string">"这个数小于100"</span></span><br><span class="line"><span class="keyword">elif</span> [ <span class="string">"<span class="variable">$num</span>"</span> -eq <span class="string">"100"</span> ]</span><br><span class="line"><span class="keyword">then</span></span><br><span class="line">        <span class="built_in">echo</span> -e <span class="string">"这个数等于100"</span></span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>实例4:</strong> 判断输入的年份是否是润年(润年条件：1、能被4整除,但不能被100整除的年份.2、能被100整除,又能被400整除的年份)<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/sh</span></span><br><span class="line">  </span><br><span class="line"><span class="built_in">echo</span> <span class="string">"Please Input a year: "</span></span><br><span class="line"><span class="built_in">read</span> year</span><br><span class="line"> </span><br><span class="line"><span class="built_in">let</span> <span class="string">"n1=<span class="variable">$year</span> % 4"</span></span><br><span class="line"><span class="built_in">let</span> <span class="string">"n2=<span class="variable">$year</span> % 100"</span></span><br><span class="line"><span class="built_in">let</span> <span class="string">"n3=<span class="variable">$year</span> % 400"</span></span><br><span class="line"><span class="keyword">if</span> [ <span class="string">"<span class="variable">$n1</span>"</span> -ne 0 ]</span><br><span class="line"><span class="keyword">then</span></span><br><span class="line">    leap=0</span><br><span class="line"><span class="keyword">elif</span> [ <span class="string">"<span class="variable">$n2</span>"</span> -ne 0 ]</span><br><span class="line"><span class="keyword">then</span></span><br><span class="line">    leap=1</span><br><span class="line"><span class="keyword">elif</span> [ <span class="string">"<span class="variable">$n3</span>"</span> -ne 0 ]</span><br><span class="line"><span class="keyword">then</span></span><br><span class="line">    leap=0</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">    leap=1</span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="CASE分支结构"><a href="#CASE分支结构" class="headerlink" title="CASE分支结构"></a>CASE分支结构</h2><p>case结构变量值依次比较,遇到双分号则跳到esac后的语句执行,没有匹配则脚本将执行默认值<code>*</code>“后的命令,直到”‘;;”为止.case的匹配值必须是常量或正则表达式.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">read</span> -p <span class="string">"输入一个符号:"</span> temp</span><br><span class="line"></span><br><span class="line"><span class="keyword">case</span> <span class="variable">$temp</span> <span class="keyword">in</span></span><br><span class="line"></span><br><span class="line">        <span class="string">"-print"</span>)</span><br><span class="line">                <span class="built_in">echo</span> -e <span class="string">"您执行了print函数"</span></span><br><span class="line">        ;;</span><br><span class="line">        <span class="string">"-save"</span>)</span><br><span class="line">                <span class="built_in">echo</span> -e <span class="string">"您执行了save函数"</span></span><br><span class="line">        ;;</span><br><span class="line">        <span class="string">"-help"</span>)</span><br><span class="line">                <span class="built_in">echo</span> -e <span class="string">"您执行了help函数"</span></span><br><span class="line">        ;;</span><br><span class="line">        *)</span><br><span class="line">                <span class="built_in">echo</span> -e <span class="string">"您执行了其他操作"</span></span><br><span class="line">        ;;</span><br><span class="line"><span class="keyword">esac</span></span><br></pre></td></tr></table></figure>
+<p><br></p>
+<h2 id="FOR循环结构"><a href="#FOR循环结构" class="headerlink" title="FOR循环结构"></a>FOR循环结构</h2><p>Shell编程中循环命令用于特定条件下决定某些语句重复执行的控制方式,有三种常用的循环语句：for、while和until.while循环和for循环属于”当型循环”,而until属于”直到型循环”,循环控制符：break和continue控制流程转向.</p>
+<p><strong>列表FOR循环:</strong> 循环打印数据分别从1遍历到5.</p>
+<p>do和done之间的命令称为循环体,执行次数和list列表中常数或字符串的个数相同.for循环,首先将in后list列表的第一个常数或字符串赋值给循环变量,然后执行循环体,以此执行list,最后执行done命令后的命令序列.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">for</span> tmp <span class="keyword">in</span> &#123;1..5&#125;</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">     <span class="built_in">echo</span> <span class="string">"Hello, Welcome <span class="variable">$tmp</span> times"</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>FOR循环累加:</strong> 通过FOR循环累加打印数据.</p>
+<p>通过i的按步数2不断递增,计算sum值为2500.同样可以使用seq命令实现按2递增来计算1～100内的所有奇数之和,<code>for i in $(seq 1 2 100)</code>,seq表示起始数为1,跳跃的步数为2,结束条件值为100.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line">sum=0</span><br><span class="line"> </span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> &#123;1..100..2&#125;</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">    <span class="built_in">let</span> <span class="string">"sum+=i"</span></span><br><span class="line"><span class="keyword">done</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"sum=<span class="variable">$sum</span>"</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>FOR循环遍历目录:</strong> 通过for循环显示当前目录下所有的文件.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">for</span> file <span class="keyword">in</span> $( ls )</span><br><span class="line"><span class="comment">#for file in *</span></span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">   <span class="built_in">echo</span> <span class="string">"file: <span class="variable">$file</span>"</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>不带列表FOR:</strong> 由用户制定参数和参数的个数,与上述的for循环列表参数功能相同.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"number of arguments is <span class="variable">$#</span>"</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"What you input is: "</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> argument</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"<span class="variable">$argument</span>"</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>C风格FOR循环:</strong> 也被称为计次循环.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"><span class="keyword">for</span>((<span class="built_in">integer</span> = 1; <span class="built_in">integer</span> &lt;= 5; <span class="built_in">integer</span>++))</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"<span class="variable">$integer</span>"</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>实例1:</strong> 通过for循环打印1-10.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cat for.sh</span></span><br><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> temp <span class="keyword">in</span> `seq 1 10`</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">        <span class="built_in">echo</span> -e <span class="string">"打印数据: <span class="variable">$temp</span>"</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>实例2:</strong> 通过for循环计算1-100的累加和.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cat for.sh</span></span><br><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">declare</span> -i sum=0</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> temp <span class="keyword">in</span> `seq 1 100`</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">        sum=<span class="variable">$sum</span>+<span class="variable">$temp</span></span><br><span class="line"><span class="keyword">done</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> -e <span class="string">"从1+到100的结果是: <span class="variable">$sum</span>"</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>实例3:</strong> 从列表中选择数据.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cat for.sh</span></span><br><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> temp <span class="keyword">in</span> 1 3 5 7 9</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">        <span class="built_in">echo</span> -e <span class="string">"打印: <span class="variable">$temp</span>"</span></span><br><span class="line"><span class="keyword">done</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># bash for.sh</span></span><br><span class="line">打印: 1</span><br><span class="line">打印: 3</span><br><span class="line">打印: 5</span><br><span class="line">打印: 7</span><br><span class="line">打印: 9</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例4:</strong> 读取文件内容并打印.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cat for.sh</span></span><br><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line">world=`cat /etc/passwd`</span><br><span class="line"><span class="keyword">for</span> temp <span class="keyword">in</span> <span class="variable">$world</span></span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">        <span class="built_in">echo</span> -e <span class="string">"打印: <span class="variable">$temp</span>"</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="WHILE-循环"><a href="#WHILE-循环" class="headerlink" title="WHILE 循环"></a>WHILE 循环</h2><p>也称为前测试循环语句,重复次数是利用一个条件来控制是否继续重复执行这个语句.为了避免死循环,必须保证循环体中包含循环出口条件即表达式存在退出状态为非0的情况.</p>
+<p><strong>计数控制:</strong> 指定了循环的次数500,初始化计数器值为1,不断测试循环条件i是否小于等于100.在循环条件中设置了计数器加2来计算1～100内所有的奇数之和.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"> </span><br><span class="line">sum=0</span><br><span class="line"> </span><br><span class="line">i=1</span><br><span class="line"> </span><br><span class="line"><span class="keyword">while</span>(( i &lt;= 100 ))</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">     <span class="built_in">let</span> <span class="string">"sum+=i"</span></span><br><span class="line">     <span class="built_in">let</span> <span class="string">"i += 2"</span>   </span><br><span class="line"><span class="keyword">done</span></span><br><span class="line"> </span><br><span class="line"><span class="built_in">echo</span> <span class="string">"sum=<span class="variable">$sum</span>"</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>结束标记控制的while循环:</strong> 设置一个特殊的数据值(结束标记)来结束while循环.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"> </span><br><span class="line"><span class="built_in">echo</span> <span class="string">"Please input the num(1-10) "</span></span><br><span class="line"><span class="built_in">read</span> num</span><br><span class="line"> </span><br><span class="line"><span class="keyword">while</span> [[ <span class="string">"<span class="variable">$num</span>"</span> != 4 ]]</span><br><span class="line"><span class="keyword">do</span> </span><br><span class="line">   <span class="keyword">if</span> [ <span class="string">"<span class="variable">$num</span>"</span> -lt 4 ]</span><br><span class="line">   <span class="keyword">then</span></span><br><span class="line">        <span class="built_in">echo</span> <span class="string">"Too small. Try again!"</span></span><br><span class="line">        <span class="built_in">read</span> num</span><br><span class="line">   <span class="keyword">elif</span> [ <span class="string">"<span class="variable">$num</span>"</span> -gt 4 ]</span><br><span class="line">   <span class="keyword">then</span></span><br><span class="line">         <span class="built_in">echo</span> <span class="string">"To high. Try again"</span> </span><br><span class="line">         <span class="built_in">read</span> num</span><br><span class="line">   <span class="keyword">else</span></span><br><span class="line">       <span class="built_in">exit</span> 0</span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line"><span class="keyword">done</span> </span><br><span class="line"> </span><br><span class="line"><span class="built_in">echo</span> <span class="string">"Congratulation, you are right! "</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>标志控制的while循环:</strong> 使用用户输入的标志值来控制循环的结束(避免不知道循环结束标志的条件).<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"> </span><br><span class="line"><span class="built_in">echo</span> <span class="string">"Please input the num "</span></span><br><span class="line"><span class="built_in">read</span> num</span><br><span class="line"> </span><br><span class="line">sum=0</span><br><span class="line">i=1</span><br><span class="line"> </span><br><span class="line">signal=0</span><br><span class="line"> </span><br><span class="line"><span class="keyword">while</span> [[ <span class="string">"<span class="variable">$signal</span>"</span> -ne 1 ]]</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">    <span class="keyword">if</span> [ <span class="string">"<span class="variable">$i</span>"</span> -eq <span class="string">"<span class="variable">$num</span>"</span> ]</span><br><span class="line">    <span class="keyword">then</span> </span><br><span class="line">       <span class="built_in">let</span> <span class="string">"signal=1"</span></span><br><span class="line">       <span class="built_in">let</span> <span class="string">"sum+=i"</span></span><br><span class="line">       <span class="built_in">echo</span> <span class="string">"1+2+...+<span class="variable">$num</span>=<span class="variable">$sum</span>"</span></span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">       <span class="built_in">let</span> <span class="string">"sum=sum+i"</span></span><br><span class="line">       <span class="built_in">let</span> <span class="string">"i++"</span></span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>命令行控制的while循环:</strong> 使用命令行来指定输出参数和参数个数,通常与shift结合使用,shift命令使位置变量下移一位(<code>$2代替$1、$3代替$2,并使$#变量递减</code>),当最后一个参数显示给用户,<code>$#</code>会等于0,<code>$*</code>也等于空.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"number of arguments is <span class="variable">$#</span>"</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"What you input is: "</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">while</span> [[ <span class="string">"$*"</span> != <span class="string">""</span> ]]</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"<span class="variable">$1</span>"</span></span><br><span class="line">    <span class="built_in">shift</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>while计算:</strong> 通过while循环,计算1-100的累加和.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cat while.sh</span></span><br><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">declare</span> -i x=0</span><br><span class="line"><span class="built_in">declare</span> -i num=0</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> [ <span class="string">"<span class="variable">$x</span>"</span> -lt <span class="string">"100"</span> ]</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">        x=<span class="variable">$x</span>+1</span><br><span class="line">        num=<span class="variable">$num</span>+<span class="variable">$x</span></span><br><span class="line"><span class="keyword">done</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> -e <span class="string">"从1-100结果是: <span class="variable">$num</span>"</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># bash while.sh</span></span><br><span class="line">从1-100结果是: 5050</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="UNTIL-循环"><a href="#UNTIL-循环" class="headerlink" title="UNTIL 循环"></a>UNTIL 循环</h2><p>until命令和while命令类似,while能实现的脚本until同样也可以实现,但区别是until循环的退出状态是不为0,退出状态是为0(与while刚好相反),即whie循环在条件为真时继续执行循环而until则在条件为假时执行循环.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"> </span><br><span class="line">i=0</span><br><span class="line"> </span><br><span class="line">until [[ <span class="string">"<span class="variable">$i</span>"</span> -gt 5 ]]    <span class="comment">#大于5</span></span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">    <span class="built_in">let</span> <span class="string">"square=i*i"</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"<span class="variable">$i</span> * <span class="variable">$i</span> = <span class="variable">$square</span>"</span></span><br><span class="line">    <span class="built_in">let</span> <span class="string">"i++"</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">for</span> (( i = 1; i &lt;=9; i++ ))</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> (( j=1; j &lt;= i; j++ ))</span><br><span class="line">    <span class="keyword">do</span></span><br><span class="line">        <span class="built_in">let</span> <span class="string">"temp = i * j"</span>     </span><br><span class="line">        <span class="built_in">echo</span> -n <span class="string">"<span class="variable">$i</span>*<span class="variable">$j</span>=<span class="variable">$temp</span>  "</span></span><br><span class="line">     <span class="keyword">done</span> </span><br><span class="line">     </span><br><span class="line">     <span class="built_in">echo</span> <span class="string">""</span>   <span class="comment">#output newline</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line">i=0</span><br><span class="line"></span><br><span class="line">until [[ <span class="string">"<span class="variable">$i</span>"</span> -gt 5 ]]    <span class="comment">#大于5</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">do</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">let</span> <span class="string">"square=i*i"</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"<span class="variable">$i</span> * <span class="variable">$i</span> = <span class="variable">$square</span>"</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">let</span> <span class="string">"i++"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+<p><br></p>
+<h2 id="跳出语句-break-continue"><a href="#跳出语句-break-continue" class="headerlink" title="跳出语句(break,continue)"></a>跳出语句(break,continue)</h2><p><strong>break:</strong> 在for、while和until循环中break可强行退出循环,break语句仅能退出当前的循环,如果是两层循环嵌套,则需要在外层循环中使用break.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"> </span><br><span class="line">sum=0</span><br><span class="line"><span class="keyword">for</span> (( i=1; i &lt;= 100; i++))</span><br><span class="line"><span class="keyword">do</span> </span><br><span class="line">    <span class="built_in">let</span> <span class="string">"sum+=i"</span></span><br><span class="line"> </span><br><span class="line">    <span class="keyword">if</span> [ <span class="string">"<span class="variable">$sum</span>"</span> -gt 1000 ]</span><br><span class="line">    <span class="keyword">then</span></span><br><span class="line">        <span class="built_in">echo</span> <span class="string">"1+2+...+<span class="variable">$i</span>=<span class="variable">$sum</span>"</span></span><br><span class="line">        <span class="built_in">break</span></span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>continue:</strong> 在for、while和until中用于让脚本跳过其后面的语句,执行下一次循环.continue用于显示100内能被7整除的数.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"> </span><br><span class="line">m=1</span><br><span class="line"><span class="keyword">for</span> (( i=1; i &lt; 100; i++ ))</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">    <span class="built_in">let</span> <span class="string">"temp1=i%7"</span>         <span class="comment">#被7整除</span></span><br><span class="line"> </span><br><span class="line">    <span class="keyword">if</span> [ <span class="string">"<span class="variable">$temp1</span>"</span> -ne 0 ]</span><br><span class="line">    <span class="keyword">then</span></span><br><span class="line">        <span class="built_in">continue</span></span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line">    </span><br><span class="line">    <span class="built_in">echo</span> -n <span class="string">"<span class="variable">$i</span>  "</span></span><br><span class="line">    </span><br><span class="line">    <span class="built_in">let</span> <span class="string">"temp2=m%7"</span>          <span class="comment">#7个数字换一行</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span>  [ <span class="string">"<span class="variable">$temp2</span>"</span> -eq 0 ]</span><br><span class="line">    <span class="keyword">then</span></span><br><span class="line">        <span class="built_in">echo</span> <span class="string">""</span></span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line">    </span><br><span class="line">    <span class="built_in">let</span> <span class="string">"m++"</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="SELECT-语句"><a href="#SELECT-语句" class="headerlink" title="SELECT 语句"></a>SELECT 语句</h2><p>select结构从技术角度看不能算是循环结构,只是相似而已,它是bash的扩展结构用于交互式菜单显示,功能类似于case结构比case的交互性要好.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cat select.sh</span></span><br><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> -e <span class="string">"请选择系统类型?"</span></span><br><span class="line"></span><br><span class="line">select var <span class="keyword">in</span> <span class="string">"Linux"</span> <span class="string">"GNU HURD"</span> <span class="string">"FreeBSD"</span> <span class="string">"Other"</span>;</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">        <span class="keyword">if</span> [ <span class="variable">$var</span> == <span class="string">"Linux"</span> ]</span><br><span class="line">        <span class="keyword">then</span></span><br><span class="line">                <span class="built_in">echo</span> -e <span class="string">"您的系统是Linux"</span></span><br><span class="line">        <span class="keyword">elif</span> [ <span class="variable">$var</span> == <span class="string">"FreeBSD"</span> ]</span><br><span class="line">        <span class="keyword">then</span></span><br><span class="line">                <span class="built_in">echo</span> -e <span class="string">"您的系统是FreeBSD"</span></span><br><span class="line">        <span class="keyword">fi</span></span><br><span class="line"><span class="built_in">break</span></span><br><span class="line"><span class="keyword">done</span></span><br><span class="line">[root@localhost ~]<span class="comment"># bash select.sh</span></span><br><span class="line">请选择系统类型?</span><br><span class="line">1) Linux</span><br><span class="line">2) GNU HURD</span><br><span class="line">3) FreeBSD</span><br><span class="line">4) Other</span><br><span class="line"></span><br><span class="line"><span class="comment">#? 1</span></span><br><span class="line">您的系统是Linux</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">declare</span> -a serial</span><br><span class="line">serial=(1 2 3 4)</span><br><span class="line">PS3=<span class="string">"Enter a number: "</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">select var <span class="keyword">in</span> <span class="string">"a"</span> <span class="string">"b"</span> <span class="string">"c"</span> <span class="string">"d"</span></span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">    <span class="keyword">if</span> ! <span class="built_in">echo</span> <span class="variable">$&#123;serial[@]&#125;</span> | grep -q <span class="variable">$REPLY</span></span><br><span class="line">        <span class="keyword">then</span></span><br><span class="line">                <span class="built_in">echo</span> <span class="string">"please enter [1-4]."</span></span><br><span class="line">                <span class="built_in">continue</span></span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line">        <span class="built_in">echo</span> <span class="string">"your anwser is: <span class="variable">$var</span>"</span></span><br><span class="line">        <span class="built_in">break</span></span><br><span class="line"><span class="keyword">done</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># bash select.sh</span></span><br><span class="line">1) a</span><br><span class="line">2) b</span><br><span class="line">3) c</span><br><span class="line">4) d</span><br><span class="line">Enter a number: 1</span><br><span class="line">your anwser is: a</span><br></pre></td></tr></table></figure>
+<p><br></p>
+<h2 id="FUNCTION-函数"><a href="#FUNCTION-函数" class="headerlink" title="FUNCTION 函数"></a>FUNCTION 函数</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cat function.sh</span></span><br><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> my_print()</span><br><span class="line">&#123;</span><br><span class="line">        <span class="built_in">echo</span> -e <span class="string">"------------------------"</span></span><br><span class="line">        <span class="built_in">echo</span> -e <span class="string">"hello world"</span></span><br><span class="line">        <span class="built_in">echo</span> -e <span class="string">"------------------------"</span></span><br><span class="line">        <span class="built_in">return</span> <span class="string">"127"</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">my_print</span><br><span class="line"><span class="built_in">echo</span> $?</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># bash function.sh</span></span><br><span class="line">------------------------</span><br><span class="line">hello world</span><br><span class="line">------------------------</span><br><span class="line">127</span><br></pre></td></tr></table></figure>
+<p>推荐一个shell博客：<br><a href="https://blog.csdn.net/taiyang1987912/article/details/38929069" target="_blank" rel="noopener">https://blog.csdn.net/taiyang1987912/article/details/38929069</a><br><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/11/25/Linux 系统管理/Linux Shell脚本编程提高-12/">Linux Shell脚本编程提高(12)</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年11月25日 - 15:11</p>
+  <p><span>最后更新:</span>2019年04月16日 - 20:04</p>
+  <p><span>原始链接:</span><a href="/2018/11/25/Linux 系统管理/Linux Shell脚本编程提高-12/" title="Linux Shell脚本编程提高(12)">https://www.mkdirs.com/2018/11/25/Linux 系统管理/Linux Shell脚本编程提高-12/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux-系统管理/" rel="tag"> <i class="fa fa-tag"></i> Linux 系统管理</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/25/Linux 系统管理/Linux Shell脚本编程基础-11/" rel="next" title="Linux Shell脚本编程基础(11)">
+                <i class="fa fa-chevron-left"></i> Linux Shell脚本编程基础(11)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/11/26/Linux 系统管理/Linux例行工作与系统管理-13/" rel="prev" title="Linux例行工作与系统管理(13)">
+                Linux例行工作与系统管理(13) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Shell-条件判断"><span class="nav-text">Shell 条件判断</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆按文件类型判断◆"><span class="nav-text">◆按文件类型判断◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆按文件权限判断◆"><span class="nav-text">◆按文件权限判断◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆两文件之间的比较◆"><span class="nav-text">◆两文件之间的比较◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆数值之间的比较◆"><span class="nav-text">◆数值之间的比较◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆字符串之间的比较◆"><span class="nav-text">◆字符串之间的比较◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆多重条件判断◆"><span class="nav-text">◆多重条件判断◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IF条件判断"><span class="nav-text">IF条件判断</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CASE分支结构"><span class="nav-text">CASE分支结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#FOR循环结构"><span class="nav-text">FOR循环结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#WHILE-循环"><span class="nav-text">WHILE 循环</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UNTIL-循环"><span class="nav-text">UNTIL 循环</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#跳出语句-break-continue"><span class="nav-text">跳出语句(break,continue)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SELECT-语句"><span class="nav-text">SELECT 语句</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#FUNCTION-函数"><span class="nav-text">FUNCTION 函数</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

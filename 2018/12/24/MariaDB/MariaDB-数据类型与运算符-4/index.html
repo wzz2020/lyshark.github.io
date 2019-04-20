@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="MariaDB数据库管理系统是MySQL的一个分支,主要由开源社区在维护,采用GPL授权许可MariaDB的目的是完全兼容MySQL,包括API和命令行,MySQL由于现在闭源了,而能轻松成为MySQL的代替品.在存储引擎方面,使用XtraDB来代替MySQL的InnoDB,MariaDB由MySQL的创始人Michael Widenius主导开发,他早前曾以10亿美元的价格,将自己创建的公司My">
+<meta name="keywords" content="MariaDB">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MariaDB 数据类型与运算符(4)">
+<meta property="og:url" content="https://www.mkdirs.com/2018/12/24/MariaDB/MariaDB-数据类型与运算符-4/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="MariaDB数据库管理系统是MySQL的一个分支,主要由开源社区在维护,采用GPL授权许可MariaDB的目的是完全兼容MySQL,包括API和命令行,MySQL由于现在闭源了,而能轻松成为MySQL的代替品.在存储引擎方面,使用XtraDB来代替MySQL的InnoDB,MariaDB由MySQL的创始人Michael Widenius主导开发,他早前曾以10亿美元的价格,将自己创建的公司My">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-12-25T02:32:28.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MariaDB 数据类型与运算符(4)">
+<meta name="twitter:description" content="MariaDB数据库管理系统是MySQL的一个分支,主要由开源社区在维护,采用GPL授权许可MariaDB的目的是完全兼容MySQL,包括API和命令行,MySQL由于现在闭源了,而能轻松成为MySQL的代替品.在存储引擎方面,使用XtraDB来代替MySQL的InnoDB,MariaDB由MySQL的创始人Michael Widenius主导开发,他早前曾以10亿美元的价格,将自己创建的公司My">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/12/24/MariaDB/MariaDB-数据类型与运算符-4/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>MariaDB 数据类型与运算符(4) | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/12/24/MariaDB/MariaDB-数据类型与运算符-4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">MariaDB 数据类型与运算符(4)
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-24 14:41:09" itemprop="dateCreated datePublished" datetime="2018-12-24T14:41:09+08:00">2018-12-24</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-12-25 10:32:28" itemprop="dateModified" datetime="2018-12-25T10:32:28+08:00">2018-12-25</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/MariaDB/" itemprop="url" rel="index"><span itemprop="name">MariaDB</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>MariaDB数据库管理系统是MySQL的一个分支,主要由开源社区在维护,采用GPL授权许可MariaDB的目的是完全兼容MySQL,包括API和命令行,MySQL由于现在闭源了,而能轻松成为MySQL的代替品.在存储引擎方面,使用XtraDB来代替MySQL的InnoDB,MariaDB由MySQL的创始人Michael Widenius主导开发,他早前曾以10亿美元的价格,将自己创建的公司MySQL AB卖给了SUN,此后,随着SUN被甲骨文收购MySQL的所有权也落入Oracle的手中.MariaDB名称来自MichaelWidenius的女儿Maria的名字.</p>
+<a id="more"></a>
+<p>数据库表由多列字段构成,每一个字段指定了不同的数据类型.指定字段的数据类型之后,也就决定了向字段插入的数据内容,例如,当要插入数值的时候,可以将它们存储为整数类型,也可以将它们存储为字符串类型.不同的数据类型也决定了MySQL在存储它们的时候使用的方式,以及在使用它们的时候选择什么运算符号进行运算,下面的小结内容将介绍,常用的数据类型,和常用的运算符,在最后再看即可常用的MySQL系统函数的使用.</p>
+<blockquote>
+<p>MySQL支持多种数据类型,主要分为几大类,包括:数值类型,日期时间类型,和字符串类型等.</p>
+<blockquote>
+<p>数值类型(int):包括TINYINT,SMALLINT,MEDIUMINT,INT,BIGINT<br>数值类型(float):包括FLOAT,DOUBLE,DECIMAL<br>日期时间型(time):包括YEAR,TIME,DATE,DATETIME,TIMESTAMP<br>字符串类型(string):包括CHAR,VARCHAR,BINARY,VARBINARY,BLOB,TEXT,ENUM,SET</p>
+</blockquote>
+</blockquote>
+<h2 id="MariaDB-数据类型"><a href="#MariaDB-数据类型" class="headerlink" title="MariaDB 数据类型"></a>MariaDB 数据类型</h2><h3 id="◆整数数据类型◆"><a href="#◆整数数据类型◆" class="headerlink" title="◆整数数据类型◆"></a>◆整数数据类型◆</h3><p>数值型类型主要用来存储数字,MySQL提供了多种数值数据类型,不同的数据类型提供不同的取值范围,可以存储的值范围越大,其所需要的存储空间也会越大,MySQL主要提供的整形有:TINYINT,SMALLINT,MEDIUMINT,INT,BIGINT,整数类型的属性字段可以添加<code>AUTO_INCREMENT</code>自增长约束条件,如下表所示:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">类型名称</th>
+<th style="text-align:left">说明信息</th>
+<th style="text-align:left">存储占比</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">TINYINT</td>
+<td style="text-align:left">很小的整数</td>
+<td style="text-align:left">1个字节</td>
+</tr>
+<tr>
+<td style="text-align:left">SMALLINT</td>
+<td style="text-align:left">小的整数</td>
+<td style="text-align:left">2个字节</td>
+</tr>
+<tr>
+<td style="text-align:left">MEDIUMINT</td>
+<td style="text-align:left">中等大小整数</td>
+<td style="text-align:left">3个字节</td>
+</tr>
+<tr>
+<td style="text-align:left">INT</td>
+<td style="text-align:left">普通大小整数</td>
+<td style="text-align:left">4个字节</td>
+</tr>
+<tr>
+<td style="text-align:left">BIGINT</td>
+<td style="text-align:left">大整数</td>
+<td style="text-align:left">8个字节</td>
+</tr>
+</tbody>
+</table>
+<p>上表可看出,不同类型的数据字节是不同的,整数类型的取值范围也是固定的,基本上分为有符号和无符号型,下表就是他们的相应取值范围,仅供参考:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">数据类型</th>
+<th style="text-align:left">有符号</th>
+<th style="text-align:left">无符号</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">TINYINT</td>
+<td style="text-align:left">-128-127</td>
+<td style="text-align:left">0-255</td>
+</tr>
+<tr>
+<td style="text-align:left">SMALLINT</td>
+<td style="text-align:left">32768-32767</td>
+<td style="text-align:left">0-65535</td>
+</tr>
+<tr>
+<td style="text-align:left">MEDIUMINT</td>
+<td style="text-align:left">-8388608-8388607</td>
+<td style="text-align:left">0-16777215</td>
+</tr>
+<tr>
+<td style="text-align:left">INT</td>
+<td style="text-align:left">-2147483648-2147483647</td>
+<td style="text-align:left">0-4294967295</td>
+</tr>
+<tr>
+<td style="text-align:left">BIGINT</td>
+<td style="text-align:left">这个范围不多说,(大)</td>
+<td style="text-align:left">0-无法形容的大</td>
+</tr>
+</tbody>
+</table>
+<p><strong>实例1:</strong> 创建一个整数类型的表.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; create table myint</span><br><span class="line">    -&gt; (</span><br><span class="line">    -&gt; uid int(10),</span><br><span class="line">    -&gt; name varchar(20)</span><br><span class="line">    -&gt; );</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br></pre></td></tr></table></figure></p>
+<p>以上是uid就是一个整数类型的字段,注意后面的(10)意思是指定能够显示的数值中数字的个数.</p>
+<p><strong>实例2:</strong> 分别创建整形的数据类型字段看看.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; create table temp</span><br><span class="line">    -&gt; (</span><br><span class="line">    -&gt; a tinyint,</span><br><span class="line">    -&gt; b smallint,</span><br><span class="line">    -&gt; c mediumint,</span><br><span class="line">    -&gt; d int,</span><br><span class="line">    -&gt; e bigint</span><br><span class="line">    -&gt; );</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; desc temp;</span><br><span class="line"></span><br><span class="line">+<span class="comment">-------+--------------+------+-----+---------+-------+</span></span><br><span class="line">| Field | Type         | Null | Key | Default | Extra |</span><br><span class="line">+<span class="comment">-------+--------------+------+-----+---------+-------+</span></span><br><span class="line">| a     | tinyint(4)   | YES  |     | NULL    |       |</span><br><span class="line">| b     | smallint(6)  | YES  |     | NULL    |       |</span><br><span class="line">| c     | mediumint(9) | YES  |     | NULL    |       |</span><br><span class="line">| d     | int(11)      | YES  |     | NULL    |       |</span><br><span class="line">| e     | bigint(20)   | YES  |     | NULL    |       |</span><br><span class="line">+<span class="comment">-------+--------------+------+-----+---------+-------+</span></span><br><span class="line">5 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆浮点数和定点数◆"><a href="#◆浮点数和定点数◆" class="headerlink" title="◆浮点数和定点数◆"></a>◆浮点数和定点数◆</h3><p>在MySQL中浮点数和定点数都是用来表示小数的,浮点数类型有两种:单精度浮点数(FLOAT)和双精度浮点数(DOUBLE),定点类型的话只有一种(DECIMAL),下表是这几个数值的说明信息:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">类型名称</th>
+<th style="text-align:left">说明信息</th>
+<th style="text-align:left">存储占比</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">FLOAT</td>
+<td style="text-align:left">单精度浮点数</td>
+<td style="text-align:left">4个字节</td>
+</tr>
+<tr>
+<td style="text-align:left">DOUBLE</td>
+<td style="text-align:left">双精度浮点数</td>
+<td style="text-align:left">8个字节</td>
+</tr>
+<tr>
+<td style="text-align:left">DECIMAL</td>
+<td style="text-align:left">压缩的定点数</td>
+<td style="text-align:left">M+2个字节</td>
+</tr>
+</tbody>
+</table>
+<p><strong>实例:</strong> 创建<code>temp</code>表,其中字段<code>x,y,z</code>数据类型分别是 <code>float(5.1) double(5.1) decimal(5.1)</code>并向表中插入一些数据.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; create table temp</span><br><span class="line">    -&gt; (</span><br><span class="line">    -&gt; x float(5,1),</span><br><span class="line">    -&gt; y double(5,1),</span><br><span class="line">    -&gt; z decimal(5,1)</span><br><span class="line">    -&gt; );</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br></pre></td></tr></table></figure></p>
+<p>向表中插入数据，并查看结果,MySQL默认自动截断小数点后面的数据,具体截断位数由计算机硬件和操作系统决定.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; insert into temp values(5.12,5.22,5.123);</span><br><span class="line">Query OK, 1 row affected, 1 warning (0.01 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; select * from temp1;</span><br><span class="line">+<span class="comment">------+------+------+</span></span><br><span class="line">| x    | y    | z    |</span><br><span class="line">+<span class="comment">------+------+------+</span></span><br><span class="line">|  5.1 |  5.2 |  5.1 |</span><br><span class="line">+<span class="comment">------+------+------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt;</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆日期与时间类型◆"><a href="#◆日期与时间类型◆" class="headerlink" title="◆日期与时间类型◆"></a>◆日期与时间类型◆</h3><p>MySQL中有多种表示日期的数据类型,主要有LDATETIME、DATE、TIME和YEAR.例如,当只记录年信息的时候,可以只使用 YEAR类型而没有必要使用DATE,每一个类型都有合法的取值范围,当指定确实不合法的值时系统将”0”值插入到数据库中,下面先来看一下他的类型说明吧:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">类型名称</th>
+<th style="text-align:left">日期格式</th>
+<th style="text-align:left">日期范围</th>
+<th style="text-align:left">存储需求</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">YEAR</td>
+<td style="text-align:left">YYYY</td>
+<td style="text-align:left">1901-2155</td>
+<td style="text-align:left">1字节</td>
+</tr>
+<tr>
+<td style="text-align:left">TIME</td>
+<td style="text-align:left">HH:MM:SS</td>
+<td style="text-align:left">-838:59:59-838:59:59</td>
+<td style="text-align:left">3字节</td>
+</tr>
+<tr>
+<td style="text-align:left">DATE</td>
+<td style="text-align:left">YYYY-MM-DD</td>
+<td style="text-align:left">1000-01-01-9999-12-3</td>
+<td style="text-align:left">3字节</td>
+</tr>
+<tr>
+<td style="text-align:left">DATETIME</td>
+<td style="text-align:left">YYYY-MM-DD HH:MM:SS</td>
+<td style="text-align:left">1000-01-01 00:00:00-9999:12-31 23:59:59</td>
+<td style="text-align:left">8字节</td>
+</tr>
+<tr>
+<td style="text-align:left">TIMESTAMP</td>
+<td style="text-align:left">YYYY-MM-DD HH:MM:SS</td>
+<td style="text-align:left">1970-01-01 00:00:01 UTC-2038-01-19 03:14:07 UTC</td>
+<td style="text-align:left">4字节</td>
+</tr>
+</tbody>
+</table>
+<p><strong>YEAR类型: 主要用于存储一个年份,例如：1997 2018</strong></p>
+<p>1.创建<code>temp</code>表,定义数据类型为<code>year</code>的字段<code>x</code>,并向表中插入数据.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; create table temp(x year);                 #创建一个year类型的字段</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; desc temp;</span><br><span class="line">+<span class="comment">-------+---------+------+-----+---------+-------+</span></span><br><span class="line">| Field | Type    | Null | Key | Default | Extra |</span><br><span class="line">+<span class="comment">-------+---------+------+-----+---------+-------+</span></span><br><span class="line">| x     | year(4) | YES  |     | NULL    |       |</span><br><span class="line">+<span class="comment">-------+---------+------+-----+---------+-------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.01</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; <span class="keyword">insert</span> <span class="keyword">into</span> temp <span class="keyword">values</span>(<span class="number">2018</span>),(<span class="string">"2020"</span>);    <span class="comment">#插入一些数据：注意必须是1901-2155之间的数</span></span><br><span class="line">Query OK, 2 rows affected (0.00 sec)</span><br><span class="line">Records: 2  Duplicates: 0  Warnings: 0</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; select * from temp;</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">| x    |</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">| 2018 |</span><br><span class="line">| 2020 |</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">2 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>TIME类型:主要用于存储时间,例如：12:12:21</strong></p>
+<p>1.创建<code>temp1</code>表,定义数据类型为<code>time</code>的字段<code>x</code>,并向表中插入数据.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; create table temp1(                        #创建一个time类型的字段</span><br><span class="line">    -&gt; x time</span><br><span class="line">    -&gt; );</span><br><span class="line">Query OK, 0 rows affected (0.01 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; desc temp1;</span><br><span class="line">+<span class="comment">-------+------+------+-----+---------+-------+</span></span><br><span class="line">| Field | Type | Null | Key | Default | Extra |</span><br><span class="line">+<span class="comment">-------+------+------+-----+---------+-------+</span></span><br><span class="line">| x     | time | YES  |     | NULL    |       |</span><br><span class="line">+<span class="comment">-------+------+------+-----+---------+-------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; <span class="keyword">insert</span> <span class="keyword">into</span> temp1 <span class="keyword">values</span>(<span class="string">'11:22:05'</span>),(<span class="string">'23:23'</span>),(<span class="string">'20'</span>);   <span class="comment">#分别插入数据：注意（%HH-%MM-%SS）</span></span><br><span class="line">Query OK, 3 rows affected (0.00 sec)</span><br><span class="line">Records: 3  Duplicates: 0  Warnings: 0</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; select * from temp1;</span><br><span class="line">+<span class="comment">----------+</span></span><br><span class="line">| x        |</span><br><span class="line">+<span class="comment">----------+</span></span><br><span class="line">| 11:22:05 |</span><br><span class="line">| 23:23:00 |</span><br><span class="line">| 00:00:20 |</span><br><span class="line">+<span class="comment">----------+</span></span><br><span class="line">3 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>2.当然啦我们可以简写省略冒号.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; create table temp1(x time);</span><br><span class="line">Query OK, 0 rows affected (0.01 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; insert into temp1 values('102231');</span><br><span class="line">Query OK, 1 row affected (0.00 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; select * from temp1;</span><br><span class="line">+<span class="comment">----------+</span></span><br><span class="line">| x        |</span><br><span class="line">+<span class="comment">----------+</span></span><br><span class="line">| 10:22:31 |</span><br><span class="line">+<span class="comment">----------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>3.向<code>temp</code>表中的<code>x</code>字段插入当前系统运行时间,通过函数<code>(CURRENT_TIME),(NOW()</code>取出.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select * from temp;</span><br><span class="line">Empty <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; <span class="keyword">insert</span> <span class="keyword">into</span> temp <span class="keyword">values</span> (<span class="keyword">CURRENT_TIME</span>),(<span class="keyword">NOW</span>());</span><br><span class="line">Query OK, 2 rows affected, 1 warning (0.00 sec)</span><br><span class="line">Records: 2  Duplicates: 0  Warnings: 1</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; select * from temp;</span><br><span class="line">+<span class="comment">----------+</span></span><br><span class="line">| x        |</span><br><span class="line">+<span class="comment">----------+</span></span><br><span class="line">| 21:27:43 |</span><br><span class="line">| 21:27:43 |</span><br><span class="line">+<span class="comment">----------+</span></span><br><span class="line">2 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>DATE类型:Date类型主要用于存储年月日,例如：1997-10-05</strong></p>
+<p>1.创建<code>temp</code>表,表中是<code>date</code>类型的<code>x</code>字段,并插入一条数据.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; create table temp(x date);       #创建一个date类型的字段</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; desc temp;</span><br><span class="line">+<span class="comment">-------+------+------+-----+---------+-------+</span></span><br><span class="line">| Field | Type | Null | Key | Default | Extra |</span><br><span class="line">+<span class="comment">-------+------+------+-----+---------+-------+</span></span><br><span class="line">| x     | date | YES  |     | NULL    |       |</span><br><span class="line">+<span class="comment">-------+------+------+-----+---------+-------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; <span class="keyword">insert</span> <span class="keyword">into</span> temp <span class="keyword">values</span>(<span class="string">'1997-10-05'</span>),(<span class="string">'20180523'</span>);   <span class="comment">#插入一些数据</span></span><br><span class="line">Query OK, 2 rows affected (0.00 sec)</span><br><span class="line">Records: 2  Duplicates: 0  Warnings: 0</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; select * from temp;</span><br><span class="line">+<span class="comment">------------+</span></span><br><span class="line">| x          |</span><br><span class="line">+<span class="comment">------------+</span></span><br><span class="line">| 1997-10-05 |</span><br><span class="line">| 2018-05-23 |</span><br><span class="line">+<span class="comment">------------+</span></span><br><span class="line">2 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>2.向<code>temp</code>表中插入系统当前日期,通过函数<code>(CURRENT_DATE()),(NOW())</code>取出系统日期.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select * from temp;</span><br><span class="line">+<span class="comment">------------+</span></span><br><span class="line">| x          |</span><br><span class="line">+<span class="comment">------------+</span></span><br><span class="line">| 1997-10-05 |</span><br><span class="line">| 2018-05-23 |</span><br><span class="line">+<span class="comment">------------+</span></span><br><span class="line">2 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; <span class="keyword">insert</span> <span class="keyword">into</span> temp <span class="keyword">values</span>(<span class="keyword">CURRENT_DATE</span>()),(<span class="keyword">NOW</span>());    <span class="comment">#取出系统当前日期并插入</span></span><br><span class="line">Query OK, 2 rows affected, 1 warning (0.00 sec)</span><br><span class="line">Records: 2  Duplicates: 0  Warnings: 1</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; select * from temp;</span><br><span class="line">+<span class="comment">------------+</span></span><br><span class="line">| x          |</span><br><span class="line">+<span class="comment">------------+</span></span><br><span class="line">| 1997-10-05 |</span><br><span class="line">| 2018-05-23 |</span><br><span class="line">| 2018-06-16 |</span><br><span class="line">| 2018-06-16 |</span><br><span class="line">+<span class="comment">------------+</span></span><br><span class="line">4 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>DATATIME:DateTime类型用于存储日期和时间,例如：2018-01-24 22:12:24</strong></p>
+<p>1.创建<code>temp</code>表<code>dt</code>字段类型为<code>datetime</code>,并插入一条数据.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; create table temp(dt datetime);</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; desc temp;</span><br><span class="line">+<span class="comment">-------+----------+------+-----+---------+-------+</span></span><br><span class="line">| Field | Type     | Null | Key | Default | Extra |</span><br><span class="line">+<span class="comment">-------+----------+------+-----+---------+-------+</span></span><br><span class="line">| dt    | datetime | YES  |     | NULL    |       |</span><br><span class="line">+<span class="comment">-------+----------+------+-----+---------+-------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; <span class="keyword">insert</span> <span class="keyword">into</span> temp <span class="keyword">values</span>(<span class="string">'1997-05-10 10:22:14'</span>),(<span class="string">'20180616220101'</span>);   <span class="comment">#插入日期时间</span></span><br><span class="line">Query OK, 2 rows affected (0.00 sec)</span><br><span class="line">Records: 2  Duplicates: 0  Warnings: 0</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; select * from temp;</span><br><span class="line">+<span class="comment">---------------------+</span></span><br><span class="line">| dt                  |</span><br><span class="line">+<span class="comment">---------------------+</span></span><br><span class="line">| 1997-05-10 10:22:14 |</span><br><span class="line">| 2018-06-16 22:01:01 |</span><br><span class="line">+<span class="comment">---------------------+</span></span><br><span class="line">2 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>2.取系统当前日期并插入<code>temp</code>表的<code>dt</code>字段.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select * from temp;</span><br><span class="line">+<span class="comment">---------------------+</span></span><br><span class="line">| dt                  |</span><br><span class="line">+<span class="comment">---------------------+</span></span><br><span class="line">| 1997-05-10 10:22:14 |</span><br><span class="line">| 2018-06-16 22:01:01 |</span><br><span class="line">+<span class="comment">---------------------+</span></span><br><span class="line">2 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; <span class="keyword">insert</span> <span class="keyword">into</span> temp <span class="keyword">values</span>(<span class="keyword">now</span>());    <span class="comment">#取系统日期插入temp表的dt字段</span></span><br><span class="line">Query OK, 1 row affected (0.00 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; select * from temp;</span><br><span class="line">+<span class="comment">---------------------+</span></span><br><span class="line">| dt                  |</span><br><span class="line">+<span class="comment">---------------------+</span></span><br><span class="line">| 1997-05-10 10:22:14 |</span><br><span class="line">| 2018-06-16 22:01:01 |</span><br><span class="line">| 2018-06-16 22:03:39 |</span><br><span class="line">+<span class="comment">---------------------+</span></span><br><span class="line">3 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>TIMESTAMP类型:TimeStamp与DateTime相同,但是TimeStamp是使用的UTC(世界标准时间)</strong></p>
+<p>1.创建<code>temp</code>表并插入<code>timestamp</code>类型的<code>x</code>字段,插入一条数据.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; create table temp(x timestamp);          #创建一个timestamp类型的字段</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; desc temp;</span><br><span class="line">+<span class="comment">-------+-----------+------+-----+-------------------+-----------------------------+</span></span><br><span class="line">| Field | Type      | Null | Key | Default           | Extra                       |</span><br><span class="line">+<span class="comment">-------+-----------+------+-----+-------------------+-----------------------------+</span></span><br><span class="line">| x     | timestamp | NO   |     | CURRENT_TIMESTAMP | on <span class="keyword">update</span> <span class="keyword">CURRENT_TIMESTAMP</span> |</span><br><span class="line">+<span class="comment">-------+-----------+------+-----+-------------------+-----------------------------+</span></span><br><span class="line"><span class="number">1</span> <span class="keyword">row</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; <span class="keyword">insert</span> <span class="keyword">into</span> temp <span class="keyword">values</span>(<span class="string">'2018-06-16 22:24:00'</span>);  <span class="comment">#插入一条时间记录</span></span><br><span class="line">Query OK, 1 row affected (0.01 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; select *from temp;</span><br><span class="line">+<span class="comment">---------------------+</span></span><br><span class="line">| x                   |</span><br><span class="line">+<span class="comment">---------------------+</span></span><br><span class="line">| 2018-06-16 22:24:00 |</span><br><span class="line">+<span class="comment">---------------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; <span class="keyword">set</span> <span class="keyword">time_zone</span>=<span class="string">'+12:00'</span>                            <span class="comment">#将时间上调12小时</span></span><br><span class="line">    -&gt; ;</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; select * from temp;                              #再次查询已经是第二天了</span><br><span class="line">+<span class="comment">---------------------+</span></span><br><span class="line">| x                   |</span><br><span class="line">+<span class="comment">---------------------+</span></span><br><span class="line">| 2018-06-17 02:24:00 |</span><br><span class="line">+<span class="comment">---------------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆文本字符串类型◆"><a href="#◆文本字符串类型◆" class="headerlink" title="◆文本字符串类型◆"></a>◆文本字符串类型◆</h3><p>字符串类型用来存储字符串数据,除了可以存储字符串数据之外,还可以存储其他数据,比如图片和声音的二进制数据.MySQL支持两类字符型数据:文本字符串和二进制字符串,本小节主要介绍文本字符串类型,文本字符串可以进行区分或者不区分大小写的串比较,另外还可以进行模式匹配查找.MysQL中文本字符串类型指CHAR,VARCHAR,TEXT,ENUM和SET,如下表所示.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">类型名称</th>
+<th style="text-align:left">说明信息</th>
+<th style="text-align:left">存储需求</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">CHAR</td>
+<td style="text-align:left">固定长度非二进制字符串</td>
+<td style="text-align:left">M字节,1&lt;=M&lt;=255</td>
+</tr>
+<tr>
+<td style="text-align:left">VARCHAR</td>
+<td style="text-align:left">变长非二进制字符串</td>
+<td style="text-align:left">L+1字节</td>
+</tr>
+<tr>
+<td style="text-align:left">TIMYTEXT</td>
+<td style="text-align:left">非常小的非二进制字符串</td>
+<td style="text-align:left">L+1字节</td>
+</tr>
+<tr>
+<td style="text-align:left">TEXT</td>
+<td style="text-align:left">小的非二进制字符串</td>
+<td style="text-align:left">L+2字节</td>
+</tr>
+<tr>
+<td style="text-align:left">MEDIUMTEXT</td>
+<td style="text-align:left">中等非二进制字符串</td>
+<td style="text-align:left">L+3字节</td>
+</tr>
+<tr>
+<td style="text-align:left">LONGTEXT</td>
+<td style="text-align:left">大的非二进制字符串</td>
+<td style="text-align:left">L+4字节</td>
+</tr>
+<tr>
+<td style="text-align:left">ENUM</td>
+<td style="text-align:left">枚举类型</td>
+<td style="text-align:left">l或2个字节</td>
+</tr>
+<tr>
+<td style="text-align:left">SET</td>
+<td style="text-align:left">SET成员类型</td>
+<td style="text-align:left">1,2,3,4或8个字节</td>
+</tr>
+</tbody>
+</table>
+<p><strong>CHAR和VARCHAR:定长和不定长字符串类型</strong></p>
+<blockquote>
+<p>CHAR和VARCHAR的长度区别:</p>
+<blockquote>
+<p>● CHAR是一种定长字符串,它的长度在初始化时就被固定比如说：char(10)则固定分配10个字符的长度,如果使用了CHAR类型,不论你的数据填充多少都会消耗4字节存储空间.<br>● VARCHAR是一种不定长字符串,它的长度取决于你输入的字符数,使用VARCHAR的话,它会动态的分配空间大小,但最大也不能超过定义的长度</p>
+</blockquote>
+</blockquote>
+<p>1.定义一个<code>temp</code>表,里面有两个字段分别是<code>ch,vch</code>类型是<code>char(4)</code>和<code>varchar(4)</code>插入数据查看区别.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; create table temp</span><br><span class="line">    -&gt; (</span><br><span class="line">    -&gt; ch char(4),</span><br><span class="line">    -&gt; vch varchar(4)</span><br><span class="line">    -&gt; );</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; desc temp;</span><br><span class="line">+<span class="comment">-------+------------+------+-----+---------+-------+</span></span><br><span class="line">| Field | Type       | Null | Key | Default | Extra |</span><br><span class="line">+<span class="comment">-------+------------+------+-----+---------+-------+</span></span><br><span class="line">| ch    | char(4)    | YES  |     | NULL    |       |</span><br><span class="line">| vch   | varchar(4) | YES  |     | NULL    |       |</span><br><span class="line">+<span class="comment">-------+------------+------+-----+---------+-------+</span></span><br><span class="line">2 rows in <span class="keyword">set</span> (<span class="number">0.01</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; <span class="keyword">insert</span> <span class="keyword">into</span> temp <span class="keyword">values</span>(<span class="string">'xy '</span>,<span class="string">'xy '</span>);</span><br><span class="line">Query OK, 1 row affected (0.01 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; select *from temp;</span><br><span class="line">+<span class="comment">------+------+</span></span><br><span class="line">| ch   | vch  |</span><br><span class="line">+<span class="comment">------+------+</span></span><br><span class="line">| xy   | xy   |</span><br><span class="line">+<span class="comment">------+------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>TEXT类型:用于保存非二进制字符串,如文章内容评论内容等,当保存或查询text列的值时,不删除尾部空格.</strong></p>
+<blockquote>
+<p>关于TEXT类型的取值范围:</p>
+<blockquote>
+<p>● TINYTEXT 最大长度为<code>255(2^8-1)</code>字符的TEXT列.<br>● TEXT 最大长度为<code>65535(2^16-1)</code>字符的TEXT列.<br>● MEDIUMTEXT 最大长度为<code>16777215(2^24-1)</code>字符的TEXT列.<br>● LONGTEXT 最大长度为<code>4294967295</code>字符的TEXT列.</p>
+</blockquote>
+</blockquote>
+<p>1.创建一个表<code>temp1</code>,并创建<code>text</code>字段,写入一段话看看.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; create table temp1(x text);</span><br><span class="line">Query OK, 0 rows affected (0.02 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; desc temp1;</span><br><span class="line">+<span class="comment">-------+------+------+-----+---------+-------+</span></span><br><span class="line">| Field | Type | Null | Key | Default | Extra |</span><br><span class="line">+<span class="comment">-------+------+------+-----+---------+-------+</span></span><br><span class="line">| x     | text | YES  |     | NULL    |       |</span><br><span class="line">+<span class="comment">-------+------+------+-----+---------+-------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; <span class="keyword">insert</span> <span class="keyword">into</span> temp1 <span class="keyword">values</span>(<span class="string">'hello lyshark'</span>)</span><br><span class="line">    -&gt; ;</span><br><span class="line">Query OK, 1 row affected (0.00 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; select * from temp1;</span><br><span class="line">+<span class="comment">---------------+</span></span><br><span class="line">| x             |</span><br><span class="line">+<span class="comment">---------------+</span></span><br><span class="line">| hello lyshark |</span><br><span class="line">+<span class="comment">---------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>ENUM枚举类型:enum的值根据列索引顺序排列,并且空字符串排在非空字符串前,NULL值排在其他所有的枚举值前面</strong></p>
+<p>1.来看一个枚举的小例子,注意:枚举默认标号从1开始.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; create table temp2(enm enum('first','second','thire'));</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; desc temp2;</span><br><span class="line">+<span class="comment">-------+--------------------------------+------+-----+---------+-------+</span></span><br><span class="line">| Field | Type                           | Null | Key | Default | Extra |</span><br><span class="line">+<span class="comment">-------+--------------------------------+------+-----+---------+-------+</span></span><br><span class="line">| enm   | enum('first','second','thire') | YES  |     | NULL    |       |</span><br><span class="line">+<span class="comment">-------+--------------------------------+------+-----+---------+-------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; <span class="keyword">insert</span> <span class="keyword">into</span> temp2 <span class="keyword">values</span>(<span class="string">'1'</span>),(<span class="string">'2'</span>),(<span class="string">'3'</span>),(<span class="literal">NULL</span>);</span><br><span class="line">Query OK, 4 rows affected (0.00 sec)</span><br><span class="line">Records: 4  Duplicates: 0  Warnings: 0</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; select * from temp2;</span><br><span class="line">+<span class="comment">--------+</span></span><br><span class="line">| enm    |</span><br><span class="line">+<span class="comment">--------+</span></span><br><span class="line">| first  |</span><br><span class="line">| second |</span><br><span class="line">| thire  |</span><br><span class="line">| NULL   |</span><br><span class="line">+<span class="comment">--------+</span></span><br><span class="line">4 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>set集合:但在声明成集合时,其取值就已经固定了</strong></p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; create table temp3(s set('a','b','c','d'));            #首先定义了一个集合，元素有abcd</span><br><span class="line">Query OK, 0 rows affected (0.01 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; desc temp3;</span><br><span class="line">+<span class="comment">-------+----------------------+------+-----+---------+-------+</span></span><br><span class="line">| Field | Type                 | Null | Key | Default | Extra |</span><br><span class="line">+<span class="comment">-------+----------------------+------+-----+---------+-------+</span></span><br><span class="line">| s     | <span class="keyword">set</span>(<span class="string">'a'</span>,<span class="string">'b'</span>,<span class="string">'c'</span>,<span class="string">'d'</span>) | YES  |     | <span class="literal">NULL</span>    |       |</span><br><span class="line">+<span class="comment">-------+----------------------+------+-----+---------+-------+</span></span><br><span class="line"><span class="number">1</span> <span class="keyword">row</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; </span><br><span class="line">MariaDB [lyshark]&gt; <span class="keyword">insert</span> <span class="keyword">into</span> temp3 <span class="keyword">values</span>(<span class="string">'a'</span>),(<span class="string">'a,b,c'</span>),(<span class="string">'a,b,c,d'</span>);   <span class="comment">#分别插入3个不同的集合，看看</span></span><br><span class="line">Query OK, 3 rows affected (0.00 sec)</span><br><span class="line">Records: 3  Duplicates: 0  Warnings: 0</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; select * from temp3;</span><br><span class="line">+<span class="comment">---------+</span></span><br><span class="line">| s       |</span><br><span class="line">+<span class="comment">---------+</span></span><br><span class="line">| a       |</span><br><span class="line">| a,b,c   |</span><br><span class="line">| a,b,c,d |</span><br><span class="line">+<span class="comment">---------+</span></span><br><span class="line">3 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; <span class="keyword">insert</span> <span class="keyword">into</span> temp3 <span class="keyword">values</span>(<span class="string">'a,'</span>f<span class="string">''</span>);                     <span class="comment">#在插入f时报错，因为集合中定义是没有f</span></span><br><span class="line">ERROR 1064 (42000): You have an error in your SQL syntax;</span><br></pre></td></tr></table></figure>
+<h3 id="◆二进制字串类型◆"><a href="#◆二进制字串类型◆" class="headerlink" title="◆二进制字串类型◆"></a>◆二进制字串类型◆</h3><p>在MySQL中的二进制数据类型有:BIT、BINARY、VARBINARY、TINYBLOB、BLOB、MEDIUMBLOB,LONGBLOB,老样子,看下面的表格,就清晰啦.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">类型名称</th>
+<th style="text-align:left">说明信息</th>
+<th style="text-align:left">存储需求</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">BIT</td>
+<td style="text-align:left">位字段类型</td>
+<td style="text-align:left">(M+7/8)个字节</td>
+</tr>
+<tr>
+<td style="text-align:left">BINARY</td>
+<td style="text-align:left">固定长度二进制字符串</td>
+<td style="text-align:left">M个字节</td>
+</tr>
+<tr>
+<td style="text-align:left">VARBINARY</td>
+<td style="text-align:left">可变长二进制字符串</td>
+<td style="text-align:left">M+1字节</td>
+</tr>
+<tr>
+<td style="text-align:left">TINYBLOB</td>
+<td style="text-align:left">非常小的BLOB</td>
+<td style="text-align:left">L+1字节</td>
+</tr>
+<tr>
+<td style="text-align:left">BLOB</td>
+<td style="text-align:left">小BLOB</td>
+<td style="text-align:left">L+2字节</td>
+</tr>
+<tr>
+<td style="text-align:left">MEDIUMBLOB</td>
+<td style="text-align:left">中等大小的BLOB</td>
+<td style="text-align:left">L+3字节</td>
+</tr>
+<tr>
+<td style="text-align:left">LONGBLOB</td>
+<td style="text-align:left">非常大的BLOB</td>
+<td style="text-align:left">L+4字节</td>
+</tr>
+</tbody>
+</table>
+<p><strong>bit类型:位字段类型,也就是说插入的数据会被转换成101011011这样的格式</strong></p>
+<p>1.定义并插入数据测试,<code>x+0</code>表示将二进制结果转换为对应的数字的值,<code>bin()</code>函数将数字转换为2进制.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; create table temp5(x bit(4));</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; desc temp5;</span><br><span class="line">+<span class="comment">-------+--------+------+-----+---------+-------+</span></span><br><span class="line">| Field | Type   | Null | Key | Default | Extra |</span><br><span class="line">+<span class="comment">-------+--------+------+-----+---------+-------+</span></span><br><span class="line">| x     | bit(4) | YES  |     | NULL    |       |</span><br><span class="line">+<span class="comment">-------+--------+------+-----+---------+-------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; <span class="keyword">insert</span> <span class="keyword">into</span> temp5 <span class="keyword">values</span>(<span class="number">100</span>),(<span class="number">115</span>),(<span class="number">10</span>);</span><br><span class="line">Query OK, 3 rows affected, 2 warnings (0.00 sec)</span><br><span class="line">Records: 3  Duplicates: 0  Warnings: 2</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; select BIN(x+0) from temp5;</span><br><span class="line">+<span class="comment">----------+</span></span><br><span class="line">| BIN(x+0) |</span><br><span class="line">+<span class="comment">----------+</span></span><br><span class="line">| 1111     |</span><br><span class="line">| 1111     |</span><br><span class="line">| 1010     |</span><br><span class="line">+<span class="comment">----------+</span></span><br><span class="line">3 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>BINARY和VARBINARY类型:</strong> 定长与不定长二进制字符串类型.</p>
+<p>1.binary类型是一个定长,二进制字节字符串类型,在字段不足制定字节是会自动在后面填\0.<br>2.varbinary类型是一个可变长,二进制字节字符串类型,而vb字段不会填充.</p>
+<p>创建一个<code>temp10</code>,分别有两个字段<code>b,vb</code>类型分别是<code>binary(3)</code>和<code>varbinary(30)</code><br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; create table temp10(</span><br><span class="line">    -&gt; b binary(3),</span><br><span class="line">    -&gt; vb varbinary(30)</span><br><span class="line">    -&gt; );</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; desc temp10;</span><br><span class="line">+<span class="comment">-------+---------------+------+-----+---------+-------+</span></span><br><span class="line">| Field | Type          | Null | Key | Default | Extra |</span><br><span class="line">+<span class="comment">-------+---------------+------+-----+---------+-------+</span></span><br><span class="line">| b     | binary(3)     | YES  |     | NULL    |       |</span><br><span class="line">| vb    | varbinary(30) | YES  |     | NULL    |       |</span><br><span class="line">+<span class="comment">-------+---------------+------+-----+---------+-------+</span></span><br><span class="line">2 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; <span class="keyword">insert</span> <span class="keyword">into</span> temp10 <span class="keyword">values</span>(<span class="number">5</span>,<span class="number">5</span>);</span><br><span class="line">Query OK, 1 row affected (0.01 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; select length(b),length(vb) from temp10;     #可以看到b占用3字节，而vb是只占用1字节</span><br><span class="line">+<span class="comment">-----------+------------+</span></span><br><span class="line">| length(b) | length(vb) |</span><br><span class="line">+<span class="comment">-----------+------------+</span></span><br><span class="line">|         3 |          1 |</span><br><span class="line">+<span class="comment">-----------+------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="MariaDB-运算符类型"><a href="#MariaDB-运算符类型" class="headerlink" title="MariaDB 运算符类型"></a>MariaDB 运算符类型</h2><p>运算符链接表达式中各个操作数,其作用是用来指明对操作数所进行的运算,运用运算符可以更加灵活的使用表中的数据,常见的运算符有:算术运算,比较运算,逻辑运算,位运算等,下面我们将依次介绍这几种运算符的运用.</p>
+<h3 id="◆算术运算符◆"><a href="#◆算术运算符◆" class="headerlink" title="◆算术运算符◆"></a>◆算术运算符◆</h3><table>
+<thead>
+<tr>
+<th style="text-align:left">运算符</th>
+<th style="text-align:left">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">+</td>
+<td style="text-align:left">加法运算</td>
+</tr>
+<tr>
+<td style="text-align:left">-</td>
+<td style="text-align:left">减法运算</td>
+</tr>
+<tr>
+<td style="text-align:left">*</td>
+<td style="text-align:left">乘法运算</td>
+</tr>
+<tr>
+<td style="text-align:left">/</td>
+<td style="text-align:left">除法运算</td>
+</tr>
+<tr>
+<td style="text-align:left">%</td>
+<td style="text-align:left">求余运算</td>
+</tr>
+</tbody>
+</table>
+<p><strong>加法运算(+)</strong><br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select * from temp;</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">| num  |</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">|  100 |</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; <span class="keyword">select</span> <span class="keyword">num</span>,<span class="keyword">num</span>+<span class="number">10</span> <span class="keyword">from</span> temp;</span><br><span class="line">+<span class="comment">------+--------+</span></span><br><span class="line">| num  | num+10 |</span><br><span class="line">+<span class="comment">------+--------+</span></span><br><span class="line">|  100 |    110 |</span><br><span class="line">+<span class="comment">------+--------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>减法运算(-)</strong><br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select * from temp;</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">| num  |</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">|  100 |</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.01</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; <span class="keyword">select</span> <span class="keyword">num</span>,<span class="keyword">num</span><span class="number">-10</span> <span class="keyword">from</span> temp;</span><br><span class="line">+<span class="comment">------+--------+</span></span><br><span class="line">| num  | num-10 |</span><br><span class="line">+<span class="comment">------+--------+</span></span><br><span class="line">|  100 |     90 |</span><br><span class="line">+<span class="comment">------+--------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>乘法运算(*)</strong><br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select * from temp;</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">| num  |</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">|  100 |</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; <span class="keyword">select</span> <span class="keyword">num</span>,<span class="keyword">num</span>*<span class="number">10</span> <span class="keyword">from</span> temp;</span><br><span class="line">+<span class="comment">------+--------+</span></span><br><span class="line">| num  | num*10 |</span><br><span class="line">+<span class="comment">------+--------+</span></span><br><span class="line">|  100 |   1000 |</span><br><span class="line">+<span class="comment">------+--------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>除法运算(/)</strong><br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select * from temp;</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">| num  |</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">|  100 |</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; <span class="keyword">select</span> <span class="keyword">num</span>,<span class="keyword">num</span>/<span class="number">10</span> <span class="keyword">from</span> temp;</span><br><span class="line">+<span class="comment">------+---------+</span></span><br><span class="line">| num  | num/10  |</span><br><span class="line">+<span class="comment">------+---------+</span></span><br><span class="line">|  100 | 10.0000 |</span><br><span class="line">+<span class="comment">------+---------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>取余数运算(%)</strong><br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select * from temp;</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">| num  |</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">|  100 |</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; <span class="keyword">select</span> <span class="keyword">num</span>,<span class="keyword">num</span>%<span class="number">10</span> <span class="keyword">from</span> temp;</span><br><span class="line">+<span class="comment">------+--------+</span></span><br><span class="line">| num  | num%10 |</span><br><span class="line">+<span class="comment">------+--------+</span></span><br><span class="line">|  100 |      0 |</span><br><span class="line">+<span class="comment">------+--------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆比较运算符◆"><a href="#◆比较运算符◆" class="headerlink" title="◆比较运算符◆"></a>◆比较运算符◆</h3><table>
+<thead>
+<tr>
+<th style="text-align:left">运算符</th>
+<th style="text-align:left">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">=</td>
+<td style="text-align:left">等于</td>
+</tr>
+<tr>
+<td style="text-align:left">&lt;=&gt;</td>
+<td style="text-align:left">安全的等于</td>
+</tr>
+<tr>
+<td style="text-align:left">&lt;&gt;(!=)</td>
+<td style="text-align:left">不等于</td>
+</tr>
+<tr>
+<td style="text-align:left">&lt;=</td>
+<td style="text-align:left">小于等于</td>
+</tr>
+<tr>
+<td style="text-align:left">&gt;=</td>
+<td style="text-align:left">大于等于</td>
+</tr>
+<tr>
+<td style="text-align:left">&gt;</td>
+<td style="text-align:left">大于</td>
+</tr>
+<tr>
+<td style="text-align:left">IS NULL</td>
+<td style="text-align:left">判断一个值是否为NULL</td>
+</tr>
+<tr>
+<td style="text-align:left">IS NOT NULL</td>
+<td style="text-align:left">判断一个值是否不为NULL</td>
+</tr>
+<tr>
+<td style="text-align:left">LEAST</td>
+<td style="text-align:left">在有两个或多个参数时,返回最小值</td>
+</tr>
+<tr>
+<td style="text-align:left">GREATEST</td>
+<td style="text-align:left">当有两个或多个参数时,返回最大值</td>
+</tr>
+<tr>
+<td style="text-align:left">BETWEEN AND</td>
+<td style="text-align:left">判断一个值是否落在两个值之间</td>
+</tr>
+<tr>
+<td style="text-align:left">ISNULL</td>
+<td style="text-align:left">与IS NULL作用相同</td>
+</tr>
+<tr>
+<td style="text-align:left">IN</td>
+<td style="text-align:left">判断一个值是IN列表中的任意一个值</td>
+</tr>
+<tr>
+<td style="text-align:left">NOT IN</td>
+<td style="text-align:left">判断一个值不是IN列表中的任意一个值</td>
+</tr>
+<tr>
+<td style="text-align:left">LIKE</td>
+<td style="text-align:left">通配符匹配</td>
+</tr>
+<tr>
+<td style="text-align:left">REGEXP</td>
+<td style="text-align:left">正则表达式匹配</td>
+</tr>
+</tbody>
+</table>
+<p><strong>等于运算符(=):</strong> 使用等于运算符进行相等判断<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select 1=1 , 1=0 , '1'=1 , '0.01'=0 , 'a'='a' , (1+1)=(2+2) , NULL=NULL;</span><br><span class="line">+<span class="comment">-----+-----+-------+----------+---------+-------------+-----------+</span></span><br><span class="line">| 1=1 | 1=0 | '1'=1 | '0.01'=0 | 'a'='a' | (1+1)=(2+2) | NULL=NULL |</span><br><span class="line">+<span class="comment">-----+-----+-------+----------+---------+-------------+-----------+</span></span><br><span class="line">|   1 |   0 |     1 |        0 |       1 |           0 |      NULL |</span><br><span class="line">+<span class="comment">-----+-----+-------+----------+---------+-------------+-----------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>全等于(&lt;=&gt;):</strong> 这个运算符和=功能相同,但是全等于可以用来判断NULL值,而等于是不能的<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select 1&lt;=&gt;0 , 1&lt;=&gt;1 , '1'&lt;=&gt;1 , '0.01' &lt;=&gt; 0 , 'a' &lt;=&gt; 'a' , (10+10)&lt;=&gt;(20+20) , NULL&lt;=&gt;NULL ;</span><br><span class="line">+<span class="comment">-------+-------+---------+--------------+-------------+-------------------+-------------+</span></span><br><span class="line">| 1&lt;=&gt;0 | 1&lt;=&gt;1 | '1'&lt;=&gt;1 | '0.01' &lt;=&gt; 0 | 'a' &lt;=&gt; 'a' | (10+10)&lt;=&gt;(20+20) | NULL&lt;=&gt;NULL |</span><br><span class="line">+<span class="comment">-------+-------+---------+--------------+-------------+-------------------+-------------+</span></span><br><span class="line">|     0 |     1 |       1 |            0 |           1 |                 0 |           1 |</span><br><span class="line">+<span class="comment">-------+-------+---------+--------------+-------------+-------------------+-------------+</span></span><br><span class="line">row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>不等于(&lt;&gt;或!=):</strong> 俩数不相等返回1,相等返回0<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select 'lyshark' != 'admin' , 1!=2 , 1 &lt;&gt; 1 , (10+10)&lt;&gt;(10+10) , NULL!=NULL;</span><br><span class="line">+<span class="comment">----------------------+------+--------+------------------+------------+</span></span><br><span class="line">| 'lyshark' != 'admin' | 1!=2 | 1 &lt;&gt; 1 | (10+10)&lt;&gt;(10+10) | NULL!=NULL |</span><br><span class="line">+<span class="comment">----------------------+------+--------+------------------+------------+</span></span><br><span class="line">|                    1 |    1 |      0 |                0 |       NULL |</span><br><span class="line">+<span class="comment">----------------------+------+--------+------------------+------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>小于运算符(&lt;):</strong> 两数相比较,左边小于右边返回1,否则返回0<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select 'xxx' &lt; 'xxxx' , 1&lt;2 , 1&lt;1 , 5.5&lt;5 , (1+1)&lt;(10-10) , NULL &lt;NULL ;</span><br><span class="line">+<span class="comment">----------------+-----+-----+-------+---------------+------------+</span></span><br><span class="line">| 'xxx' &lt; 'xxxx' | 1&lt;2 | 1&lt;1 | 5.5&lt;5 | (1+1)&lt;(10-10) | NULL &lt;NULL |</span><br><span class="line">+<span class="comment">----------------+-----+-----+-------+---------------+------------+</span></span><br><span class="line">|              1 |   1 |   0 |     0 |             0 |       NULL |</span><br><span class="line">+<span class="comment">----------------+-----+-----+-------+---------------+------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>小于等于(&lt;=):</strong> 两数相比较,左边小于或者等于右边返回1,否则返回0<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select 'xxxx' &lt;= 'xxxx' , 1&lt;=1 , 1&lt;=2 , 5.5&lt;=5 , NULL&lt;=NULL;</span><br><span class="line">+<span class="comment">------------------+------+------+--------+------------+</span></span><br><span class="line">| 'xxxx' &lt;= 'xxxx' | 1&lt;=1 | 1&lt;=2 | 5.5&lt;=5 | NULL&lt;=NULL |</span><br><span class="line">+<span class="comment">------------------+------+------+--------+------------+</span></span><br><span class="line">|                1 |    1 |    1 |      0 |       NULL |</span><br><span class="line">+<span class="comment">------------------+------+------+--------+------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>大于运算符(&gt;):</strong> 两数相比较,左边大于右边返回1,否则返回0<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select 'xxxx' &gt; 'xxx' , 5&gt;1 , 10&gt;10 , NULL &gt; NULL;</span><br><span class="line">+<span class="comment">----------------+-----+-------+-------------+</span></span><br><span class="line">| 'xxxx' &gt; 'xxx' | 5&gt;1 | 10&gt;10 | NULL &gt; NULL |</span><br><span class="line">+<span class="comment">----------------+-----+-------+-------------+</span></span><br><span class="line">|              1 |   1 |     0 |        NULL |</span><br><span class="line">+<span class="comment">----------------+-----+-------+-------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>大于等于(&gt;=):</strong> 两数相比较,左边大于或者等于右边返回1,否则返回0<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select 'xxxx' &gt;= 'xxxx' , 1&gt;=1 , 1&gt;=10 , NULL&gt;=NULL;</span><br><span class="line">+<span class="comment">------------------+------+-------+------------+</span></span><br><span class="line">| 'xxxx' &gt;= 'xxxx' | 1&gt;=1 | 1&gt;=10 | NULL&gt;=NULL |</span><br><span class="line">+<span class="comment">------------------+------+-------+------------+</span></span><br><span class="line">|                1 |    1 |     0 |       NULL |</span><br><span class="line">+<span class="comment">------------------+------+-------+------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>IS NULL运算符(ISNULL)和IS NOT NULL运算符(ISNOTNULL):</strong>  <code>is null</code>如果为NULL返回1否则返回0,而<code>is not null</code>则相反.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select null is null , isnull(null) , isnull(1) , 1 is not null;</span><br><span class="line">+<span class="comment">--------------+--------------+-----------+---------------+</span></span><br><span class="line">| null is null | isnull(null) | isnull(1) | 1 is not null |</span><br><span class="line">+<span class="comment">--------------+--------------+-----------+---------------+</span></span><br><span class="line">|            1 |            1 |         0 |             1 |</span><br><span class="line">+<span class="comment">--------------+--------------+-----------+---------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>between and 运算符(expr BETWEEN min AND max):</strong> 假如expr大于或等于min并且小于或等于max,则beetween返回1,否则返回0<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select 4 between 2 and 5 , 4 between 4 and 6 , 20 between 5 and 10;</span><br><span class="line">+<span class="comment">-------------------+-------------------+---------------------+</span></span><br><span class="line">| 4 between 2 and 5 | 4 between 4 and 6 | 20 between 5 and 10 |</span><br><span class="line">+<span class="comment">-------------------+-------------------+---------------------+</span></span><br><span class="line">|                 1 |                 1 |                   0 |</span><br><span class="line">+<span class="comment">-------------------+-------------------+---------------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>letsa运算符(least 值1,值2…..值n):</strong> 在定义的数值列表中返回最小的那个元素的数值<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select least(10,0) , least(1,2,3,4,5,6,7,8,9) , least('a','b','c') , least(10,null);</span><br><span class="line">+<span class="comment">-------------+--------------------------+--------------------+----------------+</span></span><br><span class="line">| least(10,0) | least(1,2,3,4,5,6,7,8,9) | least('a','b','c') | least(10,null) |</span><br><span class="line">+<span class="comment">-------------+--------------------------+--------------------+----------------+</span></span><br><span class="line">|           0 |                        1 | a                  |           NULL |</span><br><span class="line">+<span class="comment">-------------+--------------------------+--------------------+----------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>greatest运算符(greatest 值1,值2….值n):</strong> 在定义的数值列表中返回最大的那个元素的数值<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select greatest(10,0) , greatest(1,2,3,4,5,6,7,8,9) , greatest('a','b','c') , greatest(10,null);</span><br><span class="line">+<span class="comment">----------------+-----------------------------+-----------------------+-------------------+</span></span><br><span class="line">| greatest(10,0) | greatest(1,2,3,4,5,6,7,8,9) | greatest('a','b','c') | greatest(10,null) |</span><br><span class="line">+<span class="comment">----------------+-----------------------------+-----------------------+-------------------+</span></span><br><span class="line">|             10 |                           9 | c                     |              NULL |</span><br><span class="line">+<span class="comment">----------------+-----------------------------+-----------------------+-------------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>IN 和NOT IN 运算符(值1 IN (值1,值2…..值n)):</strong> <code>in</code>运算符判断指定数值是否在指定的一个列表里,有则返回1无则返回0,而<code>not in</code>运算符恰恰相反.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select 1 in (1,2,3,4,5) , 'lyshark' in ('root','admin','lyshark');</span><br><span class="line">+<span class="comment">------------------+-----------------------------------------+</span></span><br><span class="line">| 1 in (1,2,3,4,5) | 'lyshark' in ('root','admin','lyshark') |</span><br><span class="line">+<span class="comment">------------------+-----------------------------------------+</span></span><br><span class="line">|                1 |                                       1 |</span><br><span class="line">+<span class="comment">------------------+-----------------------------------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; <span class="keyword">select</span> <span class="number">10</span> <span class="keyword">not</span> <span class="keyword">in</span> (<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>) , <span class="string">'lyshark'</span> <span class="keyword">not</span> <span class="keyword">in</span> (<span class="string">'root'</span>,<span class="string">'admin'</span>,<span class="string">'lyshark'</span>);</span><br><span class="line">+<span class="comment">-----------------------+---------------------------------------------+</span></span><br><span class="line">| 10 not in (1,2,3,4,5) | 'lyshark' not in ('root','admin','lyshark') |</span><br><span class="line">+<span class="comment">-----------------------+---------------------------------------------+</span></span><br><span class="line">|                     1 |                                           0 |</span><br><span class="line">+<span class="comment">-----------------------+---------------------------------------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>LIKE匹配运算符(expr LIKE 匹配条件):</strong> <code>like</code>运算符用来匹配字符串,如果expr满足条件则返回1否则返回0,若expr或匹配条件中任何一个为NULL则结果为NULL.</p>
+<blockquote>
+<p>LIKE通配符:</p>
+<blockquote>
+<p>%:匹配任意字符,贪婪匹配<br>_:只匹配一个字符<br>t__:表示匹配以t开头,长度为2个字符的字符串<br>%d:表示匹配以字母d结尾的字符串</p>
+</blockquote>
+</blockquote>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select 'lyshark' like 'lyshark' , 'lyshark' like '%k' , 'lyshark' like 'ly_____';</span><br><span class="line">+<span class="comment">--------------------------+---------------------+--------------------------+</span></span><br><span class="line">| 'lyshark' like 'lyshark' | 'lyshark' like '%k' | 'lyshark' like 'ly_____' |</span><br><span class="line">+<span class="comment">--------------------------+---------------------+--------------------------+</span></span><br><span class="line">|                        1 |                   1 |                        1 |</span><br><span class="line">+<span class="comment">--------------------------+---------------------+--------------------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure>
+<p><strong>regexp字符串匹配运算符(expr regexp 匹配条件):</strong> regexp运算符能够更加精确的匹配,如果expr满足条件则返回1否则返回0,若expr或匹配条件中任何一个为NULL则结果为NULL.</p>
+<blockquote>
+<p>REGEXP通配符：</p>
+<blockquote>
+<p>^：匹配以该字符后面的字符开头的字符串<br>$：匹配以该字符后面的字符结尾的字符串<br>.：匹配任意一个单一字符<br>[…]：匹配在方括号内的任意字符</p>
+</blockquote>
+</blockquote>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select 'lyshark' regexp '^l' , 'lyshark' regexp 'k$' , 'lyshark' regexp '..shark' , 'lyshark' regexp '[lyak]';</span><br><span class="line">+<span class="comment">-----------------------+-----------------------+----------------------------+---------------------------+</span></span><br><span class="line">| 'lyshark' regexp '^l' | 'lyshark' regexp 'k$' | 'lyshark' regexp '..shark' | 'lyshark' regexp '[lyak]' |</span><br><span class="line">+<span class="comment">-----------------------+-----------------------+----------------------------+---------------------------+</span></span><br><span class="line">|                     1 |                     1 |                          1 |                         1 |</span><br><span class="line">+<span class="comment">-----------------------+-----------------------+----------------------------+---------------------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure>
+<h3 id="◆逻辑运算符◆"><a href="#◆逻辑运算符◆" class="headerlink" title="◆逻辑运算符◆"></a>◆逻辑运算符◆</h3><table>
+<thead>
+<tr>
+<th style="text-align:left">运算符</th>
+<th style="text-align:left">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">NOT 或 !</td>
+<td style="text-align:left">逻辑非</td>
+</tr>
+<tr>
+<td style="text-align:left">AND 或 &amp;&amp;</td>
+<td style="text-align:left">逻辑与</td>
+</tr>
+<tr>
+<td style="text-align:left">OR</td>
+<td style="text-align:left">逻辑或</td>
+</tr>
+<tr>
+<td style="text-align:left">XOR</td>
+<td style="text-align:left">逻辑异或</td>
+</tr>
+</tbody>
+</table>
+<p><strong>NOT逻辑非:</strong> <code>not或!</code>逻辑非运算符,当操作数为0时返回1,当操作为1时返回0,当操作数为NULL时,返回NULL<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select not 1 , not(1-1) , not -10 , not NULL;</span><br><span class="line">+<span class="comment">-------+----------+---------+----------+</span></span><br><span class="line">| not 1 | not(1-1) | not -10 | not NULL |</span><br><span class="line">+<span class="comment">-------+----------+---------+----------+</span></span><br><span class="line">|     0 |        1 |       0 |     NULL |</span><br><span class="line">+<span class="comment">-------+----------+---------+----------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>AND逻辑与:</strong> <code>and</code>是逻辑与运算符,当两边都为真是结果为1,否则结果为0<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select 1 and -1 , 1 and 0 , 1 and NULL , 0 and NULL;</span><br><span class="line">+<span class="comment">----------+---------+------------+------------+</span></span><br><span class="line">| 1 and -1 | 1 and 0 | 1 and NULL | 0 and NULL |</span><br><span class="line">+<span class="comment">----------+---------+------------+------------+</span></span><br><span class="line">|        1 |       0 |       NULL |          0 |</span><br><span class="line">+<span class="comment">----------+---------+------------+------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>OR逻辑或:</strong> <code>or</code>是逻辑或运算符,两边的结果如果有一边为真,则返回1否则返回0<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select 1 or 1 , 1 or 0 , 1 or -1 , 1 or NULL;</span><br><span class="line">+<span class="comment">--------+--------+---------+-----------+</span></span><br><span class="line">| 1 or 1 | 1 or 0 | 1 or -1 | 1 or NULL |</span><br><span class="line">+<span class="comment">--------+--------+---------+-----------+</span></span><br><span class="line">|      1 |      1 |       1 |         1 |</span><br><span class="line">+<span class="comment">--------+--------+---------+-----------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>XOR异或:</strong> <code>xor</code>逻辑异或运算符,当任意一个操作数为null时返回null,如果两边都为0则返回1否则返回0<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select 1 xor 1 , 0 xor 0 , 1 xor 0 , 1 xor null;</span><br><span class="line">+<span class="comment">---------+---------+---------+------------+</span></span><br><span class="line">| 1 xor 1 | 0 xor 0 | 1 xor 0 | 1 xor null |</span><br><span class="line">+<span class="comment">---------+---------+---------+------------+</span></span><br><span class="line">|       0 |       0 |       1 |       NULL |</span><br><span class="line">+<span class="comment">---------+---------+---------+------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆移位运算符◆"><a href="#◆移位运算符◆" class="headerlink" title="◆移位运算符◆"></a>◆移位运算符◆</h3><table>
+<thead>
+<tr>
+<th style="text-align:left">运算符</th>
+<th style="text-align:left">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">\</td>
+<td style="text-align:left">位或</td>
+</tr>
+<tr>
+<td style="text-align:left">&amp;</td>
+<td style="text-align:left">位与</td>
+</tr>
+<tr>
+<td style="text-align:left">^</td>
+<td style="text-align:left">位异或</td>
+</tr>
+<tr>
+<td style="text-align:left">&lt;&lt;</td>
+<td style="text-align:left">位左移</td>
+</tr>
+<tr>
+<td style="text-align:left">&gt;&gt;</td>
+<td style="text-align:left">位右移</td>
+</tr>
+<tr>
+<td style="text-align:left">~</td>
+<td style="text-align:left">位取反</td>
+</tr>
+</tbody>
+</table>
+<p><strong>位或(|):</strong> 位或运算符,按照提供数据的二进制形式依次或运算,最后输出结果<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select 10 |15 , 9|4|2 ;</span><br><span class="line">+<span class="comment">--------+-------+</span></span><br><span class="line">| 10 |15 | 9|4|2 |</span><br><span class="line">+<span class="comment">--------+-------+</span></span><br><span class="line">|     15 |    15 |</span><br><span class="line">+<span class="comment">--------+-------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>位与(&amp;):</strong> 位与运算符,按照提供数据的二进制形式依次与运算,最后输出结果<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select 10 &amp; 15 ,9&amp;4&amp;2 ;</span><br><span class="line">+<span class="comment">---------+-------+</span></span><br><span class="line">| 10 &amp; 15 | 9&amp;4&amp;2 |</span><br><span class="line">+<span class="comment">---------+-------+</span></span><br><span class="line">|      10 |     0 |</span><br><span class="line">+<span class="comment">---------+-------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>位异或(^):</strong> 将指定数据的二进制形式,逐一按位或运算<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select 10 ^ 15 , 1^0 , 1^1;</span><br><span class="line">+<span class="comment">---------+-----+-----+</span></span><br><span class="line">| 10 ^ 15 | 1^0 | 1^1 |</span><br><span class="line">+<span class="comment">---------+-----+-----+</span></span><br><span class="line">|       5 |   1 |   0 |</span><br><span class="line">+<span class="comment">---------+-----+-----+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>按位左移(expr&lt;&lt;需要左移的位数):</strong> 将指定数据expr,的二进制形式,按位左移<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select 4 &lt;&lt;2;</span><br><span class="line">+<span class="comment">-------+</span></span><br><span class="line">| 4 &lt;&lt;2 |</span><br><span class="line">+<span class="comment">-------+</span></span><br><span class="line">|    16 |</span><br><span class="line">+<span class="comment">-------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>按位右移(expr&gt;&gt;需要右移的位数):</strong> 将指定数据expr,的二进制形式,按位右移<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select 16 &gt;&gt;2;</span><br><span class="line">+<span class="comment">--------+</span></span><br><span class="line">| 16 &gt;&gt;2 |</span><br><span class="line">+<span class="comment">--------+</span></span><br><span class="line">|      4 |</span><br><span class="line">+<span class="comment">--------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>按位取反(~):</strong> 将相应位数的二进制形式,逐位反转<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select 5 &amp; ~1 ;</span><br><span class="line">+<span class="comment">--------+</span></span><br><span class="line">| 5 &amp; ~1 |</span><br><span class="line">+<span class="comment">--------+</span></span><br><span class="line">|      4 |</span><br><span class="line">+<span class="comment">--------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="MariaDB-常用函数-拓展"><a href="#MariaDB-常用函数-拓展" class="headerlink" title="MariaDB 常用函数(拓展)"></a>MariaDB 常用函数(拓展)</h2><p>函数表示对输入参数值返回一个具有特定关系的值,MySQL提供了大量丰富的函数,在进行数据库管理以及数据的查询和操作时将会经常用到各种函数.通过对数据的处理,数据库功能可以变得更加强大,更加灵活地满足不同用户的需求.各类函数从功能方面主要分为以下几类：数学函数、字符串函数、日期和时间函数、条件判断函数、系统信息函数和加密函数等.下面我们就来介绍一些基础函数的使用.</p>
+<h3 id="◆数学函数◆"><a href="#◆数学函数◆" class="headerlink" title="◆数学函数◆"></a>◆数学函数◆</h3><p><strong>绝对值函数:abx(x)</strong><br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select abs(2) , abs(-10.5) ,abs(-100);</span><br><span class="line">+<span class="comment">--------+------------+-----------+</span></span><br><span class="line">| abs(2) | abs(-10.5) | abs(-100) |</span><br><span class="line">+<span class="comment">--------+------------+-----------+</span></span><br><span class="line">|      2 |       10.5 |       100 |</span><br><span class="line">+<span class="comment">--------+------------+-----------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>平方根函数:sqrt(x)</strong><br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select sqrt(10) , sqrt(50) , sqrt(-10);</span><br><span class="line">+<span class="comment">--------------------+--------------------+-----------+</span></span><br><span class="line">| sqrt(10)           | sqrt(50)           | sqrt(-10) |</span><br><span class="line">+<span class="comment">--------------------+--------------------+-----------+</span></span><br><span class="line">| 3.1622776601683795 | 7.0710678118654755 |      NULL |</span><br><span class="line">+<span class="comment">--------------------+--------------------+-----------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>获取整数的函数:ceil(x),ceiling(x),floor(x)</strong><br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select ceil(-3.35) , ceiling(3.35) , floor(3.35);</span><br><span class="line">+<span class="comment">-------------+---------------+-------------+</span></span><br><span class="line">| ceil(-3.35) | ceiling(3.35) | floor(3.35) |</span><br><span class="line">+<span class="comment">-------------+---------------+-------------+</span></span><br><span class="line">|          -3 |             4 |           3 |</span><br><span class="line">+<span class="comment">-------------+---------------+-------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>获取随机数函数:rand(),rand(x)</strong><br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select rand() , rand(10);</span><br><span class="line">+<span class="comment">--------------------+--------------------+</span></span><br><span class="line">| rand()             | rand(10)           |</span><br><span class="line">+<span class="comment">--------------------+--------------------+</span></span><br><span class="line">| 0.5317976954689227 | 0.6570515219653505 |</span><br><span class="line">+<span class="comment">--------------------+--------------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>其他函数:round(x),round(x,y),runcate(x,y)</strong><br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select round(-1.14) , round(1.14) , round(1.66);        #对数据进行四舍五入</span><br><span class="line">+<span class="comment">--------------+-------------+-------------+</span></span><br><span class="line">| round(-1.14) | round(1.14) | round(1.66) |</span><br><span class="line">+<span class="comment">--------------+-------------+-------------+</span></span><br><span class="line">|           -1 |           1 |           2 |</span><br><span class="line">+<span class="comment">--------------+-------------+-------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; <span class="keyword">select</span> <span class="keyword">round</span>(<span class="number">1.38</span>,<span class="number">1</span>) , <span class="keyword">round</span>(<span class="number">232.38989</span>,<span class="number">3</span>);              <span class="comment">#对指定小数点后几位进行四舍五入</span></span><br><span class="line">+<span class="comment">---------------+--------------------+</span></span><br><span class="line">| round(1.38,1) | round(232.38989,3) |</span><br><span class="line">+<span class="comment">---------------+--------------------+</span></span><br><span class="line">|           1.4 |            232.390 |</span><br><span class="line">+<span class="comment">---------------+--------------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; <span class="keyword">select</span> <span class="keyword">truncate</span>(<span class="number">1.31</span>,<span class="number">1</span>) , <span class="keyword">truncate</span>(<span class="number">20.9999</span>,<span class="number">2</span>);           <span class="comment">#截断操作，y参数为保留小数点后几位</span></span><br><span class="line">+<span class="comment">------------------+---------------------+</span></span><br><span class="line">| <span class="keyword">truncate</span>(<span class="number">1.31</span>,<span class="number">1</span>) | <span class="keyword">truncate</span>(<span class="number">20.9999</span>,<span class="number">2</span>) |</span><br><span class="line">+<span class="comment">------------------+---------------------+</span></span><br><span class="line">|              <span class="number">1.3</span> |               <span class="number">20.99</span> |</span><br><span class="line">+<span class="comment">------------------+---------------------+</span></span><br><span class="line"><span class="number">1</span> <span class="keyword">row</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆字符串函数◆"><a href="#◆字符串函数◆" class="headerlink" title="◆字符串函数◆"></a>◆字符串函数◆</h3><p><strong>计算字符串长度:CHAR_LENGTH,字节长度:LENGTH(str)</strong><br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select CHAR_LENGTH('date'),CHAR_LENGTH('egg');</span><br><span class="line">+<span class="comment">---------------------+--------------------+</span></span><br><span class="line">| CHAR_LENGTH('date') | CHAR_LENGTH('egg') |</span><br><span class="line">+<span class="comment">---------------------+--------------------+</span></span><br><span class="line">|                   4 |                  3 |</span><br><span class="line">+<span class="comment">---------------------+--------------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; <span class="keyword">select</span> <span class="keyword">LENGTH</span>(<span class="string">'date'</span>),<span class="keyword">LENGTH</span>(<span class="string">'egg'</span>);</span><br><span class="line">+<span class="comment">----------------+---------------+</span></span><br><span class="line">| LENGTH('date') | LENGTH('egg') |</span><br><span class="line">+<span class="comment">----------------+---------------+</span></span><br><span class="line">|              4 |             3 |</span><br><span class="line">+<span class="comment">----------------+---------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>合并字符串函数:CONCAT()</strong><br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select CONCAT('hello','lyshark'),CONCAT('my',NULL,'SQL');</span><br><span class="line">+<span class="comment">---------------------------+-------------------------+</span></span><br><span class="line">| CONCAT('hello','lyshark') | CONCAT('my',NULL,'SQL') |</span><br><span class="line">+<span class="comment">---------------------------+-------------------------+</span></span><br><span class="line">| hellolyshark              | NULL                    |</span><br><span class="line">+<span class="comment">---------------------------+-------------------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>字符串替换:INSERT(s1,len,s2)</strong> 将从<code>Quest</code>替换,从第二个字符开始,一直替换三个.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select insert('Quest',2,3,'what') ;</span><br><span class="line">+<span class="comment">----------------------------+</span></span><br><span class="line">| <span class="keyword">insert</span>(<span class="string">'Quest'</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="string">'what'</span>) |</span><br><span class="line">+<span class="comment">----------------------------+</span></span><br><span class="line">| Qwhatt                     |</span><br><span class="line">+<span class="comment">----------------------------+</span></span><br><span class="line"><span class="number">1</span> <span class="keyword">row</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>大小写转换:LOWER(str),LCASE(str)</strong> 将大写转换成小写<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select LOWER('LYSHARK'),LCASE('well');</span><br><span class="line">+<span class="comment">------------------+---------------+</span></span><br><span class="line">| LOWER('LYSHARK') | LCASE('well') |</span><br><span class="line">+<span class="comment">------------------+---------------+</span></span><br><span class="line">| lyshark          | well          |</span><br><span class="line">+<span class="comment">------------------+---------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>大小写转换:UPPER(str),UCASE(str)</strong> 将小写转换成大写<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select UPPER('black'),UCASE('mkdirs');</span><br><span class="line">+<span class="comment">----------------+-----------------+</span></span><br><span class="line">| UPPER('black') | UCASE('mkdirs') |</span><br><span class="line">+<span class="comment">----------------+-----------------+</span></span><br><span class="line">| BLACK          | MKDIRS          |</span><br><span class="line">+<span class="comment">----------------+-----------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>比较字符串大小:STRCMP(s1,s2)</strong> 相同返回0,<code>s1&lt;s2</code>返回-1,其他返回1<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select STRCMP('lyshark','lyshark'),STRCMP('txt','ttxt'),STRCMP('ttxt','txt');</span><br><span class="line">+<span class="comment">-----------------------------+----------------------+----------------------+</span></span><br><span class="line">| STRCMP('lyshark','lyshark') | STRCMP('txt','ttxt') | STRCMP('ttxt','txt') |</span><br><span class="line">+<span class="comment">-----------------------------+----------------------+----------------------+</span></span><br><span class="line">|                           0 |                    1 |                   -1 |</span><br><span class="line">+<span class="comment">-----------------------------+----------------------+----------------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>字符串逆序:REVERSE(str)</strong><br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select REVERSE('lyshark');</span><br><span class="line">+<span class="comment">--------------------+</span></span><br><span class="line">| REVERSE('lyshark') |</span><br><span class="line">+<span class="comment">--------------------+</span></span><br><span class="line">| krahsyl            |</span><br><span class="line">+<span class="comment">--------------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆日期时间函数◆"><a href="#◆日期时间函数◆" class="headerlink" title="◆日期时间函数◆"></a>◆日期时间函数◆</h3><p><strong>获取当前日期:CURDATE()</strong><br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select CURDATE(),CURRENT_DATE(),CURDATE()+1;</span><br><span class="line">+<span class="comment">------------+----------------+-------------+</span></span><br><span class="line">| CURDATE()  | CURRENT_DATE() | CURDATE()+1 |</span><br><span class="line">+<span class="comment">------------+----------------+-------------+</span></span><br><span class="line">| 2018-12-24 | 2018-12-24     |    20181225 |</span><br><span class="line">+<span class="comment">------------+----------------+-------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>获取当前时间:CURTIME()</strong><br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select CURTIME(),CURRENT_TIME(),CURTIME()+1;</span><br><span class="line">+<span class="comment">-----------+----------------+-------------+</span></span><br><span class="line">| CURTIME() | CURRENT_TIME() | CURTIME()+1 |</span><br><span class="line">+<span class="comment">-----------+----------------+-------------+</span></span><br><span class="line">| 20:49:04  | 20:49:04       |      204905 |</span><br><span class="line">+<span class="comment">-----------+----------------+-------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>获取日期与时间:ALL</strong><br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select CURRENT_TIMESTAMP(),LOCALTIME(),NOW(),SYSDATE();</span><br><span class="line">+<span class="comment">---------------------+---------------------+---------------------+---------------------+</span></span><br><span class="line">| CURRENT_TIMESTAMP() | LOCALTIME()         | NOW()               | SYSDATE()           |</span><br><span class="line">+<span class="comment">---------------------+---------------------+---------------------+---------------------+</span></span><br><span class="line">| 2018-12-24 20:50:19 | 2018-12-24 20:50:19 | 2018-12-24 20:50:19 | 2018-12-24 20:50:19 |</span><br><span class="line">+<span class="comment">---------------------+---------------------+---------------------+---------------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>获取UNIX时间戳:UNIX_TIMESTAMP()</strong><br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select UNIX_TIMESTAMP(),UNIX_TIMESTAMP(NOW()),NOW();</span><br><span class="line">+<span class="comment">------------------+-----------------------+---------------------+</span></span><br><span class="line">| UNIX_TIMESTAMP() | UNIX_TIMESTAMP(NOW()) | NOW()               |</span><br><span class="line">+<span class="comment">------------------+-----------------------+---------------------+</span></span><br><span class="line">|       1545702698 |            1545702698 | 2018-12-24 20:51:38 |</span><br><span class="line">+<span class="comment">------------------+-----------------------+---------------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>获取年份:YEAR()</strong><br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select year('18-10-10');</span><br><span class="line">+<span class="comment">------------------+</span></span><br><span class="line">| year('18-10-10') |</span><br><span class="line">+<span class="comment">------------------+</span></span><br><span class="line">|             2018 |</span><br><span class="line">+<span class="comment">------------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>获取月份:MONTH()</strong><br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select month('2018-10-05');</span><br><span class="line">+<span class="comment">---------------------+</span></span><br><span class="line">| month('2018-10-05') |</span><br><span class="line">+<span class="comment">---------------------+</span></span><br><span class="line">|                  10 |</span><br><span class="line">+<span class="comment">---------------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>获取星期:DAYNAME()</strong><br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select dayname('2018-10-25');</span><br><span class="line">+<span class="comment">-----------------------+</span></span><br><span class="line">| dayname('2018-10-25') |</span><br><span class="line">+<span class="comment">-----------------------+</span></span><br><span class="line">| Thursday              |</span><br><span class="line">+<span class="comment">-----------------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>获取天:DAYOFYEAR()</strong><br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select dayofyear('2018-10-10');</span><br><span class="line">+<span class="comment">-------------------------+</span></span><br><span class="line">| dayofyear('2018-10-10') |</span><br><span class="line">+<span class="comment">-------------------------+</span></span><br><span class="line">|                     283 |</span><br><span class="line">+<span class="comment">-------------------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆条件判断函数◆"><a href="#◆条件判断函数◆" class="headerlink" title="◆条件判断函数◆"></a>◆条件判断函数◆</h3><p><strong>IF(expr,v1,v2):</strong> 如果表达式expr是<code>true(expr&lt;&gt;0 and expr&lt;&gt; NULL)</code>,则if()函数返回为v1,否则返回v2,if()语句返回值为数字或字符串,具体情况视其所在语境而定.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select if(1&gt;2,2,3),</span><br><span class="line">    -&gt; if(1&lt;2,'yes','no'),</span><br><span class="line">    -&gt; if(strcmp('test','test1'),'no','yes');</span><br><span class="line"></span><br><span class="line">+<span class="comment">-------------+--------------------+---------------------------------------+</span></span><br><span class="line">| if(1&gt;2,2,3) | if(1&lt;2,'yes','no') | if(strcmp('test','test1'),'no','yes') |</span><br><span class="line">+<span class="comment">-------------+--------------------+---------------------------------------+</span></span><br><span class="line">|           3 | yes                | no                                    |</span><br><span class="line">+<span class="comment">-------------+--------------------+---------------------------------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>IFNULL(v1,v2):</strong> 假如v1不为null,则ifnull()返回值为v1,否则其返回值为v2.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select ifnull(1,2) , ifnull(null,10) , ifnull(1/0,'wrong');</span><br><span class="line">+<span class="comment">-------------+-----------------+---------------------+</span></span><br><span class="line">| ifnull(1,2) | ifnull(null,10) | ifnull(1/0,'wrong') |</span><br><span class="line">+<span class="comment">-------------+-----------------+---------------------+</span></span><br><span class="line">|           1 |              10 | wrong               |</span><br><span class="line">+<span class="comment">-------------+-----------------+---------------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>case expr when v1 then r1 [when v2 then r2][else rn] end:</strong> 如果expr等价于某个vn,则返回对应位置then后面的结果.如果所用值都不相等,则返回else后面的rn.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select case 2 when 1 then 'one' when 2 then 'two' else 'more' end;</span><br><span class="line">+<span class="comment">------------------------------------------------------------+</span></span><br><span class="line">| case 2 when 1 then 'one' when 2 then 'two' else 'more' <span class="keyword">end</span> |</span><br><span class="line">+<span class="comment">------------------------------------------------------------+</span></span><br><span class="line">| two                                                        |</span><br><span class="line">+<span class="comment">------------------------------------------------------------+</span></span><br><span class="line"><span class="number">1</span> <span class="keyword">row</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; <span class="keyword">select</span> <span class="keyword">case</span> <span class="keyword">when</span> <span class="number">1</span>&lt;<span class="number">0</span> <span class="keyword">then</span> <span class="string">'true'</span> <span class="keyword">else</span> <span class="string">'false'</span> <span class="keyword">end</span>;</span><br><span class="line">+<span class="comment">--------------------------------------------+</span></span><br><span class="line">| case when 1&lt;0 then 'true' else 'false' end |</span><br><span class="line">+<span class="comment">--------------------------------------------+</span></span><br><span class="line">| false                                      |</span><br><span class="line">+<span class="comment">--------------------------------------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆系统信息函数◆"><a href="#◆系统信息函数◆" class="headerlink" title="◆系统信息函数◆"></a>◆系统信息函数◆</h3><p><strong>获取版本:version()</strong><br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select version();</span><br><span class="line">+<span class="comment">----------------+</span></span><br><span class="line">| version()      |</span><br><span class="line">+<span class="comment">----------------+</span></span><br><span class="line">| 5.5.60-MariaDB |</span><br><span class="line">+<span class="comment">----------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.04</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>查看当前用户连接数:connection_id()</strong><br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select connection_id();</span><br><span class="line">+<span class="comment">-----------------+</span></span><br><span class="line">| connection_id() |</span><br><span class="line">+<span class="comment">-----------------+</span></span><br><span class="line">|               2 |</span><br><span class="line">+<span class="comment">-----------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>输出当前用户的连接信息:show processlist</strong><br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; show processlist;</span><br><span class="line">+<span class="comment">----+------+-----------+---------+---------+------+-------+------------------+----------+</span></span><br><span class="line">| Id | User | Host      | db      | Command | Time | State | Info             | Progress |</span><br><span class="line">+<span class="comment">----+------+-----------+---------+---------+------+-------+------------------+----------+</span></span><br><span class="line">|  2 | root | localhost | lyshark | Query   |    0 | NULL  | <span class="keyword">show</span> <span class="keyword">processlist</span> |    <span class="number">0.000</span> |</span><br><span class="line">+<span class="comment">----+------+-----------+---------+---------+------+-------+------------------+----------+</span></span><br><span class="line"><span class="number">1</span> <span class="keyword">row</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.01</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt;</span><br><span class="line">MariaDB [lyshark]&gt; <span class="keyword">show</span> <span class="keyword">full</span> <span class="keyword">processlist</span>;</span><br><span class="line">+<span class="comment">----+------+-----------+---------+---------+------+-------+-----------------------+----------+</span></span><br><span class="line">| Id | User | Host      | db      | Command | Time | State | Info                  | Progress |</span><br><span class="line">+<span class="comment">----+------+-----------+---------+---------+------+-------+-----------------------+----------+</span></span><br><span class="line">|  2 | root | localhost | lyshark | Query   |    0 | NULL  | <span class="keyword">show</span> <span class="keyword">full</span> <span class="keyword">processlist</span> |    <span class="number">0.000</span> |</span><br><span class="line">+<span class="comment">----+------+-----------+---------+---------+------+-------+-----------------------+----------+</span></span><br><span class="line"><span class="number">1</span> <span class="keyword">row</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>返回当前使用的数据库:schema()</strong><br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select database(),schema();</span><br><span class="line">+<span class="comment">------------+----------+</span></span><br><span class="line">| database() | schema() |</span><br><span class="line">+<span class="comment">------------+----------+</span></span><br><span class="line">| lyshark    | lyshark  |</span><br><span class="line">+<span class="comment">------------+----------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆加密解密函数◆"><a href="#◆加密解密函数◆" class="headerlink" title="◆加密解密函数◆"></a>◆加密解密函数◆</h3><p><strong>加密函数:password(str)</strong><br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select password('newpass');</span><br><span class="line">+<span class="comment">-------------------------------------------+</span></span><br><span class="line">| password('newpass')                       |</span><br><span class="line">+<span class="comment">-------------------------------------------+</span></span><br><span class="line">| *D8DECEC305209EEFEC43008E1D420E1AA06B19E0 |</span><br><span class="line">+<span class="comment">-------------------------------------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>加密函数:MD5(str)</strong><br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select MD5('mypass');</span><br><span class="line">+<span class="comment">----------------------------------+</span></span><br><span class="line">| MD5('mypass')                    |</span><br><span class="line">+<span class="comment">----------------------------------+</span></span><br><span class="line">| a029d0df84eb5549c641e04a9ef389e5 |</span><br><span class="line">+<span class="comment">----------------------------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>加密函数:encode(str,pswd_str)</strong><br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select encode('secret','cry'),length(encode('secret','cry'));</span><br><span class="line">+<span class="comment">------------------------+--------------------------------+</span></span><br><span class="line">| encode('secret','cry') | length(encode('secret','cry')) |</span><br><span class="line">+<span class="comment">------------------------+--------------------------------+</span></span><br><span class="line">| ▒h▒ ▒                  |                              6 |</span><br><span class="line">+<span class="comment">------------------------+--------------------------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>解密函数:decode(crypt_str,pswd_str)</strong><br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select decode(encode('secret','cry'),'cry');</span><br><span class="line">+<span class="comment">--------------------------------------+</span></span><br><span class="line">| decode(encode('secret','cry'),'cry') |</span><br><span class="line">+<span class="comment">--------------------------------------+</span></span><br><span class="line">| secret                               |</span><br><span class="line">+<span class="comment">--------------------------------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆其他通用函数◆"><a href="#◆其他通用函数◆" class="headerlink" title="◆其他通用函数◆"></a>◆其他通用函数◆</h3><p><strong>格式化函数:ormat(x,n)</strong><br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select format(123.123,2);</span><br><span class="line">+<span class="comment">-------------------+</span></span><br><span class="line">| format(123.123,2) |</span><br><span class="line">+<span class="comment">-------------------+</span></span><br><span class="line">| 123.12            |</span><br><span class="line">+<span class="comment">-------------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>IP地址转为数字:inet_aton(ipaddr)</strong><br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select inet_aton("192.168.1.1");</span><br><span class="line">+<span class="comment">--------------------------+</span></span><br><span class="line">| inet_aton("192.168.1.1") |</span><br><span class="line">+<span class="comment">--------------------------+</span></span><br><span class="line">|               3232235777 |</span><br><span class="line">+<span class="comment">--------------------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>数字转为IP地址:inet_ntoa</strong><br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select inet_ntoa(3232235777);</span><br><span class="line">+<span class="comment">-----------------------+</span></span><br><span class="line">| inet_ntoa(3232235777) |</span><br><span class="line">+<span class="comment">-----------------------+</span></span><br><span class="line">| 192.168.1.1           |</span><br><span class="line">+<span class="comment">-----------------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/12/24/MariaDB/MariaDB-数据类型与运算符-4/">MariaDB 数据类型与运算符(4)</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年12月24日 - 14:12</p>
+  <p><span>最后更新:</span>2018年12月25日 - 10:12</p>
+  <p><span>原始链接:</span><a href="/2018/12/24/MariaDB/MariaDB-数据类型与运算符-4/" title="MariaDB 数据类型与运算符(4)">https://www.mkdirs.com/2018/12/24/MariaDB/MariaDB-数据类型与运算符-4/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/MariaDB/" rel="tag"> <i class="fa fa-tag"></i> MariaDB</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/24/MariaDB/MariaDB-表的基本操作-3/" rel="next" title="MariaDB 表的基本操作(3)">
+                <i class="fa fa-chevron-left"></i> MariaDB 表的基本操作(3)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/25/MariaDB/MariaDB-单表查询与聚合-5/" rel="prev" title="MariaDB 单表查询与聚合(5)">
+                MariaDB 单表查询与聚合(5) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#MariaDB-数据类型"><span class="nav-text">MariaDB 数据类型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆整数数据类型◆"><span class="nav-text">◆整数数据类型◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆浮点数和定点数◆"><span class="nav-text">◆浮点数和定点数◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆日期与时间类型◆"><span class="nav-text">◆日期与时间类型◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆文本字符串类型◆"><span class="nav-text">◆文本字符串类型◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆二进制字串类型◆"><span class="nav-text">◆二进制字串类型◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MariaDB-运算符类型"><span class="nav-text">MariaDB 运算符类型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆算术运算符◆"><span class="nav-text">◆算术运算符◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆比较运算符◆"><span class="nav-text">◆比较运算符◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆逻辑运算符◆"><span class="nav-text">◆逻辑运算符◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆移位运算符◆"><span class="nav-text">◆移位运算符◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MariaDB-常用函数-拓展"><span class="nav-text">MariaDB 常用函数(拓展)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆数学函数◆"><span class="nav-text">◆数学函数◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆字符串函数◆"><span class="nav-text">◆字符串函数◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆日期时间函数◆"><span class="nav-text">◆日期时间函数◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆条件判断函数◆"><span class="nav-text">◆条件判断函数◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆系统信息函数◆"><span class="nav-text">◆系统信息函数◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆加密解密函数◆"><span class="nav-text">◆加密解密函数◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆其他通用函数◆"><span class="nav-text">◆其他通用函数◆</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

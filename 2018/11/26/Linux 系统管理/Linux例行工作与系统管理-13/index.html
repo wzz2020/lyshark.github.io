@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Linux 是一套免费使用和自由传播的类Unix操作系统,是一个基于POSIX和UNIX的多用户、多任务、支持多线程和多CPU的操作系统.它能运行主要的UNIX工具软件、应用程序和网络协议.它支持32位和64位硬件.Linux继承了Unix以网络为核心的设计思想,是一个性能稳定的多用户网络操作系统. Linux 系统的任务是由cron(crond)这个系统服务来控制的,Linux系统上面原本就有非">
+<meta name="keywords" content="Linux 系统管理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux例行工作与系统管理(13)">
+<meta property="og:url" content="https://www.mkdirs.com/2018/11/26/Linux 系统管理/Linux例行工作与系统管理-13/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="Linux 是一套免费使用和自由传播的类Unix操作系统,是一个基于POSIX和UNIX的多用户、多任务、支持多线程和多CPU的操作系统.它能运行主要的UNIX工具软件、应用程序和网络协议.它支持32位和64位硬件.Linux继承了Unix以网络为核心的设计思想,是一个性能稳定的多用户网络操作系统. Linux 系统的任务是由cron(crond)这个系统服务来控制的,Linux系统上面原本就有非">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-04-16T12:35:18.921Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux例行工作与系统管理(13)">
+<meta name="twitter:description" content="Linux 是一套免费使用和自由传播的类Unix操作系统,是一个基于POSIX和UNIX的多用户、多任务、支持多线程和多CPU的操作系统.它能运行主要的UNIX工具软件、应用程序和网络协议.它支持32位和64位硬件.Linux继承了Unix以网络为核心的设计思想,是一个性能稳定的多用户网络操作系统. Linux 系统的任务是由cron(crond)这个系统服务来控制的,Linux系统上面原本就有非">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/11/26/Linux 系统管理/Linux例行工作与系统管理-13/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Linux例行工作与系统管理(13) | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/11/26/Linux 系统管理/Linux例行工作与系统管理-13/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Linux例行工作与系统管理(13)
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-11-26 10:55:52" itemprop="dateCreated datePublished" datetime="2018-11-26T10:55:52+08:00">2018-11-26</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-16 20:35:18" itemprop="dateModified" datetime="2019-04-16T20:35:18+08:00">2019-04-16</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Linux-系统管理/" itemprop="url" rel="index"><span itemprop="name">Linux 系统管理</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Linux 是一套免费使用和自由传播的类Unix操作系统,是一个基于POSIX和UNIX的多用户、多任务、支持多线程和多CPU的操作系统.它能运行主要的UNIX工具软件、应用程序和网络协议.它支持32位和64位硬件.Linux继承了Unix以网络为核心的设计思想,是一个性能稳定的多用户网络操作系统.</p>
+<p>Linux 系统的任务是由cron(crond)这个系统服务来控制的,Linux系统上面原本就有非常多的计划性工作,因此这个系统服务是默认启动的.另外,由于使用者自己也可以设置计划任务,所以Linux系统也提供了使用者控制计划任务的命令,crontab,at,等命令,下面的配置我们将逐一说明这些命令的使用方法.</p>
+<p>进程是正在运行的程序实体,并且包括这个运行的程序中占据的所有系统资源,比如说CPU(寄存器),IO,内存,网络资源等.很多人在回答进程的概念的时候,往往只会说它是一个运行的实体,而会忽略掉进程所占据的资源.比如说,同样一个程序,同一时刻被两次运行了,那么他们就是两个独立的进程.linux下查看系统进程的命令是ps.下面我们将分别介绍Linux系统的进程管理常用命令,以及基本概念,保证生产环境中最常用.</p>
+<p>网络管理包括对硬件、软件和人力的使用、综合与协调,以便对网络资源进行监视、测试、配置、分析、评价和控制,这样就能以合理的价格满足网络的一些需求,如实时运行性能、服务质量等,另外,当网络出现故障时能及时报告和处理,并协调、保持网络系统的高效运行等.</p>
+<a id="more"></a>
+<p><br></p>
+<h2 id="Linux系统例行工作"><a href="#Linux系统例行工作" class="headerlink" title="Linux系统例行工作"></a>Linux系统例行工作</h2><p>每个人或多或少都有一些任务或者是工作,有的工作是例行性的,例如每年一次的加薪、每个月一次的工作报告、每周一次的午餐会报、每天需要的打卡等等,有的工作则是临时发生的,例如刚好总公司有高官来访,需要你准备演讲材料等,用在生活上面,例如每年的爱人的生日、每天的起床时间等等、还有突发性的计算机大降价等等.</p>
+<p><strong>Linux上例行工作的常用作用</strong></p>
+<p>如果你曾经使用过 Linux 一阵子,那么你大概会发现到 Linux 会主动的帮我们进行一些工作,比如:自动升级、自动updatadb更新文件名数据库,自动进行日志文件的分析工作,这些功能的实现其实说白了就是操作系统自己的例行工作.基本上 Linux 系统常见的例行工作有：</p>
+<blockquote>
+<p>● 进行日志文件的轮询(log rotate)</p>
+<blockquote>
+<p>Linux系统会主动记录系统所发生的各种信息,这就是日志文件,如果不进行轮询,日志文件会越来越大,因此系统的默认计划任务,会自动帮助我们实现日志的轮询工作.</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>● 进行日志文件分析任务(logwatch)</p>
+<blockquote>
+<p>如果系统发生了软件问题,硬件错误,绝大多数的错误信息,都会被记录到日志文件中,我们的系统提供了一个程序,logwatch来主动分析日志信息,这也是系统的计划任务的其中一部分.</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>● 更新文件查询数据库(locate)</p>
+<blockquote>
+<p>当我们使用locate进行文件查找是,是不是感觉速度很快,其实它并没有查询文件目录,而是直接读取/var/lib/mlocate/中的数据,所以查询速度快,我们的系统会在每次开机时自动执行updatedb来更新这个数据库文件.</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>● whatis数据库的建立</p>
+<blockquote>
+<p>这个数据库与locate数据库类似,whatis数据库是与man page相关的查询命令,不过要使用whatis数据库,需要更新whatis数据库,这个工作也是通过系统的例行工作来完成的.</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>● RPM日志文件的建立</p>
+<blockquote>
+<p>由于系统可能会常常更新软件,包括软件的安装、升级等,都会造成软件名的差异,为了方便以后的管理工作,系统也帮我们将软件名做个排序并记录下来,有时候系统也会通过系统调度来帮RPM的数据库的生成.</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>● 删除一些临时文件</p>
+<blockquote>
+<p>当我们的系统运行过一段时间后,会产生很多的系统垃圾,如果不清理,会影响以后的系统维护,系统通过例行工作,在一段时间后执行,tmpwatch的命令来删除这些临时数据的.</p>
+</blockquote>
+</blockquote>
+<p>其实你的系统会进行的例行性工作与你安装的软件多少有关,如果你安装过多的软件,某些服务功能的软件都会附上分析工具,那么你的系统就会多出一些例行性工作,其实也就增加了系统的负担.</p>
+<h3 id="◆at-系统定时任务◆"><a href="#◆at-系统定时任务◆" class="headerlink" title="◆at 系统定时任务◆"></a>◆at 系统定时任务◆</h3><p>at命令用于在指定时间执行命令,at允许使用一套相当复杂的指定时间的方法.它能够接受在当天的hh:mm(小时:分钟)式的时间指定.假如该时间已过去,那么就放在第二天执行.当然也能够使用midnight(深夜),noon(中午),teatime(饮茶时间,一般是下午4点),等比较模糊的词语来指定时间.用户还能够采用12小时计时制,即在时间后面加上AM(上午)或PM(下午)来说明是上午还是下午.也能够指定命令执行的具体日期,指定格式为month day(月 日)或mm/dd/yy(月/日/年)或dd.mm.yy(日.月.年),指定的日期必须跟在指定时间的后面.</p>
+<p>上面介绍的都是绝对计时法,其实还能够使用相对计时法,这对于安排不久就要执行的命令是很有好处的.指定格式为：now + count time-units,now就是当前时间,time-units是时间单位,这里能够是minutes(分钟)、hours(小时)、days(天)、weeks(星期).count是时间的数量,究竟是几天,还是几小时,等. 更有一种计时方法就是直接使用today(今天)、tomorrow(明天)来指定完成命令的时间.</p>
+<blockquote>
+<p>at 命令的运行方式.</p>
+<p>事实上,我们使用 at 这个命令来添加所要运行的工作,并将这个工作以文本格式方式写入 /var/spool/at/ 目录内,该工作便能等待 atd 这个服务的取用与运行了,就这么简单,不过,并不是所有的人都可以进行 at 定时任务,at命令有以下排除方式.</p>
+</blockquote>
+<blockquote>
+<p>我们可以利用 /etc/at.allow 与 /etc/at.deny 这两个文件来进行 at 的使用限制,加上这两个文件后 at 的工作情况其实是这样的：</p>
+<p>● 先找寻 /etc/at.allow 这个文件,写在这个文件中的使用者才能使用 at 没有在这个文件中的使用者则不能使用 at (即使没有写在 at.deny 当中)</p>
+<p>● 如果 /etc/at.allow 不存在,就寻找 /etc/at.deny 这个文件,若写在这个 at.deny 的使用者则不能使用 at 而没有在这个 at.deny 文件中的使用者,就可以使用 at</p>
+<p>● 如果两个文件都不存在,那么只有 root 可以使用 at 这个命令.</p>
+</blockquote>
+<p>通过上面的说明：我们知道 /etc/at.allow 是管理较为严格的方式,而 /etc/at.deny 则较为松散.在一般的发行版当中,由于假设系统上的所有用户都是可信任的,因此系统通常会保留一个空的 /etc/at.deny 文件,意思是允许所有人使用 at 命令的意思(您可以自行检查一下该文件).不过,万一你不希望有某些使用者使用 at 的话,将那个使用者的帐号写入 /etc/at.deny 即可.一个帐号写一行.</p>
+<p>在介绍命令之前我们首先要说明的是,这个at命令,在精简版的系统中是不存在的,我们首先要先安装一下,并设置为开机自启动.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y at</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl restart atd</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl enable atd</span></span><br></pre></td></tr></table></figure></p>
+<p>接着继续来看一下at命令的常用语法吧.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># at --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ at [选项] ]</span><br><span class="line"></span><br><span class="line">        -m              <span class="comment">#执行结束发送通知邮件（执行此命令的用户）</span></span><br><span class="line">        atq             <span class="comment">#查看计划任务</span></span><br><span class="line">        atrm            <span class="comment">#删除计划任务</span></span><br><span class="line">        -c 工作号        <span class="comment">#查看对应工作号的详细信息</span></span><br></pre></td></tr></table></figure></p>
+<p>事实上,当我们使用 at 时会进入一个 at shell 的环境来让用户执行工作命令,此时建议你最好使用绝对路径来执行你的命令,由于在at工作调度的使用上,系统会将该项at工作独立出你的bash环境中,直接交给atd程序来接管,也就是说,当我们执行了at命令的时候,就可以立即脱机啦,系统会帮我们执行.</p>
+<p><strong>定时1：</strong> 在两天后的下午 5 点钟,执行<code>/bin/ls</code>命令<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># at 5pm+2 days</span></span><br><span class="line">at&gt; /bin/ls</span><br><span class="line">at&gt; CTRL +D</span><br><span class="line"></span><br><span class="line">job 6 at Mon Oct  1 17:00:00 2018</span><br></pre></td></tr></table></figure></p>
+<p><strong>定时2：</strong> 在明天17点30分,输出时间到指定文件内<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># at 17:30 tomorrow</span></span><br><span class="line">at&gt; date &gt;/root/22018.log</span><br><span class="line">at&gt; CTRL +D</span><br><span class="line"></span><br><span class="line">job 7 at Sun Sep 30 17:30:00 2018</span><br></pre></td></tr></table></figure></p>
+<p><strong>atq查询任务：</strong> 通过使用 atq 命令查看系统中的计划任务<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># atq</span></span><br><span class="line">4       Mon Oct  1 17:00:00 2018 a root</span><br><span class="line">6       Mon Oct  1 17:00:00 2018 a root</span><br><span class="line">7       Sun Sep 30 17:30:00 2018 a root</span><br></pre></td></tr></table></figure></p>
+<p><strong>删除at任务：</strong> 删除一个已设置的计划任务<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># atq</span></span><br><span class="line">4       Mon Oct  1 17:00:00 2018 a root</span><br><span class="line">6       Mon Oct  1 17:00:00 2018 a root</span><br><span class="line">7       Sun Sep 30 17:30:00 2018 a root</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># atrm 4</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># atq</span></span><br><span class="line">6       Mon Oct  1 17:00:00 2018 a root</span><br><span class="line">7       Sun Sep 30 17:30:00 2018 a root</span><br></pre></td></tr></table></figure></p>
+<p><strong>显示指定at任务：</strong> 显示指定设置计划的任务内容<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># atq</span></span><br><span class="line">6       Mon Oct  1 17:00:00 2018 a root</span><br><span class="line">7       Sun Sep 30 17:30:00 2018 a root</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># at -c 7</span></span><br><span class="line"><span class="meta">#!/bin/sh</span></span><br><span class="line"><span class="comment"># atrun uid=0 gid=0</span></span><br><span class="line"><span class="comment"># mail root 0</span></span><br><span class="line"><span class="built_in">umask</span> 22</span><br><span class="line">XDG_SESSION_ID=1; <span class="built_in">export</span> XDG_SESSION_ID</span><br><span class="line">....</span><br></pre></td></tr></table></figure></p>
+<p><strong>其他小例子：</strong> 其他定时例子<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Minute    at now + 5 minutes   任务在5分钟后运行</span><br><span class="line">Hour      at now + 1 hour      任务在1小时后运行</span><br><span class="line">Days      at now + 3 days      任务在3天后运行</span><br><span class="line">Weeks     at now + 2 weeks     任务在两周后运行</span><br><span class="line">Fixed     at midnight          任务在午夜运行</span><br><span class="line">Fixed     at 10:30pm           任务在晚上10点30分</span><br><span class="line">Fixed     at 23:59 12/31/2018　任务在2018年12月31号23点59分</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆jobs-工作管理◆"><a href="#◆jobs-工作管理◆" class="headerlink" title="◆jobs 工作管理◆"></a>◆jobs 工作管理◆</h3><p>jobs命令用于显示Linux中的任务列表及任务状态,包括后台运行的任务.该命令可以显示任务号及其对应的进程号.其中任务号是以普通用户的角度进行的,而进程号则是从系统管理员的角度来看的,一个任务可以对应于一个或者多个进程号.</p>
+<p>在Linux系统中执行某些操作时候,有时需要将当前任务暂停调至后台,或有时须将后台暂停的任务重启开启并调至前台,这一序列的操作将会使用到 jobs、bg、和 fg 三个命令以及两个快捷键来完成.</p>
+<p>这个工作管理 (job control)是用在 bash 环境下的,也就是说：『当我们登陆系统取得一个shell之后,在单一终端下同时进行多个工作的行为管理 』.举例来说,我们在登陆 bash 后,想要一边复制文件、一边进行数据搜寻、一边进行编译,还可以一边进行 vi 程序编写,这就是实现了在一个终端的情况下进行多个工作任务.</p>
+<p>假设我们只有一个终端,因此在可以出终端提示符让你操作的环境就称为前台(foreground),其他工作就可以让你放入后台(background)去暂停或者运行,这里要注意的是,放入后台的工作想要运行的话,它必须不能与用户交互.而放入后台的工作无法使用Ctrl+C来终止.</p>
+<blockquote>
+<p>总之要进行bash的job control管理必须注意以下限制：</p>
+<blockquote>
+<p>● 这些工作所触发的进程必须来自于你的shell的子进程<br>● 前台：当前终端正在进行标准输出到显示器上的工作<br>● 后台：不用将命令执行过程标准输出到显示器的工作<br>● 后台中：后台中的进程是正在运行的,不能使用强制终止<br>● 当前终端的工作只能当前终端管理,其它终端不能管理<br>● 放入后台的工作必须是能持续运行的,否则程序会被暂停</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>那么如何将工作放到后台 ?</p>
+<blockquote>
+<p>通过命令 <code>&amp;</code> 可以将工作转到后台,并持续运行<br>通过热键 <code>ctrl+z</code> 可以将工作放到后台,并暂停执行</p>
+</blockquote>
+</blockquote>
+<p>说了这么多理论,下面说一下jobs命令的语法,以及常用参数<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># jobs --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ <span class="built_in">jobs</span> [选项] ]</span><br><span class="line"></span><br><span class="line">        -l 			<span class="comment">#显示工作进程PID</span></span><br><span class="line">        -r 			<span class="comment">#列出后台正在运行的工作</span></span><br><span class="line">        -s 			<span class="comment">#列出后台暂停的工作</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>命令放入后台：</strong> 通过 <code>&amp;</code> 符号将vim编辑器放入后台<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim lyshark.sh &amp;</span></span><br><span class="line">[1] 1294</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment">#</span></span><br><span class="line">[1]+  Stopped                 vim lyshark.sh</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># jobs -l</span></span><br><span class="line">[1]+  1294 Stopped (tty output)    vim lyshark.sh</span><br></pre></td></tr></table></figure></p>
+<p><strong>杀死后台任务：</strong> 终止序号是[1]的那个后台任务<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># jobs -l</span></span><br><span class="line">[1]+  1294 Stopped (tty output)    vim lyshark.sh</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># kill -9 %1</span></span><br><span class="line">[1]+  Stopped                 vim lyshark.sh</span><br><span class="line">[1]+  Killed                  vim lyshark.sh</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># jobs -l</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>恢复暂停工作：</strong> 使用fg命令,将后台暂停的工作恢复到前台,继续执行<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># jobs -l</span></span><br><span class="line">[1]   1296 Stopped (tty output)    vim lyshark.sh</span><br><span class="line">[2]-  1297 Stopped (tty output)    vim lyshark.sh</span><br><span class="line">[3]+  1298 Stopped (tty output)    vim lyshark.sh</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># fg %1</span></span><br><span class="line">vim lyshark.sh</span><br></pre></td></tr></table></figure></p>
+<p><strong>激活后台工作：</strong> 使用bg让后台工作脱离终端运行,就是激活工作<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># jobs -l</span></span><br><span class="line">[2]-  1297 Stopped (tty output)    vim lyshark.sh</span><br><span class="line">[3]+  1298 Stopped (tty output)    vim lyshark.sh</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># bg %2</span></span><br><span class="line">[2]- vim lyshark.sh &amp;</span><br><span class="line"></span><br><span class="line">[2]+  Stopped                 vim lyshark.sh</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆crond-例行工作◆"><a href="#◆crond-例行工作◆" class="headerlink" title="◆crond 例行工作◆"></a>◆crond 例行工作◆</h3><p>crontab命令被用来提交和管理用户的需要周期性执行的任务,与windows下的计划任务类似,当安装完成操作系统后,默认会安装此服务工具,并且会自动启动crond进程,crond进程每分钟会定期检查是否有要执行的任务,如果有要执行的任务,则自动执行该任务,相对于 at 是仅运行一次的工作,循环运行的例行性工作的调度则是由 crond 这个系统服务来控制的,这个系统服务是默认启动的.</p>
+<p>用户如果想添加计划任务的话,可以使用crontab命令设置,不过为了安全性的问题,与at命令类似我们也可以通过配置文件限制用户列表,下面我们先来看一下他的两个配置文件吧.</p>
+<blockquote>
+<p>● /etc/cron.allow</p>
+<blockquote>
+<p>此配置文件记录可以使用crontab任务的用户,若不在这个文件内的用户则不可以使用crontab</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>● /etc/cron.deny</p>
+<blockquote>
+<p>此配置文件记录了不可以使用crontab设定计划任务的用户列表</p>
+</blockquote>
+</blockquote>
+<p>同样的,以优先顺序来说 <code>/etc/cron.allow</code> 比 <code>/etc/cron.deny</code> 要优先,而判断上面,这两个文件只选择一个来限制而已,因此,建议你只要保留一个即可,免得影响自己在配置上面的判断,一般来说,系统默认是保留 <code>/etc/cron.deny</code> 这个配置文件的,你可以将不想让他运行 crontab 的那个使用者写入 <code>/etc/cron.deny</code> 当中,书写格式是一个帐号一行.</p>
+<p>另外当使用者使用 crontab 这个命令来新建工作调度时,该项任务就会被纪录到 <code>/var/spool/cron/</code> 里面去,而且是以帐号来作为判断依据的,cron 运行的每一项工作都会被纪录到 /var/log/cron 这个文件里,所以如果你的 Linux 不知道是否被植入木马时,也可以搜寻一下 /var/log/cron 这个文件,查看一些.</p>
+<p><strong>Linux下的任务调度分为两类：系统任务调度和用户任务调度</strong></p>
+<p><strong>系统任务调度：</strong> 系统周期性所要执行的工作,比如写缓存数据到硬盘,日志清理等,在/etc目录下有一个crontab文件,这个就是系统任务调度的配置文件,也就是说,如果我想让所有用户都执行这些任务,可以将此任务写入 <code>/etc/crontab</code> 这个文件里,这样一来无论使用那个用户登录,都会执行这些任务.</p>
+<p>/etc/crontab文件包括下面几行：<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">SHELL=/bin/bash</span><br><span class="line">PATH=/sbin:/bin:/usr/sbin:/usr/bin</span><br><span class="line">MAILTO=<span class="string">""</span>HOME=/</span><br><span class="line"></span><br><span class="line"><span class="comment"># run-parts</span></span><br><span class="line">51 * * * * root run-parts /etc/cron.hourly</span><br><span class="line">24 7 * * * root run-parts /etc/cron.daily</span><br><span class="line">22 4 * * 0 root run-parts /etc/cron.weekly</span><br><span class="line">42 4 1 * * root run-parts /etc/cron.monthly</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>前四行是用来配置crond任务运行的环境变量</p>
+<blockquote>
+<p>第一行：SHELL变量指定了系统要使用哪个shell,这里是bash<br>第二行：PATH变量指定了系统执行命令的路径<br>第三行：MAILTO变量指定了crond的任务执行信息将通过电子邮件发送给root用户,如果MAILTO变量的值为空,则表示不发送任务执行信息给用户<br>第四行:HOME变量指定了在执行命令或者脚本时使用的主目录</p>
+</blockquote>
+</blockquote>
+<p><strong>用户任务调度：</strong> 用户定期要执行的工作,比如用户数据备份、定时邮件提醒等,用户可以使用 crontab 工具来定制自己的计划任务,所有用户定义的crontab文件都被保存在/var/spool/cron目录中,其文件名与用户名一致,使用者权限文件如下：<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">/etc/cron.deny     该文件中所列用户不允许使用crontab命令</span><br><span class="line">/etc/cron.allow    该文件中所列用户允许使用crontab命令</span><br><span class="line">/var/spool/cron/   所有用户crontab文件存放的目录,以用户名命名</span><br></pre></td></tr></table></figure></p>
+<p><strong>crontab文件的含义：</strong> 用户所建立的crontab文件中,每一行都代表一项任务,每行的每个字段代表一项设置,它的格式共分为六个字段,前五段是时间设定段,第六段是要执行的命令段,格式如下：<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">--------------------------------------------------------------------------------------</span><br><span class="line">[分钟]     [小时]   [天]      [月]     [周]    [执行命令]</span><br><span class="line">--------------------------------------------------------------------------------------</span><br><span class="line">minute     hour     day      month     week   <span class="built_in">command</span>         顺序：分 时 日 月 周</span><br><span class="line">--------------------------------------------------------------------------------------</span><br><span class="line">0-59       0-23     1-31      1-12     0-7    <span class="built_in">command</span>         范围：数字范围</span><br><span class="line">--------------------------------------------------------------------------------------</span><br><span class="line"></span><br><span class="line">	minute            表示分钟,(1-59)</span><br><span class="line">	hour              表示小时,(1-23)</span><br><span class="line">	day               表示日期,(1-31)</span><br><span class="line">	month             表示月份,(1-12)</span><br><span class="line">	week              表示星期几(0-7)</span><br><span class="line">	<span class="built_in">command</span>           要执行的命令</span><br><span class="line">--------------------------------------------------------------------------------------</span><br><span class="line">在以上的各个字段中,还可以使用以下特殊字符:</span><br><span class="line"></span><br><span class="line">	星号  *           代表所有可能的值</span><br><span class="line">	逗号  ,           可以用逗号隔开的值指定一个列表范围</span><br><span class="line">	中杠  -           可以用整数之间的中杠表示一个整数范围</span><br><span class="line">	正斜线 /          可以用正斜线指定时间的间隔频率</span><br><span class="line">--------------------------------------------------------------------------------------</span><br></pre></td></tr></table></figure></p>
+<p>光说不练等于零,下面是crontab命令的语法,以及常用参数,紧接着我来举几个小例子吧.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># crontab --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ crontab [选项] ]</span><br><span class="line"></span><br><span class="line">        -e          <span class="comment">#编辑计划任务</span></span><br><span class="line">        -l          <span class="comment">#查看已存在的计划任务</span></span><br><span class="line">        -r          <span class="comment">#删除计划任务</span></span><br><span class="line">        -u&lt;用户名&gt;   <span class="comment">#指定用户</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>实例1：</strong> 周一到周五每天17:00,执行任务<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">0 17 * * 1-5 <span class="built_in">echo</span> <span class="string">"1"</span> &gt; /proc/sys/vm/drop_caches</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例2：</strong> 每周一、三、五的8点30分,执行任务<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">30 8 * * 1,3,5 <span class="built_in">echo</span> <span class="string">"1"</span> &gt; /proc/sys/vm/drop_caches</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例3：</strong> 8点到18点之间每隔2小时执行一次<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">0 8-18/2 * * * <span class="built_in">echo</span> <span class="string">"1"</span> &gt; /proc/sys/vm/drop_caches</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例4：</strong> 每隔3天执行一次计划任务<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">0 * */3 * * <span class="built_in">echo</span> <span class="string">"1"</span> &gt; /proc/sys/vm/drop_caches</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例5：</strong> 每分钟执行一次,计划任务<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">* * * * * <span class="built_in">echo</span> <span class="string">"1"</span> &gt; /proc/sys/vm/drop_caches</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例6：</strong> 每小时第3,和第15分钟执行一次<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">3,15 * * * * <span class="built_in">echo</span> <span class="string">"1"</span> &gt; /proc/sys/vm/drop_caches</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例7：</strong> 在上午8点到11点的,第3和第15分钟执行<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">3,15 8-11 * * * <span class="built_in">echo</span> <span class="string">"1"</span> &gt; /proc/sys/vm/drop_caches</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例8：</strong> 每隔两天的,上午8点到11点,的第3和第15分钟执行<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">3,15 8-11 */2 * * <span class="built_in">echo</span> <span class="string">"1"</span> &gt; /proc/sys/vm/drop_caches</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例9：</strong> 每个星期一的上午8点到11点的第3和第15分钟执行<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">3,15 8-11 * * 1 <span class="built_in">echo</span> <span class="string">"1"</span> &gt; /proc/sys/vm/drop_caches</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例10：</strong> 每月1、10、22日的4 : 45重启smb<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">45 4 1,10,22 * * /etc/init.d/smb restart</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="Linux系统进程管理"><a href="#Linux系统进程管理" class="headerlink" title="Linux系统进程管理"></a>Linux系统进程管理</h2><p>一个程序被加载到内存当中运行,那么在内存内的那个数据就被称为程序(process).程序是操作系统上非常重要的概念,所有系统上面跑的数据都会以程序的类型存在.在 Linux 系统当中：『触发任何一个事件时,系统都会将他定义成为一个程序,并且给予这个程序一个 ID 称为 PID,同时依据触发这个进程的相关用户与相关属性关系,给予这个 PID 一组有效的权限设置』 从此以后这个 PID 能够在系统上面进行的动作,就与这个 PID 的权限有关了.</p>
+<blockquote>
+<p>什么是程序? 如何产生一个程序?</p>
+<blockquote>
+<p>我们通过执行一个程序或一个命令,就可以产生一个事件从而取得一个PID,我们的系统只认识二进制文件,当我让系统工作时当然就需要触发二进制文件,那个被触发的东西就叫做程序(program).通俗地说,能够代替人管理操作系统,完成特定任务,解决特定问题的一段代码的集合就是程序.</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>什么是进程? 如何产生一个进程?</p>
+<blockquote>
+<p>程序一般是放在磁盘中的,当我们的程序被触发后,执行者的权限与属性,都会被加载到内存,操作系统并给予这个内存单元一个标识符(PID),可以这么说,进程就是一个正在运行的程序.</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>关于系统的子进程与父进程?</p>
+<blockquote>
+<p>子进程与父进程是相互依存的,而父进程所产生的子进程,其权限也是父进程的权限所给予的,打个比方:当我们登陆系统后会取得一个BASH接口,然后我们使用这个接口,去执行另一个命令,则这个BASH接口就是父进程,而执行的那个命令,是从父进程中衍生出来的,其权限也是父进程给予的,我们把这种进程称作子进程.</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>关于常驻内存的进程?</p>
+<blockquote>
+<p>常驻内存的进程通常都是负责一些系统所提供的功能以服务各种用户的任务,通常我们把这些常驻进程称作服务,而这些服务,一旦被启动他就会一直持续不断的运行着,我们把这种狗皮膏药叫做,常驻内存进程.</p>
+</blockquote>
+</blockquote>
+<p>其实我们了解并学会使用系统进程管理,对我们的日常维护大有好处,一个称职的管理员,必须要熟练进程的管理才行,否则系统发生问题时很难去解决,接下来我们就来学习一下,进程管理当中的查询,终止,重启,以及调节进程优先级等操作吧:</p>
+<h3 id="◆进程的查看◆"><a href="#◆进程的查看◆" class="headerlink" title="◆进程的查看◆"></a>◆进程的查看◆</h3><p><strong>❤ PS-静态查询进程</strong></p>
+<p>ps命令用于报告当前系统的进程状态,可以搭配kill指令随时中断,删除不必要的程序,ps命令是最基本同时也是非常强大的进程查看命令,使用该命令可以确定有哪些进程正在运行和运行的状态、进程是否结束、进程有没有僵死、哪些进程占用了过多的资源等,总之大部分信息都是可以通过执行该命令得到的,静态查看系统中的进程,查询的是命令执行一瞬间的进程的状态.</p>
+<p>紧接着,我们先来看一下PS命令的常用参数吧,后期我们会分别说明各种参数和显示结果的说明.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ps --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ ps [选项] [PID] ]</span><br><span class="line"></span><br><span class="line">        aux             <span class="comment">#以BSD操作系统的格式输出</span></span><br><span class="line">        ajfx            <span class="comment">#以树形格式输出</span></span><br><span class="line">        le              <span class="comment">#以Linux标准格式输出</span></span><br><span class="line"></span><br><span class="line">        -a              <span class="comment">#显示一个终端的所有进程</span></span><br><span class="line">        -u              <span class="comment">#显示进程的归属用户及内存的使用情况</span></span><br><span class="line">        -x              <span class="comment">#显示没有控制终端的进程</span></span><br><span class="line">        -l              <span class="comment">#长格式显示,更加详细的信息</span></span><br><span class="line">        -j              <span class="comment">#工作格式显示</span></span><br><span class="line">        -f              <span class="comment">#做一个更完整的输出</span></span><br><span class="line">        -e              <span class="comment">#显示所有进程,与a的作用一致</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>通过PS -l 仅查看自己的bash相关进程</strong></p>
+<p>系统整体运行的进程是非常多的,但如果使用 ps -l 则仅列出与你的操作环境(bash)有关的进程而已,即最上层的父进程会是你自己的 bash 而没有延伸到 init 这个进程上去.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ps -l</span></span><br><span class="line">F S   UID    PID   PPID  C PRI  NI ADDR SZ WCHAN  TTY          TIME CMD</span><br><span class="line"></span><br><span class="line">4 S     0   1381   1377  0  80   0 - 28859 do_wai pts/0    00:00:00 bash</span><br><span class="line">0 R     0   1401   1381  0  80   0 - 38300 -      pts/0    00:00:00 ps</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>参数解释环节</p>
+</blockquote>
+<blockquote>
+<p>F:代表进程标志,说明这个进程的权限</p>
+<blockquote>
+<p>若为4：表示此进程权限为root<br>若为1：表示此进程可以被复制fork</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>S：代表进程的状态(STAT),进程的主要状态有:</p>
+<blockquote>
+<p>R(Running)：运行中<br>S(Sleep)：睡眠中<br>D：不可被唤醒的<br>T(Stop)：停止状态<br>Z(Zombie)：僵尸进程</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>UID/PID/PPID:代表进程号:</p>
+<blockquote>
+<p>PID：进程的PID号<br>UID：用户身份标识<br>PPID：父进程的PID号</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>C：代表CPU的使用率,单位是百分比<br>PRI/NI：进程CPU执行优先级</p>
+</blockquote>
+<blockquote>
+<p>ADDR/SZ/WCHAN：内存参数,主要有：</p>
+<blockquote>
+<p>ADDR：该进程在内存的那个部分<br>SZ：代表次进程用掉多少内存<br>WCHAN：目前进程是否运行中,-代表运行</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>TTY：代表执行的终端编号<br>TIME：进程使用掉的CPU时间<br>CMD：终端执行的命令</p>
+</blockquote>
+<p><strong>通过PS aux 查看系统所有进程</strong></p>
+<p>此命令,是unix通用命令,在Linux下同样保留了下来,此命令可以用来查看系统的所有进程,默认也是使用人数最多的一个查询命令.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ps aux</span></span><br><span class="line">USER        PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND</span><br><span class="line"></span><br><span class="line">root          1  0.9  2.2 193500  5136 ?        Ss   08:41   0:01 /usr/lib/systemd/systemd</span><br><span class="line">root          2  0.0  0.0      0     0 ?        S    08:41   0:00 [kthreadd]</span><br><span class="line">root          3  0.0  0.0      0     0 ?        S    08:41   0:00 [ksoftirqd/0]</span><br><span class="line">root          4  0.0  0.0      0     0 ?        S    08:41   0:00 [kworker/0:0]</span><br><span class="line">....省略....</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>关于ps aux命令,参数解释环节</p>
+<blockquote>
+<p>USER：该进程的运行用户<br>PID：进程的PID号<br>%CPU：进程占用的cpu的百分比<br>%MEM：进程占用物理内存的百分比<br>VSZ：占用的虚拟内存的大小(KB)<br>RSS：占用物理内存的大小(KB)<br>tty：登录终端(Alt+F1-F6)<br>stat：进程执行状态<br>START：进程启动时间<br>TIME：进程运行的时间(总时间),非系统时间<br>COMMAND：产生此进程的命令</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>STAT 进程常用状态</p>
+<blockquote>
+<p>D：无法中断的休眠状态（通常 IO 的进程）<br>R：正在运行的进程<br>S：处于休眠状态<br>T：停止或被追踪<br>W：进入内存交换（从内核2.6开始无效）<br>X：死掉的进程（基本很少见）<br>Z：僵尸进程<br>&lt;：优先级高的进程<br>N：优先级较低的进程<br>L：被锁进内存的进程<br>s：进程的领导者（在它之下有子进程）<br>l：多进程的<br>+：位于后台的进程组</p>
+</blockquote>
+</blockquote>
+<p><strong>❤ TOP-动态查询进程</strong></p>
+<p>top命令可以实时动态地查看系统的整体运行情况,是一个综合了多方信息监测系统性能和运行信息的实用工具,通过top命令所提供的互动式界面,用热键可以管理,使用方便,事实性高.</p>
+<p>废话不多说,先看一下常用参数吧.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># top --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ top [选项] [PID] ]</span><br><span class="line"></span><br><span class="line">[常用选项]</span><br><span class="line"></span><br><span class="line">        -d 秒数	        <span class="comment">#指定刷新频率</span></span><br><span class="line">        -b              <span class="comment">#使用批处理模式，和-n结合将top的结果重定向到文本</span></span><br><span class="line">        -n 次数	        <span class="comment">#指定top次数和-b结合</span></span><br><span class="line">        -p              <span class="comment">#指定查看某的PID的进程</span></span><br><span class="line">        -s              <span class="comment">#使top在安全模式下运行，避免在交互模式下出现错误</span></span><br><span class="line">        -u 用户名        <span class="comment">#只查看（监听）某一个用户的进程</span></span><br><span class="line"></span><br><span class="line">------------------------------------------------------------------------------</span><br><span class="line">[交互模式命令]</span><br><span class="line"></span><br><span class="line">        P               <span class="comment">#按照CPU使用率排序</span></span><br><span class="line">        M               <span class="comment">#按照内存使用率排序</span></span><br><span class="line">        N               <span class="comment">#按照PID号排序</span></span><br><span class="line">        T               <span class="comment">#按照cpu运算时间排序</span></span><br><span class="line">        k               <span class="comment">#按照PID号给予某一个进程信发送指令，可用于杀死进程</span></span><br><span class="line">        r               <span class="comment">#按照PID给某个进程重设优先级（Nice）值</span></span><br><span class="line">        q               <span class="comment">#退出交互模式</span></span><br></pre></td></tr></table></figure></p>
+<p>关于 top 命令的输出信息的解释,与汉化.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># top</span></span><br><span class="line"></span><br><span class="line">   [系统当前时间]   [运行时间]   [当前用户数]           [系统平均负载1,5,15分钟]</span><br><span class="line">top - 21:32:00     up 14 min,  2 users,       load average: 0.00, 0.01, 0.05</span><br><span class="line"></span><br><span class="line">      [系统总进程数]    [运行中]       [睡眠进程]        [停止的进程]     [僵尸进程]</span><br><span class="line">Tasks:  94 total,      1 running,    93 sleeping,      0 stopped,      0 zombie</span><br><span class="line"></span><br><span class="line">[CPU百分比]    [用户模式]   [系统模式]   [改变优先级百分比]  [空闲CPU]   [输入输出]  [硬中断]  [软中断]</span><br><span class="line">%Cpu(s):       0.0 us,     5.9 sy,     0.0 ni,          94.1 id,     0.0 wa,    0.0 hi,  0.0 si</span><br><span class="line"></span><br><span class="line">[物理内存KB]    [总量]             [剩余]        [已使用]        [缓冲/缓存]</span><br><span class="line">KiB Mem :      223836 total,     3388 free,   119024 used,   101424 buff/cache</span><br><span class="line"></span><br><span class="line">[交换内存KB]    [总量]              [剩余]        [已使用]    [缓存交换分区大小]</span><br><span class="line">KiB Swap:      1048572 total,     1048564 free,  8 used.    67412 avail Mem</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"> [进程ID]   [执行用户]  [优先级]  [Nice]    [虚拟内存]   [常驻内存]  [共享内存]</span><br><span class="line">   PID        USER      PR       NI        VIRT        RES        SHR S %CPU %MEM     TIME+ COMMAND</span><br><span class="line">  1317        root      20        0        161840      2140       1532 R  5.9  1.0   0:00.01 top</span><br><span class="line">     1        root      20        0        125312      3780       2564 S  0.0  1.7   0:01.20 systemd</span><br><span class="line">....省略....</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆进程的管理◆"><a href="#◆进程的管理◆" class="headerlink" title="◆进程的管理◆"></a>◆进程的管理◆</h3><p>程序之间是可以互相控制的,举例来说,你可以关闭、重新启动服务器软件,服务器软件本身是个程序,你既然可以让她关闭或启动,当然就是可以控制该程序啦,那么程序是如何互相管理的呢,其实是通过给予该程序一个信号(signal)去告知该程序想要让他做什么操作,因此这个信号就很重要啦,默认情况下我们可以使用<code>kill -l</code>命令来查询系统支持的信号,但是常用的信号,无非就一下几种.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">信号数字</th>
+<th style="text-align:center">信号名称</th>
+<th style="text-align:center">信号内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">1</td>
+<td style="text-align:center">SIGHUP</td>
+<td style="text-align:center">启动被终止的进程,可让该PID重新读取自己的配置文件,类似重启</td>
+</tr>
+<tr>
+<td style="text-align:center">2</td>
+<td style="text-align:center">SIGINT</td>
+<td style="text-align:center">相当于使用Ctrl+C 来中断一个进程</td>
+</tr>
+<tr>
+<td style="text-align:center">9</td>
+<td style="text-align:center">SIGKILL</td>
+<td style="text-align:center">强制杀死一个进程的执行</td>
+</tr>
+<tr>
+<td style="text-align:center">15</td>
+<td style="text-align:center">SIGTERM</td>
+<td style="text-align:center">已正常的结束进程来终止该进程的执行</td>
+</tr>
+<tr>
+<td style="text-align:center">17</td>
+<td style="text-align:center">SIGSTOP</td>
+<td style="text-align:center">相当于使用Ctrl+Z 来暂停一个进程</td>
+</tr>
+</tbody>
+</table>
+<p>上面仅是常见的 signal 而已,如果想知道更多关于信号的东西,请自行 man 7 signal 吧,一般来说你只要记得 『1,9,15』 这三个号码的意义即可,那么我们如何传送一个信号给某个程序呢？ 就是通过 kill 或 killall 下面我们分别来看看：</p>
+<p><strong>❤ Kill命令-杀死指定进程</strong></p>
+<p>kill命令用来删除执行中的程序或工作,kill可将指定的信息送至程序,预设的信息为SIGTERM(15),可将指定程序终止,若仍无法终止该程序,可使用SIGKILL(9)信号尝试强制删除程序,程序或工作的编号可利用ps指令或job指令查看.</p>
+<p>下面是kill命令的常用格式,和基本参数<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># kill --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ <span class="built_in">kill</span> [选项][信号] [PID] ]</span><br><span class="line"></span><br><span class="line">        -a              <span class="comment">#当处理当前进程时,不限制命令名和进程号的对应关系</span></span><br><span class="line">        -l 信号         <span class="comment">#若不加&lt;信号&gt;选项,则查看kill 所支持的信号</span></span><br><span class="line">        -p              <span class="comment">#只打印相关进程的进程号,而不发送任何信号</span></span><br><span class="line">        -s 信号         <span class="comment">#指定要送出的信息</span></span><br><span class="line">        -u              <span class="comment">#指定用户</span></span><br><span class="line"></span><br><span class="line">[常用信号]</span><br><span class="line"></span><br><span class="line">        1               <span class="comment">#复位,重新加载配置</span></span><br><span class="line">        2               <span class="comment">#中断(同 Ctrl + C) </span></span><br><span class="line">        15              <span class="comment">#终止(正常退出)</span></span><br><span class="line">        9               <span class="comment">#强制终止</span></span><br><span class="line">        18              <span class="comment">#继续（与STOP相反） </span></span><br><span class="line">        19              <span class="comment">#暂停（同 Ctrl + Z）</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>重启进程：</strong> 使用<code>kill -1</code>重启一个syslog程序<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ps aux | grep "syslog" | grep -v "grep" | awk '&#123;print $2&#125;'</span></span><br><span class="line">1103</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># kill -1 $(ps aux | grep "syslog" | grep -v "grep" | awk '&#123;print $2&#125;')</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>强制终止指定程序：</strong> 使用<code>kill -9</code>强制终止一个VIM程序<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ps aux | grep "vim"</span></span><br><span class="line">root      11207  0.2  2.0 148792  4620 pts/1    S+   09:28   0:00 vim</span><br><span class="line">root      11222  0.0  0.4 112704   976 pts/0    R+   09:29   0:00 grep --color=auto vim</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ps aux | grep "vim" | grep -v "grep"</span></span><br><span class="line">root      11207  0.2  2.0 148792  4620 pts/1    S+   09:28   0:00 vim</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ps aux | grep "vim" | grep -v "grep" | awk '&#123;print $2&#125;'</span></span><br><span class="line">11207</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># kill -9 $(ps aux | grep "vim" | grep -v "grep" | awk '&#123;print $2&#125;')</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ps aux | grep "vim" | grep -v "grep" | awk '&#123;print $2&#125;'</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>强制终止Jobs任务：</strong> 使用<code>Kill -9 %</code>命令,强制结束一个jobs工作<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># jobs</span></span><br><span class="line">[1]+  Stopped                 vim lyshark.sh</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># kill -9 %1; jobs  #结束指定计划任务</span></span><br><span class="line">[1]+  Stopped                 vim lyshark.sh</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># jobs</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>❤ Killall命令-杀进程</strong></p>
+<p>由于 kill 后面必须要加上 PID (或者是 job number)所以,通常 kill 都会配合 ps,pstree 等命令,因为我们必须要找到相对应的那个程序的PID号码,才能够去结束它,但是这样的话很是麻烦,那么我们的killall命令可以直接通过进程名称来操作指定程序,不过这个包默认是没有安装的,您需要执行<code>yum install -y psmisc</code>先来安装一下,下面我们就一起来学习一下吧.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># killall --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ killall [选项][信号] [PID] ]</span><br><span class="line"></span><br><span class="line">        -i              <span class="comment">#交互模式,终止前提示用户</span></span><br><span class="line">        -e              <span class="comment">#exact的意思,但整个完整的命令</span></span><br><span class="line">        -I              <span class="comment">#命令名称(可能含参数)忽略大小写</span></span><br></pre></td></tr></table></figure>
+<p>总之,要终止某个程序,我们可以使用 PID 或者是启动该程序的命令名称,而如果要终止某个服务呢,最简单的方法就是利用 killall 因为他可以将系统当中所有以某个命令名称启动的服务全部终止.</p>
+<p><strong>❤ pkill命令-剔除终端</strong></p>
+<p>pkill命令可以按照进程名杀死进程,pkill和killall应用方法差不多,也是直接杀死运行中的程序.如果您想杀掉单个进程,请用kill来杀掉.下面演示一下,通过pkill命令,下线一个终端<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># who</span></span><br><span class="line">root     tty1         2018-09-28 22:03</span><br><span class="line">root     pts/0        2018-09-28 22:01 (192.168.1.6)</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># pkill -9 -t tty1</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># who</span></span><br><span class="line">root     pts/0        2018-09-28 22:01 (192.168.1.6)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆调节优先级◆"><a href="#◆调节优先级◆" class="headerlink" title="◆调节优先级◆"></a>◆调节优先级◆</h3><p>我们知道 Linux 是多任务,多用户的工作环境,由 top 的输出结果我们也发现,系统同一时间内有非常多的进程在运行中,只是绝大部分的进程都在休眠(sleeping)状态而已,想一想,如果所有的进程同时被唤醒,那么 CPU 应该要先处理那个进程呢,这就得要考虑到进程的优先运行序(Priority)与CPU 调度问题了.CPU调度指的是每个程序被 CPU 运行的运算规则,而例行性工作则是将某个任务安排在某个时间再交由系统运行,CPU调度与操作系统较具有相关性.</p>
+<p>在介绍命令之前我们先来看一下关于PRI与NICE值的问题,Linux系统给每一个进程分配了一个PRI进程优先级,不过这个PRI值是由内核动态调整的,用户无法直接调整PRI的值,先来看看它的格式吧.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ps -l</span></span><br><span class="line"></span><br><span class="line">F S   UID    PID   PPID  C PRI  NI ADDR SZ WCHAN  TTY          TIME CMD</span><br><span class="line">4 S     0   1409   1405  0  80   0 - 28859 do_wai pts/0    00:00:00 bash</span><br><span class="line">0 R     0   1502   1409  0  80   0 - 38300 -      pts/0    00:00:00 ps</span><br></pre></td></tr></table></figure></p>
+<p>上面我们可以看到PRI的存在,由于 PRI 是由内核动态调整的,我们使用者也无权去干涉 PRI ,那如果你想要调整程序的优先运行序时,就得要通过 Nice 值了,Nice 值就是上表的 NI 字段内容,一般来说 PRI 与 NI 的相关性如下：<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">PRI(new) = PRI(old) + Nice</span><br></pre></td></tr></table></figure></p>
+<p>不过我们要注意的是,Nice值有正负之分,Nice可调整的范围是(-20-19),系统会将PRI的值和Nice相加,得到的结果越小,优先值就越高.</p>
+<blockquote>
+<p>关于Nice值的注意事项：</p>
+<blockquote>
+<p>1.nice值的范围是-20-19<br>2.root可随意调整自己或他人的Nice值<br>3.一般用户只可以调整自己的Nice值<br>4.一般用户只可以调高nice不能减小</p>
+</blockquote>
+</blockquote>
+<p><strong>使用nice：</strong> 新执行vim程序,并赋予-5的权限<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># nice -n -5 vim &amp;</span></span><br><span class="line">[1] 1591</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># top -bn1 | grep vim</span></span><br><span class="line">  1591 root      15  -5  148872   4520   2316 T  0.0  2.0   0:00.01 vim</span><br></pre></td></tr></table></figure></p>
+<p><strong>使用renice:</strong> 使用renice,给一个已经运行的进程修改nice值<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># jobs</span></span><br><span class="line">[1]+  Stopped                 vim lyshark.sh</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># top -bn1 | grep vim</span></span><br><span class="line">  1595 root      20   0  148872   4544   2340 T  0.0  2.0   0:00.01 vim</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># renice -5 1595</span></span><br><span class="line">1595 (process ID) old priority 0, new priority -5</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># top -bn1 | grep vim</span></span><br><span class="line">  1595 root      15  -5  148872   4544   2340 T  0.0  2.0   0:00.01 vim</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="Linux系统资源管理"><a href="#Linux系统资源管理" class="headerlink" title="Linux系统资源管理"></a>Linux系统资源管理</h2><p>除了系统的程序之外,我们还必须就系统的一些资源进行检查,举例来说,我们使用 top 可以看到很多系统的资源,那么还有没有其他的工具可以查阅的？当然有,下面这些工具命令可以玩一玩</p>
+<h3 id="◆free-查看内存使用◆"><a href="#◆free-查看内存使用◆" class="headerlink" title="◆free 查看内存使用◆"></a>◆free 查看内存使用◆</h3><p>Linux 系统为了要加速系统效能,所以会将最常使用到的或者是最近使用到的文件数据缓存 (cache) 下来,这样未来系统要使用该文件时,就直接由内存中搜寻取出,而不需要重新读取硬盘,速度上面当然就加快了,因此实体内存被用光是正常的喔</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># free --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ free [选项] ]</span><br><span class="line"></span><br><span class="line">        -b              <span class="comment">#以kb为单位显示</span></span><br><span class="line">        -h              <span class="comment">#以常用单位显示</span></span><br><span class="line">        -t              <span class="comment">#输出显示实体内存</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># free -h</span></span><br><span class="line"></span><br><span class="line">              [总量]       [已使用]    [剩余]    [共享内存]    [缓冲/缓存]    </span><br><span class="line">              total        used        free      shared      buff/cache   available</span><br><span class="line">[物理内存]</span><br><span class="line">Mem:           218M        121M        5.4M        5.0M         91M         61M</span><br><span class="line">[交换内存]</span><br><span class="line">Swap:          1.0G        520K        1.0G</span><br><span class="line"></span><br><span class="line"><span class="comment">#提示：我们可以使用 echo "1" &gt; /proc/sys/vm/drop_caches 释放缓冲</span></span><br></pre></td></tr></table></figure>
+<h3 id="◆uname-查系统版本◆"><a href="#◆uname-查系统版本◆" class="headerlink" title="◆uname 查系统版本◆"></a>◆uname 查系统版本◆</h3><p>这个东西我们前面使用过很多次了,uname 可以列出目前系统的内核版本、 主要硬件平台以及 CPU 类型等.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># uname --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ uname [选项] ]</span><br><span class="line"></span><br><span class="line">        -a              <span class="comment">#所有系统相关参数</span></span><br><span class="line">        -s              <span class="comment">#系统名称</span></span><br><span class="line">        -r              <span class="comment">#内核的版本</span></span><br><span class="line">        -m              <span class="comment">#本系统的硬件名称，例如 i686 或 x86_64 等</span></span><br><span class="line">        -p              <span class="comment">#CPU 的类型，与 -m 类似，只是显示的是 CPU 的类型</span></span><br><span class="line">        -i              <span class="comment">#硬件的平台 (ix86)</span></span><br></pre></td></tr></table></figure>
+<h3 id="◆uptime-查系统负载◆"><a href="#◆uptime-查系统负载◆" class="headerlink" title="◆uptime 查系统负载◆"></a>◆uptime 查系统负载◆</h3><p>uptime命令能够打印系统总共运行了多长时间和系统的平均负载,uptime命令可以显示的信息显示依次为：现在时间、系统已经运行了多长时间、目前有多少登陆用户、系统在过去的1分钟、5分钟和15分钟内的平均负载.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># uptime</span></span><br><span class="line"> 22:59:34 up 25 min,  1 user,  load average: 0.00, 0.01, 0.05</span><br></pre></td></tr></table></figure>
+<h3 id="◆vmstat-检测系统资源◆"><a href="#◆vmstat-检测系统资源◆" class="headerlink" title="◆vmstat 检测系统资源◆"></a>◆vmstat 检测系统资源◆</h3><p>如果你想要动态的了解一下系统资源的运行,那么这个 vmstat 确实可了解一下,vmstat 可以检测『 CPU / 内存 / 磁盘输入输出状态 』等<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vmstat --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ vmstat [选项] ]</span><br><span class="line"></span><br><span class="line">        -a              <span class="comment">#使用 inactive/active(活跃与否) 取代 buffer/cache 的内存输出</span></span><br><span class="line">        -f              <span class="comment">#启动到目前为止,系统复制 (fork) 的程序数</span></span><br><span class="line">        -s              <span class="comment">#将一些事件 (启动至目前为止) 导致的内存变化情况列表说明</span></span><br><span class="line">        -S              <span class="comment">#后面可以接单位，让显示的数据有单位,例如 K/M 取代 bytes 的容量</span></span><br><span class="line">        -d              <span class="comment">#列出磁盘的读写总量统计表</span></span><br><span class="line">        -p              <span class="comment">#后面列出分区,可显示分区的总量</span></span><br></pre></td></tr></table></figure></p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vmstat 1 3</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----</span><br><span class="line"> r  b   swpd   free   buff  cache   si   so    bi    bo   <span class="keyword">in</span>   cs us sy id wa st</span><br><span class="line"> 2  0    520  24400      0  74864    0    0    68     4   73  143  0  0 99  1  0</span><br><span class="line"> 0  0    520  24400      0  74864    0    0     0     0   39   39  0  0 100  0  0</span><br><span class="line"> 0  0    520  24400      0  74864    0    0     0     0   39   37  0  0 100  0  0</span><br><span class="line"></span><br><span class="line">------------------------------------------------------------------------------------</span><br><span class="line">[参数解释]</span><br><span class="line"></span><br><span class="line">Procs（进程）：</span><br><span class="line">		r: 	运行队列中进程数量</span><br><span class="line">		b:	阻塞的进程</span><br><span class="line"></span><br><span class="line">Memory（内存）：</span><br><span class="line">		swpd: 	虚拟内存已使用的大小</span><br><span class="line">		free: 	空闲的物理内存的大小</span><br><span class="line">		buff: 	用作缓冲的内存大小（系统）</span><br><span class="line">		cache: 	用作缓存的内存大小（被调用资源）</span><br><span class="line"></span><br><span class="line">Swap：</span><br><span class="line">	si:  	每秒从磁盘读入虚拟内存的大小</span><br><span class="line">	so: 	每秒虚拟内存写入磁盘的大小</span><br><span class="line">注：如果这个值大于0，表示物理内存不够用</span><br><span class="line"></span><br><span class="line">IO:	（现在的Linux版本块的大小为1024bytes）</span><br><span class="line">	bi: 	每秒读取的块数</span><br><span class="line">	bo: 	每秒写入的块数</span><br><span class="line"></span><br><span class="line">系统：</span><br><span class="line">	<span class="keyword">in</span>: 	每秒CPU中断数，包括时钟中断。</span><br><span class="line">	cs: 	每秒上下文切换数（资源调用的次数，如：函数）。</span><br><span class="line"></span><br><span class="line">CPU（以百分比表示）：</span><br><span class="line">	us: 	用户进程执行消耗cpu时间(user time)</span><br><span class="line">	sy: 	系统进程消耗cpu时间(system time)</span><br><span class="line">	id: 	空闲时间(包括IO等待时间)</span><br><span class="line">	wa: 	等待IO时间</span><br><span class="line">	st:	虚拟机偷取时间（不为0则代表cpu被其他虚拟机所调用）</span><br><span class="line">------------------------------------------------------------------------------------</span><br></pre></td></tr></table></figure>
+<h3 id="◆dmesg-分析启动数据◆"><a href="#◆dmesg-分析启动数据◆" class="headerlink" title="◆dmesg 分析启动数据◆"></a>◆dmesg 分析启动数据◆</h3><p>系统在启动的时候,核心会去侦测系统的硬件,你的某些硬件到底有没有被捉到,那就与这个时候的侦测有关.dmesg命令被用于检查和控制内核的环形缓冲区,kernel会将开机信息存储在ring buffer中.您若是开机时来不及查看信息,可利用dmesg来查看.开机信息保存在/var/log/dmesg文件里.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># dmesg</span></span><br></pre></td></tr></table></figure>
+<h3 id="◆lsof-查进程打开文件◆"><a href="#◆lsof-查进程打开文件◆" class="headerlink" title="◆lsof 查进程打开文件◆"></a>◆lsof 查进程打开文件◆</h3><p>lsof命令用于查看你进程开打的文件,打开文件的进程,进程打开的端口(TCP、UDP).找回/恢复删除的文件,是十分方便的系统监视工具,因为lsof命令需要访问核心内存和各种文件,所以需要root用户执行.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># lsof --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ lsof [选项] ]</span><br><span class="line"></span><br><span class="line">        -a              <span class="comment">#列出打开文件存在的进程</span></span><br><span class="line">        -c [进程名]      <span class="comment">#列出指定进程所打开的文件</span></span><br><span class="line">        -g              <span class="comment">#列出GID号进程详情</span></span><br><span class="line">        -p [进程号]      <span class="comment">#列出指定进程号所打开的文件</span></span><br><span class="line">        -u              <span class="comment">#列出UID号进程详情</span></span><br></pre></td></tr></table></figure>
+<p><strong>实例:</strong> 列出进程打开或正在使用的文件信息<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># lsof</span></span><br><span class="line">[root@localhost ~]<span class="comment"># lsof -p	进程号  #查看某进程运行所调用的资源</span></span><br><span class="line">[root@localhost ~]<span class="comment"># lsof -u        #查看用户运行的进程调用了哪些文件</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="Linux系统网络管理"><a href="#Linux系统网络管理" class="headerlink" title="Linux系统网络管理"></a>Linux系统网络管理</h2><p>本小结内容将具体介绍几个常用的网络测试命令的使用,在日常工作中,网络方面的命令还是要经常使用的,比如排查网络故障等操作,下面我们就来介绍几个常用的网络管理命令吧.</p>
+<h3 id="◆ping-测试网络连通性◆"><a href="#◆ping-测试网络连通性◆" class="headerlink" title="◆ping 测试网络连通性◆"></a>◆ping 测试网络连通性◆</h3><p>ping命令用来测试主机之间网络的连通性,执行ping指令会使用ICMP传输协议,发出要求回应的信息,若远端主机的网络功能没问题,就会回应该信息,因而得知该主机运作正常.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ping --help</span></span><br><span class="line">ping: invalid option -- <span class="string">'-'</span></span><br><span class="line"></span><br><span class="line">语法格式：[ ping [选项] [IP或网址] ]</span><br><span class="line"></span><br><span class="line">        -c [次数]        <span class="comment">#探测时指定次数</span></span><br><span class="line">        -S [大小]        <span class="comment">#探测时指定数据包大小</span></span><br><span class="line">        -i [秒数]        <span class="comment">#探测时指定秒数</span></span><br><span class="line">        -l [数值]        <span class="comment">#设置在送出要求信息之前,先行发出的数据包</span></span><br><span class="line">        -f               <span class="comment">#极限检测模式</span></span><br><span class="line">        -R               <span class="comment">#探测时记录路由过程</span></span><br><span class="line">        -q               <span class="comment">#不显示指令执行过程</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>指定探测次数:</strong> 通过使用<code>-c</code>可以指定要探测的次数,默认是一直探测下去.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ping -c 3 www.baidu.com</span></span><br><span class="line"></span><br><span class="line">PING www.a.shifen.com (61.135.169.125) 56(84) bytes of data.</span><br><span class="line">64 bytes from 61.135.169.125 (61.135.169.125): icmp_seq=1 ttl=55 time=21.0 ms</span><br><span class="line">64 bytes from 61.135.169.125 (61.135.169.125): icmp_seq=2 ttl=55 time=21.4 ms</span><br><span class="line">64 bytes from 61.135.169.125 (61.135.169.125): icmp_seq=3 ttl=55 time=20.8 ms</span><br><span class="line"></span><br><span class="line">--- www.a.shifen.com ping statistics ---</span><br><span class="line">3 packets transmitted, 3 received, 0% packet loss, time 2009ms</span><br><span class="line">rtt min/avg/max/mdev = 20.805/21.088/21.456/0.319 ms</span><br></pre></td></tr></table></figure></p>
+<p><strong>启用极限检测:</strong> 通过使用<code>-f</code>参数,一直检测下去.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ping -f www.baidu.com</span></span><br><span class="line">PING www.a.shifen.com (61.135.169.125) 56(84) bytes of data.</span><br><span class="line">.....</span><br></pre></td></tr></table></figure></p>
+<p><strong>使用安静模式:</strong> 非交互模式ping一个主机,写脚本用.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ping -q www.baidu.com &gt; /dev/null</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $?</span></span><br><span class="line">0</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆ifconfig-查询网络信息◆"><a href="#◆ifconfig-查询网络信息◆" class="headerlink" title="◆ifconfig 查询网络信息◆"></a>◆ifconfig 查询网络信息◆</h3><p>ifconfig命令被用于配置和显示Linux内核中网络接口的网络参数,用ifconfig命令配置的网卡信息,在网卡重启后机器重启后,配置就不存在.要想将上述的配置信息永远的存的电脑里,那就要修改网卡的配置文件了,这里需要注意的是,精简模式的Linux下没有这个命令,请执行 <code>yum install -y net-tools</code> 安装.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ifconfig --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ ifconfig [选项] [参数列表] [IP或网址] ]</span><br><span class="line"></span><br><span class="line">        add [地址]        <span class="comment">#设置网络设备IPv6的ip地址</span></span><br><span class="line">        del [地址]        <span class="comment">#删除网络设备IPv6的IP地址</span></span><br><span class="line">        up                <span class="comment">#启动指定的网络设备</span></span><br><span class="line">        down              <span class="comment">#关闭指定的网络设备</span></span><br><span class="line">        io_addr [I/O地址] <span class="comment">#设置网络设备的I/O地址</span></span><br><span class="line">        netmask [掩码]    <span class="comment">#设置网络设备的子网掩码</span></span><br><span class="line">        tunnel [地址]     <span class="comment">#建立IPv4与IPv6之间的隧道通信地址</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>启动/关闭指定网卡:</strong><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ifconfig eth0 up   或者 ifup eth0</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ifconfig eth0 down 或者 ifdown eth0</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>临时分配一个IP地址:</strong><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ifconfig eth0 192.168.1.10</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ifconfig eth0 192.168.1.10 netmask 255.255.255.0</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ifconfig eth0 192.168.1.10 netmask 255.255.255.0 broadcast 192.168.1.255</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>临时分配一个子网口:</strong><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ifconfig eth0:0 192.168.1.10</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ifconfig eth0:1 192.168.1.10 netmask 255.255.255.0</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>为网卡配置和删除IPv6地址:</strong><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ifconfig eth0 add 33ffe:3240:800:1005::2/64    #为网卡eth0配置IPv6地址</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ifconfig eth0 del 33ffe:3240:800:1005::2/64    #为网卡eth0删除IPv6地址</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>启动/关闭ARP协议:</strong><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ifconfig eth0 arp    #开启网卡eth0 的arp协议</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ifconfig eth0 -arp   #关闭网卡eth0 的arp协议</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>设置最大传输单元:</strong><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ifconfig eth0 mtu 1500    #设置能通过的最大数据包大小为 1500 bytes</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="◆netstat-查网络连接状态◆"><a href="#◆netstat-查网络连接状态◆" class="headerlink" title="◆netstat 查网络连接状态◆"></a>◆netstat 查网络连接状态◆</h3><p>Netstat是控制台命令,是一个监控TCP/IP网络的非常有用的工具,它可以显示路由表、实际的网络连接以及每一个网络接口设备的状态信息.Netstat用于显示与IP、TCP、UDP和ICMP协议相关的统计数据,一般用于检验本机各端口的网络连接情况,netstat命令用来打印Linux中网络系统的状态信息,可让你得知整个Linux系统的网络情况.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># netstat --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ netstat [选项] ]</span><br><span class="line"></span><br><span class="line">        -t              <span class="comment">#列出TCP协议端口</span></span><br><span class="line">        -u              <span class="comment">#列出UPD协议端口</span></span><br><span class="line">        -n              <span class="comment">#使用IP地址和端口显示</span></span><br><span class="line">        -l              <span class="comment">#仅列出在监听状态网络服务</span></span><br><span class="line">        -a              <span class="comment">#列出所有的网络连接</span></span><br><span class="line">        -r              <span class="comment">#列出路由列表(route)</span></span><br><span class="line">        -c              <span class="comment">#持续列出网络状态</span></span><br><span class="line">        -g              <span class="comment">#显示多重广播功能群组组员名单</span></span><br><span class="line">        -i              <span class="comment">#显示网络接口列表</span></span><br><span class="line">        -n              <span class="comment">#直接使用ip地址,而不通过域名服务器</span></span><br><span class="line">        -s              <span class="comment">#显示网络工作信息统计表</span></span><br></pre></td></tr></table></figure>
+<p><strong>列出所有端口(包括监听和未监听的)</strong><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># netstat -a        #列出所有端口</span></span><br><span class="line">[root@localhost ~]<span class="comment"># netstat -at       #列出所有tcp端口</span></span><br><span class="line">[root@localhost ~]<span class="comment"># netstat -au       #列出所有udp端口</span></span><br><span class="line">[root@localhost ~]<span class="comment"># netstat -antp     #列出所有tcp端口</span></span><br><span class="line">[root@localhost ~]<span class="comment"># netstat -anup     #列出所有udp端口</span></span><br><span class="line">[root@localhost ~]<span class="comment"># netstat -autp     #列出所有tcp/udp端口</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>列出所有处于监听状态的Sockets</strong><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># netstat -l        #只显示监听端口</span></span><br><span class="line">[root@localhost ~]<span class="comment"># netstat -lt       #只列出所有监听 tcp 端口</span></span><br><span class="line">[root@localhost ~]<span class="comment"># netstat -lu       #只列出所有监听 udp 端口</span></span><br><span class="line">[root@localhost ~]<span class="comment"># netstat -lx       #只列出所有监听 UNIX 端口</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>显示每个协议的统计信息</strong><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># netstat -s        #显示所有端口的统计信息</span></span><br><span class="line">[root@localhost ~]<span class="comment"># netstat -st       #显示TCP端口的统计信息</span></span><br><span class="line">[root@localhost ~]<span class="comment"># netstat -su       #显示UDP端口的统计信息</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>在netstat输出中显示 PID 和进程名称</strong><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># netstat -pt</span></span><br><span class="line">[root@localhost ~]<span class="comment"># netstat -i</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="◆traceroute-追踪数据包◆"><a href="#◆traceroute-追踪数据包◆" class="headerlink" title="◆traceroute 追踪数据包◆"></a>◆traceroute 追踪数据包◆</h3><p>traceroute用于追踪数据包在网络上的传输时的全部路径,它默认发送的数据包大小是40字节,通过traceroute我们可以知道信息从你的计算机到互联网另一端的主机是走的什么路径.当然每次数据包由某一同样的出发点(source)到达某一同样的目的地(destination)走的路径可能会不一样,但基本上来说大部分时候所走的路由是相同的.</p>
+<p>traceroute通过发送小的数据包到目的设备直到其返回,来测量其需要多长时间.一条路径上的每个设备traceroute要测3次.输出结果中包括每次测试的时间(ms)和设备的名称(如有的话)及其ip地址,注意精简模式的Linux下没有这个命令,请执行 <code>yum install -y traceroute</code> 安装.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># traceroute --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ traceroute [选项] [网址或IP] ]</span><br><span class="line"></span><br><span class="line">        -q [次数]       <span class="comment">#指定每次的追踪次数</span></span><br><span class="line">        -d              <span class="comment">#使用Socket层级的排错功能</span></span><br><span class="line">        -f[存活数值]     <span class="comment">#设置第一个检测数据包的存活数值TTL的大小</span></span><br><span class="line">        -I              <span class="comment">#使用ICMP回应取代UDP资料信息</span></span><br></pre></td></tr></table></figure>
+<p><strong>测试与百度的路由次数</strong><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># traceroute -q 1 www.baidu.com</span></span><br><span class="line">traceroute to www.baidu.com (61.135.169.121), 30 hops max, 60 byte packets</span><br><span class="line"> 1  gateway (192.168.1.1)  1.002 ms</span><br><span class="line"> 2  39.85.88.1 (39.85.88.1)  3.322 ms</span><br><span class="line"> 3  124.130.190.49 (124.130.190.49)  593.163 ms</span><br><span class="line"> 4  27.200.59.129 (27.200.59.129)  8.084 ms</span><br><span class="line"> 5  219.158.21.89 (219.158.21.89)  18.701 ms</span><br><span class="line"> 6  123.126.0.126 (123.126.0.126)  16.885 ms</span><br><span class="line"> 7  124.65.62.118 (124.65.62.118)  17.802 ms</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆route-查询与设置路由◆"><a href="#◆route-查询与设置路由◆" class="headerlink" title="◆route 查询与设置路由◆"></a>◆route 查询与设置路由◆</h3><p>route命令用来显示并设置Linux内核中的网络路由表,route命令设置的路由主要是静态路由.要实现两个不同的子网之间的通信,需要一台连接两个网络的路由器,或者同时位于两个网络的网关来实现.</p>
+<p>在Linux系统中设置路由通常是为了解决以下问题：该Linux系统在一个局域网中,局域网中有一个网关,能够让机器访问Internet,那么就需要将这台机器的ip地址设置为Linux机器的默认路由.要注意的是,直接在命令行下执行route命令来添加路由,不会永久保存,当网卡重启或者机器重启之后,该路由就失效了,可以在<code>/etc/rc.local</code>中添加route命令来保证该路由设置永久有效.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># route --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ route [选项] [地址] ]</span><br><span class="line"></span><br><span class="line">        -A             <span class="comment">#设置地址类型</span></span><br><span class="line">        -C             <span class="comment">#打印将Linux核心的路由缓存</span></span><br><span class="line">        -v             <span class="comment">#详细信息模式</span></span><br><span class="line">        -n             <span class="comment">#不执行DNS反查,以IP地址显示</span></span><br><span class="line">        -e             <span class="comment">#netstat格式显示路由表</span></span><br><span class="line">        -net           <span class="comment">#指定网络的路由表</span></span><br><span class="line">        -host          <span class="comment">#指定主机的路由表</span></span><br><span class="line"></span><br><span class="line">        Add            <span class="comment">#增加指定的路由记录</span></span><br><span class="line">        Del            <span class="comment">#删除指定的路由记录</span></span><br><span class="line">        Target         <span class="comment">#目的网络或目的主机</span></span><br><span class="line">        gw             <span class="comment">#设置默认网关</span></span><br><span class="line">        mss            <span class="comment">#设置TCP的最大区块长度(MSS)单位MB</span></span><br><span class="line">        window         <span class="comment">#指定通过路由表的TCP连接的TCP窗口大小</span></span><br><span class="line">        dev            <span class="comment">#路由记录所表示的网络接口</span></span><br></pre></td></tr></table></figure>
+<p><strong>显示当前路由:</strong> 使用<code>route</code>命令显示当前路由表.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># route</span></span><br><span class="line">Kernel IP routing table</span><br><span class="line">Destination     Gateway         Genmask         Flags Metric Ref    Use Iface</span><br><span class="line">default         gateway         0.0.0.0         UG    100    0        0 ens32</span><br><span class="line">192.168.1.0     0.0.0.0         255.255.255.0   U     100    0        0 ens32</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># route -n</span></span><br><span class="line">Kernel IP routing table</span><br><span class="line">Destination     Gateway         Genmask         Flags Metric Ref    Use Iface</span><br><span class="line">0.0.0.0         192.168.1.1     0.0.0.0         UG    100    0        0 ens32</span><br><span class="line">192.168.1.0     0.0.0.0         255.255.255.0   U     100    0        0 ens32</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>其中Flags为路由标志,标记当前网络节点的状态,Flags标志说明:</p>
+<blockquote>
+<p>U ————-&gt; (Up)表示此路由当前为启动状态<br>H ————-&gt; (Host)表示此网关为一主机<br>G ————-&gt; (Gateway)表示此网关为一路由器<br>R ————-&gt; (Reinstate Route)使用动态路由重新初始化的路由<br>D ————-&gt; (Dynamically)此路由是动态性地写入<br>M ————-&gt; (Modified)此路由是由路由守护程序或导向器动态修改<br>! ————-&gt; (false)表示此路由当前为关闭状态</p>
+</blockquote>
+</blockquote>
+<p><strong>添加网关/设置网关:</strong> 增加一条到达<code>192.168.10.0</code>的路由.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># route add -net 192.168.10.0 netmask 255.255.255.0 dev ens32</span></span><br><span class="line">[root@localhost ~]<span class="comment"># route</span></span><br><span class="line">Kernel IP routing table</span><br><span class="line">Destination     Gateway         Genmask         Flags Metric Ref    Use Iface</span><br><span class="line">default         gateway         0.0.0.0         UG    100    0        0 ens32</span><br><span class="line">192.168.1.0     0.0.0.0         255.255.255.0   U     0      0        0 ens32</span><br><span class="line">192.168.10.0    0.0.0.0         255.255.255.0   U     100    0        0 ens32</span><br></pre></td></tr></table></figure></p>
+<p><strong>屏蔽一条路由:</strong> 增加一条屏蔽的路由,目的地址为<code>192.168.10.0</code>将被拒绝.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># route add -net 192.168.10.0 netmask 255.255.255.0 reject</span></span><br><span class="line">[root@localhost ~]<span class="comment"># route</span></span><br><span class="line">Kernel IP routing table</span><br><span class="line">Destination     Gateway         Genmask         Flags Metric Ref    Use Iface</span><br><span class="line">default         gateway         0.0.0.0         UG    100    0        0 ens32</span><br><span class="line">192.168.1.0     0.0.0.0         255.255.255.0   U     0      0        0 ens32</span><br><span class="line">192.168.1.0     0.0.0.0         255.255.255.0   U     100    0        0 ens32</span><br><span class="line">192.168.10.0    -               255.255.255.0   !     0      -        0 -</span><br></pre></td></tr></table></figure></p>
+<p><strong>删除路由记录:</strong> 删除<code>192.168.10.0</code>这条路由记录.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># route</span></span><br><span class="line">Kernel IP routing table</span><br><span class="line">Destination     Gateway         Genmask         Flags Metric Ref    Use Iface</span><br><span class="line">default         gateway         0.0.0.0         UG    100    0        0 ens32</span><br><span class="line">192.168.1.0     0.0.0.0         255.255.255.0   U     0      0        0 ens32</span><br><span class="line">192.168.1.0     0.0.0.0         255.255.255.0   U     100    0        0 ens32</span><br><span class="line">192.168.10.0    -               255.255.255.0   !     0      -        0 -</span><br><span class="line">192.168.10.0    0.0.0.0         255.255.255.0   U     0      0        0 ens32</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># route del -net 192.168.10.0 netmask 255.255.255.0</span></span><br><span class="line">[root@localhost ~]<span class="comment"># route del -net 192.168.10.0 netmask 255.255.255.0 reject</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># route</span></span><br><span class="line">Kernel IP routing table</span><br><span class="line">Destination     Gateway         Genmask         Flags Metric Ref    Use Iface</span><br><span class="line">default         gateway         0.0.0.0         UG    100    0        0 ens32</span><br><span class="line">192.168.1.0     0.0.0.0         255.255.255.0   U     0      0        0 ens32</span><br><span class="line">192.168.1.0     0.0.0.0         255.255.255.0   U     100    0        0 ens32</span><br></pre></td></tr></table></figure></p>
+<p><strong>添加网关:</strong> 添加设置默认网关.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># route add default gw 192.168.1.1</span></span><br><span class="line">[root@localhost ~]<span class="comment"># route</span></span><br><span class="line">Kernel IP routing table</span><br><span class="line">Destination     Gateway         Genmask         Flags Metric Ref    Use Iface</span><br><span class="line">default         gateway         0.0.0.0         UG    0      0        0 ens32</span><br><span class="line">default         gateway         0.0.0.0         UG    100    0        0 ens32</span><br><span class="line">192.168.1.0     0.0.0.0         255.255.255.0   U     0      0        0 ens32</span><br><span class="line">192.168.1.0     0.0.0.0         255.255.255.0   U     100    0        0 ens32</span><br></pre></td></tr></table></figure></p>
+<p><strong>删除网关:</strong> 删除设置默认网关.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># route del default gw 192.168.1.1</span></span><br><span class="line">[root@localhost ~]<span class="comment"># route</span></span><br><span class="line">Kernel IP routing table</span><br><span class="line">Destination     Gateway         Genmask         Flags Metric Ref    Use Iface</span><br><span class="line">default         gateway         0.0.0.0         UG    100    0        0 ens32</span><br><span class="line">192.168.1.0     0.0.0.0         255.255.255.0   U     0      0        0 ens32</span><br><span class="line">192.168.1.0     0.0.0.0         255.255.255.0   U     100    0        0 ens32</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆Nmcli-管理网络配置◆"><a href="#◆Nmcli-管理网络配置◆" class="headerlink" title="◆Nmcli 管理网络配置◆"></a>◆Nmcli 管理网络配置◆</h3><p>RHEL7与CentOS7中默认的网络服务由NetworkManager提供,这是动态控制及配置网络的守护进程,它用于保持当前网络设备及连接处于工作状态,同时也支持传统的ifcfg类型的配置文件.NetworkManager在RHEL系统中也叫nmcli,经常使用ifconfig的用户应该在RHEL中避免使用ifconfig了,nmcli的功能要强大、复杂的多.</p>
+<p><strong>查询网络连接:</strong> 通过nmcli命令查询网络连接详情.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># nmcli connection show          #显示所有网络连接</span></span><br><span class="line">[root@localhost ~]<span class="comment"># nmcli connection show ens32    #显示指定网卡的详情</span></span><br><span class="line">[root@localhost ~]<span class="comment"># nmcli dev status               #显示网络设备连接状态</span></span><br><span class="line">[root@localhost ~]<span class="comment"># nmcli dev show                 #显示所有网络设备的详情</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>启用与禁止网络连接:</strong> 下面的命令用来启动和禁止连接网络.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># nmcli connection up ens32      #启动ens32网卡</span></span><br><span class="line">[root@localhost ~]<span class="comment"># nmcli connection down ens32    #停止ens32网卡</span></span><br><span class="line">[root@localhost ~]<span class="comment"># nmcli connection del ens32     #删除网络连接的配置文件</span></span><br><span class="line">[root@localhost ~]<span class="comment"># nmcli connection reload ens32  #重新加载配置网络配置文件</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># nmcli net on/off               #启用/关闭所有的网络连接</span></span><br><span class="line">[root@localhost ~]<span class="comment"># nmcli con dis ens32            #禁用网络设备并防止自动激活</span></span><br><span class="line">[root@localhost ~]<span class="comment"># nmcli con add help             #查看添加网络连接配置的帮助</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>修改网络地址:</strong> 修改网络连接单项参数,如下.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">nmcli con add con-name ens32 <span class="built_in">type</span> ethernet ifname ens32 动态获取IP方式的网络连接配置</span><br><span class="line">nmcli con add con-name ens32 ifname ens32 autoconnect yes <span class="built_in">type</span> ethernet ip4 192.168.1.10 gw4 192.168.1.1</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># nmcli con mod 网卡名 connection.autoconnect yes                   #修改为自动连接</span></span><br><span class="line">[root@localhost ~]<span class="comment"># nmcli con mod 网卡名 ipv4.method manual                           #dhcp修改IP地址是静态还是DHCP</span></span><br><span class="line">[root@localhost ~]<span class="comment"># nmcli con mod 网卡名 ipv4.addresses "192.168.1.0/24 192.168.1.1"  #修改IP配置及网关</span></span><br><span class="line">[root@localhost ~]<span class="comment"># nmcli con mod 网卡名 ipv4.gateway 192.168.1.1                     #修改默认网关</span></span><br><span class="line">[root@localhost ~]<span class="comment"># nmcli con mod 网卡名 +ipv4.addresses 192.168.1./24                #添加第二个IP地址</span></span><br><span class="line">[root@localhost ~]<span class="comment"># nmcli con mod 网卡名 ipv4.dns 114.114.114.114                     #添加dns1</span></span><br><span class="line">[root@localhost ~]<span class="comment"># nmcli con mod 网卡名 +ipv4.dns  8.8.8.8                           #添加dns2</span></span><br><span class="line">[root@localhost ~]<span class="comment"># nmcli con mod 网卡名 -ipv4.dns  8.8.8.8                           #删除dns</span></span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>以上nmcli命令修改所对应的文件条目:</p>
+<blockquote>
+<p>nmcli con mod ————-&gt; ifcfg-* 文件<br>ipv4.method manual ————-&gt; BOOTPROTO=none<br>ipv4.method auto ————-&gt; BOOTPROTO=dhcp<br>connection.id eth0 ————-&gt; NAME=eth0<br>ipv4.addresses ————-&gt; IPADDR0=192.168.1.10<br>192.168.1.0/24 ————-&gt; PREFIX0=24<br>192.168.1.1 ————-&gt; GATEWAY0=192.168.1.1<br>ipv4.dns 8.8.8.8 ————-&gt; DNS0=8.8.8.8<br>pv4.dns-search example.com ————-&gt; DOMAIN=example.com<br>pv4.ignore-auto-dns true ————-&gt; PEERDNS=no<br>connection.autoconnect yes ————-&gt; ONBOOT=yes<br>connection.interface-name eth0 ————-&gt; DEVICE=eth0<br>802-3-ethernet.mac-address… ————-&gt; HWADDR=…</p>
+</blockquote>
+</blockquote>
+<p><strong>配置一个IPV6地址:</strong> 使用上面的方法配置一个IPV6地址.</p>
+<p>a.先查看一下网卡名称,看一下名称是否能够匹配.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@system1 ~]<span class="comment"># nmcli connection </span></span><br><span class="line">名称 UUID 类型 设备 </span><br><span class="line">eth2 3a73717e-65ab-93e8-b518-24f5af32dc0d 802-3-ethernet eth2 </span><br><span class="line">eth1 9c92fad9-6ecb-3e6c-eb4d-8a47c6f50c04 802-3-ethernet eth1 </span><br><span class="line">eth0 5fb06bd0-0bb0-7ffb-45f1-d6edd65f3e03 802-3-ethernet eth0</span><br></pre></td></tr></table></figure></p>
+<p>b.紧接着修改管理方式为auto,并配置上IP地址.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># nmcli connection modify eth0 ipv6.method auto</span></span><br><span class="line">[root@localhost ~]<span class="comment"># nmcli connection modify eth0 ipv6.address "200e:ac18::e0a/64"</span></span><br><span class="line">[root@localhost ~]<span class="comment"># nmcli connection modify eth0 ipv6.method manual</span></span><br></pre></td></tr></table></figure></p>
+<p>c.重启服务,并查看配置是否生效<code>inet6 200e:ac18::e0a</code>.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># systemctl restart network</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ifconfig ens32</span></span><br><span class="line"></span><br><span class="line">eth0: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt; mtu 1500</span><br><span class="line">inet 192.168.122.100 netmask 255.255.255.0 broadcast 192.168.122.255</span><br><span class="line">inet6 fe80::5054:ff:fe29:8298 prefixlen 64 scopeid 0x20&lt;link&gt;</span><br><span class="line">inet6 200e:ac18::e0a prefixlen 64 scopeid 0x0&lt;global&gt;</span><br><span class="line">ether 52:54:00:29:82:98 txqueuelen 1000 (Ethernet)</span><br><span class="line">RX packets 5483 bytes 466334 (455.4 KiB)</span><br><span class="line">RX errors 0 dropped 0 overruns 0 frame 0</span><br><span class="line">TX packets 2639 bytes 357765 (349.3 KiB)</span><br><span class="line">TX errors 0 dropped 0 overruns 0 carrier 0 collisions 0</span><br></pre></td></tr></table></figure></p>
+<p><strong>配置聚合网络(拓展):</strong> 给本机配置要给聚合网络,并使用<code>eth1</code>和<code>eth2</code>接口,实现当<code>eth1</code>失效后自动切换到<code>eth2</code>.</p>
+<p>a.拷贝配置文件模板,默认配置模板.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cd /usr/share/doc/teamd-1.9/example_ifcfgs/1</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cp -a * /etc/sysconfig/network-scripts/</span></span><br></pre></td></tr></table></figure></p>
+<p>b.修改tteam_test0模板.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/sysconfig/network-scripts/ifcfg-team_test0</span></span><br><span class="line"></span><br><span class="line">1 DEVICE=<span class="string">"team_test0"</span></span><br><span class="line">2 NAME=team_test0                  <span class="comment">#添加本行</span></span><br><span class="line">3 DEVICETYPE=<span class="string">"Team"</span></span><br><span class="line">4 ONBOOT=<span class="string">"yes"</span>                     <span class="comment">#改为yes</span></span><br><span class="line">5 BOOTPROTO=none</span><br><span class="line">6 NETMASK=255.255.255.0            <span class="comment">#修改</span></span><br><span class="line">7 IPADDR=172.168.11.25             <span class="comment">#修改</span></span><br><span class="line">8 TEAM_CONFIG=<span class="string">'&#123;"runner": &#123;"name": "activebackup"&#125;&#125;'</span>  <span class="comment">#修改成activebackup</span></span><br></pre></td></tr></table></figure></p>
+<p>d.修改eth1网卡,修改两处位置即可.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/sysconfig/network-scripts/ifcfg-eth1 </span></span><br><span class="line"></span><br><span class="line">1 DEVICE=<span class="string">"eth1"</span></span><br><span class="line">2 NAME=<span class="string">"eth1"</span>                    <span class="comment">#添加</span></span><br><span class="line">3 DEVICETYPE=<span class="string">"TeamPort"</span></span><br><span class="line">4 ONBOOT=<span class="string">"yes"</span>                   <span class="comment">#修改yes</span></span><br><span class="line">5 TEAM_MASTER=<span class="string">"team_test0"</span></span><br></pre></td></tr></table></figure></p>
+<p>d.修改eth2网卡,修改两处位置即可.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/sysconfig/network-scripts/ifcfg-eth2</span></span><br><span class="line"></span><br><span class="line">1 DEVICE=<span class="string">"eth2"</span></span><br><span class="line">2 NAME=<span class="string">"eth2"</span>                    <span class="comment">#添加</span></span><br><span class="line">4 DEVICETYPE=<span class="string">"TeamPort"</span></span><br><span class="line">5 ONBOOT=<span class="string">"yes"</span>                   <span class="comment">#修改yes</span></span><br><span class="line">6 TEAM_MASTER=<span class="string">"team_test0"</span></span><br></pre></td></tr></table></figure></p>
+<p>e.重启网络看效果,到此聚合配置完毕.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># systemctl restart network</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ifconfig team_test0</span></span><br><span class="line"></span><br><span class="line">team_test0: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt; mtu 1500 </span><br><span class="line">inet 172.168.11.25 netmask 255.255.255.0 broadcast 172.168.11.255</span><br><span class="line">inet6 fe80::5054:ff:feb2:5545 prefixlen 64 scopeid 0x20&lt;link&gt;</span><br><span class="line">ether 52:54:00:b2:55:45 txqueuelen 0 (Ethernet)</span><br><span class="line">RX packets 21 bytes 2819 (2.7 KiB)</span><br><span class="line">RX errors 0 dropped 36 overruns 0 frame 0</span><br><span class="line">TX packets 27 bytes 3792 (3.7 KiB)</span><br><span class="line">TX errors 0 dropped 0 overruns 0 carrier 0 collisions 0</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/11/26/Linux 系统管理/Linux例行工作与系统管理-13/">Linux例行工作与系统管理(13)</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年11月26日 - 10:11</p>
+  <p><span>最后更新:</span>2019年04月16日 - 20:04</p>
+  <p><span>原始链接:</span><a href="/2018/11/26/Linux 系统管理/Linux例行工作与系统管理-13/" title="Linux例行工作与系统管理(13)">https://www.mkdirs.com/2018/11/26/Linux 系统管理/Linux例行工作与系统管理-13/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux-系统管理/" rel="tag"> <i class="fa fa-tag"></i> Linux 系统管理</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/25/Linux 系统管理/Linux Shell脚本编程提高-12/" rel="next" title="Linux Shell脚本编程提高(12)">
+                <i class="fa fa-chevron-left"></i> Linux Shell脚本编程提高(12)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/11/28/Linux 系统管理/Linux系统日志分析与管理-14/" rel="prev" title="Linux系统日志分析与管理(14)">
+                Linux系统日志分析与管理(14) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux系统例行工作"><span class="nav-text">Linux系统例行工作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆at-系统定时任务◆"><span class="nav-text">◆at 系统定时任务◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆jobs-工作管理◆"><span class="nav-text">◆jobs 工作管理◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆crond-例行工作◆"><span class="nav-text">◆crond 例行工作◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux系统进程管理"><span class="nav-text">Linux系统进程管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆进程的查看◆"><span class="nav-text">◆进程的查看◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆进程的管理◆"><span class="nav-text">◆进程的管理◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆调节优先级◆"><span class="nav-text">◆调节优先级◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux系统资源管理"><span class="nav-text">Linux系统资源管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆free-查看内存使用◆"><span class="nav-text">◆free 查看内存使用◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆uname-查系统版本◆"><span class="nav-text">◆uname 查系统版本◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆uptime-查系统负载◆"><span class="nav-text">◆uptime 查系统负载◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆vmstat-检测系统资源◆"><span class="nav-text">◆vmstat 检测系统资源◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆dmesg-分析启动数据◆"><span class="nav-text">◆dmesg 分析启动数据◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆lsof-查进程打开文件◆"><span class="nav-text">◆lsof 查进程打开文件◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux系统网络管理"><span class="nav-text">Linux系统网络管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆ping-测试网络连通性◆"><span class="nav-text">◆ping 测试网络连通性◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆ifconfig-查询网络信息◆"><span class="nav-text">◆ifconfig 查询网络信息◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆netstat-查网络连接状态◆"><span class="nav-text">◆netstat 查网络连接状态◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆traceroute-追踪数据包◆"><span class="nav-text">◆traceroute 追踪数据包◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆route-查询与设置路由◆"><span class="nav-text">◆route 查询与设置路由◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆Nmcli-管理网络配置◆"><span class="nav-text">◆Nmcli 管理网络配置◆</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

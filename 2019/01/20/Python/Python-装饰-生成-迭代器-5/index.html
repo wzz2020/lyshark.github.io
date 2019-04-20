@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Python 的创始人为吉多·范罗苏姆(Guido van Rossum).1989年的圣诞节期间,吉多·范罗苏姆为了在阿姆斯特丹打发时间,决心开发一个新的脚本解释程序,作为ABC语言的一种继承.Python是纯粹的自由软件,源代码和解释器CPython遵循 GPL(GNU General Public License)协议.关于python的哲学：python崇尚:”优雅”、”明确”、”简单”,">
+<meta name="keywords" content="Python">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python 装饰&amp;生成&amp;迭代器(5)">
+<meta property="og:url" content="https://www.mkdirs.com/2019/01/20/Python/Python-装饰-生成-迭代器-5/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="Python 的创始人为吉多·范罗苏姆(Guido van Rossum).1989年的圣诞节期间,吉多·范罗苏姆为了在阿姆斯特丹打发时间,决心开发一个新的脚本解释程序,作为ABC语言的一种继承.Python是纯粹的自由软件,源代码和解释器CPython遵循 GPL(GNU General Public License)协议.关于python的哲学：python崇尚:”优雅”、”明确”、”简单”,">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-01-20T11:52:32.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Python 装饰&amp;生成&amp;迭代器(5)">
+<meta name="twitter:description" content="Python 的创始人为吉多·范罗苏姆(Guido van Rossum).1989年的圣诞节期间,吉多·范罗苏姆为了在阿姆斯特丹打发时间,决心开发一个新的脚本解释程序,作为ABC语言的一种继承.Python是纯粹的自由软件,源代码和解释器CPython遵循 GPL(GNU General Public License)协议.关于python的哲学：python崇尚:”优雅”、”明确”、”简单”,">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2019/01/20/Python/Python-装饰-生成-迭代器-5/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Python 装饰&生成&迭代器(5) | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2019/01/20/Python/Python-装饰-生成-迭代器-5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Python 装饰&生成&迭代器(5)
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-01-20 10:00:35 / 修改时间：19:52:32" itemprop="dateCreated datePublished" datetime="2019-01-20T10:00:35+08:00">2019-01-20</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Python/" itemprop="url" rel="index"><span itemprop="name">Python</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Python 的创始人为吉多·范罗苏姆(Guido van Rossum).1989年的圣诞节期间,吉多·范罗苏姆为了在阿姆斯特丹打发时间,决心开发一个新的脚本解释程序,作为ABC语言的一种继承.Python是纯粹的自由软件,源代码和解释器CPython遵循 GPL(GNU General Public License)协议.关于python的哲学：python崇尚:”优雅”、”明确”、”简单”,Python是用最简单最优雅最明确的方法来解决问题.</p>
+<a id="more"></a>
+<p><br></p>
+<h2 id="Python-装饰器"><a href="#Python-装饰器" class="headerlink" title="Python 装饰器"></a>Python 装饰器</h2><p>装饰器可以使函数执行前和执行后分别执行其他的附加功能,这种在代码运行期间动态增加功能的方式,称之为<code>&quot;装饰器&quot;(Decorator)</code>,装饰器的功能非常强大,装饰器一般接受一个函数对象作为参数,以对其进行增强,相当于C++中的构造函数,与析构函数.</p>
+<p>装饰器本质上是一个Python函数,它可以让其他函数在不需要做任何代码变动的前提下增加额外功能,装饰器的返回值也是一个函数对象.它经常用于有迫切需求的场景,比如：插入日志、性能测试、事务处理、缓存、权限校验等场景.装饰器是解决这类问题的绝佳设计,有了装饰器,我们就可以抽离出大量与函数功能本身无关的雷同代码并继续重用.</p>
+<blockquote>
+<p>总而言之,装饰器具有如下几个特点:</p>
+<blockquote>
+<p>● 装饰器本身也是一个函数,其作用是,用于装饰其他函数.<br>● 装饰器是一个闭包函数是嵌套函数,通过外层函数提供嵌套函数的环境<br>● 装饰器在权限控制,增加额外功能,如增加记录日志,缓存处理,发送邮件用的比较多</p>
+</blockquote>
+</blockquote>
+<h3 id="◆无参装饰器◆"><a href="#◆无参装饰器◆" class="headerlink" title="◆无参装饰器◆"></a>◆无参装饰器◆</h3><p>原函数中不带参数的装饰器,如下例子假设：我定义了一个函数<code>lyshark()</code>,现在想要在不改变原来函数定义的情况下,在函数运行前打印一段话,函数运行后打印另一段话,此时我们可以使用装饰器的装饰功能来简单的实现这个需求.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> os</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> sys</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="function"><span class="keyword">def</span> <span class="title">outer</span><span class="params">(function)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">inner</span><span class="params">()</span>:</span></span><br><span class="line">        print(<span class="string">"主函数开始执行前,会先执行我!"</span>)</span><br><span class="line">        result=function()</span><br><span class="line">        print(<span class="string">"主函数执行结束后,要在执行我!"</span>)</span><br><span class="line">        <span class="keyword">return</span> result</span><br><span class="line">    <span class="keyword">return</span> inner</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># (1) @ + 函数名,直接作用在需要装饰的函数上一行</span></span><br><span class="line"><span class="comment"># (2) 自动执行outer函数并且将下面的函数名lyshark()当做参数传递到outer()</span></span><br><span class="line"><span class="comment"># (3) 将outer函数的返回值inner,重新赋值给lyshark()函数</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>@outer</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">lyshark</span><span class="params">()</span>:</span></span><br><span class="line">    print(<span class="string">"lyshark 的主函数体,装饰器在装饰我(*^_^*)"</span>)</span><br><span class="line">    <span class="keyword">return</span> <span class="string">"check ok"</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#==调用并执行函数,结果如下==========================================</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>ret=lyshark()</span><br><span class="line">主函数开始执行前,会先执行我!</span><br><span class="line">lyshark 的主函数体,装饰器在装饰我(*^_^*)</span><br><span class="line">主函数执行结束后,要在执行我!</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(<span class="string">"lyshark()函数的返回值: "</span>,ret)</span><br><span class="line">lyshark()函数的返回值:  check</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>如上代码的执行流程是这样的,步骤如下:</p>
+<blockquote>
+<p>1.当我们调用lyshark()函数时,会自动检查lyshark()函数上是否有装饰器<br>2.如果有则将lyshark()函数的指针,传递给装饰器outer(function)<br>3.outer(function)接到指针后,执行嵌套函数内的inner(),则先执行print打印一段话<br>4.由于lyshark()函数指针,传递给了function变量,执行function()则相当于执行lyshark()<br>5.紧接着,最后一步执行打印一段结束的话,并执行返回,返回inner</p>
+</blockquote>
+</blockquote>
+<h3 id="◆有参装饰器◆"><a href="#◆有参装饰器◆" class="headerlink" title="◆有参装饰器◆"></a>◆有参装饰器◆</h3><p><strong>原函数带一个参数的装饰器:</strong> 我们在以上的案例中,给装饰器添加一个参数,并在内部使用这个参数.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> os</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> sys</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="function"><span class="keyword">def</span> <span class="title">outer</span><span class="params">(function)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">inner</span><span class="params">(args)</span>:</span></span><br><span class="line">        print(<span class="string">"主函数开始执行前,会先执行我!"</span>)</span><br><span class="line">        ret=function(args)</span><br><span class="line">        print(<span class="string">"主函数执行结束后,要在执行我!"</span>)</span><br><span class="line">        <span class="keyword">return</span> ret</span><br><span class="line">    <span class="keyword">return</span> inner</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>@outer</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">lyshark</span><span class="params">(args)</span>:</span></span><br><span class="line">    print(args)</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#==调用并执行函数,结果如下==========================================</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>ret=lyshark(<span class="string">"hello world!"</span>)</span><br><span class="line">主函数开始执行前,会先执行我!</span><br><span class="line">hello world!</span><br><span class="line">主函数执行结束后,要在执行我!</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(<span class="string">"lyshark 的返回值是："</span>,ret)</span><br><span class="line">lyshark() 函数的返回值是： <span class="number">0</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>原函数带两个参数的装饰器:</strong> 接下来继续演示一下,带有两个参数的装饰器,3个4个,以此类推.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> os</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> sys</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="function"><span class="keyword">def</span> <span class="title">outer</span><span class="params">(function)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">inner</span><span class="params">(x,y)</span>:</span></span><br><span class="line">        print(<span class="string">"主函数开始执行前,会先执行我!"</span>)</span><br><span class="line">        ret=function(x,y)</span><br><span class="line">        print(<span class="string">"主函数执行结束后,要在执行我!"</span>)</span><br><span class="line">        <span class="keyword">return</span> ret</span><br><span class="line">    <span class="keyword">return</span> inner</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>@outer</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">lyshark</span><span class="params">(x,y)</span>:</span></span><br><span class="line">    print(x,y)</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#==调用并执行函数,结果如下==========================================</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>ret=lyshark(<span class="string">"Hello"</span>,<span class="string">"LyShark"</span>)</span><br><span class="line">主函数开始执行前,会先执行我!</span><br><span class="line">Hello LyShark</span><br><span class="line">主函数执行结束后,要在执行我!</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(<span class="string">"lyshark() 函数的返回值是："</span>,ret)</span><br><span class="line">lyshark() 函数的返回值是： <span class="number">0</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>传递一个万能参数:</strong> 装饰器也可传递一个万能参数,通过此参数传递列表字典等.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> os</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> sys</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="function"><span class="keyword">def</span> <span class="title">outer</span><span class="params">(function)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">inner</span><span class="params">(*args,**kwargs)</span>:</span></span><br><span class="line">        print(<span class="string">"主函数开始执行前,会先执行我!"</span>)</span><br><span class="line">        ret=function(*args,**kwargs)</span><br><span class="line">        print(<span class="string">"主函数执行结束后,要在执行我!"</span>)</span><br><span class="line">        <span class="keyword">return</span> ret</span><br><span class="line">    <span class="keyword">return</span> inner</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>@outer</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">lyshark</span><span class="params">(*args)</span>:</span></span><br><span class="line">    print(args)</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#==调用并执行函数,结果如下==========================================</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>num=[<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>ret=lyshark(num)</span><br><span class="line">主函数开始执行前,会先执行我!</span><br><span class="line">([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>],)</span><br><span class="line">主函数执行结束后,要在执行我!</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(<span class="string">"lyshark() 函数的返回值是："</span>,ret)</span><br><span class="line">lyshark() 函数的返回值是： <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#==调用并执行函数,结果如下==========================================</span></span><br><span class="line"><span class="meta">@outer</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">lyshark_kw</span><span class="params">(*args,**kwargs)</span>:</span></span><br><span class="line">        print(args,kwargs)</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line"></span><br><span class="line">num=[<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>]</span><br><span class="line">kw=&#123;<span class="string">"1001"</span>:<span class="string">"admin"</span>,<span class="string">"1002"</span>:<span class="string">"guest"</span>&#125;</span><br><span class="line">ret=lyshark_kw(num,kw)</span><br></pre></td></tr></table></figure></p>
+<p><strong>一次使用两个装饰器装饰函数:</strong> 如果一个装饰器不够用的话,我们可以使用两个装饰器,首先将函数与内层装饰器结合然后在与外层装饰器相结合,要理解使用<code>@语法</code>的时候到底执行了什么,是理解装饰器的关键.<br><figure class="highlight"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> os</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> sys</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="function"><span class="keyword">def</span> <span class="title">outer2</span><span class="params">(function2)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">inner2</span><span class="params">(*args,**kwargs)</span>:</span></span><br><span class="line">        print(<span class="string">"装饰器2---&gt;【开始】"</span>)</span><br><span class="line">        ret=function2(*args,**kwargs)</span><br><span class="line">        print(<span class="string">"装饰器2---&gt;【结束】"</span>)</span><br><span class="line">        <span class="keyword">return</span> ret</span><br><span class="line">    <span class="keyword">return</span> inner2</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="function"><span class="keyword">def</span> <span class="title">outer1</span><span class="params">(function1)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">inner1</span><span class="params">(*args,**kwargs)</span>:</span></span><br><span class="line">        print(<span class="string">"装饰器1---&gt;【开始】"</span>)</span><br><span class="line">        ret=function1(*args,**kwargs)</span><br><span class="line">        print(<span class="string">"装饰器1---&gt;【结束】"</span>)</span><br><span class="line">        <span class="keyword">return</span> ret</span><br><span class="line">    <span class="keyword">return</span> inner1</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@outer2</span></span><br><span class="line"><span class="meta">@outer1</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">lyshark</span><span class="params">()</span>:</span></span><br><span class="line">    print(<span class="string">"lyshark 函数被执行了"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#==调用并执行函数,结果如下==========================================</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lyshark()</span><br><span class="line">装饰器2---&gt;【开始】</span><br><span class="line">装饰器1---&gt;【开始】</span><br><span class="line">lyshark 函数执行了</span><br><span class="line">装饰器1---&gt;【结束】</span><br><span class="line">装饰器2---&gt;【结束】</span><br><span class="line"></span><br><span class="line"><span class="comment">#==调用并执行函数,结果如下==========================================</span></span><br><span class="line"><span class="meta">@outer1</span></span><br><span class="line"><span class="meta">@outer2</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">lyshark_and</span><span class="params">()</span>:</span></span><br><span class="line">    print(<span class="string">"lyshark_and 函数被执行了"</span>)</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>lyshark_and()</span><br><span class="line">装饰器1---&gt;【开始】</span><br><span class="line">装饰器2---&gt;【开始】</span><br><span class="line">lyshark_and 函数执行了</span><br><span class="line">装饰器2---&gt;【结束】</span><br><span class="line">装饰器1---&gt;【结束】</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆带参装饰器◆"><a href="#◆带参装饰器◆" class="headerlink" title="◆带参装饰器◆"></a>◆带参装饰器◆</h3><p>前面的装饰器本身没有带参数,如果要写一个带参数的装饰器怎么办,那么我们就需要写一个三层的装饰器,而且前面写的装饰器都不太规范,下面来写一个比较规范带参数的装饰器,下面来看一下代码,大家可以将下面的代码自我运行一下.</p>
+<p><strong>给装饰器本身添加参数:</strong> 接下来我们将给装饰器本身添加一些参数,使其能够实现参数传递.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> functools</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> sys</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="function"><span class="keyword">def</span> <span class="title">lyshark</span><span class="params">(temp=<span class="string">""</span>)</span>:</span>                                   <span class="comment">#指定装饰器默认参数</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">decorator</span><span class="params">(function)</span>:</span>                                <span class="comment">#定义装饰器</span></span><br><span class="line"><span class="meta">        @functools.wraps(function)                          #使被装饰的装饰器的函数名不改变</span></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">wrapper</span><span class="params">(*args,**kwargs)</span>:</span></span><br><span class="line">            print(<span class="string">"主函数开始执行前,会先执行我!"</span>)</span><br><span class="line">            print(<span class="string">"&#123;&#125;:&#123;&#125;"</span>.format(temp,function.__name__))   <span class="comment">#这里调用了装饰器temp变量</span></span><br><span class="line">            ret=function(*args,**kwargs)</span><br><span class="line">            print(<span class="string">"主函数执行结束后,要在执行我!"</span>)</span><br><span class="line">            <span class="keyword">return</span> ret</span><br><span class="line">        <span class="keyword">return</span> wrapper</span><br><span class="line">    <span class="keyword">return</span> decorator</span><br><span class="line"></span><br><span class="line"><span class="comment">#==调用并执行函数,结果如下==========================================</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="comment">#如果不给装饰器加参数,那么这个装饰器将使用默认参数 temp="",来填充</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>@lyshark()</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span><span class="params">(x)</span>:</span></span><br><span class="line">    print(x+<span class="number">100</span>)</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>test(<span class="number">100</span>)</span><br><span class="line">主函数开始执行前,会先执行我!</span><br><span class="line">:test                         <span class="comment">#这里由于没有传递参数则第一项为空,第二项是函数名称`function.__name__`取出的</span></span><br><span class="line">主函数执行结束后,要在执行我!</span><br><span class="line"></span><br><span class="line"><span class="comment">#==调用并执行函数,结果如下==========================================</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="comment">#下面是给装饰器一个参数,将不是用默认参数 temp="",将变成 temp="LyShark"</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>@lyshark(<span class="string">"LyShark"</span>)</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span><span class="params">(x)</span>:</span></span><br><span class="line">    print(x+<span class="number">100</span>)</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>test(<span class="number">100</span>)</span><br><span class="line">主函数开始执行前,会先执行我!</span><br><span class="line">LyShark:test</span><br><span class="line">主函数执行结束后,要在执行我!</span><br></pre></td></tr></table></figure></p>
+<p><strong>给装饰器本身添加参数:</strong> 接下来我们将给装饰器本身添加两个参数,使其能够传递多个参数.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> sys</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> os</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="function"><span class="keyword">def</span> <span class="title">lyshark</span><span class="params">(x=<span class="string">"Hello"</span>,y=<span class="string">"LyShark"</span>)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">decorator</span><span class="params">(function)</span>:</span></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">wrapper</span><span class="params">()</span>:</span></span><br><span class="line">            print(<span class="string">"主函数执行前,应先执行我！"</span>)</span><br><span class="line">            print(x,y)</span><br><span class="line">            ret=function()</span><br><span class="line">            print(<span class="string">"主函数执行后,要执行我！"</span>)</span><br><span class="line">            <span class="keyword">return</span> ret</span><br><span class="line">        <span class="keyword">return</span> wrapper</span><br><span class="line">    <span class="keyword">return</span> decorator</span><br><span class="line"></span><br><span class="line"><span class="comment">#==调用并执行函数,结果如下==========================================</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="comment">#使用默认参数的装饰器:此时 x="Hello" y="LyShark"</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>@lyshark()</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span><span class="params">()</span>:</span></span><br><span class="line">    print(<span class="string">"我是test(),主函数,装饰器在装饰我"</span>)</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>test()</span><br><span class="line">主函数执行前,应先执行我！</span><br><span class="line">Hello LyShark</span><br><span class="line">我是test(),主函数,装饰器在装饰我</span><br><span class="line">主函数执行后,要执行我！</span><br><span class="line"></span><br><span class="line"><span class="comment">#==调用并执行函数,结果如下==========================================</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="comment">#给装饰器指定参数:此时 x="My Name Is :" y="LyShark"</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>@lyshark(<span class="string">"My Name Is :"</span>,<span class="string">"LyShark"</span>)</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span><span class="params">()</span>:</span></span><br><span class="line">    print(<span class="string">"我是test(),主函数，装饰器在装饰我"</span>)</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>test()</span><br><span class="line">主函数执行前,应先执行我！</span><br><span class="line">My Name Is : LyShark</span><br><span class="line">我是test(),主函数,装饰器在装饰我</span><br><span class="line">主函数执行后,要执行我！</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆装饰器实战-练习-◆"><a href="#◆装饰器实战-练习-◆" class="headerlink" title="◆装饰器实战(练习)◆"></a>◆装饰器实战(练习)◆</h3><p><strong>测试程序执行时间:</strong> 通过使用装饰器,给一个已存在的函数,测试函数的执行时间.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">showtime</span><span class="params">(func)</span>:</span></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">                start_time=time.time()</span><br><span class="line">                func()</span><br><span class="line">                end_time=time.time()</span><br><span class="line">                print(<span class="string">"程序运行了: %s"</span>%(end_time-start_time))</span><br><span class="line">        <span class="keyword">return</span> main</span><br><span class="line"></span><br><span class="line"><span class="comment">#==调用并执行函数,结果如下==========================================</span></span><br><span class="line"><span class="meta">@showtime</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">timer</span><span class="params">()</span>:</span></span><br><span class="line">        time.sleep(<span class="number">3</span>)</span><br><span class="line">        print(<span class="string">"执行程序结束...."</span>)</span><br><span class="line"></span><br><span class="line">timer()</span><br></pre></td></tr></table></figure></p>
+<p><strong>记录登陆状态(1):</strong> 使用装饰器记录登陆状态,下次自动登录.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"></span><br><span class="line">user_info=&#123;&#125;</span><br><span class="line">user_name=<span class="string">"admin"</span></span><br><span class="line">pass_word=<span class="string">"1233"</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">check_login</span><span class="params">(func)</span>:</span></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">                <span class="keyword">if</span>((user_info.get(<span class="string">"is_login"</span>,<span class="literal">None</span>) ==<span class="literal">True</span>) <span class="keyword">and</span> (user_info.get(<span class="string">"is_type"</span>,<span class="literal">None</span>)==<span class="number">0</span>)):</span><br><span class="line">                        print(<span class="string">"你已经登陆过了,不能重复登陆!"</span>)</span><br><span class="line">                        func()</span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                        print(<span class="string">"你没有登陆,请先登录,在进行此操作"</span>)</span><br><span class="line">        <span class="keyword">return</span> main</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">login</span><span class="params">()</span>:</span></span><br><span class="line">        username=input(<span class="string">"输入用户名:"</span>).strip()</span><br><span class="line">        password=input(<span class="string">"输入密码:"</span>).strip()</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> username==user_name <span class="keyword">and</span> password==pass_word:</span><br><span class="line">                user_info[<span class="string">"is_login"</span>]=<span class="literal">True</span></span><br><span class="line">                user_info[<span class="string">"is_type"</span>]=<span class="number">0</span></span><br><span class="line">                print(<span class="string">"你好: "</span>+username+<span class="string">"登陆成功,登录状态已被记录"</span>)</span><br><span class="line">        <span class="keyword">elif</span> username!=<span class="string">""</span> <span class="keyword">and</span> password!=<span class="string">""</span>:</span><br><span class="line">                print(<span class="string">"您输入的用户名,或者密码不正确,请重新输入"</span>)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">                print(<span class="string">"您没有输入任何内容,错误"</span>)</span><br><span class="line"></span><br><span class="line"><span class="meta">@check_login</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">home</span><span class="params">()</span>:</span></span><br><span class="line">        print(<span class="string">"用户登录成功，显示这个函数中的内容."</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">        <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">                temp=input(<span class="string">"1.登陆  2.查询状态\n"</span>)</span><br><span class="line">                <span class="keyword">if</span>(temp==<span class="string">"1"</span>):</span><br><span class="line">                        login()</span><br><span class="line">                <span class="keyword">elif</span>(temp==<span class="string">"2"</span>):</span><br><span class="line">                        home()</span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                        <span class="keyword">continue</span></span><br><span class="line"></span><br><span class="line">main()</span><br></pre></td></tr></table></figure></p>
+<p><strong>记录登陆状态(2):</strong> 使用装饰器记录登陆状态,下次自动登录.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">USER_INFO = &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">check_login</span><span class="params">(func)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">inner</span><span class="params">(*args,**kwargs)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> USER_INFO.get(<span class="string">'is_login'</span>,<span class="literal">None</span>):</span><br><span class="line">            ret = func()</span><br><span class="line">            <span class="keyword">return</span> ret</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            print(<span class="string">"请登录"</span>)</span><br><span class="line">    <span class="keyword">return</span> inner</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">check_admin</span><span class="params">(func)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">inner</span><span class="params">(*args,**kwargs)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> USER_INFO.get(<span class="string">'user_type'</span>,<span class="literal">None</span>) == <span class="number">2</span>:</span><br><span class="line">            ret = func()</span><br><span class="line">            <span class="keyword">return</span> ret</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            print(<span class="string">"无权限查看"</span>)</span><br><span class="line">    <span class="keyword">return</span> inner</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@check_login        #先检查你是不是登陆了</span></span><br><span class="line"><span class="meta">@check_admin        #在检查你是不是管理员</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    管理员用户</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    print(<span class="string">'index'</span>)</span><br><span class="line"></span><br><span class="line"><span class="meta">@check_login</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">home</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    普通用户</span></span><br><span class="line"><span class="string">    </span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    print(<span class="string">'home'</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">login</span><span class="params">()</span>:</span></span><br><span class="line">    user = input(<span class="string">"请输入用户名:"</span>)</span><br><span class="line">    <span class="keyword">if</span> user == <span class="string">'admin'</span>:</span><br><span class="line">        USER_INFO[<span class="string">'is_login'</span>] = <span class="literal">True</span></span><br><span class="line">        USER_INFO[<span class="string">'user_type'</span>] = <span class="number">2</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        USER_INFO[<span class="string">'is_login'</span>] = <span class="literal">True</span></span><br><span class="line">        USER_INFO[<span class="string">'user_type'</span>] = <span class="number">1</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        inp = input(<span class="string">'1、登录;2、查看信息;3、超级管理员管理\n&gt;:'</span>)</span><br><span class="line">        <span class="keyword">if</span> inp == <span class="string">'1'</span>:</span><br><span class="line">            login()</span><br><span class="line">        <span class="keyword">elif</span> inp == <span class="string">'2'</span>:</span><br><span class="line">            home()</span><br><span class="line">        <span class="keyword">elif</span> inp == <span class="string">'3'</span>:</span><br><span class="line">            index()</span><br><span class="line"></span><br><span class="line">main()</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="Python-生成器"><a href="#Python-生成器" class="headerlink" title="Python 生成器"></a>Python 生成器</h2><p>通过列表生成式,我们可以直接创建一个列表.但是,受到内存限制,列表容量肯定是有限的,而且创建一个包含100万个元素的列表,不仅占用很大的存储空间,还会造成大量空间的白白浪费,如果列表元素可以按照某种算法推算出来,这样我们就不必创建完整的list,从而节省大量的空间.在Python中,这种一边循环一边计算的机制,称为<code>生成器(Generator)</code>.</p>
+<p>生成器是一个特殊的程序,可以被用作控制循环的迭代行为,Python中生成器是迭代器的一种,使用yield返回值函数,每次调用yield会暂停,而可以使用next()函数和send()函数恢复生成器.</p>
+<p>生成器类似于返回值为数组的一个函数,这个函数可以接受参数,可以被调用,但不同于一般的函数会一次性返回包括了所有数值的数组,生成器一次只能产生一个值,这样消耗的内存数量将大大减小,而且允许调用函数可以很快的处理前几个返回值,因此生成器看起来像是一个函数,但是表现得却像是迭代器.</p>
+<blockquote>
+<p>生成器的注意事项,和相关的特性:</p>
+<blockquote>
+<p>● 当我们调用一个生成器函数时,其实返回的是一个迭代器对象<br>● 在Python语言中,只要表达式中使用了,yield函数,通常将此类函数称为生成器(generator)<br>● 运行生成器时,每次遇到yield函数,则会自动保存并暂停执行,直到使用next()方法时,才会继续迭代<br>● 跟普通函数不同,生成器是一个返回迭代器的函数,只能用于迭代操作,更简单点理解生成器就是一个迭代器</p>
+</blockquote>
+</blockquote>
+<p>在学习生成器之前,我们先来看一下以下两种情况的对比,第一种方法很简单,只有把一个列表生成式的[]中括号改为()小括号,就创建了一个生成器.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>lis = [x*x <span class="keyword">for</span> x <span class="keyword">in</span> range(<span class="number">10</span>)]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(lis)</span><br><span class="line">[<span class="number">0</span>, <span class="number">1</span>, <span class="number">4</span>, <span class="number">9</span>, <span class="number">16</span>, <span class="number">25</span>, <span class="number">36</span>, <span class="number">49</span>, <span class="number">64</span>, <span class="number">81</span>]</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>generator = (x*x <span class="keyword">for</span> x <span class="keyword">in</span> range(<span class="number">10</span>))</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(generator)</span><br><span class="line">&lt;generator object &lt;genexpr&gt; at <span class="number">0x0000022E5C788A98</span>&gt;</span><br></pre></td></tr></table></figure></p>
+<p>如上的例子,第一个<code>lis</code>通过列表生成式,创建了一个列表,而第二个<code>generator</code>则打印出一个内存地址,如果我们想获取到第二个变量中的数据,则需要迭代操作,如下所示:<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>generator = (x*x <span class="keyword">for</span> x <span class="keyword">in</span> range(<span class="number">10</span>))</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(next(generator))</span><br><span class="line"><span class="number">0</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(next(generator))</span><br><span class="line"><span class="number">1</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(next(generator))</span><br><span class="line"><span class="number">4</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(next(generator))</span><br><span class="line"><span class="number">9</span></span><br></pre></td></tr></table></figure></p>
+<p>以上可以看到,generator保存的是算法,每次调用next(generaotr),就计算出他的下一个元素的值,直到计算出最后一个元素,使用for循环可以简便的遍历出迭代器中的数据,因为generator也是可迭代对象.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>generator = (x*x <span class="keyword">for</span> x <span class="keyword">in</span> range(<span class="number">10</span>))</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">for</span> i <span class="keyword">in</span> generator:</span><br><span class="line">	print(i,end=<span class="string">""</span>)</span><br><span class="line"></span><br><span class="line"><span class="number">0149162536496481</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="◆生成器的实例◆"><a href="#◆生成器的实例◆" class="headerlink" title="◆生成器的实例◆"></a>◆生成器的实例◆</h3><p><strong>实例(1):</strong> 通过函数,和<code>yield关键字</code>,生成几个生成器.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> sys</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="function"><span class="keyword">def</span> <span class="title">func</span><span class="params">()</span>:</span></span><br><span class="line">	<span class="keyword">yield</span> <span class="number">1</span></span><br><span class="line">	<span class="keyword">yield</span> <span class="number">2</span></span><br><span class="line">	<span class="keyword">yield</span> <span class="number">3</span></span><br><span class="line">	<span class="keyword">yield</span> <span class="number">4</span></span><br><span class="line">	<span class="keyword">yield</span> <span class="number">5</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>temp=func()</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>temp.__next__()</span><br><span class="line"><span class="number">1</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>temp.__next__()</span><br><span class="line"><span class="number">2</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>temp.__next__()</span><br><span class="line"><span class="number">3</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>实例(2):</strong> 使用while循环构建一个生成器,并通过for遍历打印出结果.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> sys</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="function"><span class="keyword">def</span> <span class="title">yieldNum</span><span class="params">(x)</span>:</span></span><br><span class="line">	y=<span class="number">0</span></span><br><span class="line">	<span class="keyword">while</span> (y &lt;= x):</span><br><span class="line">		<span class="keyword">yield</span> y</span><br><span class="line">		y += <span class="number">1</span></span><br><span class="line">	</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>yie=yieldNum(<span class="number">5</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">for</span> i <span class="keyword">in</span> yie:</span><br><span class="line">	print(i)</span><br><span class="line"></span><br><span class="line"><span class="number">0</span></span><br><span class="line"><span class="number">1</span></span><br><span class="line"><span class="number">2</span></span><br><span class="line"><span class="number">3</span></span><br><span class="line"><span class="number">4</span></span><br><span class="line"><span class="number">5</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>实例(3):</strong> 使用生成器求1-10的平方.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="function"><span class="keyword">def</span> <span class="title">yieldNum</span><span class="params">()</span>:</span></span><br><span class="line">    x=<span class="number">1</span></span><br><span class="line">    <span class="keyword">while</span> (x &lt;=<span class="number">10</span> ):</span><br><span class="line">        <span class="keyword">yield</span> x ** <span class="number">2</span></span><br><span class="line">        x += <span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>yie=yieldNum()</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">for</span> i <span class="keyword">in</span> yie:</span><br><span class="line">    print(i)</span><br><span class="line"><span class="number">4</span></span><br><span class="line"><span class="number">16</span></span><br><span class="line"><span class="number">36</span></span><br><span class="line"><span class="number">64</span></span><br><span class="line"><span class="number">100</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>实例(4):</strong> 使用生成器,自定义实现range函数.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="function"><span class="keyword">def</span> <span class="title">xrange</span><span class="params">(num)</span>:</span></span><br><span class="line">    temp=<span class="number">-1</span></span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        temp=temp+<span class="number">1</span></span><br><span class="line">        <span class="keyword">if</span> (temp &gt;= num):</span><br><span class="line">            <span class="keyword">return</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">yield</span> temp</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>xrange(<span class="number">10</span>)</span><br><span class="line">&lt;generator object xrange at <span class="number">0x038E3030</span>&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例(5):</strong> 通过使用生成器求斐波那契数列.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="function"><span class="keyword">def</span> <span class="title">fib</span><span class="params">(max)</span>:</span></span><br><span class="line">    n,a,b=<span class="number">0</span>,<span class="number">0</span>,<span class="number">1</span></span><br><span class="line">    <span class="keyword">while</span> n &lt; max:</span><br><span class="line">        <span class="keyword">yield</span> b</span><br><span class="line">        a,b=b,a+b</span><br><span class="line">        n+=<span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">"done"</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>f=fib(<span class="number">5</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>f</span><br><span class="line">&lt;generator object fib at <span class="number">0x038F4A20</span>&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例(6):</strong> 使用生成器,在单个进程情况下实现并发效果.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">consumer</span><span class="params">(name)</span>:</span></span><br><span class="line">    print(<span class="string">"%s 准备吃包子啦!"</span> %name)</span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">       baozi = <span class="keyword">yield</span></span><br><span class="line"> </span><br><span class="line">       print(<span class="string">"包子[%s]来了,被[%s]吃了!"</span> %(baozi,name))</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">producer</span><span class="params">(name)</span>:</span></span><br><span class="line">    c = consumer(<span class="string">'A'</span>)</span><br><span class="line">    c2 = consumer(<span class="string">'B'</span>)</span><br><span class="line">    c.__next__()</span><br><span class="line">    c2.__next__()</span><br><span class="line">    print(<span class="string">"老子开始准备做包子啦!"</span>)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10</span>):</span><br><span class="line">        time.sleep(<span class="number">1</span>)</span><br><span class="line">        print(<span class="string">"做了2个包子!"</span>)</span><br><span class="line">        c.send(i)</span><br><span class="line">        c2.send(i)</span><br><span class="line"> </span><br><span class="line">producer(<span class="string">"alex"</span>)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆生成列表解析◆"><a href="#◆生成列表解析◆" class="headerlink" title="◆生成列表解析◆"></a>◆生成列表解析◆</h3><p>列表解析是Python迭代机制的一种应用,它常用于实现创建新的列表,因此要放置于[]中,列表解析非常灵活,可以用户快速创建一组相应规则的列表元素,且支持迭代操作.</p>
+<p><strong>求阶乘:</strong> 通过列表解析式,来实现列表的迭代求阶乘.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>temp1 = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>temp2 = [ x ** <span class="number">2</span> <span class="keyword">for</span> x <span class="keyword">in</span> temp1 ]</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>temp1</span><br><span class="line">[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>temp2</span><br><span class="line">[<span class="number">1</span>, <span class="number">4</span>, <span class="number">9</span>, <span class="number">16</span>, <span class="number">25</span>]</span><br></pre></td></tr></table></figure></p>
+<p><strong>求阶乘:</strong> 通过列表解析式,实现迭代求阶乘,并且只打印<code>大于2(if x&gt;=2)</code>的数据.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>temp1 = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>temp2 = [ x**<span class="number">2</span> <span class="keyword">for</span> x <span class="keyword">in</span> temp <span class="keyword">if</span> x&gt;=<span class="number">2</span> ]</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>temp1</span><br><span class="line">[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>temp2</span><br><span class="line">[<span class="number">4</span>, <span class="number">9</span>, <span class="number">16</span>, <span class="number">25</span>]</span><br></pre></td></tr></table></figure></p>
+<p><strong>求阶乘:</strong> 通过列表解析式,实现迭代求阶乘,并通过<code>range</code>函数生成相关数据.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>temp = [ (x**<span class="number">2</span>)/<span class="number">2</span> <span class="keyword">for</span> x <span class="keyword">in</span> range(<span class="number">1</span>,<span class="number">10</span>)]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>temp</span><br><span class="line">[<span class="number">0.5</span>, <span class="number">2.0</span>, <span class="number">4.5</span>, <span class="number">8.0</span>, <span class="number">12.5</span>, <span class="number">18.0</span>, <span class="number">24.5</span>, <span class="number">32.0</span>, <span class="number">40.5</span>]</span><br></pre></td></tr></table></figure></p>
+<p><strong>数据合并:</strong> 通过列表解析式,实现迭代将两个列表按照规律合并.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>temp1=[<span class="string">"x"</span>,<span class="string">"y"</span>,<span class="string">"z"</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>temp2=[<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>temp3=[ (i,j) <span class="keyword">for</span> i <span class="keyword">in</span> temp1 <span class="keyword">for</span> j <span class="keyword">in</span> temp2 ]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>temp3</span><br><span class="line">[(<span class="string">'x'</span>, <span class="number">1</span>), (<span class="string">'x'</span>, <span class="number">2</span>), (<span class="string">'x'</span>, <span class="number">3</span>), (<span class="string">'y'</span>, <span class="number">1</span>), (<span class="string">'y'</span>, <span class="number">2</span>), (<span class="string">'y'</span>, <span class="number">3</span>), (<span class="string">'z'</span>, <span class="number">1</span>), (<span class="string">'z'</span>, <span class="number">2</span>), (<span class="string">'z'</span>, <span class="number">3</span>)]</span><br></pre></td></tr></table></figure></p>
+<p><strong>文件过滤:</strong> 通过使用列表解析,实现文本的过滤操作.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>file_list=os.listdir(<span class="string">"/var/log"</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>file_log=[ i <span class="keyword">for</span> i <span class="keyword">in</span> file_list <span class="keyword">if</span> i.endswith(<span class="string">".log"</span>) ]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(file_log)</span><br><span class="line">[<span class="string">'boot.log'</span>, <span class="string">'yum.log'</span>, <span class="string">'ecs_network_optimization.log'</span>, <span class="string">'ntp.log'</span>]</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>file_log=[ i <span class="keyword">for</span> i <span class="keyword">in</span> os.listdir(<span class="string">"/var/log"</span>) <span class="keyword">if</span> i.endswith(<span class="string">".log"</span>) ]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(file_log)</span><br><span class="line">[<span class="string">'boot.log'</span>, <span class="string">'yum.log'</span>, <span class="string">'ecs_network_optimization.log'</span>, <span class="string">'ntp.log'</span>]</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆生成器表达式◆"><a href="#◆生成器表达式◆" class="headerlink" title="◆生成器表达式◆"></a>◆生成器表达式◆</h3><p>生成器表达式并不真正创建数字列表,而是返回一个生成器对象,此对象在每次计算出一个条目后,把这个条目<code>&quot;产生&quot;(yield)</code>出来,生成器表达式使用了”惰性计算”或称作”延迟求值”的机制序列过长,并且每次只需要获取一个元素时,应当考虑使用生成器表达式而不是列表解析.</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> sys</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>yie=( i**<span class="number">2</span> <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>,<span class="number">10</span>) )</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>next(yie)</span><br><span class="line"><span class="number">1</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>next(yie)</span><br><span class="line"><span class="number">4</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>next(yie)</span><br><span class="line"><span class="number">9</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">for</span> j <span class="keyword">in</span> ( i**<span class="number">2</span> <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>,<span class="number">10</span>)):print(j/<span class="number">2</span>)</span><br><span class="line"><span class="meta">... </span></span><br><span class="line"><span class="number">0.5</span></span><br><span class="line"><span class="number">2.0</span></span><br><span class="line"><span class="number">4.5</span></span><br><span class="line"><span class="number">8.0</span></span><br><span class="line"><span class="number">12.5</span></span><br><span class="line"><span class="number">18.0</span></span><br><span class="line"><span class="number">24.5</span></span><br><span class="line"><span class="number">32.0</span></span><br><span class="line"><span class="number">40.5</span></span><br></pre></td></tr></table></figure>
+<p><br></p>
+<h2 id="Python-迭代器"><a href="#Python-迭代器" class="headerlink" title="Python 迭代器"></a>Python 迭代器</h2><p>迭代器是访问集合元素的一种方式,迭代器对象从集合的第一个元素开始访问,直到所有的元素被访问完结束.迭代器只能往前不会后退,不过这也没什么,因为人们很少在迭代途中往后退.另外,迭代器的一大优点是不要求事先准备好整个迭代过程中所有的元素.迭代器仅仅在迭代到某个元素时才计算该元素,而在这之前或之后,元素可以不存在或者被销毁.这个特点使得它特别适合用于遍历一些巨大的或是无限的集合,比如几个G文件的遍历.</p>
+<blockquote>
+<p>关于迭代器的几个特性:</p>
+<blockquote>
+<p>● 迭代器是一个可以记住遍历的位置的对象<br>● 字符串,列表或元组对象都可用于创建迭代器<br>● 迭代器有两个基本的方法：<code>iter()和next()</code><br>● 迭代器便于循环比较大的数据集合,节省了内存开支<br>● 迭代是Python最强大的功能之一,是访问集合元素的一种方式<br>● next()就相当于调用<strong>next</strong>(),for也是iterable(可迭代)对象<br>● 访问者不需要关心迭代器内部的结构,仅需通过next()方法不断去取下一个内容<br>● 迭代器对象从集合的第一个元素开始访问,直到所有的元素被访问完结束.迭代器只能往前不会后退</p>
+</blockquote>
+</blockquote>
+<p><strong>实例(1):</strong> 迭代器的基本用法1.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> sys</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>temp=iter([<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>,<span class="number">9</span>])</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>temp</span><br><span class="line">&lt;list_iterator object at <span class="number">0x03BD1F90</span>&gt;</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>temp.__next__()</span><br><span class="line"><span class="number">1</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>temp.__next__()</span><br><span class="line"><span class="number">2</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>temp.__next__()</span><br><span class="line"><span class="number">3</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>实例(2):</strong> 迭代器的基本用法2.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> sys</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>temp=[<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>ite=temp.__iter__()</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(type(temp),type(ite))</span><br><span class="line">&lt;<span class="class"><span class="keyword">class</span> '<span class="title">list</span>'&gt; &lt;<span class="title">class</span> '<span class="title">list_iterator</span>'&gt;</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class">&gt;&gt;&gt; <span class="title">next</span><span class="params">(ite)</span></span></span><br><span class="line"><span class="class">1</span></span><br><span class="line"><span class="class">&gt;&gt;&gt; </span></span><br><span class="line"><span class="class">&gt;&gt;&gt; <span class="title">next</span><span class="params">(ite)</span></span></span><br><span class="line"><span class="class">2</span></span><br><span class="line"><span class="class">&gt;&gt;&gt; <span class="title">next</span><span class="params">(ite)</span></span></span><br><span class="line"><span class="class">3</span></span><br><span class="line"><span class="class">&gt;&gt;&gt; <span class="title">next</span><span class="params">(ite)</span></span></span><br><span class="line"><span class="class">4</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>实例(3):</strong> 通过while语句遍历迭代对象.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>ite=iter([<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>])</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        temp=next(ite)</span><br><span class="line">        print(temp)</span><br><span class="line">    <span class="keyword">except</span> StopIteration:</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line"></span><br><span class="line"><span class="number">1</span></span><br><span class="line"><span class="number">2</span></span><br><span class="line"><span class="number">3</span></span><br><span class="line"><span class="number">4</span></span><br><span class="line"><span class="number">5</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2019/01/20/Python/Python-装饰-生成-迭代器-5/">Python 装饰&生成&迭代器(5)</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2019年01月20日 - 10:01</p>
+  <p><span>最后更新:</span>2019年01月20日 - 19:01</p>
+  <p><span>原始链接:</span><a href="/2019/01/20/Python/Python-装饰-生成-迭代器-5/" title="Python 装饰&生成&迭代器(5)">https://www.mkdirs.com/2019/01/20/Python/Python-装饰-生成-迭代器-5/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Python/" rel="tag"> <i class="fa fa-tag"></i> Python</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/01/18/Python/Python-变量作用域与函数-4/" rel="next" title="Python 变量作用域与函数(4)">
+                <i class="fa fa-chevron-left"></i> Python 变量作用域与函数(4)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/01/21/Python/Python-常用内置模块详解-6/" rel="prev" title="Python 常用内置模块详解(6)">
+                Python 常用内置模块详解(6) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Python-装饰器"><span class="nav-text">Python 装饰器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆无参装饰器◆"><span class="nav-text">◆无参装饰器◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆有参装饰器◆"><span class="nav-text">◆有参装饰器◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆带参装饰器◆"><span class="nav-text">◆带参装饰器◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆装饰器实战-练习-◆"><span class="nav-text">◆装饰器实战(练习)◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Python-生成器"><span class="nav-text">Python 生成器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆生成器的实例◆"><span class="nav-text">◆生成器的实例◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆生成列表解析◆"><span class="nav-text">◆生成列表解析◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆生成器表达式◆"><span class="nav-text">◆生成器表达式◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Python-迭代器"><span class="nav-text">Python 迭代器</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Docker是基于Go语言实现的开源容器项目,Docker让开发者可以打包他们的应用以及依赖包到一个可移植的容器中,然后发布到任何流行的 Linux 机器上,也可以实现虚拟化.容器是完全使用沙箱机制,相互之间不会有任何接口,Docker诞生于2013年年初,最初发起者是dotCloud公司.Docker自开源后受到广泛的关注和讨论,目前已有多个相关项目(包括Docker三剑客、Kubernetes">
+<meta name="keywords" content="Docker">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Docker 数据卷与容器互联(3)">
+<meta property="og:url" content="https://www.mkdirs.com/2018/12/15/Docker/Docker-数据管理与容器互联-3/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="Docker是基于Go语言实现的开源容器项目,Docker让开发者可以打包他们的应用以及依赖包到一个可移植的容器中,然后发布到任何流行的 Linux 机器上,也可以实现虚拟化.容器是完全使用沙箱机制,相互之间不会有任何接口,Docker诞生于2013年年初,最初发起者是dotCloud公司.Docker自开源后受到广泛的关注和讨论,目前已有多个相关项目(包括Docker三剑客、Kubernetes">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-12-17T09:17:32.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Docker 数据卷与容器互联(3)">
+<meta name="twitter:description" content="Docker是基于Go语言实现的开源容器项目,Docker让开发者可以打包他们的应用以及依赖包到一个可移植的容器中,然后发布到任何流行的 Linux 机器上,也可以实现虚拟化.容器是完全使用沙箱机制,相互之间不会有任何接口,Docker诞生于2013年年初,最初发起者是dotCloud公司.Docker自开源后受到广泛的关注和讨论,目前已有多个相关项目(包括Docker三剑客、Kubernetes">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/12/15/Docker/Docker-数据管理与容器互联-3/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Docker 数据卷与容器互联(3) | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/12/15/Docker/Docker-数据管理与容器互联-3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Docker 数据卷与容器互联(3)
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-15 14:50:42" itemprop="dateCreated datePublished" datetime="2018-12-15T14:50:42+08:00">2018-12-15</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-12-17 17:17:32" itemprop="dateModified" datetime="2018-12-17T17:17:32+08:00">2018-12-17</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Docker/" itemprop="url" rel="index"><span itemprop="name">Docker</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Docker是基于Go语言实现的开源容器项目,Docker让开发者可以打包他们的应用以及依赖包到一个可移植的容器中,然后发布到任何流行的 Linux 机器上,也可以实现虚拟化.容器是完全使用沙箱机制,相互之间不会有任何接口,Docker诞生于2013年年初,最初发起者是dotCloud公司.Docker自开源后受到广泛的关注和讨论,目前已有多个相关项目(包括Docker三剑客、Kubernetes等),逐渐形成了围绕Docker容器的生态体系,由于Docker在业界造成的影响力实在太大,dotCloud公司后来也直接改名为Docker Inc,并专注于Docker相关技术和产品的开发.</p>
+<a id="more"></a>
+<p><br></p>
+<h2 id="Docker持久化处理"><a href="#Docker持久化处理" class="headerlink" title="Docker持久化处理"></a>Docker持久化处理</h2><p>生产环境中使用Docker的过程中,往往需要对数据进行持久化,或者需要在多个容器之间进行数据共享,这必然涉及容器的数据管理操作,容器管理中主要有两种方式,<code>数据卷(Data Volumes)</code>,<code>数据卷容器(Data Volume Containers)</code>,本小结将首先介绍如何在容器内创建数据卷,并且把本地的目录或文件挂载到容器内的数据卷中.接下来,会介绍如何使用数据卷容器在容器和主机、容器和容器之间共享数据,并实现数据的备份和恢复.</p>
+<h3 id="◆数据卷◆"><a href="#◆数据卷◆" class="headerlink" title="◆数据卷◆"></a>◆数据卷◆</h3><p>数据卷是一个可供容器使用的特殊目录,它将主机操作系统目录直接映射进容器,类似于Linux中的mount操作.</p>
+<blockquote>
+<p>数据卷可以提供很多有用的特性,如下所示:</p>
+<blockquote>
+<p>● 数据卷可以在容器之间共享和重用,容器间传递数据将变得高效方便.<br>● 对数据卷内数据的修改会立马生效,无论是容器内操作还是本地操作.<br>● 对数据卷的更新不会影响镜像,解耦了应用和数据.<br>● 卷会一直存在,直到没有容器使用,可以安全地卸载它.</p>
+</blockquote>
+</blockquote>
+<p><strong>挂载一个本地目录作为数据卷:</strong></p>
+<p>1.在本地主机创建一个目录,并写入一些数据,来模拟本地数据.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mkdir /data</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "hello mkdirs.com" &gt; /data/index.html</span></span><br></pre></td></tr></table></figure></p>
+<p>2.开启容器,并让容器读取本地的<code>/data</code>目录.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># docker run -d -p 8080:80 --name MyWeb -v /data:/usr/local/apache2/htdocs httpd:latest</span></span><br><span class="line">2882b3edda42fe153a897d3dc21f73835eb57c14019b5e810066c34e0eda4c0c</span><br><span class="line"></span><br><span class="line">[参数解释]</span><br><span class="line"></span><br><span class="line">	-d     <span class="comment">#以守护进程运行</span></span><br><span class="line">	-p     <span class="comment">#将容器中的80口,映射到本地主机的8080</span></span><br><span class="line">	--name <span class="comment">#指定一个容器名称</span></span><br><span class="line">	-v     <span class="comment">#上面指的是,将本地/data目录挂载得到容器中的/usr/local目录中.</span></span><br><span class="line">	-P     <span class="comment">#是将容器服务暴露的端口,是自动映射到本地主机的临时端口.</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># curl 127.0.0.1:8080</span></span><br><span class="line">hello mkdirs.com</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆数据卷容器◆"><a href="#◆数据卷容器◆" class="headerlink" title="◆数据卷容器◆"></a>◆数据卷容器◆</h3><p>如果用户需要在多个容器之间共享一些持续更新的数据,最简单的方式是使用数据卷容器.数据卷容器也是一个容器,但是它的目的是专门用来提供数据卷供其他容器挂载.</p>
+<p>1.首先,创建一个数据卷容器dbdata,并在容器中创建一个数据卷/dbdata的目录.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># docker run -itd -v /usr/local/apache2/htdocs --name dbdata centos:latest</span></span><br><span class="line">1bc16a7978db7db83a4a107bf2fe1c4c42c4c7fffa7dd92372a6aacb68ccfdd0</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># docker exec -it dbdata /bin/bash</span></span><br><span class="line">[root@1bc16a7978db /]<span class="comment"># echo "hello mkdirs.com" &gt; /usr/local/apache2/htdocs/index.html</span></span><br><span class="line">[root@1bc16a7978db /]<span class="comment"># ls -lh /usr/local/apache2/htdocs/index.html</span></span><br><span class="line">total 4.0K</span><br><span class="line">-rw-r--r-- 1 root root 17 Dec 15 11:37 index.html</span><br><span class="line"></span><br><span class="line">[root@1bc16a7978db /]<span class="comment"># exit</span></span><br></pre></td></tr></table></figure></p>
+<p>2.然后,可以在其他容器中使用<code>--volumes-from</code>来挂载dbdata容器中的数据卷,例如创建db1和db2两个容器,并从dbdata容器挂载数据卷.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># docker run -d -p 801:80 --volumes-from dbdata --name db1 httpd:latest</span></span><br><span class="line">123e75f38947f3294ac77a08bf4380f311d09cc176b576c61499139d75b35db3</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># docker run -d -p 802:80 --volumes-from dbdata --name db2 httpd:latest</span></span><br><span class="line">a4e0f8016af6b89e31a637b1482b0849dcea26e4004298def4abce44c84d6dd6</span><br></pre></td></tr></table></figure></p>
+<p>3.分别访问两个不同的端口,会发现网页展现效果是一样的,也就是说,db1和db2共享了dbdata容器里指定文件的内容.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># netstat -antp |grep 801</span></span><br><span class="line">tcp6       0      0 :::801                  :::*                    LISTEN      3998/docker-proxy</span><br><span class="line">[root@localhost ~]<span class="comment"># netstat -antp |grep 802</span></span><br><span class="line">tcp6       0      0 :::802                  :::*                    LISTEN      4157/docker-proxy</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># curl 127.0.0.1:801</span></span><br><span class="line">hello mkdirs.com</span><br><span class="line">[root@localhost ~]<span class="comment"># curl 127.0.0.1:802</span></span><br><span class="line">hello mkdirs.com</span><br></pre></td></tr></table></figure></p>
+<p>使用<code>--volumes-from</code>参数所挂载数据卷的容器自身并不需要保持在运行状态,如果删除了挂载的容器(包括dbdata、db1和db2),数据卷并不会被自动删除.如果要删除一个数据卷,必须在删除最后一个还挂载着它的容器时显式使用<code>docker rm -v</code>命令来指定同时删除关联的容器.</p>
+<h3 id="◆容器备份恢复◆"><a href="#◆容器备份恢复◆" class="headerlink" title="◆容器备份恢复◆"></a>◆容器备份恢复◆</h3><p><strong>数据备份：</strong> 使用下面的命令来备份dbdata数据卷容器内的数据卷,并把它备份到当前目录下.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># docker run --volumes-from dbdata -v $(pwd):/backup --name workers centos:latest tar -czvf /backup/backup.tar /usr/local/apache2/htdocs</span></span><br><span class="line"></span><br><span class="line">tar: Removing leading `/<span class="string">' from member names</span></span><br><span class="line"><span class="string">/usr/local/apache2/htdocs/</span></span><br><span class="line"><span class="string">/usr/local/apache2/htdocs/index.html</span></span><br><span class="line"><span class="string">[root@localhost ~]# ls</span></span><br><span class="line"><span class="string">backup.tar</span></span><br></pre></td></tr></table></figure></p>
+<p>这个命令稍微有点复杂,具体分析一下,首先利用centos镜像创建了一个容器workers.使用<code>--volumes-from dbdata</code>参数来让workers容器挂载dbdata容器的数据卷(即dbdata数据卷),使用<code>-v $(pwd):/backup</code>参数来挂载本地的当前目录到workers容器的/backup目录.workers容器启动后,使用了<code>tar -czvf/backup/backup.tar /usr/local/apache2/htdocs</code>命令来将<code>/usr/local/apache2/htdocs</code>下内容备份为容器内的<code>/backup/backup.tar</code>,即宿主主机当前目录下的backup.tar.</p>
+<p><strong>数据恢复：</strong> 如果要将数据恢复到一个容器,可以按照下面的步骤操作.</p>
+<p>1.首先创建一个带有数据卷的容器dbdata_backup.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># docker run -itd -v /usr/local/apache2/htdocs --name dbdata_backup centos:latest /bin/bash</span></span><br><span class="line">a207d887bfa07cc0e1737efb197950cac3b2c5647391348b1b8fa8b873c58667</span><br></pre></td></tr></table></figure></p>
+<p>2.然后创建另一个新的容器,挂载dbdata2的容器,并使用untar解压备份文件到所挂载的容器卷中.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># docker run --volumes-from dbdata_backup -v $(pwd):/backup busybox tar -xzvf /backup/backup.tar</span></span><br><span class="line"></span><br><span class="line">usr/<span class="built_in">local</span>/apache2/htdocs/</span><br><span class="line">usr/<span class="built_in">local</span>/apache2/htdocs/index.html</span><br></pre></td></tr></table></figure></p>
+<p>本小结介绍了通过数据卷和数据卷容器对容器内数据进行共享、备份和恢复等操作,通过这些机制,即使容器在运行中出现故障,用户也不必担心数据发生丢失,只需要快速地重新创建容器即可.<br><br></p>
+<h2 id="Docker端口映射"><a href="#Docker端口映射" class="headerlink" title="Docker端口映射"></a>Docker端口映射</h2><p>在实践中,经常会碰到需要多个服务组件容器共同协作的情况,这往往需要多个容器之间有能够互相访问到对方的服务,Docker提供了两个很方便的功能来满足服务访问的基本需求：一个是允许映射容器内应用的服务端口到本地宿主主机,另一个是互联机制实现多个容器间通过容器名来快速访问,下面我们来分别介绍一下吧.</p>
+<h3 id="◆从外部访问容器应用◆"><a href="#◆从外部访问容器应用◆" class="headerlink" title="◆从外部访问容器应用◆"></a>◆从外部访问容器应用◆</h3><p><strong>随机分配端口：</strong> 当容器中运行一些网络应用,要让外部访问这些应用时,可以通过<code>-P</code>或<code>-p</code>参数来指定端口映射.当使用-P(大写的)标记时,Docker会随机映射一个<code>49000~49900</code>的端口到内部容器开放的网络端口.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># docker run -d -P --name myweb httpd:latest</span></span><br><span class="line">afb211e832c16c80822632fe0864838781cee2132993f93cde8c915e242f9df5</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># docker ps</span></span><br><span class="line">CONTAINER ID        IMAGE               COMMAND              CREATED             STATUS              PORTS                   NAMES</span><br><span class="line">afb211e832c1        httpd:latest        <span class="string">"httpd-foreground"</span>   3 seconds ago       Up 2 seconds        0.0.0.0:32768-&gt;80/tcp   myweb</span><br></pre></td></tr></table></figure></p>
+<p><strong>指定分配端口：</strong> 当我们使用<code>-p(小写的)</code>可以指定要映射的端口,并且,在一个指定端口上只可以绑定一个容器.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># docker run -d -p 8080:80 --name myweb1 httpd:latest</span></span><br><span class="line">b47f6131dea02c8cd22a75049e97c28cc4bb25bc6bf5cd36645c1ccb4210554e</span><br><span class="line"></span><br><span class="line"><span class="comment">#上面说明,将容器的80端口,映射到本地的8080</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># curl 127.0.0.1.8080</span></span><br><span class="line">&lt;html&gt;&lt;body&gt;&lt;h1&gt;It works!&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆映射所有接口地址◆"><a href="#◆映射所有接口地址◆" class="headerlink" title="◆映射所有接口地址◆"></a>◆映射所有接口地址◆</h3><p><strong>映射指定端口：</strong> 格式将容器的80端口映射到本机的80端口.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># docker run -d -p 80:80 --name myweb2 httpd:latest</span></span><br><span class="line">9c3d0f8ad0bbfa75cc6534f93f959192316125a2776a2c909c71dc9dfb5a8b79</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># curl 127.0.0.1</span></span><br><span class="line">&lt;html&gt;&lt;body&gt;&lt;h1&gt;It works!&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>映射多个端口：</strong> 多次使用<code>-p</code>标记可以绑定多个端口.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># docker run -d -p 8080:80 -p 1000:21 --name myweb3 httpd:latest</span></span><br><span class="line">097ceb68128b58195c990dff720e39ca1717809cc2019d3f31466dee6fd32aec</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># netstat -antp |grep "8080"</span></span><br><span class="line">tcp6       0      0 :::8080                 :::*                    LISTEN      2306/docker-proxy</span><br><span class="line">[root@localhost ~]<span class="comment"># netstat -antp |grep "1000"</span></span><br><span class="line">tcp6       0      0 :::1000                 :::*                    LISTEN      2317/docker-proxy</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆映射到指定地址◆"><a href="#◆映射到指定地址◆" class="headerlink" title="◆映射到指定地址◆"></a>◆映射到指定地址◆</h3><p><strong>映射到指定地址的指定端口：</strong> 将容器中的80端口映射到本地指定IP地址上去.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ifconfig ens32:0 192.168.1.10 netmask 255.255.255.0</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ifconfig ens32:0</span></span><br><span class="line">ens32:0: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1500</span><br><span class="line">        inet 192.168.1.10  netmask 255.255.255.0  broadcast 192.168.1.255</span><br><span class="line">        ether 00:0c:29:1e:14:e2  txqueuelen 1000  (Ethernet)</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># docker run -d -p 192.168.1.10:8080:80 --name myweb_port httpd:latest</span></span><br><span class="line">7385faa5d476cb37dd7d201cd0ec939501c9bdb23ec1c8239245c30d2be9abe7</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># netstat -antp |grep "8080"</span></span><br><span class="line">tcp        0      0 192.168.1.10:8080       0.0.0.0:*               LISTEN      2585/docker-proxy</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># curl 192.168.1.10:8080</span></span><br><span class="line">&lt;html&gt;&lt;body&gt;&lt;h1&gt;It works!&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>映射到指定地址的任意端口：</strong> ：本地主机会自动分配一个端口,绑定到容器的80口.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># docker run -d -p 192.168.1.10::80 --name myweb_port1 httpd:latest</span></span><br><span class="line">7a5a105ae0827aaff68864a28b5f9b8a9592af3551f7deca564ea2d6d5a249b3</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># netstat -antp |grep "80"</span></span><br><span class="line">tcp        0      0 192.168.1.10:8080       0.0.0.0:*               LISTEN      2585/docker-proxy</span><br><span class="line"></span><br><span class="line"><span class="comment">#还可以使用udp标记来指定udp端口</span></span><br><span class="line">[root@localhost ~]<span class="comment"># docker run -d -p 192.168.1.10:5000:5000/udp --name myweb_udp httpd:latest</span></span><br><span class="line">b9cc6333a63109a70a1d2e645b1ff5046988b472dea3bb4f4d010f1478951adf</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># netstat -an |grep "5000"</span></span><br><span class="line">udp        0      0 192.168.1.10:5000       0.0.0.0:*</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="Docker容器互联"><a href="#Docker容器互联" class="headerlink" title="Docker容器互联"></a>Docker容器互联</h2><p>容器的互联(linking)是一种让多个容器中应用进行快速交互的方式,它会在源和接收容器之间创建连接关系,接收容器可以通过容器名快速访问到源容器,而不用指定具体的IP地址.</p>
+<p>1.使用<code>--link</code>参数可以让容器之间安全地进行交互,下面先创建一个新的MySQL数据库容器.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># docker run -d --name mysqldb mysql:latest</span></span><br><span class="line">c1770a69ed29944466ce013c42ac2a0391651c88381e41be05308eab80458390</span><br></pre></td></tr></table></figure></p>
+<p>2.然后创建一个新的web容器,并将它连接到MySQL容器,使之能够通信.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># docker run -d -P --name web --link mysqldb:mysqldb httpd:latest</span></span><br><span class="line">8b2bfcbbe00f6966c511fdbbbc16e40736ab8d6aa89d229e224f38d12c4643df</span><br></pre></td></tr></table></figure></p>
+<p>此时,mysqldb容器和web容器建立互联关系,<code>--link</code>参数的格式为<code>--link name：alias</code>,其中name是要连接的容器名称,alias是这个连接的别名.</p>
+<p>Docker相当于在两个互联的容器之间创建了一个虚机通道,而且不用映射它们的端口到宿主主机上.在启动mysqldb容器的时候并没有使用-p和-P标记,从而避免了暴露数据库服务端口到外部网络上.<br><br></p>
+<h2 id="拓展与实战例子"><a href="#拓展与实战例子" class="headerlink" title="拓展与实战例子"></a>拓展与实战例子</h2><h3 id="◆Apache◆"><a href="#◆Apache◆" class="headerlink" title="◆Apache◆"></a>◆Apache◆</h3><p>Apache是世界使用排名第一的Web服务器软件,它可以运行在几乎所有广泛使用的计算机平台上,由于其跨平台和安全性被广泛使用,是最流行的Web服务器端软件之一.它快速、可靠并且可通过简单的API扩充,将Perl/Python等解释器编译到服务器中.</p>
+<p>1.拉取镜像,并在本地创建一个测试页.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># docker pull httpd:latest</span></span><br><span class="line">[root@localhost ~]<span class="comment"># docker images</span></span><br><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">httpd               latest              2a51bb06dc8b        4 weeks ago         132MB</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># mkdir /web</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "hello world" &gt; /web/index.html</span></span><br></pre></td></tr></table></figure></p>
+<p>2.运行http容器,并访问测试.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># docker run -d -p 8080:80 --name MyWeb -v /web:/usr/local/apache2/htdocs httpd:latest</span></span><br><span class="line">[root@localhost ~]<span class="comment"># curl 127.0.0.1:8080</span></span><br><span class="line">hello world</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆GitLab◆"><a href="#◆GitLab◆" class="headerlink" title="◆GitLab◆"></a>◆GitLab◆</h3><p>Gitlab是一款非常强大的开源源码管理系统.它支持基于Git的源码管理、代码评审、issue跟踪、活动管理、wiki页面,持续集成和测试等功能.基于Gitlab,用户可以自己搭建一套类似Github的开发协同平台.</p>
+<p>1.安装并启动postgresql.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># docker pull sameersbn/postgresql:latest</span></span><br><span class="line">[root@localhost ~]<span class="comment"># docker images</span></span><br><span class="line">REPOSITORY             TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">sameersbn/postgresql   latest              3c0142eb3992        5 months ago        204MB</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># docker run --name gitlab_postgresql -d \</span></span><br><span class="line">--env <span class="string">'DB_NAME=gitlab'</span> \</span><br><span class="line">--env <span class="string">'DB_USER=gitlab'</span> --env <span class="string">'DB_PASS=gitlab'</span> \</span><br><span class="line">sameersbn/postgresql:latest</span><br></pre></td></tr></table></figure></p>
+<p>2.安装redis.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># docker pull sameersbn/redis:latest</span></span><br><span class="line">[root@localhost ~]<span class="comment"># docker images</span></span><br><span class="line">REPOSITORY             TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">sameersbn/redis        latest              ad607f019b8c        4 months ago        84.8MB</span><br><span class="line">sameersbn/postgresql   latest              3c0142eb3992        5 months ago        204MB</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># docker run --name gitlab_redis -itd sameersbn/redis:latest</span></span><br></pre></td></tr></table></figure></p>
+<p>3.安装GitLab.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># docker pull sameersbn/gitlab:latest</span></span><br><span class="line">[root@localhost ~]<span class="comment"># docker images</span></span><br><span class="line">REPOSITORY             TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">sameersbn/gitlab       latest              336fe9c19d92        6 days ago          1.96GB</span><br><span class="line">sameersbn/redis        latest              ad607f019b8c        4 months ago        84.8MB</span><br><span class="line">sameersbn/postgresql   latest              3c0142eb3992        5 months ago        204MB</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># docker run --name gitlab -d sameersbn/gitlab \</span></span><br><span class="line">--link gitlab_postgresql:postgresql --link gitlab_redis:redis \</span><br><span class="line">--publish 10022:22 --publish 10080:80 \</span><br><span class="line">--env <span class="string">'GITLAB_PORT=10080'</span> --env <span class="string">'GITLAB_SSH_PORT=10022'</span> \</span><br><span class="line">--env <span class="string">'GITLAB_SECRETS_DB_KEY_BASE=long-and-random-alpha-numeric-string'</span> \</span><br><span class="line">sameersbn/gitlab:latest</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆WordPress◆"><a href="#◆WordPress◆" class="headerlink" title="◆WordPress◆"></a>◆WordPress◆</h3><p>WordPress是使用PHP语言开发的博客平台,用户可以在支持PHP和MySQL数据库的服务器上架设属于自己的网站.也可以把WordPress当作一个内容管理系统(CMS)来使用,WordPress逐步演化成一款内容管理系统软件,它是使用PHP语言和MySQL数据库开发的.用户可以在支持PHP和MySQL数据库的服务器上使用自己的博客.</p>
+<p>1.首先安装一个MariaDB数据库,并配置好初始密码.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># docker pull mariadb:latest</span></span><br><span class="line">[root@localhost ~]<span class="comment"># docker images</span></span><br><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">mariadb             latest              b468922dbbd7        3 weeks ago         366MB</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># docker run --name MyDataBase --env MYSQL_ROOT_PASSWORD=example -d mariadb:latest</span></span><br></pre></td></tr></table></figure></p>
+<p>2.拉取WordPress镜像,并运行,将容器内的80口映射到宿主机的8080口上.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># docker pull wordpress:latest</span></span><br><span class="line">[root@localhost ~]<span class="comment"># docker run --name MyWordPress --link MyDataBase:MariaDB -p 8080:80 -d wordpress:latest</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/12/15/Docker/Docker-数据管理与容器互联-3/">Docker 数据卷与容器互联(3)</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年12月15日 - 14:12</p>
+  <p><span>最后更新:</span>2018年12月17日 - 17:12</p>
+  <p><span>原始链接:</span><a href="/2018/12/15/Docker/Docker-数据管理与容器互联-3/" title="Docker 数据卷与容器互联(3)">https://www.mkdirs.com/2018/12/15/Docker/Docker-数据管理与容器互联-3/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Docker/" rel="tag"> <i class="fa fa-tag"></i> Docker</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/14/Docker/Docker-镜像与容器管理-2/" rel="next" title="Docker 镜像与容器管理(2)">
+                <i class="fa fa-chevron-left"></i> Docker 镜像与容器管理(2)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/15/Docker/Docker-添加容器SSH服务-4/" rel="prev" title="Docker 添加容器SSH服务(4)">
+                Docker 添加容器SSH服务(4) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker持久化处理"><span class="nav-text">Docker持久化处理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆数据卷◆"><span class="nav-text">◆数据卷◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆数据卷容器◆"><span class="nav-text">◆数据卷容器◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆容器备份恢复◆"><span class="nav-text">◆容器备份恢复◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker端口映射"><span class="nav-text">Docker端口映射</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆从外部访问容器应用◆"><span class="nav-text">◆从外部访问容器应用◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆映射所有接口地址◆"><span class="nav-text">◆映射所有接口地址◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆映射到指定地址◆"><span class="nav-text">◆映射到指定地址◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker容器互联"><span class="nav-text">Docker容器互联</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#拓展与实战例子"><span class="nav-text">拓展与实战例子</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆Apache◆"><span class="nav-text">◆Apache◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆GitLab◆"><span class="nav-text">◆GitLab◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆WordPress◆"><span class="nav-text">◆WordPress◆</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

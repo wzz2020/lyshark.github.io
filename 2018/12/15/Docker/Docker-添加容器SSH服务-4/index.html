@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Docker是基于Go语言实现的开源容器项目,Docker让开发者可以打包他们的应用以及依赖包到一个可移植的容器中,然后发布到任何流行的 Linux 机器上,也可以实现虚拟化.容器是完全使用沙箱机制,相互之间不会有任何接口,Docker诞生于2013年年初,最初发起者是dotCloud公司.Docker自开源后受到广泛的关注和讨论,目前已有多个相关项目(包括Docker三剑客、Kubernetes">
+<meta name="keywords" content="Docker">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Docker 添加容器SSH服务(4)">
+<meta property="og:url" content="https://www.mkdirs.com/2018/12/15/Docker/Docker-添加容器SSH服务-4/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="Docker是基于Go语言实现的开源容器项目,Docker让开发者可以打包他们的应用以及依赖包到一个可移植的容器中,然后发布到任何流行的 Linux 机器上,也可以实现虚拟化.容器是完全使用沙箱机制,相互之间不会有任何接口,Docker诞生于2013年年初,最初发起者是dotCloud公司.Docker自开源后受到广泛的关注和讨论,目前已有多个相关项目(包括Docker三剑客、Kubernetes">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-12-16T06:42:34.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Docker 添加容器SSH服务(4)">
+<meta name="twitter:description" content="Docker是基于Go语言实现的开源容器项目,Docker让开发者可以打包他们的应用以及依赖包到一个可移植的容器中,然后发布到任何流行的 Linux 机器上,也可以实现虚拟化.容器是完全使用沙箱机制,相互之间不会有任何接口,Docker诞生于2013年年初,最初发起者是dotCloud公司.Docker自开源后受到广泛的关注和讨论,目前已有多个相关项目(包括Docker三剑客、Kubernetes">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/12/15/Docker/Docker-添加容器SSH服务-4/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Docker 添加容器SSH服务(4) | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/12/15/Docker/Docker-添加容器SSH服务-4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Docker 添加容器SSH服务(4)
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-15 20:26:12" itemprop="dateCreated datePublished" datetime="2018-12-15T20:26:12+08:00">2018-12-15</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-12-16 14:42:34" itemprop="dateModified" datetime="2018-12-16T14:42:34+08:00">2018-12-16</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Docker/" itemprop="url" rel="index"><span itemprop="name">Docker</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Docker是基于Go语言实现的开源容器项目,Docker让开发者可以打包他们的应用以及依赖包到一个可移植的容器中,然后发布到任何流行的 Linux 机器上,也可以实现虚拟化.容器是完全使用沙箱机制,相互之间不会有任何接口,Docker诞生于2013年年初,最初发起者是dotCloud公司.Docker自开源后受到广泛的关注和讨论,目前已有多个相关项目(包括Docker三剑客、Kubernetes等),逐渐形成了围绕Docker容器的生态体系,由于Docker在业界造成的影响力实在太大,dotCloud公司后来也直接改名为Docker Inc,并专注于Docker相关技术和产品的开发.</p>
+<a id="more"></a>
+<p>很多时候我们需要登陆到容器内部操作,此时我们就需要开启容器的SSH支持了,下面的小例子将具体介绍三种分配IP地址的方法,分别是pipworl分配,commit分配,Docker分配等.<br><br></p>
+<h2 id="基于commit命令创建"><a href="#基于commit命令创建" class="headerlink" title="基于commit命令创建"></a>基于commit命令创建</h2><p>Docker提供了commit命令,支持用户提交自己对定制容器的修改,并生成新的镜像.这里将介绍如何用docker commit命令,添加SSH服务的操作流程,首先默认情况下ssh服务在镜像里是没有被安装的,我们需要手动配置一下,后期生成镜像启动就方便啦.</p>
+<p>1.首先我们先来使用Centos镜像,放入后台并进入容器内部.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># docker pull centos:latest</span></span><br><span class="line">[root@localhost ~]<span class="comment"># docker run -itd --name my_ssh --net=host centos:latest</span></span><br><span class="line">[root@localhost ~]<span class="comment"># docker exec -it my_ssh /bin/bash</span></span><br><span class="line">[root@c59a63bbb /]<span class="comment"># yum install -y passwd openssh openssh-server</span></span><br></pre></td></tr></table></figure></p>
+<p>2.如果需要正常启动SSH服务,则目录<code>/var/run/sshd</code>必须存在,手动创建它,并启动SSH服务.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@c59a63bbb /]<span class="comment"># mkdir -p /var/run/sshd</span></span><br><span class="line">[root@c59a63bbb /]<span class="comment"># /usr/sbin/sshd -D &amp;</span></span><br></pre></td></tr></table></figure></p>
+<p>上面的启动命令会报错,这个错误解决方案是,执行下面命令,创建这些文件.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@c59a63bbb /]<span class="comment"># ssh-keygen -q -t rsa -b 2048 -f /etc/ssh/ssh_host_rsa_key -N ''</span></span><br><span class="line">[root@c59a63bbb /]<span class="comment"># ssh-keygen -q -t ecdsa -f /etc/ssh/ssh_host_ecdsa_key -N ''</span></span><br><span class="line">[root@c59a63bbb /]<span class="comment"># ssh-keygen -t dsa -f /etc/ssh/ssh_host_ed25519_key -N ''</span></span><br></pre></td></tr></table></figure></p>
+<p>3.然后,修改<code>/etc/ssh/sshd_config</code>配置信息<code>UsePAM yes</code>改为<code>UsePAM no</code>,<code>UsePrivilegeSeparation sandbox</code>改为<code>UsePrivilegeSeparation no</code>,可以用vim修改,也可以用下面命令.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@c59a63bbb /]<span class="comment"># sed -i "s/#UsePrivilegeSeparation.*/UsePrivilegeSeparation no/g" /etc/ssh/sshd_config</span></span><br><span class="line">[root@c59a63bbb /]<span class="comment"># sed -i "s/UsePAM.*/UsePAM no/g" /etc/ssh/sshd_config  不通过pam验证</span></span><br><span class="line"></span><br><span class="line">[root@c59a63bbb /]<span class="comment"># sed -ri 's/session required pam_loginuid.so/#session</span></span><br><span class="line">required pam_loginuid.so/g<span class="string">' /etc/pam.d/sshd</span></span><br></pre></td></tr></table></figure></p>
+<p>4.修改完后,重新启动sshd服务,并修改一个root密码.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@c59a63bbb /]<span class="comment"># /usr/sbin/sshd -D</span></span><br><span class="line">[root@c59a63bbb /]<span class="comment"># echo "root" | passwd --stdin root</span></span><br><span class="line">[root@c59a63bbb /]<span class="comment"># echo "/usr/sbin/sshd -D &amp;" &gt;&gt; /etc/profile</span></span><br></pre></td></tr></table></figure></p>
+<p>5.创建一个自启动脚本文件,写入一下内容.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@c59a63bbb /]<span class="comment"># vi /run.sh</span></span><br><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line">/usr/sbin/sshd -D</span><br><span class="line"></span><br><span class="line">[root@c59a63bbb /]<span class="comment"># chmod +x run.sh</span></span><br><span class="line">[root@c59a63bbb /]<span class="comment"># exit</span></span><br></pre></td></tr></table></figure></p>
+<p>6.保存镜像,将所退出的容器用commit命令保存为一个新的<code>my_ssh：centos</code>镜像.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># docker ps</span></span><br><span class="line">CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS</span><br><span class="line">e1fc02dfd24f        centos:latest       <span class="string">"/bin/bash"</span>         4 minutes ago       Up 4 minutes</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># docker commit e1fc my_ssh:centos</span></span><br><span class="line">sha256:48997373aee923ee9b6af833de4aa9842dd090c7fee1f2569aa187e66b96231c</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># docker images</span></span><br><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">myssh               centos              48997373aee9        25 seconds ago      280MB</span><br><span class="line">centos              latest              1e1148e4cc2c        10 days ago         202MB</span><br><span class="line">hello-world         latest              4ab4c602aa5e        3 months ago        1.84kB</span><br></pre></td></tr></table></figure></p>
+<p>7.启动容器,并添加端口映射10000–&gt;22.其中10000是宿主主机的端口,22是容器的SSH服务监听端口.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># docker run -itd -p 10000:22 my_ssh:centos</span></span><br><span class="line">[root@localhost ~]<span class="comment"># docker run -p 10000:22 -itd my_ssh:centos /run.sh</span></span><br><span class="line"></span><br><span class="line">b0b073cf4bf933b291f0e0139220d09325e7dead7a1a77cacc243516c09ee931</span><br></pre></td></tr></table></figure></p>
+<p>8.在宿主主机或其他主机上上,可以通过SSH访问10022端口来登录容器.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ssh root@192.168.1.5 -P 10000</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="使用Dockerfile创建"><a href="#使用Dockerfile创建" class="headerlink" title="使用Dockerfile创建"></a>使用Dockerfile创建</h2><p>上面的方式比较复杂,接下来我们来看一个简单的,使用dockerfile的方式来创建一个Ubuntu镜像.</p>
+<p>1.首先,拉取一个基本镜像,并创建一个<code>sshd_ubuntu</code>工作目录.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># docker pull ubuntu:latest</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># mkdir ssh_ubuntu</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd ssh_ubuntu/</span></span><br><span class="line">[root@localhost ssh_ubuntu]<span class="comment"># touch Dockerfile</span></span><br><span class="line">[root@localhost ssh_ubuntu]<span class="comment"># touch run.sh</span></span><br></pre></td></tr></table></figure></p>
+<p>2.编写run.sh以及,在宿主主机上生成SSH密钥对,并创建<code>authorized_keys</code>文件.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ssh_ubuntu]<span class="comment"># vim run.sh</span></span><br><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line">/usr/sbin/sshd -D</span><br><span class="line"></span><br><span class="line">[root@localhost ssh_ubuntu]<span class="comment"># ssh-keygen -t rsa</span></span><br><span class="line">[root@localhost ssh_ubuntu]<span class="comment"># cat ~/.ssh/id_rsa.pub &gt;authorized_keys</span></span><br><span class="line">[root@localhost ssh_ubuntu]<span class="comment"># cp -a authorized_keys /root/.ssh/</span></span><br></pre></td></tr></table></figure></p>
+<p>3.下面是Dockerfile的内容,这和commit命令创建镜像过程,所进行的操作基本一致.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment">#设置继承镜像</span></span><br><span class="line">FROM ubuntu:latest</span><br><span class="line"><span class="comment">#提供一些作者的信息</span></span><br><span class="line">MAINTAINER docker_user (user@docker.com)</span><br><span class="line"><span class="comment">#下面开始运行更新命令</span></span><br><span class="line"><span class="comment">#RUN apt-get update</span></span><br><span class="line"><span class="comment">#安装ssh服务</span></span><br><span class="line">RUN apt-get install -y passwd openssh openssh-server</span><br><span class="line">RUN mkdir -p /var/run/sshd</span><br><span class="line">RUN mkdir -p /root/.ssh</span><br><span class="line"><span class="comment">#取消pam限制</span></span><br><span class="line">RUN sed -ri <span class="string">'s/session required pam_loginuid.so/#session required pam_loginuid.so/g'</span> /etc/pam.d/sshd</span><br><span class="line"><span class="comment">#复制配置文件到相应位置,并赋予脚本可执行权限</span></span><br><span class="line">ADD authorized_keys /root/.ssh/authorized_keys</span><br><span class="line">ADD run.sh /run.sh</span><br><span class="line">RUN chmod 755 /run.sh</span><br><span class="line"><span class="comment">#开放端口</span></span><br><span class="line">EXPOSE 22</span><br><span class="line"><span class="comment">#设置初始密码</span></span><br><span class="line">RUN <span class="built_in">echo</span> <span class="string">"root"</span>|passwd --stdin root</span><br><span class="line"><span class="comment">#设置自启动命令</span></span><br><span class="line">CMD [<span class="string">"/run.sh"</span>]</span><br></pre></td></tr></table></figure></p>
+<p>4.创建镜像,在sshd_ubuntu目录下,使用build命令来创建镜像.这里需要注意最后还有一个”.”,表示使用当前目录中的Dockerfile<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cd sshd_ubuntu</span></span><br><span class="line">[root@localhost ssh_ubuntu]<span class="comment"># docker build -t sshd:Dockerfile .</span></span><br></pre></td></tr></table></figure></p>
+<p>5.测试镜像,运行容器,并通过ssh连接一下.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># docker run -d -p 10122:22 sshd:Dockerfile</span></span><br><span class="line">890c04ff8d769b604386ba4475253ae8c21fc92d60083759afa77573bf4e8af1</span><br><span class="line">[root@localhost ~]<span class="comment"># ssh 192.168.1.200 -p 10122</span></span><br></pre></td></tr></table></figure></p>
+<p>在Docker社区中,对于是否需要为Docker容器启用SSH服务一直有争论,反对方的观点是：Docker的理念是一个容器只运行一个服务.因此,如果每个容器都运行一个额外的SSH服务,就违背了这个理念.另外认为根本没有从远程主机进入容器进行维护的必要.<br><br></p>
+<h2 id="使用pipwork分配"><a href="#使用pipwork分配" class="headerlink" title="使用pipwork分配"></a>使用pipwork分配</h2><p>1.安装Git工具,并克隆pipwork,放入可执行目录,并给予相应的权限.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y git</span></span><br><span class="line">[root@localhost ~]<span class="comment"># git clone https://github.com/jpetazzo/pipework</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># cd pipework/</span></span><br><span class="line">[root@localhost pipework]<span class="comment"># cp -a pipework /usr/local/bin/</span></span><br><span class="line">[root@localhost pipework]<span class="comment"># chmod +x /usr/local/bin/pipework</span></span><br></pre></td></tr></table></figure></p>
+<p>2.将本机配置成网桥,使之能够互相通信.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/sysconfig/network-scripts/ifcfg-ens32</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cat /etc/sysconfig/network-scripts/ifcfg-ens32</span></span><br><span class="line">DEVICE=eno16777728</span><br><span class="line">TYPE=Ethernet</span><br><span class="line">BOOTPROTO=static</span><br><span class="line">BRIDGE=br0</span><br><span class="line">NM_CONTROLLED=yes</span><br><span class="line">ONBOOT=yes</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># vim /etc/sysconfig/network-scripts/ifcfg-br0</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cat /etc/sysconfig/network-scripts/ifcfg-br0</span></span><br><span class="line">TYPE=Bridge</span><br><span class="line">DEVICE=br0</span><br><span class="line">BOOTPROTO=static</span><br><span class="line">IPADDR=192.168.1.13</span><br><span class="line">NETMASK=255.255.255.0</span><br><span class="line">GATEWAY=192.168.1.1</span><br><span class="line">DNS1=8.8.8.8</span><br><span class="line">DNS2=114.114.114.114</span><br><span class="line">ONBOOT=yes</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># reboot</span></span><br></pre></td></tr></table></figure></p>
+<p>3.下载一个Centos镜像,并运行且指定<code>--net=&quot;none&quot;</code>,后期使用pipwork分配IP地址.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># docker pull centos:latest</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># docker run -d --name my_ssh --restart=always --net="none" centos:latest</span></span><br><span class="line">cf8354804431a7830a6a46999ac20240ad6402d505d3130789fdc4bbb227e4e3</span><br></pre></td></tr></table></figure></p>
+<p>4.通过命令分配IP地址,与子网掩码.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># pipework br0 镜像名称 192.168.1.100/24</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># docker inspect my_ssh |grep "IPAddress"</span></span><br><span class="line">            <span class="string">"SecondaryIPAddresses"</span>: null,</span><br><span class="line">            <span class="string">"IPAddress"</span>: <span class="string">"192.168.1.100/24"</span>,</span><br><span class="line">                    <span class="string">"IPAddress"</span>: <span class="string">"192.168.1.100/24"</span>,</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/12/15/Docker/Docker-添加容器SSH服务-4/">Docker 添加容器SSH服务(4)</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年12月15日 - 20:12</p>
+  <p><span>最后更新:</span>2018年12月16日 - 14:12</p>
+  <p><span>原始链接:</span><a href="/2018/12/15/Docker/Docker-添加容器SSH服务-4/" title="Docker 添加容器SSH服务(4)">https://www.mkdirs.com/2018/12/15/Docker/Docker-添加容器SSH服务-4/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Docker/" rel="tag"> <i class="fa fa-tag"></i> Docker</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/15/Docker/Docker-数据管理与容器互联-3/" rel="next" title="Docker 数据卷与容器互联(3)">
+                <i class="fa fa-chevron-left"></i> Docker 数据卷与容器互联(3)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/16/Docker/DockerFile-编译语法详解-5/" rel="prev" title="DockerFile 编译语法详解(5)">
+                DockerFile 编译语法详解(5) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#基于commit命令创建"><span class="nav-text">基于commit命令创建</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用Dockerfile创建"><span class="nav-text">使用Dockerfile创建</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用pipwork分配"><span class="nav-text">使用pipwork分配</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Docker是基于Go语言实现的开源容器项目,Docker让开发者可以打包他们的应用以及依赖包到一个可移植的容器中,然后发布到任何流行的 Linux 机器上,也可以实现虚拟化.容器是完全使用沙箱机制,相互之间不会有任何接口,Docker诞生于2013年年初,最初发起者是dotCloud公司.Docker自开源后受到广泛的关注和讨论,目前已有多个相关项目(包括Docker三剑客、Kubernetes">
+<meta name="keywords" content="Docker">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Docker 构建私有镜像仓库(6)">
+<meta property="og:url" content="https://www.mkdirs.com/2018/12/18/Docker/Docker-构建私有镜像仓库-6/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="Docker是基于Go语言实现的开源容器项目,Docker让开发者可以打包他们的应用以及依赖包到一个可移植的容器中,然后发布到任何流行的 Linux 机器上,也可以实现虚拟化.容器是完全使用沙箱机制,相互之间不会有任何接口,Docker诞生于2013年年初,最初发起者是dotCloud公司.Docker自开源后受到广泛的关注和讨论,目前已有多个相关项目(包括Docker三剑客、Kubernetes">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-12-18T04:10:30.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Docker 构建私有镜像仓库(6)">
+<meta name="twitter:description" content="Docker是基于Go语言实现的开源容器项目,Docker让开发者可以打包他们的应用以及依赖包到一个可移植的容器中,然后发布到任何流行的 Linux 机器上,也可以实现虚拟化.容器是完全使用沙箱机制,相互之间不会有任何接口,Docker诞生于2013年年初,最初发起者是dotCloud公司.Docker自开源后受到广泛的关注和讨论,目前已有多个相关项目(包括Docker三剑客、Kubernetes">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/12/18/Docker/Docker-构建私有镜像仓库-6/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Docker 构建私有镜像仓库(6) | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/12/18/Docker/Docker-构建私有镜像仓库-6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Docker 构建私有镜像仓库(6)
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-18 08:47:27 / 修改时间：12:10:30" itemprop="dateCreated datePublished" datetime="2018-12-18T08:47:27+08:00">2018-12-18</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Docker/" itemprop="url" rel="index"><span itemprop="name">Docker</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Docker是基于Go语言实现的开源容器项目,Docker让开发者可以打包他们的应用以及依赖包到一个可移植的容器中,然后发布到任何流行的 Linux 机器上,也可以实现虚拟化.容器是完全使用沙箱机制,相互之间不会有任何接口,Docker诞生于2013年年初,最初发起者是dotCloud公司.Docker自开源后受到广泛的关注和讨论,目前已有多个相关项目(包括Docker三剑客、Kubernetes等),逐渐形成了围绕Docker容器的生态体系,由于Docker在业界造成的影响力实在太大,dotCloud公司后来也直接改名为Docker Inc,并专注于Docker相关技术和产品的开发.</p>
+<p>在使用Docker一段时间后,往往会发现手头积累了大量的自定义镜像文件,这些文件通过公有仓库进行管理并不方便,另外有时候只是希望在内部用户之间进行分享,不希望暴露出去.这种情况下,就有必要搭建一个本地私有镜像仓库,本小结将具体介绍两个私有仓库的搭建,其中包括Registry,以及Vmware的Harbor企业仓库.</p>
+<a id="more"></a>
+<p><br></p>
+<h2 id="Registry-仓库搭建"><a href="#Registry-仓库搭建" class="headerlink" title="Registry 仓库搭建"></a>Registry 仓库搭建</h2><p>Docker Registry工具是Docker内置的私有仓库解决方案,新版本的Registry基于Golang进行了重构,提供更好的性能和扩展性,并且支持Docker 1.6+的API,非常适合用来构建私有的镜像注册服务器.官方仓库中也提供了Registry的镜像,因此用户可以通过容器运行和源码安装两种方<br>式来使用Registry.</p>
+<p>实验规划<code>Docker服务器:192.168.1.5</code>,<code>Docker客户端：192.168.1.25</code>,请在服务端配置好网桥服务.</p>
+<h3 id="◆服务端配置◆"><a href="#◆服务端配置◆" class="headerlink" title="◆服务端配置◆"></a>◆服务端配置◆</h3><p>1.将本机配置成网桥,使之能够互相通信.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/sysconfig/network-scripts/ifcfg-ens32</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cat /etc/sysconfig/network-scripts/ifcfg-ens32</span></span><br><span class="line">DEVICE=eno16777728</span><br><span class="line">TYPE=Ethernet</span><br><span class="line">BOOTPROTO=static</span><br><span class="line">BRIDGE=br0</span><br><span class="line">NM_CONTROLLED=yes</span><br><span class="line">ONBOOT=yes</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># vim /etc/sysconfig/network-scripts/ifcfg-br0</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cat /etc/sysconfig/network-scripts/ifcfg-br0</span></span><br><span class="line">TYPE=Bridge</span><br><span class="line">DEVICE=br0</span><br><span class="line">BOOTPROTO=static</span><br><span class="line">IPADDR=192.168.1.15</span><br><span class="line">NETMASK=255.255.255.0</span><br><span class="line">GATEWAY=192.168.1.1</span><br><span class="line">DNS1=8.8.8.8</span><br><span class="line">DNS2=114.114.114.114</span><br><span class="line">ONBOOT=yes</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># reboot</span></span><br></pre></td></tr></table></figure></p>
+<p>2.在服务端<code>192.168.1.5</code>上拉取registry镜像包.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># docker pull registry:latest</span></span><br><span class="line">[root@localhost ~]<span class="comment"># docker images</span></span><br><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">registry            latest              2e2f252f3c88        3 months ago        33.3MB</span><br></pre></td></tr></table></figure></p>
+<p>3.在服务端192.168.1.5运行docker私有仓库成功执行，则我们的docker私有仓库搭建成功.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># docker run -itd -p 5000:5000 -v /registry:/var/lib/registry --restart=always --privileged=true --name my_registry registry:latest</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="◆客户端上传◆"><a href="#◆客户端上传◆" class="headerlink" title="◆客户端上传◆"></a>◆客户端上传◆</h3><p>1.此处我们以<code>hello-world</code>为例,首先要先把它拉取下来.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># docker pull hello-world:latest</span></span><br><span class="line">[root@localhost ~]<span class="comment"># docker images</span></span><br><span class="line">REPOSITORY              TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">docker.io/hello-world   latest              4ab4c602aa5e        3 months ago        1.84 kB</span><br></pre></td></tr></table></figure></p>
+<p>2.其次给<code>hello-world</code>镜像打个tag表示新的版本,过程中指定服务器IP地址.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># docker tag hello-world 192.168.1.5:5000/hello-world:latest</span></span><br><span class="line">[root@localhost ~]<span class="comment"># docker images</span></span><br><span class="line">REPOSITORY                     TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">192.168.1.5:5000/hello-world   latest              4ab4c602aa5e        3 months ago        1.84 kB</span><br><span class="line">docker.io/hello-world          latest              4ab4c602aa5e        3 months ago        1.84 kB</span><br></pre></td></tr></table></figure></p>
+<p>3.由于docker私有仓库服务器,默认是基于https传输的,所以我们需要在客户端<code>192.168.1.25</code>做相关设置,禁止使用https传输.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/docker/daemon.json</span></span><br><span class="line">&#123;</span><br><span class="line">        <span class="string">"registry-mirrors"</span>: [<span class="string">"https://njrds9qc.mirror.aliyuncs.com"</span>],</span><br><span class="line">        <span class="string">"insecure-registries"</span>:[<span class="string">"192.168.1.5:5000"</span>]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>4.依次执行下面两条命令,重新启动docker让其加载我们的配置文件.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># systemctl daemon-reload</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl restart docker</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl enable docker</span></span><br></pre></td></tr></table></figure></p>
+<p>5.执行推送命令,将我们的<code>hello-world</code>推送到服务器上.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># docker images</span></span><br><span class="line">REPOSITORY                     TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">192.168.1.5:5000/hello-world   latest              4ab4c602aa5e        3 months ago        1.84 kB</span><br><span class="line">docker.io/hello-world          latest              4ab4c602aa5e        3 months ago        1.84 kB</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># docker push 192.168.1.5:5000/hello-world:latest</span></span><br><span class="line">The push refers to a repository [192.168.1.5:5000/hello-world]</span><br><span class="line">428c97da766c: Pushed</span><br><span class="line">latest: digest: sha256:1a6fd470b9ce10849be79e99529a88371dff60c60aab424c077007f6979b4812 size: 524</span><br></pre></td></tr></table></figure></p>
+<p>6.在服务器端查看刚刚提交的一个请求.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ls -l /registry/docker/registry/v2/repositories</span></span><br><span class="line">total 0</span><br><span class="line">drwxr-xr-x 5 root root 55 Dec 17 20:23 hello-world</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># curl http://192.168.1.5:5000/v2/_catalog</span></span><br><span class="line">&#123;<span class="string">"repositories"</span>:[<span class="string">"hello-world"</span>]&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆客户端拉取◆"><a href="#◆客户端拉取◆" class="headerlink" title="◆客户端拉取◆"></a>◆客户端拉取◆</h3><p>1.客户端修改一下配置文件,指定以下服务器地址.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cat /etc/docker/daemon.json</span></span><br><span class="line">&#123;</span><br><span class="line">        <span class="string">"registry-mirrors"</span>: [<span class="string">"https://njrds9qc.mirror.aliyuncs.com"</span>],</span><br><span class="line">        <span class="string">"insecure-registries"</span>:[<span class="string">"192.168.1.5:5000"</span>]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>2.修改Docker配置文件,开启局域网模式.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">在/etc/default/docker添加一行：</span><br><span class="line"></span><br><span class="line">DOCKER_OPTS=<span class="string">"--insecure-registry 192.168.1.5:5000"</span></span><br><span class="line"></span><br><span class="line">或在/etc/sysconfig/docker文件中添加</span><br><span class="line"></span><br><span class="line">OPTIONS=<span class="string">'--selinux-enabled --insecure-registry 192.168.1.5:5000'</span></span><br></pre></td></tr></table></figure></p>
+<p>3.重新启动Docker,加载配置文件.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># systemctl daemon-reload</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl restart docker</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl enable docker</span></span><br></pre></td></tr></table></figure></p>
+<p>4.通过命令下载测试镜像.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># docker pull 192.168.1.5:5000/hello-world:latest</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="Harbor-企业仓库搭建"><a href="#Harbor-企业仓库搭建" class="headerlink" title="Harbor 企业仓库搭建"></a>Harbor 企业仓库搭建</h2><p>Harbor是VMware公司开源的企业级DockerRegistry项目,项目地址为<code>https://github.com/vmware/harbor</code>.其目标是帮助用户迅速搭建一个企业级的DockerRegistry服务,它以Docker公司开源的registry为基础,提供了管理UI,基于角色的访问控制(Role BasedAccess Control),AD/LDAP集成、以及审计日志(Auditlogging)等企业用户需求的功能,同时还原生支持中文.Harbor的每个组件都是以Docker容器的形式构建的,使用DockerCompose来对它进行部署.用于部署Harbor的DockerCompose模板位于<code>/Deployer/docker-compose.yml</code>,由5个容器组成,这几个容器通过Dockerlink的形式连接在一起,在容器之间通过容器名字互相访问.对终端用户而言,只需要暴露proxy即Nginx的服务端口.</p>
+<blockquote>
+<p>Proxy：由Nginx服务器构成的反向代理<br>Registry：由Docker官方的开源 registry 镜像构成的容器实例<br>UI：即架构中的core services,构成此容器的代码是 Harbor项目的主体<br>MySQL：由官方MySQL镜像构成的数据库容器<br>Log：运行着rsyslogd的容器,通过log-driver的形式收集其他容器的日志</p>
+</blockquote>
+<blockquote>
+<p>Harbor特性</p>
+<blockquote>
+<p>a、基于角色控制：用户和仓库都是基于项目进行组织的,而用户基于项目可以拥有不同的权限<br>b、基于镜像的复制策略：镜像可以在多个Harbor实例之间进行复制<br>c、支持LDAP：Harbor的用户授权可以使用已经存在LDAP用户<br>d、镜像删除,垃圾回收：Image可以被删除并且回收Image占用的空间,绝大部分的用户操作API方便用户对系统进行扩展<br>e、用户UI：用户可以轻松的浏览、搜索镜像仓库以及对项目进行管理<br>f、轻松的部署功能：Harbor提供了online、offline安装,除此之外还提供了virtualappliance安装<br>g、Harbor和 dockerregistry 关系：Harbor实质上是对 dockerregistry 做了封装，扩展了自己的业务模块</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>Harbor认证过程</p>
+<blockquote>
+<p>a、dockerdaemon从dockerregistry拉取镜像<br>b、如果dockerregistry需要进行授权时,registry将会返回401Unauthorized响应,同时在响应中包含了docker<br>client如何进行认证的信息<br>c、dockerclient根据registry返回的信息,向auth server发送请求获取认证token<br>d、auth server则根据自己的业务实现去验证提交的用户信息是否存符合业务要求<br>e、用户数据仓库返回用户的相关信息<br>f、auth server将会根据查询的用户信息,生成token令牌,以及当前用户所具有的相关权限信息.上述就是<br>完整的授权过程.当用户完成上述过程以后便可以执行相关的pull/push操作.认证信息会每次都带在请求头中</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>Harbor认证流程</p>
+<blockquote>
+<p>a、首先,请求被代理容器监听拦截,并跳转到指定的认证服务器<br>b、如果认证服务器配置了权限认证,则会返回401.通知dockerclient在特定的请求中需要带上一个合法的token,而认证的逻辑地址则指向架构图中的core services<br>c、当dockerclient接受到错误code.client就会发送认证请求(带有用户名和密码)到coreservices进行basic<br>auth认证<br>d、当C的请求发送给ngnix以后,ngnix会根据配置的认证地址将带有用户名和密码的请求发送到core<br>serivces<br>e、coreservices获取用户名和密码以后对用户信息进行认证(自己的数据库或者介入LDAP都可以).成功以后,返回认证成功的信息</p>
+</blockquote>
+</blockquote>
+<h3 id="◆服务端配置◆-1"><a href="#◆服务端配置◆-1" class="headerlink" title="◆服务端配置◆"></a>◆服务端配置◆</h3><p>在服务端安装之前,请确保你的环境里面已安装好了Docker.</p>
+<p>1.下载Docker-Compose工具,并移动到<code>/usr/local/bin</code>目录下.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># wget https://github.com/docker/compose/releases/download/1.9.0/docker-compose-`uname -s`-`uname -m`</span></span><br><span class="line">[root@localhost ~]<span class="comment"># mv docker-compose /usr/local/bin/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># chmod 777 -R /usr/local/bin/docker-compose</span></span><br><span class="line">[root@localhost ~]<span class="comment"># docker-compose --version</span></span><br><span class="line">docker-compose version 1.9.0, build 2585387</span><br></pre></td></tr></table></figure></p>
+<p>2.下载HarBor解压并修改配置文件.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># wget https://github.com/vmware/harbor/releases/download/v1.2.0/harbor-offline-installer-v1.2.0.tgz</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># tar -xzvf harbor-offline-installer-v1.2.0.tgz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd harbor</span></span><br><span class="line">[root@localhost harbor]<span class="comment"># ls</span></span><br><span class="line">common                     docker-compose.yml     harbor.v1.2.0.tar.gz  NOTICE</span><br><span class="line">docker-compose.clair.yml   harbor_1_1_0_template  install.sh            prepare</span><br><span class="line">docker-compose.notary.yml  harbor.cfg             LICENSE               upgrade</span><br><span class="line"></span><br><span class="line">[root@localhost harbor]<span class="comment"># vim harbor.cfg</span></span><br><span class="line"></span><br><span class="line">hostname=192.168.1.5  <span class="comment">#本机IP地址</span></span><br><span class="line">ui_url_protocol=https</span><br></pre></td></tr></table></figure></p>
+<p>3.创建目录并到制定目录生成加密https证书.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mkdir -p /data/cert</span></span><br><span class="line">[root@localhost ~]<span class="comment"># chmod 777 /data/cert</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd /data/cert</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># openssl genrsa -des3 -out server.key 2048</span></span><br><span class="line">[root@localhost ~]<span class="comment"># openssl req -new -key server.key -out server.csr</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cp server.key server.key.org</span></span><br><span class="line">[root@localhost ~]<span class="comment"># openssl rsa -in server.key.org -out server.key</span></span><br><span class="line">[root@localhost ~]<span class="comment"># openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt</span></span><br></pre></td></tr></table></figure></p>
+<p>4.安装并拷贝相关配置文件,最后进入测试页测试效果.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cd /root/harbor</span></span><br><span class="line">[root@localhost harbor]<span class="comment"># ./install.sh</span></span><br><span class="line">[root@localhost ~]<span class="comment"># curl https://192.168.1.5</span></span><br><span class="line"><span class="comment">#用户名:admin  密码:Harbor12345</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="◆客户端上传◆-1"><a href="#◆客户端上传◆-1" class="headerlink" title="◆客户端上传◆"></a>◆客户端上传◆</h3><p>1.客户端需要指定镜像仓库地址(也就是服务器的地址).<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/docker/daemon.json</span></span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line"><span class="string">"insecure-registries"</span>: [<span class="string">"192.168.1.5"</span>]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl restart docker</span></span><br></pre></td></tr></table></figure></p>
+<p>2.下载一个hello-world镜像,并给镜像重新打标签.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># docker pull hello-world:latest</span></span><br><span class="line">[root@localhost ~]<span class="comment"># docker images</span></span><br><span class="line">REPOSITORY              TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">docker.io/hello-world   latest              4ab4c602aa5e        3 months ago        1.84 kB</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># docker tag hello-world:latest 192.168.1.5/library/hello-world:latest</span></span><br><span class="line">[root@localhost ~]<span class="comment"># docker images</span></span><br><span class="line">REPOSITORY                        TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">192.168.1.5/library/hello-world   latest              4ab4c602aa5e        3 months ago        1.84 kB</span><br><span class="line">docker.io/hello-world             latest              4ab4c602aa5e        3 months ago        1.84 kB</span><br></pre></td></tr></table></figure></p>
+<p>3.登陆进行上传测试.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># docker login 192.168.1.5</span></span><br><span class="line">Username: admin</span><br><span class="line">Password: Harbor12345</span><br><span class="line">Login Succeeded</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># docker images</span></span><br><span class="line">REPOSITORY                        TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">192.168.1.5/library/hello-world   latest              4ab4c602aa5e        3 months ago        1.84 kB</span><br><span class="line">docker.io/hello-world             latest              4ab4c602aa5e        3 months ago        1.84 kB</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># docker push 192.168.1.5/library/hello-world:latest</span></span><br><span class="line">The push refers to a repository [192.168.1.5/library/hello-world]</span><br><span class="line">428c97da766c: Pushed</span><br><span class="line">latest: digest: sha256:1a6fd470b9ce10849be79e99529a88371dff60c60aab424c077007f6979b4812 size: 524</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆客户端拉取◆-1"><a href="#◆客户端拉取◆-1" class="headerlink" title="◆客户端拉取◆"></a>◆客户端拉取◆</h3><p>1.指定镜像仓库地址,指定镜像仓库地址.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/docker/daemon.json</span></span><br><span class="line"></span><br><span class="line">&#123; <span class="string">"insecure-registries"</span>: [<span class="string">"192.168.1.5"</span>] &#125;         <span class="comment">#指定服务器地址</span></span><br></pre></td></tr></table></figure></p>
+<p>2.下载测试镜像,这里下载刚刚上传的试一下.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># docker pull 192.168.1.5/library/hello-world:latest</span></span><br><span class="line"></span><br><span class="line">Trying to pull repository 192.168.1.5/library/hello-world ...</span><br><span class="line">latest: Pulling from 192.168.1.5/library/hello-world</span><br><span class="line">d1725b59e92d: Pull complete</span><br><span class="line">Digest: sha256:1a6fd470b9ce10849be79e99529a88371dff60c60aab424c077007f6979b4812</span><br><span class="line">Status: Downloaded newer image <span class="keyword">for</span> 192.168.1.5/library/hello-world:latest</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># docker images</span></span><br><span class="line">REPOSITORY                        TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">192.168.1.5/library/hello-world   latest              4ab4c602aa5e        3 months ago        1.84 kB</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/12/18/Docker/Docker-构建私有镜像仓库-6/">Docker 构建私有镜像仓库(6)</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年12月18日 - 08:12</p>
+  <p><span>最后更新:</span>2018年12月18日 - 12:12</p>
+  <p><span>原始链接:</span><a href="/2018/12/18/Docker/Docker-构建私有镜像仓库-6/" title="Docker 构建私有镜像仓库(6)">https://www.mkdirs.com/2018/12/18/Docker/Docker-构建私有镜像仓库-6/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Docker/" rel="tag"> <i class="fa fa-tag"></i> Docker</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/16/Docker/DockerFile-编译语法详解-5/" rel="next" title="DockerFile 编译语法详解(5)">
+                <i class="fa fa-chevron-left"></i> DockerFile 编译语法详解(5)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/23/MariaDB/MariaDB-数据库系统概述-1/" rel="prev" title="MariaDB 数据库系统概述(1)">
+                MariaDB 数据库系统概述(1) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Registry-仓库搭建"><span class="nav-text">Registry 仓库搭建</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆服务端配置◆"><span class="nav-text">◆服务端配置◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆客户端上传◆"><span class="nav-text">◆客户端上传◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆客户端拉取◆"><span class="nav-text">◆客户端拉取◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Harbor-企业仓库搭建"><span class="nav-text">Harbor 企业仓库搭建</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆服务端配置◆-1"><span class="nav-text">◆服务端配置◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆客户端上传◆-1"><span class="nav-text">◆客户端上传◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆客户端拉取◆-1"><span class="nav-text">◆客户端拉取◆</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

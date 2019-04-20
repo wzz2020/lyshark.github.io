@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Nginx是一款轻量级的Web服务器/反向代理服务器及电子邮件 (IMAP/POP3) 代理服务器,并在一个BSD-like协议下发行.其特点是占有内存少,并发能力强,事实上nginx的并发能力确实在同类型的网页服务器中表现较好,中国大陆使用nginx网站用户有：百度、京东、新浪、网易、腾讯、淘宝等.">
+<meta name="keywords" content="Linux 服务配置">
+<meta property="og:type" content="article">
+<meta property="og:title" content="编译Nginx服务部署静态网站">
+<meta property="og:url" content="https://www.mkdirs.com/2018/11/11/Linux 服务配置/编译Nginx服务部署静态网站/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="Nginx是一款轻量级的Web服务器/反向代理服务器及电子邮件 (IMAP/POP3) 代理服务器,并在一个BSD-like协议下发行.其特点是占有内存少,并发能力强,事实上nginx的并发能力确实在同类型的网页服务器中表现较好,中国大陆使用nginx网站用户有：百度、京东、新浪、网易、腾讯、淘宝等.">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-04-16T12:38:36.350Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="编译Nginx服务部署静态网站">
+<meta name="twitter:description" content="Nginx是一款轻量级的Web服务器/反向代理服务器及电子邮件 (IMAP/POP3) 代理服务器,并在一个BSD-like协议下发行.其特点是占有内存少,并发能力强,事实上nginx的并发能力确实在同类型的网页服务器中表现较好,中国大陆使用nginx网站用户有：百度、京东、新浪、网易、腾讯、淘宝等.">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/11/11/Linux 服务配置/编译Nginx服务部署静态网站/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>编译Nginx服务部署静态网站 | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/11/11/Linux 服务配置/编译Nginx服务部署静态网站/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">编译Nginx服务部署静态网站
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-11-11 14:40:14" itemprop="dateCreated datePublished" datetime="2018-11-11T14:40:14+08:00">2018-11-11</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-16 20:38:36" itemprop="dateModified" datetime="2019-04-16T20:38:36+08:00">2019-04-16</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Linux-服务配置/" itemprop="url" rel="index"><span itemprop="name">Linux 服务配置</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Nginx是一款轻量级的Web服务器/反向代理服务器及电子邮件 (IMAP/POP3) 代理服务器,并在一个BSD-like协议下发行.其特点是占有内存少,并发能力强,事实上nginx的并发能力确实在同类型的网页服务器中表现较好,中国大陆使用nginx网站用户有：百度、京东、新浪、网易、腾讯、淘宝等.</p>
+<a id="more"></a>
+<p><br></p>
+<h2 id="编译安装Nginx"><a href="#编译安装Nginx" class="headerlink" title="编译安装Nginx"></a>编译安装Nginx</h2><p>1.配置Yum仓库,安装Nginx所依赖的包文件,以及编译器.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo</span></span><br><span class="line">[root@localhost ~]<span class="comment"># yum -y install epel-release</span></span><br><span class="line">[root@localhost ~]<span class="comment"># yum install -y gcc pcre pcre-devel zlib zlib-devel openssl openssl-devel</span></span><br></pre></td></tr></table></figure></p>
+<p>2.编译安装Nginx.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># useradd -s /sbin/nologin -M nginx</span></span><br><span class="line">[root@localhost ~]<span class="comment"># wget http://nginx.org/download/nginx-1.13.12.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># tar -xzvf nginx-1.13.12.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd nginx-1.13.12/</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ./configure --prefix=/usr/local/nginx \</span></span><br><span class="line">--user=nginx \</span><br><span class="line">--group=nginx \</span><br><span class="line">--with-http_ssl_module \</span><br><span class="line">--with-http_stub_status_module</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># make &amp;&amp; make install</span></span><br></pre></td></tr></table></figure></p>
+<p>3.检查Nginx配置文件正确性,启动关闭与重启Nginx配置.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># /usr/local/nginx/sbin/nginx -t                       #检测配置文件正确性</span></span><br><span class="line">[root@localhost ~]<span class="comment"># /usr/local/nginx/sbin/nginx                          #启动Nginx</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># kill -QUIT $(cat /usr/local/nginx/logs/nginx.pid)    #关闭Nginx</span></span><br><span class="line">[root@localhost ~]<span class="comment"># kill -HUP $(cat /usr/local/nginx/logs/nginx.pid)     #重启Nginx</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="配置Nginx访问控制"><a href="#配置Nginx访问控制" class="headerlink" title="配置Nginx访问控制"></a>配置Nginx访问控制</h2><h3 id="◆基于用户名密码的认证◆"><a href="#◆基于用户名密码的认证◆" class="headerlink" title="◆基于用户名密码的认证◆"></a>◆基于用户名密码的认证◆</h3><p>作用：当我们打开指定网页时,会提示需要输入密码才能访问,这就是密码认证技术.</p>
+<p>1.编辑Nginx主配置文件,在相应的区域中加入以下标★语句.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim  /usr/local/nginx/conf/nginx.conf</span></span><br><span class="line"></span><br><span class="line">41         <span class="comment">#access_log  logs/host.access.log  main;</span></span><br><span class="line">42 </span><br><span class="line">43         location / &#123;                                         <span class="comment">#对根站点,设置密码认证</span></span><br><span class="line">44             root   html;                                     <span class="comment">#主页位置,相对路径</span></span><br><span class="line">45             index  index.html index.htm;                     <span class="comment">#主页执行顺序</span></span><br><span class="line"></span><br><span class="line">★		auth_basic <span class="string">"welcome to admin"</span>;                          <span class="comment">#提示信息(自定义)</span></span><br><span class="line">★		auth_basic_user_file /usr/<span class="built_in">local</span>/nginx/html/login.pad;   <span class="comment">#生成的密码文件</span></span><br><span class="line">		</span><br><span class="line">46         &#125;</span><br><span class="line">47 </span><br><span class="line">48         <span class="comment">#error_page  404              /404.html;</span></span><br><span class="line">49 </span><br><span class="line">50         <span class="comment"># redirect server error pages to the static page /50x.html</span></span><br></pre></td></tr></table></figure></p>
+<p>2.由于Nginx没有生成密码文件的工具,这里需要借助Apache的工具生成密码文件.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y httpd</span></span><br><span class="line">[root@localhost ~]<span class="comment"># htpasswd -c /usr/local/nginx/html/login.pad  lyshark    #创建认证用户(覆盖)</span></span><br><span class="line">[root@localhost ~]<span class="comment"># htpasswd -m /usr/local/nginx/html/login.pad  lyshark    #写入认证用户(追加)</span></span><br></pre></td></tr></table></figure></p>
+<p>3.重启Nginx服务,访问指定的页面,即可实现认证.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># kill -HUP $(cat /usr/local/nginx/logs/nginx.pid)</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="◆基于IP地址的身份认证◆"><a href="#◆基于IP地址的身份认证◆" class="headerlink" title="◆基于IP地址的身份认证◆"></a>◆基于IP地址的身份认证◆</h3><p>作用：当我们打开指定网页时,会判断您的IP地址是允许访问还是拒绝访问,这就是基于IP的认证技术</p>
+<p>1.编辑Nginx主配置文件,在相应的区域中加入以下任意标★语句,具体情况具体对待<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim  /usr/local/nginx/conf/nginx.conf</span></span><br><span class="line"></span><br><span class="line">41         <span class="comment">#access_log  logs/host.access.log  main;</span></span><br><span class="line">42 </span><br><span class="line">43         location / &#123;</span><br><span class="line">44             root   html;</span><br><span class="line">45             index  index.html index.htm;</span><br><span class="line"></span><br><span class="line">★		allow 192.168.1.10;						<span class="comment">#允许单个IP访问</span></span><br><span class="line">★		deny 192.168.1.10;						<span class="comment">#拒绝单个IP访问</span></span><br><span class="line">★		allow 0.0.0.0/0;						<span class="comment">#允许所有网段</span></span><br><span class="line">★		deny 0.0.0.0/0;							<span class="comment">#拒绝所有网段</span></span><br><span class="line"></span><br><span class="line">46         &#125;</span><br><span class="line">47 </span><br><span class="line">48         <span class="comment">#error_page  404              /404.html;</span></span><br><span class="line">49 </span><br><span class="line">50         <span class="comment"># redirect server error pages to the static page /50x.html</span></span><br></pre></td></tr></table></figure></p>
+<p>2.重启Nginx服务,访问指定的页面,即可实现认证.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># kill -HUP $(cat /usr/local/nginx/logs/nginx.pid)</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="配置Nginx虚拟主机"><a href="#配置Nginx虚拟主机" class="headerlink" title="配置Nginx虚拟主机"></a>配置Nginx虚拟主机</h2><p>利用虚拟主机功能,可以把一台处于运行状态的物理服务器分割成多个,虚拟服务器,出于各种考虑目前各种企业都在使用虚拟主机功能,Nginx虚拟主机功能,是服务器基于用户的请求的不同Ip地址,主机域名或端口号,实现提供多个网站同时为外部提供访问服务的技术,用户取得的资源不同最后取得的页面也会不同.</p>
+<h3 id="◆基于IP的虚拟主机◆"><a href="#◆基于IP的虚拟主机◆" class="headerlink" title="◆基于IP的虚拟主机◆"></a>◆基于IP的虚拟主机◆</h3><p>如果一台服务器有多个IP地址,而且每个IP地址与服务器上部署的每个网站对应,这样当用户请求访问不同的IP时,会访问到不同网站的页面资源,而且每个网站都有一个独立的IP地址,以下实验将实现在一台服务器上配置多个IP,搭建多个网站,每个网站使用一个IP地址.</p>
+<p>1.在eno16777728上配置一个网卡子接口.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ifconfig</span></span><br><span class="line"></span><br><span class="line">eno16777728: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1500</span><br><span class="line">        inet 192.168.1.10  netmask 255.255.255.0  broadcast 192.168.1.255</span><br><span class="line">        inet6 fe80::20c:29ff:fe1e:14e2  prefixlen 64  scopeid 0x20&lt;link&gt;</span><br><span class="line">        ether 00:0c:29:1e:14:e2  txqueuelen 1000  (Ethernet)</span><br><span class="line">        RX packets 40292  bytes 4129804 (3.9 MiB)</span><br><span class="line">        RX errors 0  dropped 0  overruns 0  frame 0</span><br><span class="line">        TX packets 8962  bytes 1557264 (1.4 MiB)</span><br><span class="line">        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0</span><br><span class="line"></span><br><span class="line">eno16777728:0: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1500</span><br><span class="line">        inet 192.168.1.20  netmask 255.255.255.0  broadcast 192.168.1.255</span><br><span class="line">        ether 00:0c:29:1e:14:e2  txqueuelen 1000  (Ethernet)</span><br></pre></td></tr></table></figure></p>
+<p>2.编辑主配置文件,分别复制并编辑两个主机区域,在相应的区域中加入以下标★语句<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /usr/local/nginx/conf/nginx.conf</span></span><br><span class="line"></span><br><span class="line">35     server &#123;</span><br><span class="line">★         listen       192.168.1.10:80;					<span class="comment">#指定区域1的IP地址</span></span><br><span class="line">37         server_name  localhost;</span><br><span class="line">38 </span><br><span class="line">39         location / &#123;</span><br><span class="line">★             root   html/vhost1;                		<span class="comment">#指定区域1的文件目录</span></span><br><span class="line">41             index  index.html index.htm;</span><br><span class="line">42         &#125;</span><br><span class="line">43 </span><br><span class="line">44         error_page   500 502 503 504  /50x.html;</span><br><span class="line">45         location = /50x.html &#123;</span><br><span class="line">46             root   html;</span><br><span class="line">47         &#125;</span><br><span class="line">48     &#125;</span><br><span class="line">49     server &#123;</span><br><span class="line">★         listen       192.168.1.20:80;					<span class="comment">#指定区域2的IP地址</span></span><br><span class="line">51         server_name  localhost;</span><br><span class="line">52 </span><br><span class="line">53         location / &#123;</span><br><span class="line">★             root   html/vhost2;					    <span class="comment">#指定区域2的文件目录</span></span><br><span class="line">55             index  index.html index.htm;</span><br><span class="line">56         &#125;</span><br><span class="line">57 </span><br><span class="line">58         error_page   500 502 503 504  /50x.html;</span><br><span class="line">59         location = /50x.html &#123;</span><br><span class="line">60             root   html;</span><br><span class="line">61         &#125;</span><br><span class="line">62     &#125;</span><br></pre></td></tr></table></figure></p>
+<p>3.在html目录下创建相应目录以及html文件.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mkdir /usr/local/nginx/html/vhost1/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># mkdir /usr/local/nginx/html/vhost2/</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "ip 1 server" &gt; /usr/local/nginx/html/vhost1/index.html</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "ip 2 server" &gt; /usr/local/nginx/html/vhost2/index.html</span></span><br></pre></td></tr></table></figure></p>
+<p>4.重启Nginx服务,此时访问不同的IP会出现不同的页面<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># kill -HUP $(cat /usr/local/nginx/logs/nginx.pid)</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="◆基于端口的虚拟主机◆"><a href="#◆基于端口的虚拟主机◆" class="headerlink" title="◆基于端口的虚拟主机◆"></a>◆基于端口的虚拟主机◆</h3><p>基于端口的虚拟主机,可以让用户通过端口号,来访问服务器上的资源,在使用Nginx配置虚拟网站时,基于端口的配置方式最为复杂,以下实验将实现在一台服务器上配置多个端口,搭建多个网站,每个网站使用一个端口.</p>
+<p>1.编辑主配置文件,分别复制并编辑两个主机区域,在相应的区域中加入以下标★语句.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /usr/local/nginx/conf/nginx.conf</span></span><br><span class="line"></span><br><span class="line">35     server &#123;                               <span class="comment">#主机区域1(server1)</span></span><br><span class="line">★         listen       80;                    <span class="comment">#主机1端口</span></span><br><span class="line">★         server_name  localhost;             <span class="comment">#主机1服务器名(域名1)</span></span><br><span class="line">38 </span><br><span class="line">39         location / &#123;</span><br><span class="line">★             root   html/lyshark-80;         <span class="comment">#域名1网页存放位置</span></span><br><span class="line">41             index  index.html index.htm;</span><br><span class="line">42         &#125;</span><br><span class="line">43         error_page   500 502 503 504  /50x.html;</span><br><span class="line">44         location = /50x.html &#123;</span><br><span class="line">45             root   html;</span><br><span class="line">46         &#125;</span><br><span class="line">47     &#125;</span><br><span class="line">48     server &#123;                                 <span class="comment">#主机区域2(server2)</span></span><br><span class="line">★         listen       8080;                    <span class="comment">#主机区域2端口</span></span><br><span class="line">★         server_name  localhost;               <span class="comment">#主机2服务器名(域名2)</span></span><br><span class="line">51 </span><br><span class="line">52         location / &#123;</span><br><span class="line">★             root   html/lyshark-8080;	         <span class="comment">#域名2网页存放位置</span></span><br><span class="line">54             index  index.html index.htm;</span><br><span class="line">55         &#125;</span><br><span class="line">56 </span><br><span class="line">57         error_page   500 502 503 504  /50x.html;</span><br><span class="line">58         location = /50x.html &#123;</span><br><span class="line">59             root   html;</span><br><span class="line">60         &#125;</span><br><span class="line">61     &#125;</span><br></pre></td></tr></table></figure></p>
+<p>2.在html目录下创建相应目录以及html文件.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mkdir /usr/local/nginx/html/vhost-80/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># mkdir /usr/local/nginx/html/vhost-8080/</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "80 server zone" &gt; /usr/local/nginx/html/vhost-80/index.html</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "8080 server zone" &gt; /usr/local/nginx/html/vhost-8080/index.html</span></span><br></pre></td></tr></table></figure></p>
+<p>3.重启Nginx服务,此时访问同一网站的不同端口,会有不同页面.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># kill -HUP $(cat /usr/local/nginx/logs/nginx.pid)</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="◆基于域名的虚拟主机◆"><a href="#◆基于域名的虚拟主机◆" class="headerlink" title="◆基于域名的虚拟主机◆"></a>◆基于域名的虚拟主机◆</h3><p>当服务器无法为每一个网站分配一个独立的IP的时候,可以尝试让Nginx自动识别用户请求的域名,从而根据不同的域名请求来传输不同的内容,这里我们为了验证实验要手动搭建一个DNS解析,以下实验将实现在一台服务器上多个域名,搭建多个网站,每个网站使用一个域名.</p>
+<p>1.首先搭建DNS域名解析,模拟vhost1.com与vhost2.com两个网站域名.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y bind bind-chroot</span></span><br><span class="line">Loaded plugins: product-id, search-disabled-repos, subscription-manager</span><br><span class="line">This system is not registered with an entitlement server. You can use subscription-manager.</span><br><span class="line">Package 32:<span class="built_in">bind</span>-9.9.4-61.el7.x86_64 already installed and latest version</span><br><span class="line">Package 32:<span class="built_in">bind</span>-chroot-9.9.4-61.el7.x86_64 already installed and latest version</span><br><span class="line">Nothing to <span class="keyword">do</span></span><br></pre></td></tr></table></figure></p>
+<p>2.配置DNS解析,这里我们简单配置即可,有关DNS详细例子请查看其他相关文章.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/named.conf</span></span><br><span class="line"></span><br><span class="line"> 12 options &#123;</span><br><span class="line"> 13         listen-on port 53 &#123; any; &#125;;</span><br><span class="line"> 14         listen-on-v6 port 53 &#123; ::1; &#125;;</span><br><span class="line"> 15         directory       <span class="string">"/var/named"</span>;</span><br><span class="line"> 16         dump-file       <span class="string">"/var/named/data/cache_dump.db"</span>;</span><br><span class="line"> 17         statistics-file <span class="string">"/var/named/data/named_stats.txt"</span>;</span><br><span class="line"> 18         memstatistics-file <span class="string">"/var/named/data/named_mem_stats.txt"</span>;</span><br><span class="line"> 19         allow-query     &#123; any; &#125;;</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># vim /etc/named.rfc1912.zones</span></span><br><span class="line"></span><br><span class="line"> 43 zone <span class="string">"vhost1.com"</span> IN &#123;</span><br><span class="line"> 44         <span class="built_in">type</span> master;</span><br><span class="line"> 45         file <span class="string">"vhost1.com.zone"</span>;</span><br><span class="line"> 46         allow-update &#123; none; &#125;;</span><br><span class="line"> 47 &#125;;</span><br><span class="line"> 48 zone <span class="string">"vhost2.com"</span> IN &#123;</span><br><span class="line"> 49         <span class="built_in">type</span> master;</span><br><span class="line"> 50         file <span class="string">"vhost2.com.zone"</span>;</span><br><span class="line"> 51         allow-update &#123; none; &#125;;</span><br><span class="line"> 52 &#125;;</span><br></pre></td></tr></table></figure></p>
+<p>3.拷贝配置文件,并修改成以下模样,并重启Bind.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cp -a /var/named/named.localhost /var/named/vhost1.com.zone</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cp -a /var/named/named.localhost /var/named/vhost2.com.zone</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># vim /var/named/vhost1.com.zone</span></span><br><span class="line"><span class="variable">$TTL</span> 1D</span><br><span class="line">@       IN SOA  dns.vhost1.com. rname.invalid. (</span><br><span class="line">                                        0       ; serial</span><br><span class="line">                                        1D      ; refresh</span><br><span class="line">                                        1H      ; retry</span><br><span class="line">                                        1W      ; expire</span><br><span class="line">                                        3H )    ; minimum</span><br><span class="line">        NS      dns.vhost1.com.</span><br><span class="line">dns     A       127.0.0.1</span><br><span class="line">www     A       192.168.1.10</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># vim /var/named/vhost2.com.zone</span></span><br><span class="line"><span class="variable">$TTL</span> 1D</span><br><span class="line">@       IN SOA  dns.vhost2.com. rname.invalid. (</span><br><span class="line">                                        0       ; serial</span><br><span class="line">                                        1D      ; refresh</span><br><span class="line">                                        1H      ; retry</span><br><span class="line">                                        1W      ; expire</span><br><span class="line">                                        3H )    ; minimum</span><br><span class="line">        NS      dns.vhost2.com.</span><br><span class="line">dns     A       127.0.0.1</span><br><span class="line">www     A       192.168.1.10</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl restart named</span></span><br></pre></td></tr></table></figure></p>
+<p>4.编辑主配置文件,分别复制并编辑两个主机区域,在相应的区域中加入以下标★语句.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /usr/local/nginx/conf/nginx.conf</span></span><br><span class="line"></span><br><span class="line">35     server &#123;                                    <span class="comment">#主机区域1(server1)</span></span><br><span class="line">36         listen       80;</span><br><span class="line">★         server_name  www.vhost1.com;             <span class="comment">#主机1服务器名(域名1)</span></span><br><span class="line">38 </span><br><span class="line">39         location / &#123;</span><br><span class="line">★             root   html/vhost1;                  <span class="comment">#域名1网页存放位置</span></span><br><span class="line">41             index  index.html index.htm;</span><br><span class="line">42         &#125;</span><br><span class="line">43         error_page   500 502 503 504  /50x.html;</span><br><span class="line">44         location = /50x.html &#123;</span><br><span class="line">45             root   html;</span><br><span class="line">46         &#125;</span><br><span class="line">47     &#125;</span><br><span class="line">48     server &#123;                                      <span class="comment">#主机区域2(server2)</span></span><br><span class="line">49         listen       80;</span><br><span class="line">★         server_name  www.vhost2.com;               <span class="comment">#主机2服务器名(域名2)</span></span><br><span class="line">51 </span><br><span class="line">52         location / &#123;</span><br><span class="line">★             root   html/vhost2;                    <span class="comment">#域名2网页存放位置</span></span><br><span class="line">54             index  index.html index.htm;</span><br><span class="line">55         &#125;</span><br><span class="line">56 </span><br><span class="line">57         error_page   500 502 503 504  /50x.html;</span><br><span class="line">58         location = /50x.html &#123;</span><br><span class="line">59             root   html;</span><br><span class="line">60         &#125;</span><br><span class="line">61     &#125;</span><br></pre></td></tr></table></figure></p>
+<p>2.在html目录下创建相应目录以及html文件.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mkdir /usr/local/nginx/html/vhost1/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># mkdir /usr/local/nginx/html/vhost2/</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "vhost1 server zone" &gt; /usr/local/nginx/html/vhost1/index.html</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "vhost2 server zone" &gt; /usr/local/nginx/html/vhost2/index.html</span></span><br></pre></td></tr></table></figure></p>
+<p>3.重启Nginx服务,此时访问两个域名,出现两个网站之间不冲突.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># kill -HUP $(cat /usr/local/nginx/logs/nginx.pid)</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="配置反向代理服务器"><a href="#配置反向代理服务器" class="headerlink" title="配置反向代理服务器"></a>配置反向代理服务器</h2><p>作用：当用户访问本台Nginx代理服务器时,会自动跳转到代理的地址上面.</p>
+<p>1.修改Nginx主配置文件,在相应的区域中加入以下标★语句.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /usr/local/nginx/conf/nginx.conf</span></span><br><span class="line"></span><br><span class="line">41         <span class="comment">#access_log  logs/host.access.log  main;</span></span><br><span class="line">42 </span><br><span class="line">43         location / &#123;</span><br><span class="line">44             	root   html;                        <span class="comment">#注释掉</span></span><br><span class="line">45             	index  index.html index.htm;        <span class="comment">#注释掉</span></span><br><span class="line">★		proxy_pass http://192.168.1.100;     <span class="comment">#反向代理,当有人访问根时,自动转到100上</span></span><br><span class="line">46         &#125;</span><br><span class="line">47 </span><br><span class="line">48         <span class="comment">#error_page  404              /404.html;</span></span><br><span class="line">49 </span><br><span class="line">50         <span class="comment"># redirect server error pages to the static page /50x.html</span></span><br></pre></td></tr></table></figure></p>
+<p>2.重启Nginx服务,访问本机自动跳转到 <a href="http://192.168.1.100" target="_blank" rel="noopener">http://192.168.1.100</a> 地址上去.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># kill -HUP $(cat /usr/local/nginx/logs/nginx.pid)</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="Nginx实现负载均衡"><a href="#Nginx实现负载均衡" class="headerlink" title="Nginx实现负载均衡"></a>Nginx实现负载均衡</h2><p>作用：当用户访问Nginx负载均衡器时,Nginx将访问请求平均分配给后端的Apache服务器,实现简单的负载均衡.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[实验环境]</span><br><span class="line"></span><br><span class="line">[IP地址]			[主机作用]</span><br><span class="line"></span><br><span class="line">192.168.1.100			Nginx负载均衡</span><br><span class="line">192.168.1.10			Apache主机1</span><br><span class="line">192.168.1.20			Apache主机2</span><br></pre></td></tr></table></figure></p>
+<p>1.修改Nginx主配置文件,在相应的区域中加入以下标★语句.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /usr/local/nginx/conf/nginx.conf</span></span><br><span class="line"></span><br><span class="line">17 http &#123;</span><br><span class="line">18     include       	  mime.types;</span><br><span class="line">19     default_type  	  application/octet-stream;</span><br><span class="line">20     sendfile        	  on;</span><br><span class="line">21     keepalive_timeout  65;</span><br><span class="line">22</span><br><span class="line">---------------------------------------------------------------------------------------</span><br><span class="line">★在下处填写负载均衡语句 &lt;语句应写在http语句内并且是在server语句外填写&gt;</span><br><span class="line">★ upstream lyshark.com &#123;						<span class="comment">#自定义区域名</span></span><br><span class="line">★ </span><br><span class="line">★         server 192.168.1.10:80 weight 1;				<span class="comment">#负载均衡主机web1</span></span><br><span class="line">★         server 192.168.1.20:80 weight 2;				<span class="comment">#负载均衡主机web2</span></span><br><span class="line">★ </span><br><span class="line">★         server 192.168.1.30:80 weight 1 backup;</span><br><span class="line">★ 	   <span class="comment">#backup表示机器处于热备状态,weight代表权重,权重越高使用越多!</span></span><br><span class="line">★ &#125;</span><br><span class="line">---------------------------------------------------------------------------------------</span><br><span class="line">31 </span><br><span class="line">32     server &#123;</span><br><span class="line">33         listen       80;</span><br><span class="line">34         server_name  localhost;</span><br><span class="line">35</span><br><span class="line">---------------------------------------------------------------------------------------</span><br><span class="line">36         location / &#123;</span><br><span class="line">★ <span class="comment">#            root   html;	                       #注释掉</span></span><br><span class="line">★ <span class="comment">#            index  index.html index.htm;	       #注释掉</span></span><br><span class="line">★              proxy_pass http://lyshark.com;     <span class="comment">#代理交给上面的自定义区域处理</span></span><br><span class="line">40         &#125;</span><br><span class="line">---------------------------------------------------------------------------------------</span><br><span class="line">41 </span><br><span class="line">42         error_page   500 502 503 504  /50x.html;</span><br><span class="line">43         location = /50x.html &#123;</span><br><span class="line">44             root   html;</span><br><span class="line">45         &#125;</span><br><span class="line">46     &#125;</span><br><span class="line">47 &#125;</span><br></pre></td></tr></table></figure></p>
+<p>2.重启Nginx服务,此时访问Nginx时,会自动分配给后端的Apache集群.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># kill -HUP $(cat /usr/local/nginx/logs/nginx.pid)</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="Nginx实现HTTPS加密"><a href="#Nginx实现HTTPS加密" class="headerlink" title="Nginx实现HTTPS加密"></a>Nginx实现HTTPS加密</h2><p>作用：证书加密,提高了页面的安全性.</p>
+<p>1.安装软件依赖包<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y pcre-devel zlib-devel openssl openssl-devel</span></span><br></pre></td></tr></table></figure></p>
+<p>2.建立服务器私钥,过程中需要输入密码.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># openssl genrsa -des3 -out server.key 1024</span></span><br><span class="line"></span><br><span class="line">----------------------------------------------------------------------------</span><br><span class="line">[参数解释]</span><br><span class="line">		Genrsa –des3					<span class="comment">#加密类型</span></span><br><span class="line">		-out	server.key				<span class="comment">#输出文件</span></span><br><span class="line">		-1024						<span class="comment">#加密长度</span></span><br><span class="line">----------------------------------------------------------------------------</span><br></pre></td></tr></table></figure></p>
+<p>3.建立证书,生成的csr文件交给CA签名后形成服务端自己的证书.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># openssl req -new -key server.key -out server.csr</span></span><br><span class="line"></span><br><span class="line">----------------------------------------------------------------------------</span><br><span class="line">[参数解释]</span><br><span class="line">		req -new 				<span class="comment">#新建证书</span></span><br><span class="line">		-key server.key				<span class="comment">#私钥文件</span></span><br><span class="line">		-out server.csr				<span class="comment">#输出文件</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#注：依次输入：国家 省 市 组织 机构 全称 EMAIL 是否要改变密码 是否改名称</span></span><br><span class="line">----------------------------------------------------------------------------</span><br></pre></td></tr></table></figure></p>
+<p>4.转化成证书,这一步由证书CA机构来做的,这里只是实验.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># openssl x509 -req -days 365 -sha256 -in server.csr -signkey server.key -out servernew.crt</span></span><br></pre></td></tr></table></figure></p>
+<p>5.复制证书和密钥到Nginx目录下.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cp -a server.key /usr/local/nginx/conf/server.key           #复制密钥到conf目录下</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cp -a servernew.crt /usr/local/nginx/conf/server.crt        #复制证书到conf目录下</span></span><br></pre></td></tr></table></figure></p>
+<p>6.修改Nginx主配置文件,在相应的区域中加入以下标★语句.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /usr/local/nginx/conf/nginx.conf</span></span><br><span class="line"></span><br><span class="line">33     <span class="comment">#gzip  on;</span></span><br><span class="line">34 </span><br><span class="line">35     server &#123;</span><br><span class="line">★         listen       443;							<span class="comment">#修改端口为443</span></span><br><span class="line">37         server_name  localhost;</span><br><span class="line">38</span><br><span class="line">----------------------------------------------------------------------------</span><br><span class="line"><span class="comment">#添加以下内容,启用证书</span></span><br><span class="line"></span><br><span class="line">★         ssl on;                                                                <span class="comment">#开启SSL加密</span></span><br><span class="line">★         ssl_certificate server.crt;                                            <span class="comment">#证书位置</span></span><br><span class="line">★         ssl_certificate_key server.key;                                        <span class="comment">#密钥位置</span></span><br><span class="line">★         ssl_session_timeout 5m;                                                <span class="comment">#会话操作时间</span></span><br><span class="line">★         ssl_protocols TLSv1;                                                   <span class="comment">#协议版本</span></span><br><span class="line">★         ssl_ciphers HIGH:!RC4:!MD5:!aNULL:!eNULL:!NULL:!DH:!EDH:!EXP:+MEDIUM;  <span class="comment">#指定使用加密算法</span></span><br><span class="line">★         ssl_prefer_server_ciphers on;                                          <span class="comment">#缓存开启</span></span><br><span class="line">----------------------------------------------------------------------------</span><br><span class="line">46 </span><br><span class="line">47         location / &#123;</span><br><span class="line">48             root   html;</span><br><span class="line">49             index  index.html index.htm;</span><br><span class="line">50         &#125;</span><br><span class="line">51 </span><br><span class="line">52         <span class="comment">#error_page  404              /404.html;</span></span><br><span class="line">53 </span><br><span class="line">54         <span class="comment"># redirect server error pages to the static page /50x.html</span></span><br></pre></td></tr></table></figure></p>
+<p>7.重启Nginx服务,即可实现https加密<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># kill -HUP $(cat /usr/local/nginx/logs/nginx.pid)</span></span><br></pre></td></tr></table></figure></p>
+<p>8.访问地址,需要在末尾增加:443<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># elinks https://127.0.0.1:443</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="Nginx实现域名地址跳转"><a href="#Nginx实现域名地址跳转" class="headerlink" title="Nginx实现域名地址跳转"></a>Nginx实现域名地址跳转</h2><p>作用：实现访问跳转,比如活动页面暂时跳转.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[实验效果]</span><br><span class="line"></span><br><span class="line">当用户访问:   http://127.0.0.1/index.html</span><br><span class="line">将地址跳转到: http://59.110.167.239/index.html</span><br></pre></td></tr></table></figure>
+<p>1.修改Nginx主配置文件,在相应的区域中加入以下标★语句.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /usr/local/nginx/conf/nginx.conf</span></span><br><span class="line"></span><br><span class="line">24     server &#123;</span><br><span class="line">25         listen       80;</span><br><span class="line">26         server_name  localhost;</span><br><span class="line">27 </span><br><span class="line">28         <span class="comment">#charset koi8-r;</span></span><br><span class="line">29 </span><br><span class="line">30         <span class="comment">#access_log  logs/host.access.log  main;</span></span><br><span class="line">31 </span><br><span class="line">32         location / &#123;</span><br><span class="line">----------------------------------------------------------------------------</span><br><span class="line">★              <span class="comment">#root   html;                        #注释掉</span></span><br><span class="line">★              <span class="comment">#index  index.html index.htm;        #注释掉</span></span><br><span class="line">----------------------------------------------------------------------------</span><br><span class="line">35</span><br><span class="line">----------------------------------------------------------------------------</span><br><span class="line"><span class="comment">#添加以下内容</span></span><br><span class="line">★		rewrite ^(.*)$ http://59.110.167.239 permanent; <span class="comment">#实现地址全跳转(访问本机跳转到59.110.167.239上)</span></span><br><span class="line">★		rewrite ^(.*)$ https://<span class="variable">$host</span><span class="variable">$1</span> permanent;       <span class="comment">#实现自身http到https的全跳转</span></span><br><span class="line">----------------------------------------------------------------------------</span><br><span class="line">37         &#125;</span><br><span class="line">38         </span><br><span class="line">39         <span class="comment">#error_page  404              /404.html;</span></span><br><span class="line">40         </span><br><span class="line">41         <span class="comment"># redirect server error pages to the static page /50x.html</span></span><br></pre></td></tr></table></figure></p>
+<p>2.重启Nginx服务,加载配置<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># kill -HUP $(cat /usr/local/nginx/logs/nginx.pid)</span></span><br></pre></td></tr></table></figure></p>
+<p>3.手动访问本机 <a href="http://127.0.0.1" target="_blank" rel="noopener">http://127.0.0.1</a> 将自动跳转到 <a href="http://59.110.167.239" target="_blank" rel="noopener">http://59.110.167.239</a><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># elinks http://127.0.0.1/index.html</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="Nginx实现自身HTTP到HTTPS跳转"><a href="#Nginx实现自身HTTP到HTTPS跳转" class="headerlink" title="Nginx实现自身HTTP到HTTPS跳转"></a>Nginx实现自身HTTP到HTTPS跳转</h2><p>作用：当用户访问自身http地址时,会自动的跳转到https地址去访问.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[实验效果]</span><br><span class="line"></span><br><span class="line">用户访问: http://127.0.0.1/index.html</span><br><span class="line">会跳转到: https://127.0.0.1/index.html</span><br></pre></td></tr></table></figure>
+<p>1.安装软件依赖包.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y pcre-devel zlib-devel openssl openssl-devel</span></span><br></pre></td></tr></table></figure></p>
+<p>2.建立服务器私钥,过程中需要输入密码.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># openssl genrsa -des3 -out server.key 1024</span></span><br></pre></td></tr></table></figure></p>
+<p>3.建立证书,生成的csr文件交给CA签名后形成服务端自己的证书.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># openssl req -new -key server.key -out server.csr</span></span><br></pre></td></tr></table></figure></p>
+<p>4.转化成证书,这一步由证书CA机构来做的,这里只是实验.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># openssl x509 -req -days 365 -sha256 -in server.csr -signkey server.key -out servernew.crt</span></span><br></pre></td></tr></table></figure></p>
+<p>5.复制证书和密钥到Nginx目录下<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cp -a server.key /usr/local/nginx/conf/server.key      #复制密钥到conf目录下</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cp -a servernew.crt /usr/local/nginx/conf/server.crt   #复制证书到conf目录下</span></span><br></pre></td></tr></table></figure></p>
+<p>6.修改Nginx主配置文件,在相应的区域中加入以下标★语句.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /usr/local/nginx/conf/nginx.conf</span></span><br><span class="line"></span><br><span class="line">17 http &#123;</span><br><span class="line">18     include       mime.types;</span><br><span class="line">19     default_type  application/octet-stream;</span><br><span class="line">20     sendfile        on;</span><br><span class="line">21     keepalive_timeout  65;</span><br><span class="line">22 </span><br><span class="line">23     server &#123;</span><br><span class="line">24         listen       80;</span><br><span class="line">25         server_name  localhost;</span><br><span class="line">26 </span><br><span class="line">27         location / &#123;</span><br><span class="line">----------------------------------------------------------------------------</span><br><span class="line"><span class="comment">#修改以下内容</span></span><br><span class="line">★             <span class="comment">#root   html;				#注释掉</span></span><br><span class="line">★             <span class="comment">#index  index.html index.htm;		#注释掉</span></span><br><span class="line">★             rewrite ^(.*)$ https://<span class="variable">$host</span><span class="variable">$1</span> permanent;		<span class="comment">#实现自身http到https的跳转</span></span><br><span class="line">----------------------------------------------------------------------------</span><br><span class="line">31         &#125;</span><br><span class="line">32 </span><br><span class="line">33         error_page   500 502 503 504  /50x.html;</span><br><span class="line">34         location = /50x.html &#123;</span><br><span class="line">35             root   html;</span><br><span class="line">36         &#125;</span><br><span class="line">37     &#125;</span><br><span class="line">38 </span><br><span class="line">39     server &#123;</span><br><span class="line">★         listen       443;</span><br><span class="line">41         server_name  localhost;</span><br><span class="line">42</span><br><span class="line">----------------------------------------------------------------------------</span><br><span class="line"><span class="comment">#添加以下内容,启用证书</span></span><br><span class="line">★         ssl on;                                                         	<span class="comment">#开启SSL加密</span></span><br><span class="line">★         ssl_certificate server.crt;                                     	<span class="comment">#证书位置</span></span><br><span class="line">★         ssl_certificate_key server.key;                                 	<span class="comment">#密钥位置</span></span><br><span class="line">★         ssl_session_timeout 5m;                                         	<span class="comment">#会话操作时间</span></span><br><span class="line">★         ssl_protocols TLSv1;                                            	<span class="comment">#协议版本</span></span><br><span class="line">★         ssl_ciphers HIGH:!RC4:!MD5:!aNULL:!eNULL:!NULL:!DH:!EDH:!EXP:+MEDIUM;	<span class="comment">#指定使用加密算法</span></span><br><span class="line">★         ssl_prefer_server_ciphers on;                                   	<span class="comment">#缓存开启</span></span><br><span class="line">----------------------------------------------------------------------------</span><br><span class="line">50</span><br><span class="line">51         location / &#123;</span><br><span class="line">52             root   html;</span><br><span class="line">53             index  index.html index.htm;</span><br><span class="line">54 </span><br><span class="line">55         &#125;</span><br><span class="line">56 </span><br><span class="line">57         error_page   500 502 503 504  /50x.html;</span><br><span class="line">58         location = /50x.html &#123;</span><br><span class="line">59             root   html;</span><br><span class="line">60         &#125;</span><br><span class="line">61     &#125;</span><br><span class="line">62 &#125;</span><br></pre></td></tr></table></figure></p>
+<p>7.重启Nginx服务,加载配置.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># kill -HUP $(cat /usr/local/nginx/logs/nginx.pid)</span></span><br></pre></td></tr></table></figure></p>
+<p>8.手动访问本机 <a href="http://127.0.0.1" target="_blank" rel="noopener">http://127.0.0.1</a> 将自动跳转到 <a href="https://127.0.0.1" target="_blank" rel="noopener">https://127.0.0.1</a>.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># elinks http://127.0.0.1</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="Nginx配置HSTS"><a href="#Nginx配置HSTS" class="headerlink" title="Nginx配置HSTS"></a>Nginx配置HSTS</h2><p>作用：配置HSTS是为了提高网页的安全性,以及防止盗链接,了解即可.</p>
+<p>1.在Https的Server站点添加如下头部<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">add_header Strict-Transport-Security <span class="string">"max-age=63072000; includeSubdomains; preload"</span>;</span><br></pre></td></tr></table></figure></p>
+<p>2.在Http的Server站点添加相应代码<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">return</span> 301 https://<span class="variable">$host</span>;</span><br></pre></td></tr></table></figure></p>
+<p>3.添加X-Frame-Options头部,确保不会嵌入到Frame 或 iframe 避免点击劫持<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">add_header X-Frame-Options <span class="string">"DENY"</span>;</span><br></pre></td></tr></table></figure></p>
+<p>4.访问页面,测试<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">chrome://net-internals/</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="实战-实现企业Web环境"><a href="#实战-实现企业Web环境" class="headerlink" title="实战:实现企业Web环境"></a>实战:实现企业Web环境</h2><p>作用：本实战项目实现了企业环境的负载均衡,并启动了https认证,当作生产环境无压力.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[实验环境]</span><br><span class="line"></span><br><span class="line">[主机IP]		[主机名称]	[主机作用]</span><br><span class="line"></span><br><span class="line">192.168.1.12		Nginx 		反向代理+https认证</span><br><span class="line">192.168.1.13		Web1 		负载主机1</span><br><span class="line">192.168.1.14		Web2 		负载主机2</span><br><span class="line"></span><br><span class="line">[实验过程]</span><br><span class="line"></span><br><span class="line">1.生成SSL证书</span><br><span class="line">2.配置一个DNS,实现本地解析,将192.168.1.12解析成 www.lyshark.com</span><br><span class="line">3.配置好两台后台Apache服务器,12-13</span><br><span class="line">4.安装并配置Nginx</span><br><span class="line">5.Nginx能正常访问后</span><br><span class="line">6.在做做http到https的跳转</span><br><span class="line">7.紧接着跳转代理,做负载均衡</span><br><span class="line">8.最后访问www.lyshark.com实现https跳转,和压力分摊</span><br></pre></td></tr></table></figure>
+<p>1.配置DNS服务器,DNS服务器解析到本机Nginx服务器上<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Nginx	192.168.1.12	解析成	www.lyshark.com</span><br></pre></td></tr></table></figure></p>
+<p>2.配置两台Apache服务器<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Apache 	Web1	192.168.1.13</span><br><span class="line">Apache 	Web2	192.168.1.14</span><br></pre></td></tr></table></figure></p>
+<p>3.安装并配置Nginx</p>
+<p>a)生成证书与私钥<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># openssl genrsa -des3 -out server.key 1024</span></span><br><span class="line">[root@localhost ~]<span class="comment"># openssl req -new -key server.key -out server.csr</span></span><br><span class="line">[root@localhost ~]<span class="comment"># openssl x509 -req -days 365 -sha256 -in server.csr -signkey server.key -out servernew.crt</span></span><br></pre></td></tr></table></figure></p>
+<p>b)复制证书和密钥到Nginx目录下<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cp -a server.key /usr/local/nginx/conf/server.key</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cp -a servernew.crt /usr/local/nginx/conf/server.crt</span></span><br></pre></td></tr></table></figure></p>
+<p>4.修改Nginx主配置文件,在相应的区域中加入以下标★语句<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /usr/local/nginx/conf/nginx.conf</span></span><br><span class="line"></span><br><span class="line">1 worker_processes  1;</span><br><span class="line">2 </span><br><span class="line">3 events &#123;</span><br><span class="line">4     worker_connections  1024;</span><br><span class="line">5 &#125;</span><br><span class="line">6 </span><br><span class="line">7 </span><br><span class="line">8 http &#123;</span><br><span class="line">9     include       mime.types;</span><br><span class="line">10     default_type  application/octet-stream;</span><br><span class="line">11     sendfile        on;</span><br><span class="line">12     keepalive_timeout  65;</span><br><span class="line">13</span><br><span class="line">----------------------------------------------------------------------------</span><br><span class="line"><span class="comment">#在此处填写负载均衡语句（在http语句内,server语句外填写）</span></span><br><span class="line">★ upstream lyshark.com &#123;						<span class="comment">#自定义区域名</span></span><br><span class="line">★ </span><br><span class="line">★         server 192.168.1.13:80;					<span class="comment">#均衡主机1</span></span><br><span class="line">★         server 192.168.1.14:80;					<span class="comment">#均衡主机2</span></span><br><span class="line">★ &#125;</span><br><span class="line">----------------------------------------------------------------------------</span><br><span class="line">19 </span><br><span class="line">20 </span><br><span class="line">21     server &#123;</span><br><span class="line">22         listen       80;</span><br><span class="line">★         server_name  www.lyshark.com;					<span class="comment">#本机域名</span></span><br><span class="line">24 </span><br><span class="line">25         location / &#123;</span><br><span class="line">----------------------------------------------------------------------------</span><br><span class="line"><span class="comment">#配置http到https的自身跳转</span></span><br><span class="line">★             <span class="comment">#root   html;						#注释掉</span></span><br><span class="line">★             <span class="comment">#index  index.html index.htm;				#注释掉</span></span><br><span class="line">★             rewrite ^(.*)$ https://<span class="variable">$host</span><span class="variable">$1</span> permanent;			<span class="comment">#将http请求跳转到https</span></span><br><span class="line">----------------------------------------------------------------------------</span><br><span class="line">29         &#125;</span><br><span class="line">30 </span><br><span class="line">31         error_page   500 502 503 504  /50x.html;</span><br><span class="line">32         location = /50x.html &#123;</span><br><span class="line">33             root   html;</span><br><span class="line">34         &#125;</span><br><span class="line">35     &#125;</span><br><span class="line">36</span><br><span class="line">37     server &#123;</span><br><span class="line">★         listen       443;						<span class="comment">#修改端口</span></span><br><span class="line">★         server_name  www.lyshark.com;					<span class="comment">#本机域名</span></span><br><span class="line">40</span><br><span class="line">----------------------------------------------------------------------------</span><br><span class="line"><span class="comment">#添加以下内容,启用证书</span></span><br><span class="line">★         ssl on;                                                         <span class="comment">#开启SSL加密</span></span><br><span class="line">★         ssl_certificate server.crt;                                     <span class="comment">#证书位置</span></span><br><span class="line">★         ssl_certificate_key server.key;                                 <span class="comment">#密钥位置</span></span><br><span class="line">★         ssl_session_timeout 5m;                                         <span class="comment">#会话操作时间</span></span><br><span class="line">★         ssl_protocols TLSv1;                                            <span class="comment">#协议版本</span></span><br><span class="line">★         ssl_ciphers HIGH:!RC4:!MD5:!aNULL:!eNULL:!NULL:!DH:!EDH:!EXP:+MEDIUM;	<span class="comment">#指定使用加密算法</span></span><br><span class="line">★         ssl_prefer_server_ciphers on;                                  <span class="comment">#缓存开启</span></span><br><span class="line">----------------------------------------------------------------------------</span><br><span class="line">48 </span><br><span class="line">49         location / &#123;</span><br><span class="line">----------------------------------------------------------------------------</span><br><span class="line"><span class="comment">#地址跳转配置</span></span><br><span class="line">★             <span class="comment">#root   html;					#注释掉</span></span><br><span class="line">★             <span class="comment">#index  index.html index.htm;			#注释掉</span></span><br><span class="line">★             proxy_pass http://lyshark.com;			<span class="comment">#实现地址跳转,有80的请求转443</span></span><br><span class="line">----------------------------------------------------------------------------</span><br><span class="line">53         &#125;</span><br><span class="line">54 </span><br><span class="line">55         error_page   500 502 503 504  /50x.html;</span><br><span class="line">56         location = /50x.html &#123;</span><br><span class="line">57             root   html;</span><br><span class="line">58         &#125;</span><br><span class="line">59     &#125;</span><br><span class="line">60 &#125;</span><br></pre></td></tr></table></figure></p>
+<p>5.重启Nginx服务,加载配置<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># kill -HUP $(cat /usr/local/nginx/logs/nginx.pid)</span></span><br></pre></td></tr></table></figure></p>
+<p>6.手动访问 <a href="http://127.0.0.1/index.html" target="_blank" rel="noopener">http://127.0.0.1/index.html</a> 将跳转到 <a href="https://127.0.0.1/index.html" target="_blank" rel="noopener">https://127.0.0.1/index.html</a><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># elinks http://127.0.0.1/index.html</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="附加-去版本号-开启监控"><a href="#附加-去版本号-开启监控" class="headerlink" title="附加:去版本号,开启监控"></a>附加:去版本号,开启监控</h2><p>开启nginx监控模块<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">写入 (约在47行)</span><br><span class="line"></span><br><span class="line">location /lyshark &#123;</span><br><span class="line">	stub_status on;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">#查看监控页面输入: http://127.0.0.1/lyshark</span></span><br></pre></td></tr></table></figure></p>
+<p>源码编译修改版本号<br><figure class="highlight c"><table><tr><td class="code"><pre><span class="line">vim nginx<span class="number">-1.13</span><span class="number">.12</span>/src/core/nginx.h</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> nginx_version      1013012</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> NGINX_VERSION      <span class="meta-string">"1.13.12"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> NGINX_VER          <span class="meta-string">"nginx/"</span> NGINX_VERSION</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//修改完保存退出,编译即可</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/11/11/Linux 服务配置/编译Nginx服务部署静态网站/">编译Nginx服务部署静态网站</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年11月11日 - 14:11</p>
+  <p><span>最后更新:</span>2019年04月16日 - 20:04</p>
+  <p><span>原始链接:</span><a href="/2018/11/11/Linux 服务配置/编译Nginx服务部署静态网站/" title="编译Nginx服务部署静态网站">https://www.mkdirs.com/2018/11/11/Linux 服务配置/编译Nginx服务部署静态网站/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux-服务配置/" rel="tag"> <i class="fa fa-tag"></i> Linux 服务配置</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/11/Linux 服务配置/编译Apache服务部署静态网站/" rel="next" title="编译Apache服务部署静态网站">
+                <i class="fa fa-chevron-left"></i> 编译Apache服务部署静态网站
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/11/11/Linux 服务配置/Apache-Tomcat服务部署网站/" rel="prev" title="Apache Tomcat服务部署网站">
+                Apache Tomcat服务部署网站 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#编译安装Nginx"><span class="nav-text">编译安装Nginx</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置Nginx访问控制"><span class="nav-text">配置Nginx访问控制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆基于用户名密码的认证◆"><span class="nav-text">◆基于用户名密码的认证◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆基于IP地址的身份认证◆"><span class="nav-text">◆基于IP地址的身份认证◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置Nginx虚拟主机"><span class="nav-text">配置Nginx虚拟主机</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆基于IP的虚拟主机◆"><span class="nav-text">◆基于IP的虚拟主机◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆基于端口的虚拟主机◆"><span class="nav-text">◆基于端口的虚拟主机◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆基于域名的虚拟主机◆"><span class="nav-text">◆基于域名的虚拟主机◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置反向代理服务器"><span class="nav-text">配置反向代理服务器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Nginx实现负载均衡"><span class="nav-text">Nginx实现负载均衡</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Nginx实现HTTPS加密"><span class="nav-text">Nginx实现HTTPS加密</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Nginx实现域名地址跳转"><span class="nav-text">Nginx实现域名地址跳转</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Nginx实现自身HTTP到HTTPS跳转"><span class="nav-text">Nginx实现自身HTTP到HTTPS跳转</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Nginx配置HSTS"><span class="nav-text">Nginx配置HSTS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实战-实现企业Web环境"><span class="nav-text">实战:实现企业Web环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#附加-去版本号-开启监控"><span class="nav-text">附加:去版本号,开启监控</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

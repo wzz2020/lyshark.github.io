@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Keepalived的作用是检测服务器的状态,如果有一台web服务器宕机或工作出现故障,Keepalived将检测到,并将有故障的服务器从系统中剔除,同时使用其他服务器代替该服务器的工作,当服务器工作正常后Keepalived自动将服务器加入到服务器群中,这些工作全部自动完成,不需要人工干涉,需要人工做的只是修复故障的服务器.">
+<meta name="keywords" content="Linux 服务配置">
+<meta property="og:type" content="article">
+<meta property="og:title" content="构建Keepalived高可用集群">
+<meta property="og:url" content="https://www.mkdirs.com/2018/09/16/Linux 服务配置/构建Keepalived高可用集群/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="Keepalived的作用是检测服务器的状态,如果有一台web服务器宕机或工作出现故障,Keepalived将检测到,并将有故障的服务器从系统中剔除,同时使用其他服务器代替该服务器的工作,当服务器工作正常后Keepalived自动将服务器加入到服务器群中,这些工作全部自动完成,不需要人工干涉,需要人工做的只是修复故障的服务器.">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-04-16T12:38:49.236Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="构建Keepalived高可用集群">
+<meta name="twitter:description" content="Keepalived的作用是检测服务器的状态,如果有一台web服务器宕机或工作出现故障,Keepalived将检测到,并将有故障的服务器从系统中剔除,同时使用其他服务器代替该服务器的工作,当服务器工作正常后Keepalived自动将服务器加入到服务器群中,这些工作全部自动完成,不需要人工干涉,需要人工做的只是修复故障的服务器.">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/09/16/Linux 服务配置/构建Keepalived高可用集群/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>构建Keepalived高可用集群 | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/09/16/Linux 服务配置/构建Keepalived高可用集群/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">构建Keepalived高可用集群
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-09-16 21:10:08" itemprop="dateCreated datePublished" datetime="2018-09-16T21:10:08+08:00">2018-09-16</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-16 20:38:49" itemprop="dateModified" datetime="2019-04-16T20:38:49+08:00">2019-04-16</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Linux-服务配置/" itemprop="url" rel="index"><span itemprop="name">Linux 服务配置</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Keepalived的作用是检测服务器的状态,如果有一台web服务器宕机或工作出现故障,Keepalived将检测到,并将有故障的服务器从系统中剔除,同时使用其他服务器代替该服务器的工作,当服务器工作正常后Keepalived自动将服务器加入到服务器群中,这些工作全部自动完成,不需要人工干涉,需要人工做的只是修复故障的服务器.</p>
+<a id="more"></a>
+<p><br><br><strong>高可用集群(HA High Availability Cluster)</strong></p>
+<p>作用：最大限度的保证用户的应用程序持久,不间断的提供服务.(实现故障转移)</p>
+<p>高可用性(HA High Availablity)是指通过尽量缩短系统停机时间(因日常的维护操作或突发的系统崩溃等),以提高系统和应用的可用性.</p>
+<p>高可用集群最少是2个节点做出的HA集群,有很多通俗不科学的名称,比如 “双机热备”,”双机互备”,这样做的好处是当服务启动的时候,两台服务器一个作主(mast),另外一个作从(ser),测试机每几秒会ping主机当发现主机没有回应,就证明主机拓机了,那么从机马上会启动相应的服务,继续进行服务,这样就可保证服务不间断.</p>
+<p><strong>负载均衡集群与高性能运算集群(HPC),的区别?</strong></p>
+<p>负载均衡集群：通过提高单位时间内的执行的任务数量来提高效率.<br>高性能运算集群：通过提高单位时间内的执行时间来提高效率.</p>
+<p><strong>VRRP(Virtual Router Redundancy Protocol 虚拟路由冗余协议)简介</strong></p>
+<p>虚拟路由冗余协议(Virtual Router Redundancy Protocol，简称VRRP)是由IETF提出的解决局域网中配置静态网关出现单点失效现象的路由协议，1998年已推出正式的RFC2338协议标准。VRRP广泛应用在边缘网络中，它的设计目标是支持特定情况下IP数据流量失败转移不会引起混乱，允许主机使用单路由器，以及及时在实际第一跳路由器使用失败的情形下仍能够维护路由器间的连通性。</p>
+<p> VRRP是一种容错协议，它通过把几台路由设备联合组成一台虚拟的路由设备，并通过一定的机制来保证当主机的下一跳设备出现故障时，可以及时将业务切换到其它设备，从而保持通讯的连续性和可靠性。</p>
+<p><strong>脑分裂:与解决方法</strong></p>
+<p>解释: 在一个网络或线缆故障时导致两个节点同时认为自已是唯一处于活动状态的服务器从而出现争用资源的情况,这种争用资源的场景即是所谓的”脑裂”,会导致数据不完整或服务不可访问.</p>
+<p>解决方法：<br>1.设置参考ip,在抢夺资源之前,都去ping参考ip(网关),ping不通时,不会去抢资源,而是释放资源,将控制权交出去.<br>2.设置冗余线路,设置两条心跳线,两个网卡,第一个测时不通,再拿第二个去测.<br>3.stonish(爆头),基于能够通过软件指令关闭某节点特殊的硬件设备掐电源.</p>
+<p><strong>附加知识点:</strong></p>
+<p>RS232串口线: 串行电缆被认为是比以太网连接安全性稍好些的连接方式,因为黑客无法通过串行连接运行诸如telnet、ssh或rsh类的程序，从而可以降低其通过已劫持的服务器再次侵入备份服务器的几率.但串行线缆受限于可用长度,一般是(5米以内)因此主、备服务器的距离必须非常短.</p>
+<p>常用的双机热备软件: RoseHA KeepaLived Heartbear RHCS</p>
+<blockquote>
+<p>一年内最大停机限度</p>
+<blockquote>
+<p>99%:87.6h<br>99.9%:8.8h<br>99.99%:53m<br>99.999%:5m<br><br></p>
+</blockquote>
+</blockquote>
+<h2 id="编译安装"><a href="#编译安装" class="headerlink" title="编译安装"></a>编译安装</h2><p>1.安装依赖<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y gcc kernel kernel-devel openssl openssl-devel popt popt-devel</span></span><br></pre></td></tr></table></figure></p>
+<p>2.编译Keepalived<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># wget http://www.keepalived.org/software/keepalived-1.4.3.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># tar -xzvf keepalived-1.4.3.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd keepalived-1.4.3/</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#RHEL6中的编译参数</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ./configure --prefix=/ --with-kernel-dir=/usr/src/kernels/2.6.32-358.el6.x86_64</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#RHEL7中的编译参数</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ./configure --prefix=/ --with-kernel-dir=/usr/src/kernels/3.10.0-123.el7.x86_64/net/</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># make &amp;&amp; make install</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="LVS高可用配置"><a href="#LVS高可用配置" class="headerlink" title="LVS高可用配置"></a>LVS高可用配置</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[实验环境]</span><br><span class="line"></span><br><span class="line">[类型]			[IP地址]				[VIP/IO]</span><br><span class="line"></span><br><span class="line">LVS1_Master		IP:192.168.22.191		VIP:192.168.22.195</span><br><span class="line">LVS2_Slaves		IP:192.168.22.192		VIP:192.168.22.195</span><br><span class="line"></span><br><span class="line">RealServer_1		IP:192.168.22.193</span><br><span class="line">RealServer_2		IP:192.168.22.194</span><br><span class="line"></span><br><span class="line">[配置说明]</span><br><span class="line"></span><br><span class="line">1.首先我们需要配置一个LVS实现负载均衡</span><br><span class="line">2.其次安装第二个LVS但不需要配置</span><br><span class="line">3.在第一个LVS上配置轮询规则,并且安装开启Keepalived服务</span><br><span class="line">4.在第二个LVS上安装Keepalived服务,启动后会自动同步数据</span><br></pre></td></tr></table></figure>
+<h3 id="◆配置主节点◆"><a href="#◆配置主节点◆" class="headerlink" title="◆配置主节点◆"></a>◆配置主节点◆</h3><p>1.修改主配置文件,其他可删除,只写入以下内容,修改以下标★处<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/keepalived/keepalived.conf</span></span><br><span class="line"></span><br><span class="line"> 1 ! Configuration File <span class="keyword">for</span> keepalived</span><br><span class="line"> 2 </span><br><span class="line"> 3 global_defs &#123;</span><br><span class="line">★    router_id kp_master					<span class="comment">#指定本机keepalaved名字(主从不能重复)</span></span><br><span class="line"> 5 &#125;</span><br><span class="line"> 6 </span><br><span class="line"> 7 vrrp_instance VI_1 &#123;</span><br><span class="line">★     state MASTER						<span class="comment">#声明成主服务器(MASTER)/声明成从服务器(SLAVE)</span></span><br><span class="line">★     interface eth0						<span class="comment">#定义相应网卡接口名称</span></span><br><span class="line">★     virtual_router_id 100					<span class="comment">#虚拟路由ID（主从应同步）</span></span><br><span class="line">★     priority 100						<span class="comment">#Keepalaved主从服务器优先级(主服务器必须大于从服务器)</span></span><br><span class="line">12     advert_int 1						<span class="comment">#检查间隔,默认1秒</span></span><br><span class="line">13     authentication &#123;						<span class="comment">#定义主从验证</span></span><br><span class="line">14         auth_type PASS					<span class="comment">#设置验证方式(PASS或HA)</span></span><br><span class="line">15         auth_pass 1111					<span class="comment">#验证密码</span></span><br><span class="line">16     &#125;</span><br><span class="line">17     virtual_ipaddress &#123;					<span class="comment">#指定负载调度器（指定VIP的地址）</span></span><br><span class="line">★         192.168.22.195</span><br><span class="line">19     &#125;</span><br><span class="line">20 &#125;</span><br><span class="line">21 </span><br><span class="line">★ virtual_server 192.168.22.195 80 &#123;				<span class="comment">#虚拟主机区域(指定VIP地址)</span></span><br><span class="line">23     delay_loop 6						<span class="comment">#服务器轮询间隔时间</span></span><br><span class="line">24     lb_algo rr						<span class="comment">#指定rr轮询算法</span></span><br><span class="line">★     lb_kind DR						<span class="comment">#指定DR模式</span></span><br><span class="line">★     net_mask 255.255.255.0					<span class="comment">#指定子网掩码</span></span><br><span class="line">27     persistence_timeout 50					<span class="comment">#会话保持时间</span></span><br><span class="line">28     protocol TCP						<span class="comment">#指定数据转发协议</span></span><br><span class="line">29 </span><br><span class="line">★     real_server 192.168.22.193 80 &#123;				<span class="comment">#RealServer1池，如有多台复制此区域</span></span><br><span class="line">31         weight 1						<span class="comment">#设置服务器权重</span></span><br><span class="line">★         TCP_CHECK &#123;						<span class="comment">#对后端真实服务器TCP健康检查</span></span><br><span class="line">33             connect_timeout 3				<span class="comment">#链接超时时间</span></span><br><span class="line">34             retry 3						<span class="comment">#重试次数</span></span><br><span class="line">35             delay_before_retry 3				<span class="comment">#重试时间间隔</span></span><br><span class="line">36         &#125;</span><br><span class="line">37     &#125;</span><br><span class="line">38 </span><br><span class="line">★     real_server 192.168.22.194 80 &#123;				<span class="comment">#RealServer2池，如有多台复制此区域</span></span><br><span class="line">40         weight 1						<span class="comment">#设置服务器权重</span></span><br><span class="line">★         TCP_CHECK &#123;						<span class="comment">#对后端真实服务器TCP健康检查</span></span><br><span class="line">42             connect_timeout 3				<span class="comment">#连接超时时间</span></span><br><span class="line">43             retry 3						<span class="comment">#重试次数</span></span><br><span class="line">44             delay_before_retry 3				<span class="comment">#重试时间间隔</span></span><br><span class="line">45         &#125;</span><br><span class="line">46     &#125;</span><br><span class="line">47 &#125;</span><br></pre></td></tr></table></figure></p>
+<p>2.启动keepalived<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># chkconfig  --add  keepalived</span></span><br><span class="line">[root@localhost ~]<span class="comment"># chkconfig  keepalived  on</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ./keepalived  -f  /usr/local/keepalived/etc/keepalived.conf</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl restart keepalived</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="◆配置备节点◆"><a href="#◆配置备节点◆" class="headerlink" title="◆配置备节点◆"></a>◆配置备节点◆</h3><p>1.修改主配置文件,其他可删除,只写入以下内容,修改以下标★处<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/keepalived/keepalived.conf</span></span><br><span class="line"></span><br><span class="line"> 1 ! Configuration File <span class="keyword">for</span> keepalived</span><br><span class="line"> 2 </span><br><span class="line"> 3 global_defs &#123;</span><br><span class="line">★    router_id kp_slave						<span class="comment">#指定本机keepalaved名字(主从不能重复)</span></span><br><span class="line"> 5 &#125;</span><br><span class="line"> 6 </span><br><span class="line"> 7 vrrp_instance VI_1 &#123;</span><br><span class="line">★     state SLAVE						<span class="comment">#声明成主服务器(MASTER)/声明成从服务器(SLAVE)</span></span><br><span class="line">★     interface eth0						<span class="comment">#定义相应网卡接口名称</span></span><br><span class="line">★     virtual_router_id 100					<span class="comment">#虚拟路由ID（主从应同步）</span></span><br><span class="line">★     priority 50						<span class="comment">#Keepalaved主从服务器优先级(主服务器必须大于从服务器)</span></span><br><span class="line">12     advert_int 1						<span class="comment">#检查间隔,默认1秒</span></span><br><span class="line">13     authentication &#123;						<span class="comment">#定义主从验证</span></span><br><span class="line">14         auth_type PASS					<span class="comment">#设置验证方式(PASS或HA)</span></span><br><span class="line">15         auth_pass 1111					<span class="comment">#验证密码</span></span><br><span class="line">16     &#125;</span><br><span class="line">17     virtual_ipaddress &#123;					<span class="comment">#指定负载调度器（指定VIP的地址）</span></span><br><span class="line">★         192.168.22.195</span><br><span class="line">19     &#125;</span><br><span class="line">20 &#125;</span><br><span class="line">21 </span><br><span class="line">★ virtual_server 192.168.22.195 80 &#123;				<span class="comment">#虚拟主机区域(指定VIP地址)</span></span><br><span class="line">23     delay_loop 6						<span class="comment">#服务器轮询间隔时间</span></span><br><span class="line">24     lb_algo rr						<span class="comment">#指定rr轮询算法</span></span><br><span class="line">★     lb_kind DR						<span class="comment">#指定DR模式</span></span><br><span class="line">★     net_mask 255.255.255.0					<span class="comment">#指定子网掩码</span></span><br><span class="line">27     persistence_timeout 50					<span class="comment">#会话保持时间</span></span><br><span class="line">28     protocol TCP						<span class="comment">#指定数据转发协议</span></span><br><span class="line">29 </span><br><span class="line">★     real_server 192.168.22.193 80 &#123;				<span class="comment">#RealServer1池，如有多台复制此区域</span></span><br><span class="line">31         weight 1						<span class="comment">#设置服务器权重</span></span><br><span class="line">★         TCP_CHECK &#123;						<span class="comment">#对后端真实服务器TCP健康检查</span></span><br><span class="line">33             connect_timeout 3				<span class="comment">#链接超时时间</span></span><br><span class="line">34             retry 3						<span class="comment">#重试次数</span></span><br><span class="line">35             delay_before_retry 3				<span class="comment">#重试时间间隔</span></span><br><span class="line">36         &#125;</span><br><span class="line">37     &#125;</span><br><span class="line">38 </span><br><span class="line">★     real_server 192.168.22.194 80 &#123;				<span class="comment">#RealServer2池，如有多台复制此区域</span></span><br><span class="line">40         weight 1						<span class="comment">#设置服务器权重</span></span><br><span class="line">★         TCP_CHECK &#123;						<span class="comment">#对后端真实服务器TCP健康检查</span></span><br><span class="line">42             connect_timeout 3				<span class="comment">#连接超时时间</span></span><br><span class="line">43             retry 3						<span class="comment">#重试次数</span></span><br><span class="line">44             delay_before_retry 3				<span class="comment">#重试时间间隔</span></span><br><span class="line">45         &#125;</span><br><span class="line">46     &#125;</span><br><span class="line">47 &#125;</span><br></pre></td></tr></table></figure></p>
+<p>2.修改内核参数.防止相同网络地址广播冲突<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/sysctl.conf</span></span><br><span class="line"></span><br><span class="line">net.ipv4.conf.all.send_redirects = 0</span><br><span class="line">net.ipv4.conf.default.send_redirects = 0</span><br><span class="line">net.ipv4.conf.eth0.send_redirects = 0</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># sysctl -p</span></span><br></pre></td></tr></table></figure></p>
+<p>3.启动keepalived 添加自启动菜单以及设置开机自启<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># chkconfig  --add  keepalived</span></span><br><span class="line">[root@localhost ~]<span class="comment"># chkconfig  keepalived  on</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ./keepalived  -f  /usr/local/keepalived/etc/keepalived.conf</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl restart keepalived</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/09/16/Linux 服务配置/构建Keepalived高可用集群/">构建Keepalived高可用集群</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年09月16日 - 21:09</p>
+  <p><span>最后更新:</span>2019年04月16日 - 20:04</p>
+  <p><span>原始链接:</span><a href="/2018/09/16/Linux 服务配置/构建Keepalived高可用集群/" title="构建Keepalived高可用集群">https://www.mkdirs.com/2018/09/16/Linux 服务配置/构建Keepalived高可用集群/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux-服务配置/" rel="tag"> <i class="fa fa-tag"></i> Linux 服务配置</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/09/16/Linux 服务配置/构建LVS负载均衡集群/" rel="next" title="构建LVS负载均衡集群">
+                <i class="fa fa-chevron-left"></i> 构建LVS负载均衡集群
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/09/16/Linux 服务配置/配置VSFTP文件服务器/" rel="prev" title="配置VSFTP文件服务器">
+                配置VSFTP文件服务器 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#编译安装"><span class="nav-text">编译安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LVS高可用配置"><span class="nav-text">LVS高可用配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆配置主节点◆"><span class="nav-text">◆配置主节点◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆配置备节点◆"><span class="nav-text">◆配置备节点◆</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

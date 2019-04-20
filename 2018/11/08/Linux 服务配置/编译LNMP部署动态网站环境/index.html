@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="LNMP动态网站部署架构是由一套 Linux+Nginx+MySQL+PHP 组成的动态网站系统解决方案.以下配置环境为：Linux=RHEL7 –&amp;gt; Nginx=1.13 –&amp;gt; MySQL=5.6 –&amp;gt; PHP=7.0 无错误版.">
+<meta name="keywords" content="Linux 服务配置">
+<meta property="og:type" content="article">
+<meta property="og:title" content="编译LNMP部署动态网站环境">
+<meta property="og:url" content="https://www.mkdirs.com/2018/11/08/Linux 服务配置/编译LNMP部署动态网站环境/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="LNMP动态网站部署架构是由一套 Linux+Nginx+MySQL+PHP 组成的动态网站系统解决方案.以下配置环境为：Linux=RHEL7 –&amp;gt; Nginx=1.13 –&amp;gt; MySQL=5.6 –&amp;gt; PHP=7.0 无错误版.">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-04-16T12:38:31.987Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="编译LNMP部署动态网站环境">
+<meta name="twitter:description" content="LNMP动态网站部署架构是由一套 Linux+Nginx+MySQL+PHP 组成的动态网站系统解决方案.以下配置环境为：Linux=RHEL7 –&amp;gt; Nginx=1.13 –&amp;gt; MySQL=5.6 –&amp;gt; PHP=7.0 无错误版.">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/11/08/Linux 服务配置/编译LNMP部署动态网站环境/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>编译LNMP部署动态网站环境 | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/11/08/Linux 服务配置/编译LNMP部署动态网站环境/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">编译LNMP部署动态网站环境
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-11-08 13:59:59" itemprop="dateCreated datePublished" datetime="2018-11-08T13:59:59+08:00">2018-11-08</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-16 20:38:31" itemprop="dateModified" datetime="2019-04-16T20:38:31+08:00">2019-04-16</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Linux-服务配置/" itemprop="url" rel="index"><span itemprop="name">Linux 服务配置</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>LNMP动态网站部署架构是由一套 Linux+Nginx+MySQL+PHP 组成的动态网站系统解决方案.<br>以下配置环境为：Linux=RHEL7 –&gt; Nginx=1.13 –&gt; MySQL=5.6 –&gt; PHP=7.0 无错误版.</p>
+<a id="more"></a>
+<h2 id="安装编译环境"><a href="#安装编译环境" class="headerlink" title="安装编译环境"></a>安装编译环境</h2><p>在使用源码包安装服务程序之前,首先要让安装主机具备编译程序源码的环境,他需要具备C语言,C++语言的编译器,以及常见的编译支持函数库程序,下面我们将通过Yum仓库来快速部署这些包.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y gcc gcc-c++ apr apr-util  autoconf automake bison bzip2</span></span><br><span class="line"></span><br><span class="line">Loaded plugins: product-id, search-disabled-repos, subscription-manager</span><br><span class="line">This system is not registered with an entitlement server. You can use subscription-manager.</span><br><span class="line">Package gcc-4.8.5-28.el7.x86_64 already installed and latest version</span><br><span class="line">Package gcc-c++-4.8.5-28.el7.x86_64 already installed and latest version</span><br><span class="line">Package apr-1.4.8-3.el7_4.1.x86_64 already installed and latest version</span><br><span class="line">Package apr-util-1.5.2-6.el7.x86_64 already installed and latest version</span><br><span class="line">Package autoconf-2.69-11.el7.noarch already installed and latest version</span><br><span class="line">Package automake-1.13.4-3.el7.noarch already installed and latest version</span><br><span class="line">Package bison-3.0.4-1.el7.x86_64 already installed and latest version</span><br><span class="line">Package bzip2-1.0.6-13.el7.x86_64 already installed and latest version</span><br><span class="line">Nothing to <span class="keyword">do</span></span><br></pre></td></tr></table></figure></p>
+<p>CMake是Linux系统中一款常用的编译工具,在这里MySQL的编译会用到CMake命令,接下来我们将解压,并编译安装这个包.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># tar -xzvf cmake-2.8.11.2.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd cmake-2.8.11.2</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ./configure</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make install</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="编译安装-Nginx"><a href="#编译安装-Nginx" class="headerlink" title="编译安装 Nginx"></a>编译安装 Nginx</h2><p>Nginx是一款相当优秀的用于部署动态网站的轻量级服务程序,他最初是为俄罗斯门户站点开发的,因其性能稳定,功能丰富,占用内存小且并发能力高而备受用户的信赖,目前诸如,新浪搜狐,网易,腾讯等门户站点均已经使用了此服务.</p>
+<p>坦白来说,虽然Nginx服务程序代码质量非常高,代码很规范,技术成熟,模块扩展也很容易,但任然存在不少的问题,比如官方资料对中文的支持较少,但是Nginx服务程序,在近几年来的发展势头迅猛,相信会在轻量级Web服务器市场能够有不错的前景.</p>
+<p>1.在编译配置Nginx之前我们还需要解决相关依赖问题,例如用于提供Perl语言兼容的正则表达式库的软件包pcre,就是Nginx程序用于实现伪静态功能必不可少的依赖包,下面我们先来解压,并编译,安装这个包.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># tar -xzvf pcre-8.35.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd pcre-8.35</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ./configure --prefix=/usr/local/pcre</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make install</span></span><br></pre></td></tr></table></figure></p>
+<p>2.紧接着继续编译安装openssl,这个工具是用与提供网站加密证书服务的程序文件,安装时需要自定义服务程序的安装目录,以便于后期调用命令是更方便.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># tar -xzvf openssl-1.0.1h.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd openssl-1.0.1h</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ./config --prefix=/usr/local/openssl</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make install</span></span><br></pre></td></tr></table></figure></p>
+<p>3.在openssl安装后,默认会在/usr/local/openssl/bin目录中提供很多可用命令,我们将这个目录添加到PATH环境变量里,方便后期的调用.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># echo "export PATH=$PATH:/usr/local/openssl/bin" &gt;&gt; /etc/profile</span></span><br><span class="line">[root@localhost ~]<span class="comment"># source /etc/profile</span></span><br><span class="line">[root@localhost ~]<span class="comment"># openssl </span></span><br><span class="line">OpenSSL&gt;</span><br></pre></td></tr></table></figure></p>
+<p>4.zlib软件包是用户提供压缩功能的函数文件,下面我们开始编译安装.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># tar -xzvf zlib-1.2.8.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd zlib-1.2.8</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ./configure --prefix=/usr/local/zlib</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make install</span></span><br></pre></td></tr></table></figure></p>
+<p>5.在安装好zlib后,下面我们进入编译Nginx的前戏阶段,创建一个Nginx用户<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># useradd -s /sbin/nologin -M nginx</span></span><br></pre></td></tr></table></figure></p>
+<p>6.下面开始编译安装Nginx,这里我们需要指定–user与–group参数,也就是用户与组,在使用参数openssl和zlib库时应该指定具体位置.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># tar -xzvf nginx-1.13.12.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd nginx-1.13.12</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ./configure --prefix=/usr/local/nginx \</span></span><br><span class="line">&gt; --user=nginx --group=nginx \</span><br><span class="line">&gt; --with-http_stub_status_module --with-http_ssl_module \</span><br><span class="line">&gt; --with-http_gzip_static_module --with-openssl=/root/openssl-1.0.1h \</span><br><span class="line">&gt; --with-zlib=/root/zlib-1.2.8 --with-pcre=/root/pcre-8.35</span><br><span class="line">[root@localhost ~]<span class="comment"># make</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make install</span></span><br></pre></td></tr></table></figure></p>
+<p>7.启动Nginx,并设置开机自启动<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># /usr/local/nginx/sbin/nginx -t                        #检测配置文件正确性</span></span><br><span class="line">[root@localhost ~]<span class="comment"># /usr/local/nginx/sbin/nginx                           #启动Nginx</span></span><br><span class="line">[root@localhost ~]<span class="comment"># kill -QUIT $(cat /usr/local/nginx/logs/nginx.pid)     #关闭Nginx</span></span><br><span class="line">[root@localhost ~]<span class="comment"># kill -HUP $(cat /usr/local/nginx/logs/nginx.pid)      #重启Nginx</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "/usr/local/nginx/sbin/nginx 2&gt; /dev/null" &gt;&gt; /etc/profile</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="编译安装-MySQL"><a href="#编译安装-MySQL" class="headerlink" title="编译安装 MySQL"></a>编译安装 MySQL</h2><p>MySQL是一个关系型数据库管理系统,由瑞典MySQL AB公司开发,目前属于Oracle旗下产品.MySQL是最流行的关系型数据库管理系统之一,在WEB应用方面,MySQL是最好的RDBMS应用软件,MySQL是一种关系数据库管理系统,关系数据库将数据保存在不同的表中,而不是将所有数据放在一个大仓库内,这样就增加了速度并提高了灵活性.这里需要注意的是由于MySQL5.7以后产品闭源了,后期的话可以使用MariaDB替代.</p>
+<p>1.在编译MySQL过程中,我们需要创建一个mysql的系统用户,专门负责运行MySQL数据库,记得把这个账户变成一个不可登录的用户,且也无需创建家目录,提高系统安全性.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># useradd -s /sbin/nologin -M mysql</span></span><br></pre></td></tr></table></figure></p>
+<p>2.创建一个用于保存MySQL程序,和数据库文件的目录,并把该目录所有者和所属组改成mysql,其中/usr/local/mysql用于保存MySQL数据程序,而/usr/local/mysql/data则用来保存数据库文件.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mkdir -p /usr/local/mysql</span></span><br><span class="line">[root@localhost ~]<span class="comment"># mkdir -p /usr/local/mysql/data</span></span><br><span class="line">[root@localhost ~]<span class="comment"># chown -Rf mysql:mysql /usr/local/mysql/</span></span><br></pre></td></tr></table></figure></p>
+<p>3.安装Ncurses,若不安装ncurses编译MySQL时会报错<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y ncurses-devel</span></span><br><span class="line">[root@localhost ~]<span class="comment"># tar -xzvf ncurses-6.1.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd ncurses-6.1</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ./configure --with-shared \</span></span><br><span class="line">--without-debug \</span><br><span class="line">--without-ada \</span><br><span class="line">--<span class="built_in">enable</span>-overwrite</span><br><span class="line">[root@localhost ~]<span class="comment"># make</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make install</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># --without-ada参数为设定不编译为ada绑定，因进入chroot环境不能使用ada ；</span></span><br><span class="line"><span class="comment"># --enable-overwrite参数为定义把头文件安装到/tools/include下而不是/tools/include/ncurses目录</span></span><br><span class="line"><span class="comment"># --with-shared	生成共享库</span></span><br></pre></td></tr></table></figure></p>
+<p>4.接下来,开始解压编译MySQL,由于MySQL体积过大,编译时间很长,耐心等待吧<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># tar -xzvf mysql-5.6.19.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd mysql-5.6.19</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cmake -DCMAKE_INSTALL_PREFIX=/usr/local/mysql \</span></span><br><span class="line">-DMYSQL_DATADIR=/usr/<span class="built_in">local</span>/mysql/data \</span><br><span class="line">-DSYSCONFDIR=/etc \</span><br><span class="line">-DMYSQL_UNIX_ADDR=/tmp/mysql.sock \</span><br><span class="line">-DEXTRA_CHARSETS=all \</span><br><span class="line">-DDEFAULT_CHARSET=utf8 \</span><br><span class="line">-DDEFAULT_COLLATION=utf8_general_ci \</span><br><span class="line">-DWITH_MYISAM_STORAGE_ENGINE=1 \</span><br><span class="line">-DWITH_INNOBASE_STORAGE_ENGINE=1 \</span><br><span class="line">-DWITH_MEMORY_STORAGE_ENGINE=1 \</span><br><span class="line">-DWITH_READLINE=1 \</span><br><span class="line">-DENABLED_LOCAL_INFILE=1 \</span><br><span class="line">-DMYSQL_USER=mysql \</span><br><span class="line">-DMYSQL_TCP_PORT=3306</span><br><span class="line">[root@localhost ~]<span class="comment"># make</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make install</span></span><br></pre></td></tr></table></figure></p>
+<p>5.下面进入配置环节,首先删除/etc/my.cnf默认配置文件,然后在MySQL程序目录内,找到一个名为mysql_install_db的脚本文件,执行这个脚本,并使用–user参数指定MySQL服务的对应账号名称,使用–basedir指定MySQL程序保存目录,使用–datadir指定数据库目录.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># rm -fr /etc/my.cnf</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd /usr/local/mysql/</span></span><br><span class="line">[root@localhost mysql]<span class="comment"># ./scripts/mysql_install_db --user=mysql \</span></span><br><span class="line">--basedir=/usr/<span class="built_in">local</span>/mysql/ \</span><br><span class="line">--datadir=/usr/<span class="built_in">local</span>/mysql/data/</span><br><span class="line"></span><br><span class="line">....</span><br><span class="line">New default config file was created as /usr/<span class="built_in">local</span>/mysql//my.cnf and</span><br><span class="line">will be used by default by the server when you start it.</span><br><span class="line">You may edit this file to change server settings</span><br></pre></td></tr></table></figure></p>
+<p>6.接着把,MySQL数据库配置文件复制到/etc/目录下,然后把开机程序复制到/etc/rc.d/init.d目录下,给脚本755的权限.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost mysql]<span class="comment"># cp -a my.cnf /etc/my.cnf</span></span><br><span class="line">[root@localhost mysql]<span class="comment"># cp ./support-files/mysql.server /etc/rc.d/init.d/mysqld</span></span><br><span class="line">[root@localhost mysql]<span class="comment"># chmod 755 -R /etc/rc.d/init.d/mysqld</span></span><br></pre></td></tr></table></figure></p>
+<p>7.修改刚刚的配置文件,改basedir=/usr/local/mysql,datadir=/usr/local/mysql/data这一行.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost mysql]<span class="comment"># vim /etc/rc.d/init.d/mysqld</span></span><br><span class="line"></span><br><span class="line"> 43 <span class="comment"># If you change base dir, you must also change datadir. These may get</span></span><br><span class="line"> 44 <span class="comment"># overwritten by settings in the MySQL configuration files.</span></span><br><span class="line"> 45 </span><br><span class="line"> 46 basedir= /usr/<span class="built_in">local</span>/mysql</span><br><span class="line"> 47 datadir= /usr/<span class="built_in">local</span>/mysql/data</span><br><span class="line"> 48 </span><br><span class="line"> 49 <span class="comment"># Default value, in seconds, afterwhich the script should timeout waiting</span></span><br><span class="line"> 50 <span class="comment"># for server start.</span></span><br></pre></td></tr></table></figure></p>
+<p>8.启动MySQL,与设置chkconfig开机自启动的配置.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># /etc/rc.d/init.d/mysqld start</span></span><br><span class="line">[root@localhost ~]<span class="comment"># /usr/local/mysql/bin/mysqld_safe --user=mysql &amp;</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># chkconfig mysqld on</span></span><br><span class="line">[root@localhost ~]<span class="comment"># chkconfig --list mysqld</span></span><br><span class="line"></span><br><span class="line">Note: This output shows SysV services only and does not include native</span><br><span class="line">      systemd services. SysV configuration data might be overridden by native</span><br><span class="line">      systemd configuration.</span><br><span class="line"></span><br><span class="line">      If you want to list systemd services use <span class="string">'systemctl list-unit-files'</span>.</span><br><span class="line">      To see services enabled on particular target use</span><br><span class="line">      <span class="string">'systemctl list-dependencies [target]'</span>.</span><br><span class="line"></span><br><span class="line">mysqld         	0:off	1:off	2:on	3:on	4:on	5:on	6:off</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "/usr/local/mysql/bin/mysqld_safe --user=mysql &amp;" &gt;&gt; /etc/rc.local</span></span><br></pre></td></tr></table></figure></p>
+<p>9.添加环境变量,使用相对路径命令,这样就能直接访问了.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># echo "export PATH=$PATH:/usr/local/mysql/bin" &gt;&gt; /etc/profile</span></span><br><span class="line">[root@localhost ~]<span class="comment"># source /etc/profile</span></span><br><span class="line">[root@localhost ~]<span class="comment"># mysql -uroot</span></span><br><span class="line"></span><br><span class="line">Welcome to the MySQL monitor.  Commands end with ; or \g.</span><br><span class="line">Your MySQL connection id is 3</span><br><span class="line">Server version: 5.6.19 Source distribution</span><br><span class="line"></span><br><span class="line">Copyright (c) 2000, 2014, Oracle and/or its affiliates. All rights reserved.</span><br><span class="line"></span><br><span class="line">Oracle is a registered trademark of Oracle Corporation and/or its</span><br><span class="line">affiliates. Other names may be trademarks of their respective</span><br><span class="line">owners.</span><br><span class="line"></span><br><span class="line">Type <span class="string">'help;'</span> or <span class="string">'\h'</span> <span class="keyword">for</span> <span class="built_in">help</span>. Type <span class="string">'\c'</span> to clear the current input statement.</span><br><span class="line"></span><br><span class="line">mysql&gt;</span><br></pre></td></tr></table></figure></p>
+<p>10.MySQL数据库还会调用一些函数库,在这里我们把它们复制到指定的位置吧.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mkdir /var/lib/mysql</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ln -s /usr/local/mysql/lib/* /var/lib/mysql</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ln /usr/local/mysql/include/mysql /usr/include/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ln -s /usr/local/mysql/include/mysql /usr/include/mysql</span></span><br></pre></td></tr></table></figure></p>
+<p>11.接着我们执行 mysql_secure_installation 命令,给MySQL设置初始密码,到此配置完毕<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mysql_secure_installation </span></span><br><span class="line">[root@localhost ~]<span class="comment"># mysql -uroot -p1233</span></span><br><span class="line">Warning: Using a password on the <span class="built_in">command</span> line interface can be insecure.</span><br><span class="line">Welcome to the MySQL monitor.  Commands end with ; or \g.</span><br><span class="line">Your MySQL connection id is 18</span><br><span class="line">Server version: 5.6.19 Source distribution</span><br><span class="line"></span><br><span class="line">Copyright (c) 2000, 2014, Oracle and/or its affiliates. All rights reserved.</span><br><span class="line"></span><br><span class="line">Oracle is a registered trademark of Oracle Corporation and/or its</span><br><span class="line">affiliates. Other names may be trademarks of their respective</span><br><span class="line">owners.</span><br><span class="line"></span><br><span class="line">Type <span class="string">'help;'</span> or <span class="string">'\h'</span> <span class="keyword">for</span> <span class="built_in">help</span>. Type <span class="string">'\c'</span> to clear the current input statement.</span><br><span class="line"></span><br><span class="line">mysql&gt;</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="编译安装-PHP"><a href="#编译安装-PHP" class="headerlink" title="编译安装 PHP"></a>编译安装 PHP</h2><p>PHP是一种通用开源脚本语言,语法吸收了C语言、Java和Perl的特点,利于学习使用广泛,主要适用于Web开发领域.PHP独特的语法混合了C、Java、Perl以及PHP自创的语法.它可以比CGI或者Perl更快速地执行动态网页.用PHP做出的动态页面与其他的编程语言相比,PHP是将程序嵌入到HTML文档中去执行,执行效率比完全生成HTML标记的CGI要高许多,PHP还可以执行编译后代码,编译可以达到加密和优化代码运行,使代码运行更快.</p>
+<p>1.在编译安装PHP之前首先要解决依赖的问题,例如yasm是一款常见的开源汇编器.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># tar -xzvf yasm-1.2.0.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd yasm-1.2.0</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ./configure</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make install</span></span><br></pre></td></tr></table></figure></p>
+<p>2.libmcrypt是用于加密算法的扩展库程序.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># tar -xzvf libmcrypt-2.5.8.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd libmcrypt-2.5.8</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ./configure</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make install</span></span><br></pre></td></tr></table></figure></p>
+<p>3.libvpx是用于提供视频编码器服务的程序.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># tar -xjvf libvpx-v1.3.0.tar.bz2</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd libvpx-v1.3.0</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ./configure --prefix=/usr/local/libvpx --enable-shared --enable-vp9</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make install</span></span><br></pre></td></tr></table></figure></p>
+<p>4.tiff是用于提供标签图像文件格式的服务程序.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># tar -xzvf tiff-4.0.3.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd tiff-4.0.3</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ./configure --prefix=/usr/local/tiff --enable-shared</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make install</span></span><br></pre></td></tr></table></figure></p>
+<p>5.libpng是用于提供png图片格式支持函数库的服务程序.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># tar -xzvf libpng-1.6.12.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># yum install -y zlib zlib-devel</span></span><br><span class="line">[root@localhost ~]<span class="comment">#  ./configure --prefix=/usr/local/libpng --enable-shared</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make install</span></span><br></pre></td></tr></table></figure></p>
+<p>6.freetype是用于提供字体支持引擎的服务.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># tar -xzvf freetype-2.5.3.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd freetype-2.5.3</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ./configure --prefix=/usr/local/freetype -enable-shared</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make install</span></span><br></pre></td></tr></table></figure></p>
+<p>7.jpeg是用于提供jpeg图片格式支持的函数库.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># tar -xzvf jpegsrc.v9a.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd jpeg-9a</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ./configure --prefix=/usr/local/jpeg --enable-shared</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make install</span></span><br></pre></td></tr></table></figure></p>
+<p>8.libgd是用于提供图形处理的服务.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># tar -xzvf libgd-2.1.0.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd libgd-2.1.0</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ./configure --prefix=/usr/local/libgd --with-jpeg=/usr/local/jpeg \</span></span><br><span class="line">--with-freetype=/usr/<span class="built_in">local</span>/freetype --with-tiff=/usr/<span class="built_in">local</span>/tiff --with-vpx=/usr/<span class="built_in">local</span>/libvpx</span><br><span class="line">[root@localhost ~]<span class="comment"># make</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make install</span></span><br></pre></td></tr></table></figure></p>
+<p>9.tlib是用于提供图片生成函数库的服务程序.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># tar -xzvf t1lib-5.1.2.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd t1lib-5.1.2</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ./configure --prefix=/usr/local/t1lib --enable-shared</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make</span></span><br><span class="line">[root@localhost ~]<span class="comment">#  make install</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ln -s /usr/lib64/libltdl.so.7 /usr/lib/libltdl.so</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cp -a frp /usr/lib64/libXpm.so* /usr/lib/</span></span><br></pre></td></tr></table></figure></p>
+<p>10.编译安装PHP程序.(这里既可以使用5.x也可以使用7.x参数通用)<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># tar -xzvf php-7.0.0.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># yum install -y libxml2 libxml2-devel libcurl libcurl-devel libXpm-devel</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd php-7.0.0</span></span><br><span class="line">[root@localhost ~]<span class="comment"># export LD_LIBRARY_PATH=/usr/local/libgd/lib</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ./configure --prefix=/usr/local/php --with-config-file-path=/usr/local/php/etc --with-mysql=/usr/local/mysql --with-mysqli=/usr/local/mysql/bin/mysql_config --with-mysql-sock=/tmp/mysql.sock --with-pdo-mysql=/usr/local/mysql --with-gd --with-png-dir=/usr/local/libpng --with-jpeg-dir=/usr/local/jpeg --with-freetype-dir=/usr/local/freetype --with-xpm-dir=/usr/ --with-vpx-dir=/usr/local/libvpx/ --with-zlib-dir=/usr/local/zlib --with-t1lib=/usr/local/t1lib --with-iconv --enable-libxml --enable-xml --enable-bcmath --enable-shmop --enable-sysvsem --enable-inline-optimization --enable-opcache --enable-mbregex --enable-fpm --enable-mbstring --enable-ftp --enable-gd-native-ttf --with-openssl --enable-pcntl --enable-sockets --with-xmlrpc --enable-zip --enable-soap --without-pear --with-gettext --enable-session --with-mcrypt --with-curl --enable-ctype</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make install</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="配置-PHP与Nginx"><a href="#配置-PHP与Nginx" class="headerlink" title="配置 PHP与Nginx"></a>配置 PHP与Nginx</h2><p>1.拷贝相应配置文件<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">cp -a php.ini-development /usr/<span class="built_in">local</span>/php7/lib/php.ini</span><br><span class="line">cp -a /usr/<span class="built_in">local</span>/php7/etc/php-fpm.conf.default /usr/<span class="built_in">local</span>/php7/etc/php-fpm.conf</span><br><span class="line">cp -a sapi/fpm/php-fpm /usr/<span class="built_in">local</span>/bin</span><br></pre></td></tr></table></figure></p>
+<p>2.编辑配置文件,在PHP文件末尾追加写入以下标★语句</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">vim /usr/<span class="built_in">local</span>/php7/lib/php.ini</span><br><span class="line"></span><br><span class="line">cgi.fix_pathinfo=1 					<span class="comment">#将注释去掉,开启PHP的pathinfo伪静态功能</span></span><br><span class="line">max_execution_time = 0  				<span class="comment">#脚本运行的最长时间,默认30秒</span></span><br><span class="line">max_input_time = 300					<span class="comment">#脚本可以消耗的时间,默认60秒</span></span><br><span class="line">memory_limit = 256M					<span class="comment">#脚本运行最大消耗的内存,根据你的需求更改数值,默认128M</span></span><br><span class="line">post_max_size = 100M  				    <span class="comment">#单提交的最大数据，默认100M</span></span><br><span class="line">upload_max_filesize = 10M				<span class="comment">#上载文件的最大许可大小,默认2M</span></span><br></pre></td></tr></table></figure>
+<p>3.修改php-fpm的配置,在PHP-fpm文件中,修改以下标★语句</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cd</span>  /usr/<span class="built_in">local</span>/php7/etc/php-fpm.d/</span><br><span class="line"></span><br><span class="line">cp -a www.conf.default www.conf</span><br><span class="line"></span><br><span class="line">vim /usr/<span class="built_in">local</span>/php7/etc/php-fpm.d/www.conf </span><br><span class="line"></span><br><span class="line">★listen.owner = nobody					<span class="comment">#解除注释</span></span><br><span class="line">★listen.group = nobody					<span class="comment">#解除注释</span></span><br><span class="line"></span><br><span class="line">★user = nginx						<span class="comment">#将apache修改为nginx</span></span><br><span class="line">★group = nginx						<span class="comment">#将apache修改为nginx</span></span><br></pre></td></tr></table></figure>
+<p>4.修改nginx的主配置,在server语句内,写入以下标★语句</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">vim /usr/<span class="built_in">local</span>/nginx/conf/nginx.conf</span><br><span class="line"></span><br><span class="line">38     server &#123;</span><br><span class="line">39         listen       80 default_server;</span><br><span class="line">40         listen       [::]:80 default_server;</span><br><span class="line">41         server_name  _;</span><br><span class="line">42         root         /usr/share/nginx/html;</span><br><span class="line">43 </span><br><span class="line">44         <span class="comment"># Load configuration files for the default server block.</span></span><br><span class="line">45         include /etc/nginx/default.d/*.conf;</span><br><span class="line">46 </span><br><span class="line">★         location / &#123;</span><br><span class="line">★ </span><br><span class="line">★         root   html;</span><br><span class="line">★         index index.php index.html index.htm;</span><br><span class="line">★ </span><br><span class="line">52         &#125;</span><br><span class="line">53 </span><br><span class="line">★         location ~ \.php$ &#123;</span><br><span class="line">★         root           /usr/<span class="built_in">local</span>/nginx/html;</span><br><span class="line">★         try_files <span class="variable">$uri</span> =404;</span><br><span class="line">★         fastcgi_pass   127.0.0.1:9000;</span><br><span class="line">★         fastcgi_index  index.php;</span><br><span class="line">★         fastcgi_param  SCRIPT_FILENAME  <span class="variable">$document_root</span><span class="variable">$fastcgi_script_name</span>;</span><br><span class="line">★         include        fastcgi_params;</span><br><span class="line">★         &#125;</span><br><span class="line">62 </span><br><span class="line">63         error_page 404 /404.html;</span><br><span class="line">64             location = /40x.html &#123;</span><br><span class="line">65         &#125;</span><br></pre></td></tr></table></figure>
+<p>5.设置网页目录权限</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">chown -R nginx:nginx /usr/<span class="built_in">local</span>/nginx/html/</span><br></pre></td></tr></table></figure>
+<p>6.新建index.php测试页</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">vim /usr/<span class="built_in">local</span>/nginx/html/index.php</span><br><span class="line"></span><br><span class="line">&lt;?php</span><br><span class="line">	phpinfo();</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>7.重启服务,并查看9000端口是否启动成功</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">/usr/<span class="built_in">local</span>/nginx/sbin/nginx</span><br><span class="line">/usr/<span class="built_in">local</span>/php7/sbin/php-fpm</span><br><span class="line"></span><br><span class="line">netstat -npa | grep 9000</span><br></pre></td></tr></table></figure>
+<p>8.配置妥当后,便可以复制php管理脚本,并加入到开机自启动列表<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost php-7.0.0]<span class="comment"># cp -a sapi/fpm/init.d.php-fpm /etc/rc.d/init.d/php-fpm</span></span><br><span class="line">[root@localhost php-7.0.0]<span class="comment"># chmod 755 -R /etc/rc.d/init.d/php-fpm</span></span><br><span class="line">[root@localhost php-7.0.0]<span class="comment"># chkconfig php-fpm on</span></span><br><span class="line">[root@localhost php-7.0.0]<span class="comment"># </span></span><br><span class="line">[root@localhost php-7.0.0]<span class="comment"># chkconfig --list php-fpm</span></span><br><span class="line"></span><br><span class="line">Note: This output shows SysV services only and does not include native</span><br><span class="line">      systemd services. SysV configuration data might be overridden by native</span><br><span class="line">      systemd configuration.</span><br><span class="line"></span><br><span class="line">      If you want to list systemd services use <span class="string">'systemctl list-unit-files'</span>.</span><br><span class="line">      To see services enabled on particular target use</span><br><span class="line">      <span class="string">'systemctl list-dependencies [target]'</span>.</span><br><span class="line"></span><br><span class="line">php-fpm        	0:off	1:off	2:on	3:on	4:on	5:on	6:off</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/11/08/Linux 服务配置/编译LNMP部署动态网站环境/">编译LNMP部署动态网站环境</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年11月08日 - 13:11</p>
+  <p><span>最后更新:</span>2019年04月16日 - 20:04</p>
+  <p><span>原始链接:</span><a href="/2018/11/08/Linux 服务配置/编译LNMP部署动态网站环境/" title="编译LNMP部署动态网站环境">https://www.mkdirs.com/2018/11/08/Linux 服务配置/编译LNMP部署动态网站环境/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux-服务配置/" rel="tag"> <i class="fa fa-tag"></i> Linux 服务配置</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/09/18/Linux 系统管理/Linux Shell常用脚本整理/" rel="next" title="Linux Shell常用脚本整理">
+                <i class="fa fa-chevron-left"></i> Linux Shell常用脚本整理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/11/08/Linux 服务配置/编译LAMP部署动态网站环境/" rel="prev" title="编译LAMP部署动态网站环境">
+                编译LAMP部署动态网站环境 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装编译环境"><span class="nav-text">安装编译环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编译安装-Nginx"><span class="nav-text">编译安装 Nginx</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编译安装-MySQL"><span class="nav-text">编译安装 MySQL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编译安装-PHP"><span class="nav-text">编译安装 PHP</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置-PHP与Nginx"><span class="nav-text">配置 PHP与Nginx</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

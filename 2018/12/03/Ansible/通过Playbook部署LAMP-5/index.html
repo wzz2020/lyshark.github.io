@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Ansible是新出现的自动化运维工具,基于Python开发,集合了众多运维工具 (puppet、cfengine、chef、func、fabric) 的优点,实现了批量系统配置、批量程序部署、批量运行命令等功能,Ansible是基于模块工作的,本身没有批量部署的能力,真正具有批量部署的是Ansible所运行的模块,Ansible只是提供一种框架. LAMP 架构也是我们每个运维人员熟知的一种网站">
+<meta name="keywords" content="Ansible">
+<meta property="og:type" content="article">
+<meta property="og:title" content="通过Playbook部署LAMP(5)">
+<meta property="og:url" content="https://www.mkdirs.com/2018/12/03/Ansible/通过Playbook部署LAMP-5/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="Ansible是新出现的自动化运维工具,基于Python开发,集合了众多运维工具 (puppet、cfengine、chef、func、fabric) 的优点,实现了批量系统配置、批量程序部署、批量运行命令等功能,Ansible是基于模块工作的,本身没有批量部署的能力,真正具有批量部署的是Ansible所运行的模块,Ansible只是提供一种框架. LAMP 架构也是我们每个运维人员熟知的一种网站">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-12-09T01:27:02.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="通过Playbook部署LAMP(5)">
+<meta name="twitter:description" content="Ansible是新出现的自动化运维工具,基于Python开发,集合了众多运维工具 (puppet、cfengine、chef、func、fabric) 的优点,实现了批量系统配置、批量程序部署、批量运行命令等功能,Ansible是基于模块工作的,本身没有批量部署的能力,真正具有批量部署的是Ansible所运行的模块,Ansible只是提供一种框架. LAMP 架构也是我们每个运维人员熟知的一种网站">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/12/03/Ansible/通过Playbook部署LAMP-5/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>通过Playbook部署LAMP(5) | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/12/03/Ansible/通过Playbook部署LAMP-5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">通过Playbook部署LAMP(5)
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-03 13:24:07" itemprop="dateCreated datePublished" datetime="2018-12-03T13:24:07+08:00">2018-12-03</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-12-09 09:27:02" itemprop="dateModified" datetime="2018-12-09T09:27:02+08:00">2018-12-09</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Ansible/" itemprop="url" rel="index"><span itemprop="name">Ansible</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Ansible是新出现的自动化运维工具,基于Python开发,集合了众多运维工具 (puppet、cfengine、chef、func、fabric) 的优点,实现了批量系统配置、批量程序部署、批量运行命令等功能,Ansible是基于模块工作的,本身没有批量部署的能力,真正具有批量部署的是Ansible所运行的模块,Ansible只是提供一种框架.</p>
+<p>LAMP 架构也是我们每个运维人员熟知的一种网站架构,它是 Linux+Apachc+MariaDB 以及(PHP,Perl,Python)语言的首字母简称,这种网站架构很容易实现跨主机的横向与纵向扩展,可快速组建一个庞大的 Wcb 集群系统,本章我们通过 Ansible 自动化部署 LAMP 架构,这个架构也是我们日常运维过程中经常遇到的一个架构.</p>
+<p>Ansible的PlayBook文件格式为YAML语言,所以希望你在编写PlayBook前对YAML语法有一定的了解,否则在运行PlayBook的时候经常碰到语法错误提示,这里我们通过介绍批量部署LAMP为例,介绍一下LAMP.yml这个PlayBook的具体应用写法,如果你对YAML语言没有了解的话,请自行去百度学习.</p>
+<a id="more"></a>
+<p><br></p>
+<h2 id="创建准备环境"><a href="#创建准备环境" class="headerlink" title="创建准备环境"></a>创建准备环境</h2><p>首先,我们有两台虚拟机<code>192.168.10.20 and 192.168.10.30</code> 这两台虚拟机,下面我们将写一个剧本实现批量部署LAMP环境,在这之前我们需要先创建SSH密钥对并分发到每一台的主机上去.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ssh-keygen -t rsa </span></span><br><span class="line">Generating public/private rsa key pair.</span><br><span class="line">Enter file <span class="keyword">in</span> <span class="built_in">which</span> to save the key (/root/.ssh/id_rsa): </span><br><span class="line">Created directory <span class="string">'/root/.ssh'</span>.</span><br><span class="line">Enter passphrase (empty <span class="keyword">for</span> no passphrase): </span><br><span class="line">Enter same passphrase again: </span><br><span class="line">Your identification has been saved <span class="keyword">in</span> /root/.ssh/id_rsa.</span><br><span class="line">Your public key has been saved <span class="keyword">in</span> /root/.ssh/id_rsa.pub.</span><br><span class="line">The key fingerprint is:</span><br><span class="line">SHA256:xZxM9bunwBsS03gGT5HGT4LvOnJHdr5Bwl/Iit7qQN8 root@localhost.localdomain</span><br><span class="line">The keys randomart image is:</span><br><span class="line">+---[RSA 2048]----+</span><br><span class="line">|          .+o.   |</span><br><span class="line">|         =..=o.  |</span><br><span class="line">|          Bo.+.  |</span><br><span class="line">|         . B...o |</span><br><span class="line">|        S +.B = .|</span><br><span class="line">|       . . O+=.o |</span><br><span class="line">|        . ++Eo+ .|</span><br><span class="line">|        .o+o.+.+ |</span><br><span class="line">|         +++o o. |</span><br><span class="line">+----[SHA256]-----+</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ssh-copy-id root@192.168.10.20</span></span><br><span class="line">/usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed: <span class="string">"/root/.ssh/id_rsa.pub"</span></span><br><span class="line">The authenticity of host 192.168.10.20 (192.168.10.20) can t be established.</span><br><span class="line">ECDSA key fingerprint is SHA256:2kWFaV72YVvAl2EU2Zop4uAjP3Gy2jW92d0Va/HrSMM.</span><br><span class="line">ECDSA key fingerprint is MD5:<span class="built_in">fc</span>:6c:91:b0:02:e6:7e:98:52:af:0d:b3:47:d4:69:ef.</span><br><span class="line">Are you sure you want to <span class="built_in">continue</span> connecting (yes/no)? yes</span><br><span class="line">root@192.168.10.20 s password: </span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ssh-copy-id root@192.168.10.30</span></span><br><span class="line">/usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed: <span class="string">"/root/.ssh/id_rsa.pub"</span></span><br><span class="line">The authenticity of host 192.168.10.30 (192.168.10.30) cant be established.</span><br><span class="line">ECDSA key fingerprint is SHA256:2kWFaV72YVvAl2EU2Zop4uAjP3Gy2jW92d0Va/HrSMM.</span><br><span class="line">ECDSA key fingerprint is MD5:<span class="built_in">fc</span>:6c:91:b0:02:e6:7e:98:52:af:0d:b3:47:d4:69:ef.</span><br><span class="line">Are you sure you want to <span class="built_in">continue</span> connecting (yes/no)? yes</span><br><span class="line">root@192.168.10.30<span class="string">'s password:</span></span><br></pre></td></tr></table></figure></p>
+<p>其次创建一个目录用于存放剧本中需要用到的数据文件等,这里我们只创建两个index文件,用于后期的测试,如果你有一些配置文件需要拷贝,此时应该提前准备好.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mkdir playbook</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ls -lh</span></span><br><span class="line">total 0</span><br><span class="line">drwxr-xr-x. 2 root root 6 Dec  3 10:44 playbook</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># cd playbook/</span></span><br><span class="line"></span><br><span class="line">[root@localhost playbook]<span class="comment"># ls -lh</span></span><br><span class="line">total 8.0K</span><br><span class="line">drwxr-xr-x. 2 root root  6 Dec  3 10:46 apache</span><br><span class="line">drwxr-xr-x. 2 root root  6 Dec  3 10:46 mariadb</span><br><span class="line">drwxr-xr-x. 2 root root  6 Dec  3 10:46 php</span><br><span class="line">-rw-r--r--. 1 root root 30 Dec  3 10:45 index.html</span><br><span class="line">-rw-r--r--. 1 root root 29 Dec  3 10:46 index.php</span><br><span class="line"></span><br><span class="line">[root@localhost playbook]<span class="comment"># cat index.html </span></span><br><span class="line">hello lyshark</span><br><span class="line"></span><br><span class="line">www.mkdirs.com</span><br><span class="line"></span><br><span class="line">[root@localhost playbook]<span class="comment"># cat index.php </span></span><br><span class="line">&lt;?php</span><br><span class="line">        phpinfo();</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure></p>
+<p>接着创建一个用户主机列表,这里我们就在当前目录下创建一个Hosts文件即可,如果有很多太主机可以使用简写.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost playbook]<span class="comment"># vim hosts</span></span><br><span class="line">[root@localhost playbook]<span class="comment"># cat hosts </span></span><br><span class="line"></span><br><span class="line">[lamp]</span><br><span class="line">192.168.10.20</span><br><span class="line">192.168.10.30</span><br><span class="line"></span><br><span class="line"><span class="comment">#[test]               #此处注释,只做说明,定义从20-100网段的主机</span></span><br><span class="line"><span class="comment">#192.168.10.2[0:100]</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="编写Apache安装过程"><a href="#编写Apache安装过程" class="headerlink" title="编写Apache安装过程"></a>编写Apache安装过程</h2><p>这里由于我们是第一次编写剧本,所有我们应该先创建一个文件,编写一个main.yml剧本,我们来写一个安装apache软件的剧本,先来看一下这个PlayBook的部分代码：<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">---</span><br><span class="line"> - hosts: lamp</span><br><span class="line">   tasks:</span><br><span class="line">    - name: Yum install httpd</span><br><span class="line">      yum: name=&#123;&#123;item&#125;&#125; state=installed</span><br><span class="line">      with_items:</span><br><span class="line">          - apr</span><br><span class="line">          - apr-util</span><br><span class="line">          - httpd</span><br><span class="line">          - httpd-devel</span><br><span class="line">    - name: copy index.html</span><br><span class="line">      template: src=./index.html dest=/var/www/html/index.html owner=root group=root mode=0755</span><br><span class="line">    - name: copy index.php</span><br><span class="line">      template: src=./index.php dest=/var/www/html/index.php owner=root group=root mode=0755</span><br><span class="line">      notify:            <span class="comment">#上一个命令执行成功,才会执行notify</span></span><br><span class="line">          - start httpd</span><br><span class="line"></span><br><span class="line">   handlers:</span><br><span class="line">      - name: start httpd</span><br><span class="line">        service: name=httpd state=restarted</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>第一项：hosts指定哪些主机执行操作,此处我们将主机列表规划成了lamp组,也就是说LAMP组成员都会执行.<br>第二项：tasks是应用yum模块来安装apache服务程序包,name是说明信息,说明这个模块的功能.<br>第四项：with_items是一个迭代器,用来批量安装以下列出的包文件,此处就是apache的相关文件.<br>第五项：template是一个远程复制模块,目的是将当前目录下的index配置文件复制到远程主机上去.<br>第六项：notify发送消息的作用,这里目的是发送给名称是start httpd的handlers让其执行操作.</p>
+</blockquote>
+<p>这里有个注意的地方就是关于上方写了两个Copy才完成了复制,其实我们可以把它们放入一个迭代器里,代码如下：<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">- name: copy index.html and index.php</span><br><span class="line">  copy: src=&#123;&#123;item.src&#125;&#125; dest=&#123;&#123;item.dest&#125;&#125; owner=root group=root mode=644</span><br><span class="line">  with_items:</span><br><span class="line">      - &#123;src: ./index.html,dest:/var/www/html/index.html&#125;</span><br><span class="line">      - &#123;src: ./index.php,dest:/var/www/html/index.php&#125;</span><br></pre></td></tr></table></figure></p>
+<p>接着写完了这些配置以后,我们运行下面的几条命令,检查一下上面的文件是否有语法错误,和检查主机列表是否生效了.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost playbook]<span class="comment"># ansible-playbook -i hosts main.yml --syntax-check</span></span><br><span class="line"></span><br><span class="line">playbook: main.yml</span><br><span class="line"></span><br><span class="line">[root@localhost playbook]<span class="comment"># ansible-playbook -i hosts main.yml --list-task</span></span><br><span class="line"></span><br><span class="line">playbook: main.yml</span><br><span class="line"></span><br><span class="line">  play <span class="comment">#1 (lamp): lamp	TAGS: []</span></span><br><span class="line">    tasks:</span><br><span class="line">      yum install httpd	TAGS: []</span><br><span class="line">      copy index.html	TAGS: []</span><br><span class="line">      copy index.php	TAGS: []</span><br><span class="line"> </span><br><span class="line">[root@localhost playbook]<span class="comment"># ansible-playbook -i hosts main.yml --list-hosts</span></span><br><span class="line"></span><br><span class="line">playbook: main.yml</span><br><span class="line"></span><br><span class="line">  play <span class="comment">#1 (lamp): lamp	TAGS: []</span></span><br><span class="line">    pattern: [u<span class="string">'lamp'</span>]</span><br><span class="line">    hosts (2):</span><br><span class="line">      192.168.10.20</span><br><span class="line">      192.168.10.30</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="编写MariaDB安装过程"><a href="#编写MariaDB安装过程" class="headerlink" title="编写MariaDB安装过程"></a>编写MariaDB安装过程</h2><p>接下来我们,继续编辑main.yml剧本,写一个安装mariadb数据库的剧本,由于无需规范化,所以我们就把他们写在一个剧本里就可以了,先来看一下这个PlayBook的部分代码：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">- hosts: lamp</span><br><span class="line">  tasks:</span><br><span class="line">   - name: install mariadb</span><br><span class="line">     yum: name=&#123;&#123;item&#125;&#125; state=installed</span><br><span class="line">     with_items:</span><br><span class="line">        - mariadb</span><br><span class="line">        - mariadb-server</span><br><span class="line">     notify:</span><br><span class="line">        - start mariadb</span><br><span class="line">    - name: <span class="built_in">set</span> mysql password</span><br><span class="line">      shell: mysql -e <span class="string">"set password for root@localhost=password('123123');"</span></span><br><span class="line"></span><br><span class="line">  handlers:</span><br><span class="line">     - name: start mariadb</span><br><span class="line">       service: name=mariadb state=restarted</span><br></pre></td></tr></table></figure>
+<p>上图的例子,我们在安装Mariadb数据库时,可以使用shell模块直接赋值初始密码,也可以使用下面声明变量并调用mysql_user系统模块完成数据库密码的设置,需要注意的是,如果使用系统模块的话,被控主机必须安装MySQL-python包.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"> - hosts: lamp</span><br><span class="line"></span><br><span class="line">   vars:</span><br><span class="line">     - username: root          <span class="comment">#这里声明两个变量</span></span><br><span class="line">     - password: 123123</span><br><span class="line"></span><br><span class="line">   tasks:</span><br><span class="line">    - name: install mariadb</span><br><span class="line">      yum: name=&#123;&#123;item&#125;&#125; state=installed</span><br><span class="line">      with_items:</span><br><span class="line">         - mariadb</span><br><span class="line">         - mariadb-server</span><br><span class="line">         - MySQL-python     <span class="comment">#如果要使用MySQL函数,这里需要安装这个包</span></span><br><span class="line">      notify:</span><br><span class="line">         - start mariadb</span><br><span class="line"><span class="comment">#    - name: set mysql password</span></span><br><span class="line"><span class="comment">#      shell: mysql -e "set password=password('123123');"</span></span><br><span class="line">    - name: <span class="built_in">set</span> mysql password   <span class="comment">#这里使用两个变量来赋值</span></span><br><span class="line">      mysql_user: name=&#123;&#123;username&#125;&#125; password=&#123;&#123;password&#125;&#125; priv=*.*:ALL host=<span class="string">'localhost'</span> state=present</span><br><span class="line"></span><br><span class="line">   handlers:</span><br><span class="line">      - name: start mariadb</span><br><span class="line">        service: name=mariadb state=restarted</span><br></pre></td></tr></table></figure></p>
+<p>写完了这些配置以后,我们运行下面的几条命令,检查一下上面的文件是否有语法错误,和检查主机列表是否生效了.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost playbook]<span class="comment"># ansible-playbook -i hosts main.yml --syntax-check</span></span><br><span class="line"></span><br><span class="line">playbook: main.yml</span><br><span class="line"></span><br><span class="line">[root@localhost playbook]<span class="comment"># ansible-playbook -i hosts main.yml --list-task</span></span><br><span class="line"></span><br><span class="line">playbook: main.yml</span><br><span class="line"></span><br><span class="line">  play <span class="comment">#1 (lamp): lamp	TAGS: []</span></span><br><span class="line">    tasks:</span><br><span class="line">      yum install httpd	TAGS: []</span><br><span class="line">      copy index.html	TAGS: []</span><br><span class="line">      copy index.php	TAGS: []</span><br><span class="line"> </span><br><span class="line">[root@localhost playbook]<span class="comment"># ansible-playbook -i hosts main.yml --list-hosts</span></span><br><span class="line"></span><br><span class="line">playbook: main.yml</span><br><span class="line"></span><br><span class="line">  play <span class="comment">#1 (lamp): lamp	TAGS: []</span></span><br><span class="line">    pattern: [u<span class="string">'lamp'</span>]</span><br><span class="line">    hosts (2):</span><br><span class="line">      192.168.10.20</span><br><span class="line">      192.168.10.30</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="编写PHP环境安装过程"><a href="#编写PHP环境安装过程" class="headerlink" title="编写PHP环境安装过程"></a>编写PHP环境安装过程</h2><p>最后编辑main.yml剧本,来写一个安装PHP的剧本,先来看一下这个PlayBook的部分代码：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">- hosts: lamp</span><br><span class="line">  tasks:</span><br><span class="line">   - name: install PHP</span><br><span class="line">     yum: name=&#123;&#123;item&#125;&#125; state=installed</span><br><span class="line">     with_items:</span><br><span class="line">        - php</span><br><span class="line">        - php-mysql</span><br><span class="line">     notify:</span><br><span class="line">        - start apache</span><br><span class="line"></span><br><span class="line">  handlers:</span><br><span class="line">     - name: start apache</span><br><span class="line">       service: name=apache state=restarted</span><br></pre></td></tr></table></figure>
+<p>写完了这些配置以后,我们运行下面的几条命令,检查一下上面的文件是否有语法错误,和检查主机列表是否生效了.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost playbook]<span class="comment"># ansible-playbook -i hosts main.yml --syntax-check</span></span><br><span class="line"></span><br><span class="line">playbook: main.yml</span><br><span class="line"></span><br><span class="line">[root@localhost playbook]<span class="comment"># ansible-playbook -i hosts main.yml --list-task</span></span><br><span class="line"></span><br><span class="line">playbook: main.yml</span><br><span class="line"></span><br><span class="line">  play <span class="comment">#1 (lamp): lamp	TAGS: []</span></span><br><span class="line">    tasks:</span><br><span class="line">      yum install httpd	TAGS: []</span><br><span class="line">      copy index.html	TAGS: []</span><br><span class="line">      copy index.php	TAGS: []</span><br><span class="line"> </span><br><span class="line">[root@localhost playbook]<span class="comment"># ansible-playbook -i hosts main.yml --list-hosts</span></span><br><span class="line"></span><br><span class="line">playbook: main.yml</span><br><span class="line"></span><br><span class="line">  play <span class="comment">#1 (lamp): lamp	TAGS: []</span></span><br><span class="line">    pattern: [u<span class="string">'lamp'</span>]</span><br><span class="line">    hosts (2):</span><br><span class="line">      192.168.10.20</span><br><span class="line">      192.168.10.30</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="将剧本合并起来并执行"><a href="#将剧本合并起来并执行" class="headerlink" title="将剧本合并起来并执行"></a>将剧本合并起来并执行</h2><p>将剧本串联起来,然后我们在最后再次添加以下内容,目的是关闭防火墙,关闭SELinux,重启http服务.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">- hosts: lamp</span><br><span class="line">  tasks:</span><br><span class="line">     - name: check iptables</span><br><span class="line">       shell: iptables -F</span><br><span class="line">     - name: check selinux</span><br><span class="line">       shell:  setenforce 0</span><br><span class="line">     - name: restart httpd</span><br><span class="line">       shell: systemctl restart httpd</span><br></pre></td></tr></table></figure></p>
+<p>最后我们得到了,整个LAMP的剧本安装过程,完整代码如下所示：<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost playbook]<span class="comment"># cat main.yml </span></span><br><span class="line">---</span><br><span class="line"> - hosts: lamp</span><br><span class="line">   tasks:</span><br><span class="line">    - name: yum install httpd</span><br><span class="line">      yum: name=&#123;&#123;item&#125;&#125; state=installed</span><br><span class="line">      with_items:</span><br><span class="line">          - apr</span><br><span class="line">          - apr-util</span><br><span class="line">          - httpd</span><br><span class="line">          - httpd-devel</span><br><span class="line">    - name: copy index.html</span><br><span class="line">      template: src=./index.html dest=/var/www/html/index.html owner=root group=root mode=0755</span><br><span class="line">    - name: copy index.php</span><br><span class="line">      template: src=./index.php dest=/var/www/html/index.php owner=root group=root mode=0755</span><br><span class="line">      notify:</span><br><span class="line">          - Start httpd</span><br><span class="line"></span><br><span class="line">   handlers:</span><br><span class="line">      - name: Start httpd</span><br><span class="line">        service: name=httpd state=restarted</span><br><span class="line"><span class="comment">#-------------------------------------------------------------------</span></span><br><span class="line"> - hosts: lamp</span><br><span class="line">   tasks:</span><br><span class="line">    - name: install mariadb</span><br><span class="line">      yum: name=&#123;&#123;item&#125;&#125; state=installed</span><br><span class="line">      with_items:</span><br><span class="line">         - mariadb</span><br><span class="line">         - mariadb-server</span><br><span class="line">      notify:</span><br><span class="line">         - start mariadb</span><br><span class="line">    - name: <span class="built_in">set</span> mysql password</span><br><span class="line">      shell: mysql -e <span class="string">"set password for root@localhost=password('123123');"</span></span><br><span class="line"></span><br><span class="line">   handlers:</span><br><span class="line">      - name: start mariadb</span><br><span class="line">        service: name=mariadb state=restarted</span><br><span class="line"><span class="comment">#-------------------------------------------------------------------</span></span><br><span class="line"> - hosts: lamp</span><br><span class="line">   tasks:</span><br><span class="line">    - name: install PHP</span><br><span class="line">      yum: name=&#123;&#123;item&#125;&#125; state=installed</span><br><span class="line">      with_items:</span><br><span class="line">         - php</span><br><span class="line">         - php-mysql</span><br><span class="line"><span class="comment">#      notify:</span></span><br><span class="line"><span class="comment">#         - start apache</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#   handlers:</span></span><br><span class="line"><span class="comment">#      - name: start apache</span></span><br><span class="line"><span class="comment">#        service: name=apache state=restarted</span></span><br><span class="line"><span class="comment">#-------------------------------------------------------------------</span></span><br><span class="line"> - hosts: lamp</span><br><span class="line">   tasks:</span><br><span class="line">      - name: check iptables</span><br><span class="line">        shell: iptables -F</span><br><span class="line">      - name: check selinux</span><br><span class="line">        shell:  setenforce 0</span><br><span class="line">      - name: restart httpd</span><br><span class="line">        shell: systemctl restart httpd</span><br></pre></td></tr></table></figure></p>
+<p>接着我们执行检测程序,检查整体是否有语法错误.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost playbook]<span class="comment"># ansible-playbook -i hosts main.yml --syntax-check</span></span><br><span class="line"></span><br><span class="line">playbook: main.yml</span><br><span class="line"></span><br><span class="line">[root@localhost playbook]<span class="comment"># ansible-playbook -i hosts main.yml --list-task</span></span><br><span class="line"></span><br><span class="line">playbook: main.yml</span><br><span class="line"></span><br><span class="line">  play <span class="comment">#1 (lamp): lamp	TAGS: []</span></span><br><span class="line">    tasks:</span><br><span class="line">      yum install httpd	TAGS: []</span><br><span class="line">      copy index.html	TAGS: []</span><br><span class="line">      copy index.php	TAGS: []</span><br><span class="line"> </span><br><span class="line">[root@localhost playbook]<span class="comment"># ansible-playbook -i hosts main.yml --list-hosts</span></span><br><span class="line"></span><br><span class="line">playbook: main.yml</span><br><span class="line"></span><br><span class="line">  play <span class="comment">#1 (lamp): lamp	TAGS: []</span></span><br><span class="line">    pattern: [u<span class="string">'lamp'</span>]</span><br><span class="line">    hosts (2):</span><br><span class="line">      192.168.10.20</span><br><span class="line">      192.168.10.30</span><br></pre></td></tr></table></figure></p>
+<p><strong>执行剧本：</strong> 确认过以后,直接使用下面的命令一键部署,我们写好的PlayBook剧本,此时我们等它一会.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost playbook]<span class="comment"># ansible-playbook -i hosts main.yml</span></span><br><span class="line"></span><br><span class="line">PLAY [lamp] ******************************************************************************</span><br><span class="line"></span><br><span class="line">TASK [Gathering Facts] *******************************************************************</span><br><span class="line">ok: [192.168.10.30]</span><br><span class="line">ok: [192.168.10.20]</span><br><span class="line">....省略....</span><br><span class="line">PLAY RECAP *******************************************************************************</span><br><span class="line">192.168.10.20              : ok=5    changed=4    unreachable=0    failed=0</span><br><span class="line">192.168.10.30              : ok=5    changed=4    unreachable=0    failed=0</span><br></pre></td></tr></table></figure></p>
+<p>最后说明,本小结内容通过一个简单案例介绍如何利用 Ansiblc 部署 LAMP 架构,这是 Ansible 在构建集群甚至跨机器部署上面的人门案例,通过本章案例可以清晰地了解到如何用 Ansible 在配置部署过程中实现一个业务逻辑架构,这也是我们在实际工作作中经常遇到的,随着公司业务的扩张,会有很多需要维护和部署的集群架构,而这些繁复的下作对于 Ansible 来说易如反掌.<br><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/12/03/Ansible/通过Playbook部署LAMP-5/">通过Playbook部署LAMP(5)</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年12月03日 - 13:12</p>
+  <p><span>最后更新:</span>2018年12月09日 - 09:12</p>
+  <p><span>原始链接:</span><a href="/2018/12/03/Ansible/通过Playbook部署LAMP-5/" title="通过Playbook部署LAMP(5)">https://www.mkdirs.com/2018/12/03/Ansible/通过Playbook部署LAMP-5/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Ansible/" rel="tag"> <i class="fa fa-tag"></i> Ansible</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/02/Ansible/Ansible PlayBook语法-4/" rel="next" title="Ansible PlayBook语法(4)">
+                <i class="fa fa-chevron-left"></i> Ansible PlayBook语法(4)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/03/Ansible/通过PlayBook部署Zabbix-6/" rel="prev" title="通过PlayBook部署Zabbix(6)">
+                通过PlayBook部署Zabbix(6) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#创建准备环境"><span class="nav-text">创建准备环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编写Apache安装过程"><span class="nav-text">编写Apache安装过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编写MariaDB安装过程"><span class="nav-text">编写MariaDB安装过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编写PHP环境安装过程"><span class="nav-text">编写PHP环境安装过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#将剧本合并起来并执行"><span class="nav-text">将剧本合并起来并执行</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

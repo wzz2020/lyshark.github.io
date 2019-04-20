@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Python 的创始人为吉多·范罗苏姆(Guido van Rossum).1989年的圣诞节期间,吉多·范罗苏姆为了在阿姆斯特丹打发时间,决心开发一个新的脚本解释程序,作为ABC语言的一种继承.Python是纯粹的自由软件,源代码和解释器CPython遵循 GPL(GNU General Public License)协议.关于python的哲学：python崇尚:”优雅”、”明确”、”简单”,">
+<meta name="keywords" content="Python">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python 正则表达模块详解(7)">
+<meta property="og:url" content="https://www.mkdirs.com/2019/01/23/Python/Python-正则表达模块详解-7/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="Python 的创始人为吉多·范罗苏姆(Guido van Rossum).1989年的圣诞节期间,吉多·范罗苏姆为了在阿姆斯特丹打发时间,决心开发一个新的脚本解释程序,作为ABC语言的一种继承.Python是纯粹的自由软件,源代码和解释器CPython遵循 GPL(GNU General Public License)协议.关于python的哲学：python崇尚:”优雅”、”明确”、”简单”,">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-02-14T05:23:36.649Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Python 正则表达模块详解(7)">
+<meta name="twitter:description" content="Python 的创始人为吉多·范罗苏姆(Guido van Rossum).1989年的圣诞节期间,吉多·范罗苏姆为了在阿姆斯特丹打发时间,决心开发一个新的脚本解释程序,作为ABC语言的一种继承.Python是纯粹的自由软件,源代码和解释器CPython遵循 GPL(GNU General Public License)协议.关于python的哲学：python崇尚:”优雅”、”明确”、”简单”,">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2019/01/23/Python/Python-正则表达模块详解-7/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Python 正则表达模块详解(7) | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2019/01/23/Python/Python-正则表达模块详解-7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Python 正则表达模块详解(7)
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-01-23 16:12:32" itemprop="dateCreated datePublished" datetime="2019-01-23T16:12:32+08:00">2019-01-23</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-02-14 13:23:36" itemprop="dateModified" datetime="2019-02-14T13:23:36+08:00">2019-02-14</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Python/" itemprop="url" rel="index"><span itemprop="name">Python</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Python 的创始人为吉多·范罗苏姆(Guido van Rossum).1989年的圣诞节期间,吉多·范罗苏姆为了在阿姆斯特丹打发时间,决心开发一个新的脚本解释程序,作为ABC语言的一种继承.Python是纯粹的自由软件,源代码和解释器CPython遵循 GPL(GNU General Public License)协议.关于python的哲学：python崇尚:”优雅”、”明确”、”简单”,Python是用最简单最优雅最明确的方法来解决问题.</p>
+<a id="more"></a>
+<p>正则表达式(Regluar Expressions)又称规则表达式,这个概念最初是由Unix中的工具软件(如sed 和 grep)普及开的,正则表达式在代码中常简写为RES,它本质上是一个小巧的、高度专用的编程语言,许多程序设计语言都支持通过正则表达式进行字符串操作,通俗的来讲,正则就是用一些具有特殊含义的符号组合到一起来描述字符或者字符串的方法,正则模块内嵌在Python中,并通过re模块实现,正则表达式模式被编译成一系列的字节码,然后由用C编写的匹配引擎执行.</p>
+<p>正则表达式的主要应用对象是文本,其最基础的功能是文本匹配,而文本是由一个个的字符组成,因此正则表达式实际上是对字符的匹配,正则表达式中的字符分为<code>普通字符</code>和<code>元字符</code>,而正则表达式就是这些普通字符和特殊元字符组合成的表示一个特定匹配规则的表达式,然后通过这个规则来匹配、查找、替换或切割那些符合指定规则的文本.<br><br></p>
+<h2 id="通用字符匹配"><a href="#通用字符匹配" class="headerlink" title="通用字符匹配"></a>通用字符匹配</h2><table>
+<thead>
+<tr>
+<th style="text-align:center">语法</th>
+<th style="text-align:left">通配符匹配作用解析</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">.</td>
+<td style="text-align:left">默认匹配除<code>\n</code>之外的任意一个字符,若指定flag=DOTALL则匹配任意字符,包括换行</td>
+</tr>
+<tr>
+<td style="text-align:center">\</td>
+<td style="text-align:left">转义字符,通常情况下使后一个字符改变原来的意思,也就是脱意字符</td>
+</tr>
+<tr>
+<td style="text-align:center">[x..y]</td>
+<td style="text-align:left">字符集(字符类),此参数用来指定一个字符查找范围</td>
+</tr>
+<tr>
+<td style="text-align:center">\A</td>
+<td style="text-align:left">只从字符开头匹配,如果使用·<code>re.search(&quot;\Aabc&quot;,&quot;alexabc&quot;)</code>则匹配不到的结果</td>
+</tr>
+<tr>
+<td style="text-align:center">\Z</td>
+<td style="text-align:left">只匹配字符结尾,匹配字符结尾是指定数据的字符串,同<code>$</code>符号作用相同</td>
+</tr>
+<tr>
+<td style="text-align:center">\d</td>
+<td style="text-align:left">匹配数字,范围是<code>[0-9]</code>,匹配0-9中的任意数字</td>
+</tr>
+<tr>
+<td style="text-align:center">\D</td>
+<td style="text-align:left">匹配非数字,范围是<code>[^\d]</code>,匹配除了数字以外的其他字符</td>
+</tr>
+<tr>
+<td style="text-align:center">\w</td>
+<td style="text-align:left">匹配数字或字符,匹配范围<code>[A-Za-z0-9]</code></td>
+</tr>
+<tr>
+<td style="text-align:center">\W</td>
+<td style="text-align:left">匹配非字符或数字,匹配范围非<code>[A-Za-z0-9]</code></td>
+</tr>
+<tr>
+<td style="text-align:center">s</td>
+<td style="text-align:left">匹配空白字符,例如匹配<code>re.search(&quot;\s+&quot;,&quot;ab\tc1\n3&quot;).group()</code>结果为<code>&#39;\t&#39;</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>正则符号(<code>.</code>):</strong> 匹配除了换行符以外的任意一个字符,一个点只代表一个字符.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> re</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.search(<span class="string">"he.o"</span>,<span class="string">"helo hello helllo hellllo"</span>).group()</span><br><span class="line"><span class="string">'helo'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.search(<span class="string">"he...o"</span>,<span class="string">"helo hello helllo hellllo"</span>).group()</span><br><span class="line"><span class="string">'helllo'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.findall(<span class="string">"he.o"</span>,<span class="string">"helo heao hello helllo hellllo"</span>)</span><br><span class="line">[<span class="string">'helo'</span>, <span class="string">'heao'</span>]</span><br></pre></td></tr></table></figure></p>
+<p><strong>正则符号(<code>\</code>):</strong> 匹配数据时,需要转义的使用会用到,这个转义字符.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.search(<span class="string">"..\\t"</span>,<span class="string">"hello\t lyshark\n"</span>).group()</span><br><span class="line"><span class="string">'lo\t'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.search(<span class="string">"\\t"</span>,<span class="string">"hello\t lyshark\n"</span>).group()</span><br><span class="line"><span class="string">'\t'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.search(<span class="string">"\t"</span>,<span class="string">"hello\t lyshark\n"</span>).group()</span><br><span class="line"><span class="string">'\t'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.search(<span class="string">r"\\"</span>,<span class="string">"hello\\lyshark"</span>).group()</span><br><span class="line"><span class="string">'\\'</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>正则符号(<code>[]</code>):</strong> 匹配查找指定的数据范围,通常使用<code>[0-9] [a-z] [A-Z]</code>这几个匹配格式.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.search(<span class="string">"[0-9]"</span>,<span class="string">"hello 1,2,3,4,5"</span>).group()</span><br><span class="line"><span class="string">'1'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.findall(<span class="string">"[0-9]"</span>,<span class="string">"hello 1,2,3,4,5"</span>)</span><br><span class="line">[<span class="string">'1'</span>, <span class="string">'2'</span>, <span class="string">'3'</span>, <span class="string">'4'</span>, <span class="string">'5'</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.search(<span class="string">"[^0-9]"</span>,<span class="string">"hello 1,2,3,4,5"</span>).group()</span><br><span class="line"><span class="string">'h'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.search(<span class="string">"[a-z]"</span>,<span class="string">"hello 1,2,3,4,5"</span>).group()</span><br><span class="line"><span class="string">'h'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.search(<span class="string">"^[a-z]"</span>,<span class="string">"hello 1,2,3,4,5"</span>).group()</span><br><span class="line"><span class="string">'h'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.search(<span class="string">"[^a-z]"</span>,<span class="string">"hello 1,2,3,4,5"</span>).group()</span><br><span class="line"><span class="string">' '</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.search(<span class="string">"[^A-Z]"</span>,<span class="string">"hello 1,2,3,4,5"</span>).group()</span><br><span class="line"><span class="string">'h'</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="通用边界匹配"><a href="#通用边界匹配" class="headerlink" title="通用边界匹配"></a>通用边界匹配</h2><table>
+<thead>
+<tr>
+<th style="text-align:center">语法</th>
+<th style="text-align:left">通配符匹配作用解析</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">.</td>
+<td style="text-align:left">默认匹配除<code>\n</code>之外的任意一个字符,若指定<code>flag=DOTALL</code>则匹配任意字符,包括换行</td>
+</tr>
+<tr>
+<td style="text-align:center">^</td>
+<td style="text-align:left">匹配以指定字符开头的数据,search(r”^a”,”\nabc\neee”,flags=re.MULTILINE)</td>
+</tr>
+<tr>
+<td style="text-align:center">$</td>
+<td style="text-align:left">匹配以指定字符结尾的数据,search(“foo$”,”bfoo\nsdfsf”,flags=re.MULTILINE).group()</td>
+</tr>
+<tr>
+<td style="text-align:center">*</td>
+<td style="text-align:left">匹配<code>*</code>号前的字符0次或多次,findall(“ab*”,”cabb3abcbbac”) 结果[‘abb’, ‘ab’, ‘a’]</td>
+</tr>
+<tr>
+<td style="text-align:center">+</td>
+<td style="text-align:left">匹配前一个字符1次或多次,findall(“ab+”,”ab+cd+abb+bba”) 结果[‘ab’, ‘abb’]</td>
+</tr>
+<tr>
+<td style="text-align:center">?</td>
+<td style="text-align:left">匹配前一个字符1次或0次,findall(“ab?”,”ab,a,abc,abcde”) 结果[‘ab’, ‘a’, ‘ab’, ‘ab’]</td>
+</tr>
+<tr>
+<td style="text-align:center">竖线</td>
+<td style="text-align:left">匹配选择竖线左边或右边的字符,search(“abc竖线ABC”,”ABCBabcCD”).group() 结果[‘ABC’]</td>
+</tr>
+<tr>
+<td style="text-align:center">{m}</td>
+<td style="text-align:left">匹配前一个字符出现过m次,search(“hello{2}”,”hello,helloo).group() 结果[‘helloo’]</td>
+</tr>
+<tr>
+<td style="text-align:center">{n,m}</td>
+<td style="text-align:left">匹配前一个字符,最少出现过n次,最多出现过m次</td>
+</tr>
+<tr>
+<td style="text-align:center">(?P<name>…)</name></td>
+<td style="text-align:left">分组匹配,search(“(?P<name>[a-zA-Z]+)(?P<age>[0-9]+)”,”lyshark22”).groupdict(“temp”)</age></name></td>
+</tr>
+</tbody>
+</table>
+<p><strong>正则符号(<code>^$</code>):</strong> <code>^</code>匹配指定字符开头的数据,<code>$</code>匹配指定字符结尾的数字.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.search(<span class="string">r"^h"</span>,<span class="string">"hello world"</span>)</span><br><span class="line">&lt;re.Match object; span=(<span class="number">0</span>, <span class="number">1</span>), match=<span class="string">'h'</span>&gt;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.search(<span class="string">r"^h"</span>,<span class="string">"hello world"</span>).group()</span><br><span class="line"><span class="string">'h'</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.search(<span class="string">r"world$"</span>,<span class="string">"hello\nworld"</span>)</span><br><span class="line">&lt;re.Match object; span=(<span class="number">6</span>, <span class="number">11</span>), match=<span class="string">'world'</span>&gt;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.search(<span class="string">r"world$"</span>,<span class="string">"hello\nworld"</span>).group()</span><br><span class="line"><span class="string">'world'</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>正则符号(<code>*</code>):</strong> 匹配星号前面的字符出现0次,或任意多次.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.findall(<span class="string">"ab*"</span>,<span class="string">"abccba23acbcabb"</span>)</span><br><span class="line">[<span class="string">'ab'</span>, <span class="string">'a'</span>, <span class="string">'a'</span>, <span class="string">'abb'</span>]</span><br></pre></td></tr></table></figure></p>
+<p><strong>正则符号(<code>+</code>):</strong> 匹配加号前面的字符出现过1次,或任意多次,至少出现一次.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.findall(<span class="string">"ab+"</span>,<span class="string">"abccba23acbcabb"</span>)</span><br><span class="line">[<span class="string">'ab'</span>, <span class="string">'abb'</span>]</span><br></pre></td></tr></table></figure></p>
+<p><strong>正则符号(<code>?</code>):</strong> 匹配前一个字符出现过1次,或0次,允许出现0次.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.findall(<span class="string">"ab?"</span>,<span class="string">"ab,abc,abb,abcd,a,acd,abc"</span>)</span><br><span class="line">[<span class="string">'ab'</span>, <span class="string">'ab'</span>, <span class="string">'ab'</span>, <span class="string">'ab'</span>, <span class="string">'a'</span>, <span class="string">'a'</span>, <span class="string">'ab'</span>]</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.findall(<span class="string">"ab?"</span>,<span class="string">"ab,a,abc,abcde"</span>)</span><br><span class="line">[<span class="string">'ab'</span>, <span class="string">'a'</span>, <span class="string">'ab'</span>, <span class="string">'ab'</span>]</span><br></pre></td></tr></table></figure></p>
+<p><strong>正则符号(<code>|</code>):</strong> 匹配选择竖线左边,或者右边的任意一种情况.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.search(<span class="string">"abc|ABC"</span>,<span class="string">"ABCBabcCD"</span>).group()</span><br><span class="line"><span class="string">'ABC'</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.findall(<span class="string">"abc|ABC"</span>,<span class="string">"ABCBabcCD"</span>)</span><br><span class="line">[<span class="string">'ABC'</span>, <span class="string">'abc'</span>]</span><br></pre></td></tr></table></figure></p>
+<p><strong>正则符号(<code>x{m}</code>):</strong> 匹配前一个字符x,出现过m次的行.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.search(<span class="string">"hello&#123;2&#125;"</span>,<span class="string">"hello,helloo,hellooo,helloooo"</span>).group()</span><br><span class="line"><span class="string">'helloo'</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.search(<span class="string">"hello&#123;3&#125;"</span>,<span class="string">"hello,helloo,hellooo,helloooo"</span>).group()</span><br><span class="line"><span class="string">'hellooo'</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>正则符号(<code>x{n,m}</code>):</strong> 匹配前一个字符x,最少出现过n次,最多出现过m次.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.search(<span class="string">"hello&#123;1,2&#125;"</span>,<span class="string">"hello,helloo,hellooo,helloooo"</span>).group()</span><br><span class="line"><span class="string">'hello'</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.findall(<span class="string">"hello&#123;1,2&#125;"</span>,<span class="string">"hello,helloo,hellooo,helloooo"</span>)</span><br><span class="line">[<span class="string">'hello'</span>, <span class="string">'helloo'</span>, <span class="string">'helloo'</span>, <span class="string">'helloo'</span>]</span><br></pre></td></tr></table></figure></p>
+<p><strong>正则符号(<code>(?P&lt;name&gt;...)</code>):</strong> 匹配相关条件并自动分组,并打印出结果,其中<code>?P&lt;..&gt;</code>是固定写法,后面紧跟正则规则.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>number = <span class="string">"371481199306143242"</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.search(<span class="string">"(?P&lt;province&gt;[0-9]&#123;4&#125;)(?P&lt;city&gt;[0-9]&#123;2&#125;)(?P&lt;birthday&gt;[0-9]&#123;4&#125;)"</span>,number).groupdict()</span><br><span class="line">&#123;<span class="string">'province'</span>: <span class="string">'3714'</span>, <span class="string">'city'</span>: <span class="string">'81'</span>, <span class="string">'birthday'</span>: <span class="string">'1993'</span>&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.search(<span class="string">"(?P&lt;name&gt;[a-zA-Z]+)(?P&lt;age&gt;[0-9]+)"</span>,<span class="string">"lyshark22"</span>).groupdict(<span class="string">"temp"</span>)</span><br><span class="line">&#123;<span class="string">'name'</span>: <span class="string">'lyshark'</span>, <span class="string">'age'</span>: <span class="string">'22'</span>&#125;</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="常用匹配函数"><a href="#常用匹配函数" class="headerlink" title="常用匹配函数"></a>常用匹配函数</h2><table>
+<thead>
+<tr>
+<th style="text-align:center">函数与方法名</th>
+<th style="text-align:left">通配符匹配作用解析</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">regex.match</td>
+<td style="text-align:left">从字符串开头位置匹配查找,如果0个或多个字符被匹配则返回相应的匹配对象,如果不匹配则返回None.</td>
+</tr>
+<tr>
+<td style="text-align:center">regex.search</td>
+<td style="text-align:left">扫描整个字符串,查找正则匹配到的字串中第一次出现的位置,并返回相应的匹配对象,如果匹配失败则返回None.</td>
+</tr>
+<tr>
+<td style="text-align:center">regex.findall</td>
+<td style="text-align:left">搜索字符串中与正则表达式匹配的所有子串,也就是查找字符串中所有的匹配结果,并且以列表的形式返回数据.</td>
+</tr>
+<tr>
+<td style="text-align:center">regex.sub</td>
+<td style="text-align:left">字符串的替换,简单来说就是替换字符串中与正则表达式匹配的指定数量的子串,最后返回替换修改后的字符串.</td>
+</tr>
+<tr>
+<td style="text-align:center">regex.split</td>
+<td style="text-align:left">以正则表达式匹配的字符串作为分隔符,对一个字符串进行分割,以列表形式返回分割后的各个字符串.</td>
+</tr>
+<tr>
+<td style="text-align:center">match.expand</td>
+<td style="text-align:left">通过得到的匹配对象来构造并返回一个新的字符串,未被匹配到的分组将被替换为一个空字符串.</td>
+</tr>
+<tr>
+<td style="text-align:center">match.group</td>
+<td style="text-align:left">返回一个或多个指定捕获组所匹配到的内容,如果只有1个参数则返回单独的字符串,多参数返回元组.</td>
+</tr>
+<tr>
+<td style="text-align:center">match.groups</td>
+<td style="text-align:left">返回一个包含所有分组所匹配内容的元组,如果某个分组没有匹配到内容,则取defalult所指定的值.</td>
+</tr>
+<tr>
+<td style="text-align:center">match.groupdict</td>
+<td style="text-align:left">返回一个包含所有命名分组名称及其所匹配内容的字典对象,如果某个分组没有匹配到内容则取默认值.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>regex.match():</strong> 从起始位置开始匹配,匹配成功返回一个对象,未匹配成功返回None.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">match(pattern,string,flags=<span class="number">0</span>)</span><br><span class="line"><span class="comment"># pattern： 正则模型</span></span><br><span class="line"><span class="comment"># string ： 要匹配的字符串</span></span><br><span class="line"><span class="comment"># falgs  ： 匹配模式</span></span><br><span class="line"><span class="comment">#------------------------------------------------</span></span><br><span class="line"><span class="comment">#  未分组情况下.</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>origin = <span class="string">"hello alex bcd abcd lge acd 19"</span></span><br><span class="line">&gt;&gt;&gt;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>ret = re.match(<span class="string">"h\w+"</span>,origin)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(ret.group())                 <span class="comment">#获取匹配到的所有结果</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(ret.groups())                <span class="comment">#获取模型中匹配到的分组结果</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(ret.groupdict())             <span class="comment">#获取模型中匹配到的分组结果</span></span><br><span class="line"><span class="comment">#------------------------------------------------</span></span><br><span class="line"><span class="comment">#  有分组情况下. 提取匹配成功的指定内容(先匹配成功全部正则,再匹配成功的局部内容提取出来)</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>ret = re.match(<span class="string">"h(\w+).*(?P&lt;name&gt;\d)$"</span>,origin)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(r.group())                   <span class="comment">#获取匹配到的所有结果</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(r.groups())                  <span class="comment">#获取模型中匹配到的分组结果</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(r.groupdict())               <span class="comment">#获取模型中匹配到的分组中所有执行了key的组</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>regex.search():</strong> 搜索整个字符串去匹配第一个符合条件的数据,未匹配成功返回None.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>origin = <span class="string">"hello alex bcd abcd lge acd 19"</span></span><br><span class="line">&gt;&gt;&gt;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.search(<span class="string">"^h\w+"</span>,origin).group()          <span class="comment">#匹配开头是h的后面是任意字符的</span></span><br><span class="line"><span class="string">'hello'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.search(<span class="string">"a\w+"</span>,origin).group()           <span class="comment">#匹配a开头后面是任意字符的</span></span><br><span class="line"><span class="string">'alex'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.search(<span class="string">"(?P&lt;name&gt;a\w+)"</span>,origin).groupdict()</span><br><span class="line">&#123;<span class="string">'name'</span>: <span class="string">'alex'</span>&#125;                               <span class="comment">#分组匹配并过滤出alex</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.search(<span class="string">"(?P&lt;姓名&gt;[a-zA-Z]+)(?P&lt;年龄&gt;[0-9]+)"</span>,<span class="string">"lyshark22"</span>).groupdict()</span><br><span class="line">&#123;<span class="string">'姓名'</span>: <span class="string">'lyshark'</span>, <span class="string">'年龄'</span>: <span class="string">'22'</span>&#125;               <span class="comment">#匹配字符串,并分组打印出结果</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>regex.findall():</strong> 获取非重复的匹配列表,如果有一个组则以列表形式返回,且每一个匹配均是字符串,空的匹配也会包含在结果中.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>origin = <span class="string">"hello alex bcd abcd lge acd 19"</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.findall(<span class="string">"al\w+"</span>,origin)</span><br><span class="line">[<span class="string">'alex'</span>]                             <span class="comment">#匹配到单个结果,则以单列表返回</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.findall(<span class="string">"a\w+"</span>,origin)</span><br><span class="line">[<span class="string">'alex'</span>, <span class="string">'abcd'</span>, <span class="string">'acd'</span>]              <span class="comment">#匹配到多个结果,则以列表形式返回</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>regex.sub():</strong> 先匹配查找结果,然后进行字串的替换,也就是替换匹配成功的指定位置字符串.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">sub(pattern,repl,string,count=<span class="number">0</span>,flags=<span class="number">0</span>)</span><br><span class="line"><span class="comment"># pattern： 正则模型</span></span><br><span class="line"><span class="comment"># repl   ： 要替换的字符串或可执行对象</span></span><br><span class="line"><span class="comment"># string ： 要匹配的字符串</span></span><br><span class="line"><span class="comment"># count  ： 指定匹配个数</span></span><br><span class="line"><span class="comment"># flags  ： 匹配模式</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>origin = <span class="string">"hello alex bcd abcd lge acd 19"</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.sub(<span class="string">"a[a-z]+"</span>,<span class="string">"999999"</span>,origin,<span class="number">1</span>)      <span class="comment">#匹配以a开头则字串,并替换成9999,替换1次</span></span><br><span class="line"><span class="string">'hello 999999 bcd abcd lge acd 19'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.sub(<span class="string">"a[a-z]+"</span>,<span class="string">"999999"</span>,origin,<span class="number">2</span>)      <span class="comment">#匹配以a开头则字串,并替换成9999,替换2次</span></span><br><span class="line"><span class="string">'hello 999999 bcd 999999 lge acd 19'</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>regex.split():</strong> 字符串切割函数,用来实现对指定字符串的分割工作,根据正则匹配分割字符串.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">split(pattern,string,maxsplit=<span class="number">0</span>,flags=<span class="number">0</span>)</span><br><span class="line"><span class="comment"># pattern： 正则模型</span></span><br><span class="line"><span class="comment"># string ： 要匹配的字符串</span></span><br><span class="line"><span class="comment"># maxsplit：指定分割个数</span></span><br><span class="line"><span class="comment"># flags  ： 匹配模式</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>origin = <span class="string">"hello alex bcd abcd lge acd 19"</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.split(<span class="string">"alex"</span>,origin,<span class="number">1</span>)               <span class="comment">#无分组切割</span></span><br><span class="line">[<span class="string">'hello '</span>, <span class="string">' bcd abcd lge acd 19'</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.split(<span class="string">"(alex)"</span>,origin,<span class="number">1</span>)             <span class="comment">#有分组,以alex最为分隔符,切割字符串</span></span><br><span class="line">[<span class="string">'hello '</span>, <span class="string">'alex'</span>, <span class="string">' bcd abcd lge acd 19'</span>]</span><br></pre></td></tr></table></figure></p>
+<p><strong>常用匹配:</strong> 下面举几个小例子,分别用来匹配IP地址,手机号,和邮箱地址.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">IP：</span><br><span class="line">^(25[0-5]|2[0-4]\d|[0-1]?\d?\d)(\.(25[0-5]|2[0-4]\d|[0-1]?\d?\d))&#123;3&#125;$</span><br><span class="line"></span><br><span class="line">手机号：</span><br><span class="line">^<span class="number">1</span>[<span class="number">3</span>|<span class="number">4</span>|<span class="number">5</span>|<span class="number">8</span>][<span class="number">0</span><span class="number">-9</span>]\d&#123;<span class="number">8</span>&#125;$</span><br><span class="line"></span><br><span class="line">邮箱：</span><br><span class="line">[a-zA-Z0<span class="number">-9</span>_-]+@[a-zA-Z0<span class="number">-9</span>_-]+(\.[a-zA-Z0<span class="number">-9</span>_-]+)+</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="Flage-标识位"><a href="#Flage-标识位" class="headerlink" title="Flage 标识位"></a>Flage 标识位</h2><p><strong>re.DOTALL</strong><br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 正则表达式默认以单行开始匹配的</span></span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">re_pattern_syntax</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="comment"># .表示任意单一字符</span></span><br><span class="line">    <span class="comment"># *表示前一个字符出现&gt;=0次</span></span><br><span class="line">    <span class="comment"># re.DOTALL就可以匹配换行符\n,默认是以行来匹配的</span></span><br><span class="line">    print(re.match(<span class="string">r'.*'</span>, <span class="string">'abc\nedf'</span>).group())</span><br><span class="line">    print(<span class="string">'*'</span> * <span class="number">80</span>)</span><br><span class="line">    print(re.match(<span class="string">r'.*'</span>, <span class="string">'abc\nedf'</span>,re.DOTALL).group())</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    re_pattern_syntax()</span><br></pre></td></tr></table></figure></p>
+<p><strong>re.MULTILINE</strong><br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 正则表达式默认以单行开始匹配的</span></span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">re_pattern_syntax1</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="comment"># ^表示字符串开头(单行)</span></span><br><span class="line">    <span class="comment"># re.MULTILINE多行匹配字符串开头</span></span><br><span class="line">    print(re.findall(<span class="string">r'^abc'</span>, <span class="string">'abc\nedf'</span>))</span><br><span class="line">    print(<span class="string">'*'</span> * <span class="number">80</span>)</span><br><span class="line">    print(re.findall(<span class="string">r'^abc'</span>, <span class="string">'abc\nabc'</span>,re.MULTILINE))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">re_pattern_syntax2</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="comment"># $表示字符串结尾</span></span><br><span class="line">    <span class="comment"># re.MULTILINE表示行的结束</span></span><br><span class="line">    print(re.findall(<span class="string">r'abc\d$'</span>, <span class="string">'abc1\nabc2'</span>))</span><br><span class="line">    print(<span class="string">'*'</span> * <span class="number">80</span>)</span><br><span class="line">    print(re.findall(<span class="string">r'abc\d$'</span>, <span class="string">'abc1\nabc2'</span>,re.MULTILINE))</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    re_pattern_syntax1()</span><br><span class="line">    re_pattern_syntax2()</span><br></pre></td></tr></table></figure></p>
+<p><strong>?非贪婪模式</strong><br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> re</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">re_pattern_syntax4</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="comment"># greedy贪婪/non-greedy非贪婪,默认的是贪婪的匹配</span></span><br><span class="line">    s = <span class="string">'&lt;H1&gt;title&lt;/H1&gt;'</span></span><br><span class="line">    print(re.match(<span class="string">r'&lt;.+&gt;'</span>, s).group())  <span class="comment">#贪婪模式会匹配尽量多的匹配</span></span><br><span class="line">    print(re.match(<span class="string">r'&lt;.+?&gt;'</span>, s).group()) <span class="comment">#非贪婪模式匹配尽量少的匹配</span></span><br><span class="line">    print(re.match(<span class="string">r'&lt;(.+)&gt;'</span>, s).group(<span class="number">1</span>))</span><br><span class="line">    print(re.match(<span class="string">r'&lt;(.+?)&gt;'</span>, s).group(<span class="number">1</span>))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">re_pattern_syntax5</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="comment"># &#123;m&#125;/&#123;m,&#125;/&#123;m,n&#125;</span></span><br><span class="line">    print(re.match(<span class="string">r'ab&#123;2,4&#125;'</span>, <span class="string">'abbbbbbb'</span>).group())  <span class="comment">#贪婪模式尽量匹配多</span></span><br><span class="line">    print(re.match(<span class="string">r'ab&#123;2,4&#125;?'</span>, <span class="string">'abbbbbbb'</span>).group()) <span class="comment">#非贪婪模式尽量匹配少</span></span><br><span class="line">    print(<span class="string">'*'</span> * <span class="number">80</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    re_pattern_syntax4()</span><br><span class="line">    re_pattern_syntax5()</span><br></pre></td></tr></table></figure></p>
+<p><strong>re.I/re.IGNORECASE</strong><br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> re</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">re_pattern_flags</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="comment"># re.I/re.IGNORECASE</span></span><br><span class="line">    print(re.match(<span class="string">r'(Name)\s*:\s*(\w+)'</span>,<span class="string">'NAME : Joey'</span>,re.IGNORECASE).groups())</span><br><span class="line">    print(<span class="string">'*'</span> * <span class="number">80</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    re_pattern_syntax_meta_char()</span><br></pre></td></tr></table></figure></p>
+<p><strong>re.VERBOSE</strong><br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> re</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">re_pattern_flags1</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="comment"># re.VERBOSE此标识位可以添加注释/re.compile</span></span><br><span class="line">    s = <span class="string">'the number is 20.5'</span></span><br><span class="line">    r = re.compile(<span class="string">r'''</span></span><br><span class="line"><span class="string">                    \d+   # 整数部分</span></span><br><span class="line"><span class="string">                    \.?   # 小数点，可能包含也可能不包含</span></span><br><span class="line"><span class="string">                    \d*   # 小数部分,可选</span></span><br><span class="line"><span class="string">                    '''</span>,re.VERBOSE)</span><br><span class="line">    print(re.search(r,s).group())</span><br><span class="line">    print(r.search(s).group())</span><br><span class="line">    print(<span class="string">'*'</span> * <span class="number">80</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    re_pattern_syntax_meta_char1()</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="有无分组比较"><a href="#有无分组比较" class="headerlink" title="有无分组比较"></a>有无分组比较</h2><p><strong>re.mach()</strong><br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 无分组</span></span><br><span class="line">r = re.match(<span class="string">"h\w+"</span>, origin)</span><br><span class="line">print(r.group())     <span class="comment"># 获取匹配到的所有结果</span></span><br><span class="line">print(r.groups())    <span class="comment"># 获取模型中匹配到的分组结果</span></span><br><span class="line">print(r.groupdict()) <span class="comment"># 获取模型中匹配到的分组结果</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 有分组</span></span><br><span class="line"><span class="comment"># 为何要有分组？提取匹配成功的指定内容（先匹配成功全部正则，再匹配成功的局部内容提取出来）</span></span><br><span class="line">r = re.match(<span class="string">"h(\w+).*(?P&lt;name&gt;\d)$"</span>, origin)</span><br><span class="line">print(r.group())     <span class="comment"># 获取匹配到的所有结果</span></span><br><span class="line">print(r.groups())    <span class="comment"># 获取模型中匹配到的分组结果</span></span><br><span class="line">print(r.groupdict()) <span class="comment"># 获取模型中匹配到的分组中所有执行了key的组</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>re.search()</strong><br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 无分组</span></span><br><span class="line">r = re.search(<span class="string">"a\w+"</span>, origin)</span><br><span class="line">print(r.group())     <span class="comment"># 获取匹配到的所有结果</span></span><br><span class="line">print(r.groups())    <span class="comment"># 获取模型中匹配到的分组结果</span></span><br><span class="line">print(r.groupdict()) <span class="comment"># 获取模型中匹配到的分组结果</span></span><br><span class="line"> </span><br><span class="line"><span class="comment"># 有分组</span></span><br><span class="line">r = re.search(<span class="string">"a(\w+).*(?P&lt;name&gt;\d)$"</span>, origin)</span><br><span class="line">print(r.group())     <span class="comment"># 获取匹配到的所有结果</span></span><br><span class="line">print(r.groups())    <span class="comment"># 获取模型中匹配到的分组结果</span></span><br><span class="line">print(r.groupdict()) <span class="comment"># 获取模型中匹配到的分组中所有执行了key的组</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>re.findall()</strong><br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 无分组</span></span><br><span class="line">r = re.findall(<span class="string">"a\w+"</span>,origin)</span><br><span class="line">print(r)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 有分组</span></span><br><span class="line">origin = <span class="string">"hello alex bcd abcd lge acd 19"</span></span><br><span class="line">r = re.findall(<span class="string">"a((\w*)c)(d)"</span>, origin)</span><br><span class="line">print(r)</span><br></pre></td></tr></table></figure></p>
+<p><strong>re.split()</strong><br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 无分组</span></span><br><span class="line">origin = <span class="string">"hello alex bcd alex lge alex acd 19"</span></span><br><span class="line">r = re.split(<span class="string">"alex"</span>, origin, <span class="number">1</span>)</span><br><span class="line">print(r)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 有分组</span></span><br><span class="line">origin = <span class="string">"hello alex bcd alex lge alex acd 19"</span></span><br><span class="line">r1 = re.split(<span class="string">"(alex)"</span>, origin, <span class="number">1</span>)</span><br><span class="line">print(r1)</span><br><span class="line">r2 = re.split(<span class="string">"(al(ex))"</span>, origin, <span class="number">1</span>)</span><br><span class="line">print(r2)</span><br></pre></td></tr></table></figure></p>
+<p><strong>常用例子</strong><br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> re</span><br><span class="line">print(re.findall(<span class="string">r'(\d+)-([a-z])'</span>,<span class="string">'34324-dfsdfs777-hhh'</span>)) 　　　　　　<span class="comment"># [('34324', 'd'), ('777', 'h')]</span></span><br><span class="line">print(re.search(<span class="string">r'(\d+)-([a-z])'</span>,<span class="string">'34324-dfsdfs777-hhh'</span>).group(<span class="number">0</span>))    <span class="comment"># 34324-d 返回整体</span></span><br><span class="line">print(re.search(<span class="string">r'(\d+)-([a-z])'</span>,<span class="string">'34324-dfsdfs777-hhh'</span>).group(<span class="number">1</span>))    <span class="comment"># 34324 获取第一个组</span></span><br><span class="line">print(re.search(<span class="string">r'(\d+)-([a-z])'</span>,<span class="string">'34324-dfsdfs777-hhh'</span>).group(<span class="number">2</span>))    <span class="comment"># d 获取第二个组</span></span><br><span class="line">print(re.search(<span class="string">r'(\d+)-([a-z])'</span>,<span class="string">'34324-dfsdfs777-hhh'</span>).group(<span class="number">3</span>))    <span class="comment"># IndexError: no such group</span></span><br><span class="line">  </span><br><span class="line">print(re.search(<span class="string">r"(jason)kk\1"</span>,<span class="string">"xjasonkkjason"</span>).group())  　　　　　　<span class="comment">#\1表示应用编号为1的组 jasonkkjason</span></span><br><span class="line">print(re.search(<span class="string">r'(\d)gg\1'</span>,<span class="string">'2j333gg3jjj8'</span>).group())                 <span class="comment"># 3gg3 \1表示使用第一个组\d</span></span><br><span class="line">  </span><br><span class="line"><span class="comment"># 下面的返回None 为什么是空？而匹配不到3gg7，因为\1的不仅表示第一组，而且匹配到的内容也要和第一组匹配到的内容相同，第一组匹配到3，第二组匹配到7 不相同所以返回空</span></span><br><span class="line">print(re.search(<span class="string">r'(\d)gg\1'</span>,<span class="string">'2j333gg7jjj8'</span>))</span><br><span class="line">print(re.search(<span class="string">r'(?P&lt;first&gt;\d)abc(?P=first)'</span>,<span class="string">'1abc1'</span>))             <span class="comment"># 1abc1 声明一个组名，使用祖名引用一个组　</span></span><br><span class="line"></span><br><span class="line">r=re.match(<span class="string">'(?P&lt;n1&gt;h)(?P&lt;n2&gt;\w+)'</span>,<span class="string">'hello,hi,help'</span>)　　 <span class="comment"># 组名的另外一种用法</span></span><br><span class="line">print(r.group())                       　　　　　　　　 <span class="comment"># hello 返回匹配到的值</span></span><br><span class="line">print(r.groups())                      　　　　　　　　 <span class="comment"># ('h', 'ello')返回匹配到的分组</span></span><br><span class="line">print(r.groupdict())                   　　　　　　　　 <span class="comment"># &#123;'n2': 'ello', 'n1': 'h'&#125; 返回分组的结果，并且和相应的组名组成一个字典</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 分组是从已经匹配到的里面去取值</span></span><br><span class="line">origin =<span class="string">"hello alex,acd,alex"</span></span><br><span class="line">print(re.findall(<span class="string">r'(a)(\w+)(x)'</span>,origin))                  <span class="comment"># [('a', 'le', 'x'), ('a', 'le', 'x')]</span></span><br><span class="line">print(re.findall(<span class="string">r'a\w+'</span>,origin))                         <span class="comment"># ['alex', 'acd', 'alex']</span></span><br><span class="line">print(re.findall(<span class="string">r'a(\w+)'</span>,origin))                       <span class="comment"># ['lex', 'cd', 'lex']</span></span><br><span class="line">print(re.findall(<span class="string">r'(a\w+)'</span>,origin))                       <span class="comment"># ['alex', 'acd', 'alex']</span></span><br><span class="line">print(re.findall(<span class="string">r'(a)(\w+(e))(x)'</span>,origin))               <span class="comment"># [('a', 'le', 'e', 'x'), ('a', 'le', 'e', 'x')]</span></span><br><span class="line"></span><br><span class="line">r=re.finditer(<span class="string">r'(a)(\w+(e))(?P&lt;name&gt;x)'</span>,origin)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> r :</span><br><span class="line">    print(i,i.group(),i.groupdict())</span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">    [('a', 'le', 'e', 'x'), ('a', 'le', 'e', 'x')]</span></span><br><span class="line"><span class="string">    &lt;_sre.SRE_Match object; span=(6, 10), match='alex'&gt; alex &#123;'name': 'x'&#125;</span></span><br><span class="line"><span class="string">    &lt;_sre.SRE_Match object; span=(15, 19), match='alex'&gt; alex &#123;'name': 'x'&#125;</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"></span><br><span class="line">print(re.findall(<span class="string">'(\w)*'</span>,<span class="string">'alex'</span>))                   <span class="comment"># 匹配到了alex、但是4次只取最后一次即 x 真实括号只有1个</span></span><br><span class="line">print(re.findall(<span class="string">r'(\w)(\w)(\w)(\w)'</span>,<span class="string">'alex'</span>))       <span class="comment"># [('a', 'l', 'e', 'x')]  括号出现了4次，所以4个值都取到了</span></span><br><span class="line">  </span><br><span class="line">origin=<span class="string">'hello alex sss hhh kkk'</span></span><br><span class="line">print(re.split(<span class="string">r'a(\w+)'</span>,origin))                   <span class="comment"># ['hello ', 'lex', ' sss hhh kkk']</span></span><br><span class="line">print(re.split(<span class="string">r'a\w+'</span>,origin))                     <span class="comment"># ['hello ', ' sss hhh kkk']</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2019/01/23/Python/Python-正则表达模块详解-7/">Python 正则表达模块详解(7)</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2019年01月23日 - 16:01</p>
+  <p><span>最后更新:</span>2019年02月14日 - 13:02</p>
+  <p><span>原始链接:</span><a href="/2019/01/23/Python/Python-正则表达模块详解-7/" title="Python 正则表达模块详解(7)">https://www.mkdirs.com/2019/01/23/Python/Python-正则表达模块详解-7/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Python/" rel="tag"> <i class="fa fa-tag"></i> Python</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/01/21/Python/Python-常用内置模块详解-6/" rel="next" title="Python 常用内置模块详解(6)">
+                <i class="fa fa-chevron-left"></i> Python 常用内置模块详解(6)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/01/24/Python/Python-面向对象编程详解-8/" rel="prev" title="Python 面向对象编程详解(8)">
+                Python 面向对象编程详解(8) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#通用字符匹配"><span class="nav-text">通用字符匹配</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#通用边界匹配"><span class="nav-text">通用边界匹配</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常用匹配函数"><span class="nav-text">常用匹配函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Flage-标识位"><span class="nav-text">Flage 标识位</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#有无分组比较"><span class="nav-text">有无分组比较</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

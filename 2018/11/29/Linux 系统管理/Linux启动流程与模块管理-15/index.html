@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Linux 是一套免费使用和自由传播的类Unix操作系统,是一个基于POSIX和UNIX的多用户、多任务、支持多线程和多CPU的操作系统.它能运行主要的UNIX工具软件、应用程序和网络协议.它支持32位和64位硬件.Linux继承了Unix以网络为核心的设计思想,是一个性能稳定的多用户网络操作系统. 系统的启动其实是一项非常复杂的过程,因为内核得要检测硬件并加载适当的驱动程序,接下来则必须要调用程">
+<meta name="keywords" content="Linux 系统管理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux启动流程与模块管理(15)">
+<meta property="og:url" content="https://www.mkdirs.com/2018/11/29/Linux 系统管理/Linux启动流程与模块管理-15/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="Linux 是一套免费使用和自由传播的类Unix操作系统,是一个基于POSIX和UNIX的多用户、多任务、支持多线程和多CPU的操作系统.它能运行主要的UNIX工具软件、应用程序和网络协议.它支持32位和64位硬件.Linux继承了Unix以网络为核心的设计思想,是一个性能稳定的多用户网络操作系统. 系统的启动其实是一项非常复杂的过程,因为内核得要检测硬件并加载适当的驱动程序,接下来则必须要调用程">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-04-16T12:35:14.939Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux启动流程与模块管理(15)">
+<meta name="twitter:description" content="Linux 是一套免费使用和自由传播的类Unix操作系统,是一个基于POSIX和UNIX的多用户、多任务、支持多线程和多CPU的操作系统.它能运行主要的UNIX工具软件、应用程序和网络协议.它支持32位和64位硬件.Linux继承了Unix以网络为核心的设计思想,是一个性能稳定的多用户网络操作系统. 系统的启动其实是一项非常复杂的过程,因为内核得要检测硬件并加载适当的驱动程序,接下来则必须要调用程">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/11/29/Linux 系统管理/Linux启动流程与模块管理-15/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Linux启动流程与模块管理(15) | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/11/29/Linux 系统管理/Linux启动流程与模块管理-15/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Linux启动流程与模块管理(15)
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-11-29 13:40:57" itemprop="dateCreated datePublished" datetime="2018-11-29T13:40:57+08:00">2018-11-29</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-16 20:35:14" itemprop="dateModified" datetime="2019-04-16T20:35:14+08:00">2019-04-16</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Linux-系统管理/" itemprop="url" rel="index"><span itemprop="name">Linux 系统管理</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Linux 是一套免费使用和自由传播的类Unix操作系统,是一个基于POSIX和UNIX的多用户、多任务、支持多线程和多CPU的操作系统.它能运行主要的UNIX工具软件、应用程序和网络协议.它支持32位和64位硬件.Linux继承了Unix以网络为核心的设计思想,是一个性能稳定的多用户网络操作系统.</p>
+<p>系统的启动其实是一项非常复杂的过程,因为内核得要检测硬件并加载适当的驱动程序,接下来则必须要调用程序来准备好系统运行的环境,以让用户能够顺利的操作整台主机系统,如果你能够理解系统启动的原理,那么将有助于你在系统出问题时能够很快速的修复系统,而且还能够顺利的配置多重操作系统的多重启动问题,为了多重启动的问题,你就不能不学 grub 这个 Linux 下优秀的启动管理程序(boot loader),而在系统运行期间,你也得要学会管理内核模块,下面进入正题开始学习吧.</p>
+<a id="more"></a>
+<p><strong>关于Linux系统的启动流程一览</strong></p>
+<p>操作系统的启动过程是一个很复杂的过程,在启动过程中,那个引导装载程序(BootLoader)使用的软件可能不一样,例如目前主流发行版为GRUB,但是呢早期Linux系统使用的是,LILO,现在很多人喜欢使用SPFDISK,不管如何,我们总要了解整个(BootLoader)的工作情况,才能了解怎样进行多重引导的设置.</p>
+<p>这里以个人计算机搭建的Linux主机为例子,当你按下电源时计算机硬件会主动读取BIOS来加载硬件的一些信息,和自我检测,之后系统会读取第一个可启动的设备(由BIOS设置的),此时就可以读入引导装载程序啦.</p>
+<p>引导装载程序可以指定使用那个内核来启动,并负责实际加载内核到内存当中解压与执行,此时内核就能够开始在内存中活动啦,并检测所有硬件信息,与加载相应的驱动程序,等到内核加载驱动完毕,此时我们的操作系统就完成整个启动过程啦,简单的归纳来说,系统的启动流程是这样的：</p>
+<blockquote>
+<p>● 按下开机按钮,这个是必须的,奥对了,必须要有电才可以.<br>● 系统会加载BIOS,来进行硬件信息的读取,和自我检测,并依据设置取得第一个可启动设备.<br>● 读取并执行第一个可启动设备内 MBR 记录里的 BootLoader(grub或者是spfdisk).<br>● 依据BootLoader里的设置加载内核,内核会开始检测硬件,并加载相应的驱动程序.<br>● 在完成驱动的加载后,内核此时会主动调用systemd进程,而systemd进程会取得run-level信息.<br>● systemd进程执行 <code>/etc/rc.d/init.d</code> 内的脚本,部署操作环境(如网络,时区等).<br>● systemd进程执行,run-level的各个服务程序脚本,来启动指定运行级别的各种服务.<br>● systemd进程执行 <code>/etc/rc.d/rc.local</code> 加载内部的一些数据.<br>● systemd进程执行终端机模拟程序mingetty来启动login程序,最后等待用户的登陆.</p>
+</blockquote>
+<p>以上的流程,就是Linux系统的启动流程,你会发现systemd进程非常重要,当然这可是系统的根,这些内容你最好背过,要不然面试问到的话就尴尬啦.</p>
+<p><strong>关于BIOS开机自检与MBR主引导记录</strong></p>
+<p>想要启动一个系统首先就得让系统去加载BIOS,并通过BIOS程序去加载CMOS里的相关信息,并通过CMOS里的设置值去读取主机的各项硬件配置,例如：CPU频率,内存大小,系统时间等常规的参数.</p>
+<p>接着在取得这些信息后,BIOS还会进行开机自检(Power-On Self Test,POST),然后开始执行硬件检测初始化,并配置PNP设备等,之后再定义出可启动的设备顺序,接下来就会开始进行启动设备的数据读取了(MBR的相关任务开始).</p>
+<p>BIOS会指定启动的设备,好让我们可以读取磁盘中的操作系统内核文件,但由于不同的操作系统的文件格式并不相同,因此我们必须要以一个引导装载程序来处理内核文件的加载问题,这个引导装载程序就被称为BootLoader,这个BootLoader程序就安装在启动设备的第一个扇区内,也就是我们所说的MBR(主引导记录)了.</p>
+<p>其实只要BIOS能够检测得到你的磁盘,那么它就有办法来读取你的第一个扇区,如此一来,BootLoader也够被执行.</p>
+<p><strong>Boot Loader的功能</strong></p>
+<p>每个文件系统 (filesystem,或者 partition) 都会保留一块引导扇区 (boot sector) 提供操作系统安装 boot loader,而通常操作系统默认都会安装一份 loader 到他根目录所在的文件系统的 boot sector 上.</p>
+<p>每个操作系统默认是会安装一套 boot loader 到他自己的文件系统中,而在 Linux 系统安装时,你可以选择将 boot loader 安装到 MBR 去,也可以选择不安装。.如果选择安装到 MBR 的话,那理论上你在 MBR 与 boot sector 都会保有一份 boot loader 程序的,至于 Windows 安装时,他默认会主动的将 MBR 与 boot sector 都装上一份 boot loader 所以你会发现安装多重操作系统时,你的 MBR 常常会被不同的操作系统的 boot loader 所覆盖.</p>
+<blockquote>
+<p>BootLoader的常用功能有以下几个</p>
+<blockquote>
+<p>1.提供一个菜单：用户可以选择不同的启动项.<br>2.加载内核文件：直接执行可启动系统的区段.<br>3.转交给其他loader：将引导装载入成功,转交给其他loader负责.</p>
+</blockquote>
+</blockquote>
+<p>由于具有菜单功能,因此我们可以选择不同的内核来启动,这里需要强调的是,如果要装双系统应该先装windows再装linux.</p>
+<p><strong>加载内核自检与systemd的功能</strong></p>
+<p>接下来就是加载内核的时候啦,由于我们的Linux驱动都是以模块的形式存在的,比如键盘鼠标驱动,网络驱动等,包括我们的硬盘驱动,常用的一些驱动文件就是放在/lib/modules目录内的,那么这里就出现了一个问题,想一下,我们的硬盘驱动是在Linux模块里的,而我们要使用硬盘才是能启动系统,系统没启动也就无法加载磁盘驱动,无法加载磁盘驱动也就无法打开磁盘啊,这里就出现了一个东西,那就是虚拟文件系统(InitiaIRAM Disk).</p>
+<p>虚拟文件系统,一般使用的文件名为/boot/initrd,这个文件的作用是临时加载一些系统启动而需要用到的驱动的,你可以把它想象成是一个微型的Linux系统,它的作用只是加载系统的必要驱动而已,通过该程序来加载启动过程中所最需要的内核模块,通常这些模块就是 U盘,RAID,LVM,SCSI等文件系统与磁盘驱动程序,等加载完成后会自动调用 /sbin/init 将控制权交给完整的Linux系统管理.</p>
+<p>当上面的工作完成后,我们的系统已经可以开始工作啦,下面就要将控制权交给/sbin/init来进一步初始化我们的系统环境.</p>
+<p><strong>第一个进程init,与/etc/inittab</strong></p>
+<p>当内核加载完成后,我们的init进程就开始干活了,/sbin/init主要的任务就是加载后续的系统环境,比如终端的变量,或者调用其它配置文件,继续干活,其最主要的是系统的执行等级,我们的系统有以下7个执行等级,分别是：</p>
+<blockquote>
+<p>基本上runlevel分为0-6 ，7个等级：</p>
+<blockquote>
+<p>0：关机-shutdown<br>1：单用户模式（sigle user），root用户，无须认证；维护模式<br>2：多用户模式（multi user），会启动网络功能，但不会启动NFS；维护模式<br>3：多用户模式（multi user），完全功能模式；文本界面<br>4：预留级别：目前无特别使用目的，但习惯同3级别使用<br>5：多用户模式（multi user），完全功能模式，图形界面<br>6：重启模式</p>
+</blockquote>
+</blockquote>
+<p>由于 run level 0, 4, 6 不是关机、重新启动就是系统保留的,所以：『 您当然不能将默认的 run level 配置为这三个值 』,否则系统就会不断的自动关机或自动重新启动. </p>
+<p>完成级别的选择之后,下一步就是进一步调用配置文件,继续加载参数.</p>
+<blockquote>
+<p>系统初始化的过程主要是执行一些脚本配置文件来完成的：</p>
+<blockquote>
+<p>1.执行系统初始化脚本(<code>/etc/rc.d/rc.sysinit</code>)对系统进行基本的配置以读写方式挂载,根文件系统及其它文件系统,到此系统算是基本运行起来了,后面需要进行运行级别的确定及相应服务的启动.<br>2.执行<code>/etc/rc.d/rc</code>脚本,该文件定义了服务启动的顺序是先K后S,而具体的每个运行级别的服务状态是放在<code>/etc/rc.d/</code>目录下,所有的文件均是指向<code>/etc/init.d</code>下相应文件的符号链接,<code>rc.sysinit</code>通过分析<code>/etc/inittab</code>文件来确定系统的启动级别,然后才去执行<code>/etc/rc.d/rc.d</code>下的文件.<br>3.执行用户自定义引导程序<code>/etc/rc.d/rc.local</code>完成了系统所有的启动任务后,linux会启动终端或X-Window来等待用户登录.<br>4.最后一步输入用户名及密码就可以登入系统了.</p>
+</blockquote>
+</blockquote>
+<p>至此我们的操作系统就启动起来啦,接下来看一下常用的启动管理命令吧.<br><br></p>
+<h2 id="GRUB相关配置"><a href="#GRUB相关配置" class="headerlink" title="GRUB相关配置"></a>GRUB相关配置</h2><h3 id="改开机等待时间"><a href="#改开机等待时间" class="headerlink" title="改开机等待时间"></a>改开机等待时间</h3><p>1.第一步修改GRUB配置文件,改掉几个配置参数,然后生成写入/boot目录即可.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/default/grub</span></span><br><span class="line"></span><br><span class="line">GRUB_TIMEOUT=5    <span class="comment">#引导时间</span></span><br><span class="line">GRUB_DEFAULT=1    <span class="comment">#从哪个内核引导,默认是0</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># grub2-mkconfig -o /boot/grub2/grub.cfg</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="启动GRUB加密"><a href="#启动GRUB加密" class="headerlink" title="启动GRUB加密"></a>启动GRUB加密</h3><p>1.第一种方式是明文设置,不推荐,但下面还是要看一下配置流程的.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/grub.d/00_header</span></span><br><span class="line">文件末尾追加</span><br><span class="line"></span><br><span class="line">cat &lt;&lt; EOF</span><br><span class="line"><span class="built_in">set</span> superusers=admin</span><br><span class="line">password admin 123123</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># grub2-mkconfig -o /boot/grub2/grub.cfg</span></span><br></pre></td></tr></table></figure></p>
+<p>2.第二种方法,先加密我们的密码,此处通过命令生成.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># grub2-mkpasswd-pbkdf2</span></span><br><span class="line">Enter password:</span><br><span class="line">Reenter password:</span><br><span class="line"></span><br><span class="line">PBKDF2 <span class="built_in">hash</span> of your password is grub.pbkdf2.sha512.10000.4E2254C5684C9F12C06354A090B8447B0D1532D1BCA9FA5CBE870E7</span><br><span class="line">0E1ED46A25BD3D2443E2E3676613AAF909FD4F34C213B2904C7580B1096B1E16736E48883.D5C3FDF2DF61424C6655FE343CE909C0D13B65</span><br><span class="line">95312DD50CE764B6EC3954347BA63E04CA62D6B3DA1AE00D5DAA8CF8DCF752F8046BFB18F5B19604DCE512C09E</span><br></pre></td></tr></table></figure></p>
+<p>接着复制这一行将密码列用密钥代替即可.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/grub.d/00_header</span></span><br><span class="line">文件末尾追加</span><br><span class="line"></span><br><span class="line">cat &lt;&lt; EOF</span><br><span class="line"><span class="built_in">set</span> superusers=admin</span><br><span class="line">password_bkdf2 admin grub.pbkdf2.sha512.10000.4E2254C5684C9F12C06354A090B8447B0D1532D1BCA9FA5CBE870E7</span><br><span class="line">0E1ED46A25BD3D2443E2E3676613AAF909FD4F34C213B2904C7580B1096B1E16736E48883.D5C3FDF2DF61424C6655FE343CE909C0D13B65</span><br><span class="line">95312DD50CE764B6EC3954347BA63E04CA62D6B3DA1AE00D5DAA8CF8DCF752F8046BFB18F5B19604DCE512C09E</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># grub2-mkconfig -o /boot/grub2/grub.cfg</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="Linux系统修复流程"><a href="#Linux系统修复流程" class="headerlink" title="Linux系统修复流程"></a>Linux系统修复流程</h2><h3 id="◆破解开机密码◆"><a href="#◆破解开机密码◆" class="headerlink" title="◆破解开机密码◆"></a>◆破解开机密码◆</h3><p>1.如果我们的开机密码忘记了,我们可以使用如下方法解决.重启系统<code>按e键,找到linux16</code>加入以下内容.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">linux16 /vmlinuz-3.10.0 root=/dev/centos-root rhgb quiet</span><br><span class="line"></span><br><span class="line">删除: rhgb quiet 添加上:init=/bin/sh</span><br><span class="line">按住: CTRL+X</span><br></pre></td></tr></table></figure></p>
+<p>2.接着会看到进入到一个shell环境,我们依次执行以下代码即可.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sh-4.2<span class="comment"># mount -o remount,rw /</span></span><br><span class="line">sh-4.2<span class="comment"># echo "redhat" | passwd --stdin root</span></span><br><span class="line">sh-4.2<span class="comment"># touch /.autorelabel</span></span><br><span class="line">sh-4.2<span class="comment"># exec /sbin/init</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="◆破解GRUB密码◆"><a href="#◆破解GRUB密码◆" class="headerlink" title="◆破解GRUB密码◆"></a>◆破解GRUB密码◆</h3><p>grub密码也忘记了,如何修改密码.(光盘救援模式)了解下.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">执行以下步骤:Troubleshooting -&gt; Rescue a CentOS system -&gt; Continue -&gt;/bin/sh 会进入光盘系统.</span><br><span class="line"></span><br><span class="line">sh-4.2<span class="comment"># chroot /mnt/sysimage/</span></span><br><span class="line">sh-4.2<span class="comment"># vi /etc/grub.d/00_header</span></span><br><span class="line"></span><br><span class="line">删除以下字段</span><br><span class="line">cat &lt;&lt; EOF</span><br><span class="line"><span class="built_in">set</span> superusers=admin</span><br><span class="line">password admin 123123</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># grub2-mkconfig -o /boot/grub2/grub.cfg</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="◆MBR-GRUB修复◆"><a href="#◆MBR-GRUB修复◆" class="headerlink" title="◆MBR/GRUB修复◆"></a>◆MBR/GRUB修复◆</h3><p>1.使用命令来模拟数据损坏,这里我们强制覆盖硬盘的前<code>446</code>字节的数据,来模拟MBR损坏.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># dd if=/dev/zero of=/dev/sda bs=1 count=446</span></span><br><span class="line">[root@localhost ~]<span class="comment"># reboot</span></span><br></pre></td></tr></table></figure></p>
+<p>2.执行完成上面的步骤再次开机,会发现自动的从光盘引导启动啦,原因就是我们的MBR被删除了,而系统会默认寻找第二个启动设备,此时正好光盘能够被启动.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">执行以下步骤:Troubleshooting -&gt; Rescue a CentOS system -&gt; Continue -&gt;/bin/sh 会进入光盘系统.</span><br><span class="line"></span><br><span class="line">sh-4.2<span class="comment"># chroot /mnt/sysimage            #切换到硬盘分区</span></span><br><span class="line">bash-4.2<span class="comment"># grub2-install /dev/sda        #把grub装在sda里面</span></span><br><span class="line">bash-4.2<span class="comment"># exit</span></span><br><span class="line">sh-4.2<span class="comment"># reboot</span></span><br></pre></td></tr></table></figure></p>
+<p>如上我们就完成了MBR的修复工作,再次开机系统会进入正常的环境啦.</p>
+<h3 id="◆BOOT丢失修复◆"><a href="#◆BOOT丢失修复◆" class="headerlink" title="◆BOOT丢失修复◆"></a>◆BOOT丢失修复◆</h3><p>1.这里我们通过删除<code>/boot/</code>目录下的所有文件,来模拟BOOT文件丢失的修复流程.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># rm -fr /boot/*</span></span><br><span class="line">[root@localhost ~]<span class="comment"># reboot</span></span><br></pre></td></tr></table></figure></p>
+<p>2.此时重启后我们的系统就无法正常使用啦,会看到以下<code>grub rescue&gt;</code>提示符,说明我们的GRUB没问题,接下来我们来修复,老样子挂载光盘使用光盘系统进入<code>bash</code>并修复一下.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">执行以下步骤:F12-&gt;CD-ROM-&gt;Troubleshooting -&gt; Rescue a CentOS system -&gt; Continue -&gt;/bin/sh 会进入光盘系统.</span><br><span class="line"></span><br><span class="line">sh-4.2<span class="comment"># chroot /mnt/sysimage/</span></span><br><span class="line">bash-4.2<span class="comment"># mount /dev/sr0 /mnt</span></span><br><span class="line">bash-4.2<span class="comment"># rpm -ivh --force /mnt/Packages/kernel-3.10.0-862.el7.rpm</span></span><br><span class="line"></span><br><span class="line">bash-4.2<span class="comment"># mkdir /boot/grub2                        #创建BRUB目录,并修复</span></span><br><span class="line">bash-4.2<span class="comment"># grub2-mkconfig -o /boot/grub2/grub.cfg</span></span><br><span class="line">bash-4.2<span class="comment"># grub2-install /dev/sda</span></span><br><span class="line"></span><br><span class="line">bash-4.2<span class="comment"># exit</span></span><br><span class="line">sh-4.2<span class="comment"># reboot</span></span><br></pre></td></tr></table></figure></p>
+<p>到此为止我们的/boot目录就修复成功啦,是不是很简单啊.<br><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/11/29/Linux 系统管理/Linux启动流程与模块管理-15/">Linux启动流程与模块管理(15)</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年11月29日 - 13:11</p>
+  <p><span>最后更新:</span>2019年04月16日 - 20:04</p>
+  <p><span>原始链接:</span><a href="/2018/11/29/Linux 系统管理/Linux启动流程与模块管理-15/" title="Linux启动流程与模块管理(15)">https://www.mkdirs.com/2018/11/29/Linux 系统管理/Linux启动流程与模块管理-15/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux-系统管理/" rel="tag"> <i class="fa fa-tag"></i> Linux 系统管理</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/28/Linux 系统管理/Linux系统日志分析与管理-14/" rel="next" title="Linux系统日志分析与管理(14)">
+                <i class="fa fa-chevron-left"></i> Linux系统日志分析与管理(14)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/11/30/Linux 系统管理/Linux防火墙配置与管理-16/" rel="prev" title="Linux防火墙配置与管理(16)">
+                Linux防火墙配置与管理(16) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#GRUB相关配置"><span class="nav-text">GRUB相关配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#改开机等待时间"><span class="nav-text">改开机等待时间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动GRUB加密"><span class="nav-text">启动GRUB加密</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux系统修复流程"><span class="nav-text">Linux系统修复流程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆破解开机密码◆"><span class="nav-text">◆破解开机密码◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆破解GRUB密码◆"><span class="nav-text">◆破解GRUB密码◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆MBR-GRUB修复◆"><span class="nav-text">◆MBR/GRUB修复◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆BOOT丢失修复◆"><span class="nav-text">◆BOOT丢失修复◆</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

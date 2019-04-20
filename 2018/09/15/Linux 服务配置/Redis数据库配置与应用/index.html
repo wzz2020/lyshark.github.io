@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="REmote DIctionary Server(Redis) 是一个由Salvatore Sanfilippo写的key-value存储系统。Redis是一个开源的使用ANSI C语言编写、遵守BSD协议、支持网络、可基于内存亦可持久化的日志型、Key-Value数据库，并提供多种语言的API。它通常被称为数据结构服务器，因为值（value）可以是 字符串(String), 哈希(Map), 列">
+<meta name="keywords" content="Linux 服务配置">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis 数据库配置与应用">
+<meta property="og:url" content="https://www.mkdirs.com/2018/09/15/Linux 服务配置/Redis数据库配置与应用/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="REmote DIctionary Server(Redis) 是一个由Salvatore Sanfilippo写的key-value存储系统。Redis是一个开源的使用ANSI C语言编写、遵守BSD协议、支持网络、可基于内存亦可持久化的日志型、Key-Value数据库，并提供多种语言的API。它通常被称为数据结构服务器，因为值（value）可以是 字符串(String), 哈希(Map), 列">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-04-16T12:38:09.865Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Redis 数据库配置与应用">
+<meta name="twitter:description" content="REmote DIctionary Server(Redis) 是一个由Salvatore Sanfilippo写的key-value存储系统。Redis是一个开源的使用ANSI C语言编写、遵守BSD协议、支持网络、可基于内存亦可持久化的日志型、Key-Value数据库，并提供多种语言的API。它通常被称为数据结构服务器，因为值（value）可以是 字符串(String), 哈希(Map), 列">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/09/15/Linux 服务配置/Redis数据库配置与应用/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Redis 数据库配置与应用 | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/09/15/Linux 服务配置/Redis数据库配置与应用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Redis 数据库配置与应用
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-09-15 12:01:55" itemprop="dateCreated datePublished" datetime="2018-09-15T12:01:55+08:00">2018-09-15</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-16 20:38:09" itemprop="dateModified" datetime="2019-04-16T20:38:09+08:00">2019-04-16</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Linux-服务配置/" itemprop="url" rel="index"><span itemprop="name">Linux 服务配置</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>REmote DIctionary Server(Redis) 是一个由Salvatore Sanfilippo写的key-value存储系统。<br>Redis是一个开源的使用ANSI C语言编写、遵守BSD协议、支持网络、可基于内存亦可持久化的日志型、Key-Value数据库，并提供多种语言的API。<br>它通常被称为数据结构服务器，因为值（value）可以是 字符串(String), 哈希(Map), 列表(list), 集合(sets) 和 有序集合(sorted sets)等类型。<br>本笔记主要实现Redis的运维常用功能的配置,如编译安装,设置初始密码,主从同步,数据库的备份,等功能</p>
+<a id="more"></a>
+<h2 id="编译安装Redis"><a href="#编译安装Redis" class="headerlink" title="编译安装Redis"></a>编译安装Redis</h2><p>1.编译安装依赖.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># wget https://jaist.dl.sourceforge.net/project/tcl/Tcl/8.5.18/tcl8.5.18-src.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># tar -xzvf tcl8.5.18-src.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd tcl8.5.18/unix/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ./configure</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make &amp;&amp; make install</span></span><br></pre></td></tr></table></figure></p>
+<p>2.编译安装Redis.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># wget http://download.redis.io/releases/redis-4.0.9.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># tar -xzvf redis-4.0.9.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd redis-4.0.9/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make &amp;&amp; make test</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make PREFIX=/usr/local/redis install</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cp -a redis.conf /usr/local/redis/				#复制配置文件到Redis目录</span></span><br></pre></td></tr></table></figure></p>
+<p>3.修改主配置文件.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /usr/local/redis/redis.conf</span></span><br><span class="line">定位特征：<span class="comment"># By default Redis does not run as a daemon. Use 'yes' if you ne</span></span><br><span class="line"></span><br><span class="line">daemonize yes								<span class="comment">#以守护进程运行</span></span><br></pre></td></tr></table></figure></p>
+<p>4.启动数据库.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># /usr/local/redis/bin/redis-server /usr/local/redis/redis.conf #启动数据库</span></span><br><span class="line">[root@localhost ~]<span class="comment"># /usr/local/redis/bin/redis-cli -p 6379                        #链接数据库</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="数据库操作的基本语句"><a href="#数据库操作的基本语句" class="headerlink" title="数据库操作的基本语句"></a>数据库操作的基本语句</h2><h3 id="◆字符串类型的操作-String◆-lt-一个字符串-对应一个数据-gt"><a href="#◆字符串类型的操作-String◆-lt-一个字符串-对应一个数据-gt" class="headerlink" title="◆字符串类型的操作:String◆ &lt;一个字符串,对应一个数据&gt;"></a>◆字符串类型的操作:String◆ &lt;一个字符串,对应一个数据&gt;</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">keys  *								<span class="comment">#查看所有键值</span></span><br><span class="line">get		名称						<span class="comment">#查看键值</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">set</span>		名称	键值					<span class="comment">#创建键值</span></span><br><span class="line">sexnx	名称	键值						<span class="comment">#创建键值(有则不创建,无则创建)</span></span><br><span class="line">setex	名称	消失时间	键值				<span class="comment">#创建键值(给键值赋予有效期,到期消失)</span></span><br><span class="line">ttl		名称						<span class="comment">#查看键的生命周期( -1永久/-2不存在)</span></span><br><span class="line"></span><br><span class="line">mset		名称1	键值1	名称2	键值2			<span class="comment">#创建多个键值</span></span><br><span class="line">mget	名称1	键值1	名称2	键值2				<span class="comment">#查看多个键值</span></span><br><span class="line">msetnx	名称1	键值1	名称2	键值2				<span class="comment">#创建多个键值(无责创建,有责停止)</span></span><br><span class="line"></span><br><span class="line">setrange	名称	修改位置	欲修改值		<span class="comment">#修改替换键值</span></span><br><span class="line">getset	名称	欲修改值					<span class="comment">#先查看键值,在修改成新值</span></span><br><span class="line">getrange	名称	起始位置	终止位置		<span class="comment">#查看一个键值的部分,从起始到结束</span></span><br><span class="line"></span><br><span class="line">incr		名称						<span class="comment">#给键值每次+1</span></span><br><span class="line">incrby	名称	增长值						<span class="comment">#给键值指定增长值,进行增长</span></span><br><span class="line">decr		名称						<span class="comment">#给键值每次-1</span></span><br><span class="line"></span><br><span class="line">decrby	名称	减少值						<span class="comment">#给键值指定减少值,进行减少</span></span><br><span class="line">strlen	名称							<span class="comment">#统计键值长度</span></span><br><span class="line"></span><br><span class="line">append	名称	增长的字符					<span class="comment">#在指定键值后面追加字符</span></span><br><span class="line">del		名称						<span class="comment">#删除一个键</span></span><br></pre></td></tr></table></figure>
+<h3 id="◆哈希类型-Hash◆-lt-一个字符有多个字段-每个字段拥有独立的键值-gt"><a href="#◆哈希类型-Hash◆-lt-一个字符有多个字段-每个字段拥有独立的键值-gt" class="headerlink" title="◆哈希类型:Hash◆ &lt;一个字符有多个字段,每个字段拥有独立的键值&gt;"></a>◆哈希类型:Hash◆ &lt;一个字符有多个字段,每个字段拥有独立的键值&gt;</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">hset		名称	字段名	键值				<span class="comment">#创建指定字段的值</span></span><br><span class="line">hget		名称	字段名					<span class="comment">#查看指定字段</span></span><br><span class="line">hsetnx	名称	字段名	键值					<span class="comment">#创建指定字段(无责创建,有责停止)</span></span><br><span class="line"></span><br><span class="line">hmget	名称	字段1 字段2 字段3				<span class="comment">#一次性查看键中多个字段的值</span></span><br><span class="line">hmset	名称	字段名1	值1	 字段名2 值2			<span class="comment">#一次性创建多个字段与值</span></span><br><span class="line"></span><br><span class="line">hlen		名称						<span class="comment">#查一个键中有几个字段</span></span><br><span class="line">hvals	名称							<span class="comment">#查一个键中所有字段的值</span></span><br><span class="line">hgetall	名称							<span class="comment">#查指定键中的所有字段和值</span></span><br><span class="line"></span><br><span class="line">hdel		名称	字段	键值				<span class="comment">#删除指定键中的指定字段</span></span><br><span class="line">hkey		名称						<span class="comment">#查看键中所有字段</span></span><br><span class="line"></span><br><span class="line">hincrby	名称	字段	键值					<span class="comment">#增加自定字段的值</span></span><br><span class="line">linsert 	名称 before/after 数值 新值 			<span class="comment">#在数值下标的之前/之后 插入新值</span></span><br></pre></td></tr></table></figure>
+<h3 id="◆集合-Set◆-lt-交集-并集-补集-gt"><a href="#◆集合-Set◆-lt-交集-并集-补集-gt" class="headerlink" title="◆集合:Set◆ &lt;交集,并集,补集&gt;"></a>◆集合:Set◆ &lt;交集,并集,补集&gt;</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sadd	 名称 值 						<span class="comment">#添加集合</span></span><br><span class="line">smembers名称 							<span class="comment">#查看集合中所有元素</span></span><br><span class="line"></span><br><span class="line">srandmember 名称 						<span class="comment">#随机调取一个数据</span></span><br><span class="line">spop 名称 							<span class="comment">#随机删除一个数据</span></span><br><span class="line"></span><br><span class="line">srem 名称 值 							<span class="comment">#删除指定集合中指定序号的值</span></span><br><span class="line">scard 名称 									<span class="comment">#查看集合中有几个元素</span></span><br><span class="line">sismember 名称 数值 						<span class="comment">#查看数值是否在这个集合之中</span></span><br><span class="line"></span><br><span class="line">sdiff 集合1 集合2 						<span class="comment">#查两个集合的差集只看集合1的差集</span></span><br><span class="line">sdiffstore 集合3 集合1 集合2 					<span class="comment">#将两个集合的差集保存到集合3之中</span></span><br><span class="line">sinter 集合1 集合2 						<span class="comment">#查看两个集合的交集</span></span><br><span class="line"></span><br><span class="line">sinterstore 集合3 集合1 集合2 					<span class="comment">#将两个集合的交集并保存到集合3</span></span><br><span class="line">sunion 集合1 集合2 						<span class="comment">#查看两个集合的并集</span></span><br><span class="line"></span><br><span class="line">sunionstore 集合3 集合1 集合2 					<span class="comment">#将两个集合的并集保存到集合3</span></span><br><span class="line">smove 集合1 集合2 值 1 						<span class="comment">#将集合1中的值移动到集合2</span></span><br></pre></td></tr></table></figure>
+<h3 id="◆双向队列-List◆-lt-将多个字符排列起来-gt"><a href="#◆双向队列-List◆-lt-将多个字符排列起来-gt" class="headerlink" title="◆双向队列:List◆ &lt;将多个字符排列起来&gt;"></a>◆双向队列:List◆ &lt;将多个字符排列起来&gt;</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">注意：右序号顺序以数字1、2、3、4..... 从右到左序号顺序以数字-1、-2、-3......</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">lpush 名称1 数值1						<span class="comment">#创建队列并写入数值1，默认从左往右插入	</span></span><br><span class="line">rpush 名称2 数值1 数值2 数值3					<span class="comment">#创建队列并写入多个数值，默认从左往右插入</span></span><br><span class="line"></span><br><span class="line">lrange 名称 数值的下标1 数值的下标2				<span class="comment">#查看键，下标1到下标2的值</span></span><br><span class="line">linsert 名称 before/after 数值的下标 新值			<span class="comment">#在数值下标的 之前/之后 插入新值</span></span><br><span class="line"></span><br><span class="line">lset 名称 数值的下标 新值					<span class="comment">#将键的固定数值下标之后的原有值改为新值</span></span><br><span class="line">lrem 名称 -+/123[删除的个数] 已有数值				<span class="comment">#删除键中多个重复的元素</span></span><br><span class="line">ltrim 名称 0 1							<span class="comment">#删除表中除了第一个和第二个所有的元素（保留）</span></span><br><span class="line"></span><br><span class="line">lpop 名称							<span class="comment">#删除左边第一个值</span></span><br><span class="line">rpop 名称							<span class="comment">#删除右边第一个值</span></span><br><span class="line"></span><br><span class="line">rpoplpush 名称1 名称2						<span class="comment">#将指定队列1中的最后一个元素，移动到新队列2中</span></span><br><span class="line">llen 名称							<span class="comment">#查看队列长度</span></span><br><span class="line">lindex 名称 队列序号						<span class="comment">#查看指定序号的内容注意：右序号顺序以数字1、2、3、4..... 从右到左序号顺序以数字-1、-2、-3......</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">lpush 名称1 数值1						<span class="comment">#创建队列并写入数值1，默认从左往右插入	</span></span><br><span class="line">rpush 名称2 数值1 数值2 数值3					<span class="comment">#创建队列并写入多个数值，默认从左往右插入</span></span><br><span class="line"></span><br><span class="line">lrange 名称 数值的下标1 数值的下标2				<span class="comment">#查看键，下标1到下标2的值</span></span><br><span class="line">linsert 名称 before/after 数值的下标 新值			<span class="comment">#在数值下标的 之前/之后 插入新值</span></span><br><span class="line"></span><br><span class="line">lset 名称 数值的下标 新值					<span class="comment">#将键的固定数值下标之后的原有值改为新值</span></span><br><span class="line">lrem 名称 -+/123[删除的个数] 已有数值				<span class="comment">#删除键中多个重复的元素</span></span><br><span class="line">ltrim 名称 0 1							<span class="comment">#删除表中除了第一个和第二个所有的元素（保留）</span></span><br><span class="line"></span><br><span class="line">lpop 名称							<span class="comment">#删除左边第一个值</span></span><br><span class="line">rpop 名称							<span class="comment">#删除右边第一个值</span></span><br><span class="line"></span><br><span class="line">rpoplpush 名称1 名称2						<span class="comment">#将指定队列1中的最后一个元素，移动到新队列2中</span></span><br><span class="line">llen 名称							<span class="comment">#查看队列长度</span></span><br><span class="line">lindex 名称 队列序号						<span class="comment">#查看指定序号的内容</span></span><br></pre></td></tr></table></figure>
+<h3 id="◆有序集合-Zset◆-lt-相当于集合每个元素之后增加一个数字（必须为数字）相当于分数-gt"><a href="#◆有序集合-Zset◆-lt-相当于集合每个元素之后增加一个数字（必须为数字）相当于分数-gt" class="headerlink" title="◆有序集合:Zset◆ &lt;相当于集合每个元素之后增加一个数字（必须为数字）相当于分数&gt;"></a>◆有序集合:Zset◆ &lt;相当于集合每个元素之后增加一个数字（必须为数字）相当于分数&gt;</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">zadd 名称 数值 （必须是数字） 元素1 ........			<span class="comment">#创建有序集合</span></span><br><span class="line">zrange 名称 下标1 下标2						<span class="comment">#查看集合下标1到下标2的元素 zrange 名称 0 -1 相当于查看所有</span></span><br><span class="line">zrange 名称 下标1 下标2						<span class="comment"># withscores 查看集合下标1到下标2的元素。以及分值，从小到大排列</span></span><br><span class="line">zrevrange 名称 下标1 下标2					<span class="comment"># withscores 查看集合下标1到下标2的元素。以及分值，从大到小排列</span></span><br><span class="line">zrangebyscore 名称 数字1 数字2					<span class="comment">#withscores 查看从数字1到数字2范围的值</span></span><br><span class="line"></span><br><span class="line">zrem 名称 元素							<span class="comment">#删除有序集合指定的值</span></span><br><span class="line">zincrby 名称 数字 元素						<span class="comment">#每次以数字增加大小，如果没有这个集合，则创建</span></span><br><span class="line">zrank 名称 元素							<span class="comment">#按照元素的数值从小到大的顺序排列取值的下标</span></span><br><span class="line">zrevrank 名称 元素						<span class="comment">#按照元素的数值从大到小的顺序排列取值得下标</span></span><br><span class="line"></span><br><span class="line">zcard 名称							<span class="comment">#统计集合的元素个数</span></span><br><span class="line">zcount 名称 数字1 数字2						<span class="comment">#统计数字1到数字2之间的元素个数，两数之间的个数</span></span><br><span class="line"></span><br><span class="line">zremrangebyrank 名称 下标1 下标2				<span class="comment">#删除从下标1到下标2的元素</span></span><br><span class="line">zremrangbyscore 名称 数字1 数字2				<span class="comment">#删除从数字1到数字2之间的元素</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">zinterstore 名称3 集合数 名称1 名称2				<span class="comment">#取名称1和名称2的交集保存在名称3之中，取出集合之后分数叠加</span></span><br><span class="line">zunionstore 名称3 集合数 名称1 名称2				<span class="comment">#取名称1和名称2的并集保存在名称3之中，取出集合之后分数叠加</span></span><br></pre></td></tr></table></figure>
+<h3 id="◆全局命令◆-lt-常用参数-gt"><a href="#◆全局命令◆-lt-常用参数-gt" class="headerlink" title="◆全局命令◆ &lt;常用参数&gt;"></a>◆全局命令◆ &lt;常用参数&gt;</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">dbsize								<span class="comment">#统计键的数量</span></span><br><span class="line">exists 键名称							<span class="comment">#查看键是否存在</span></span><br><span class="line"></span><br><span class="line">expire 键名称 时效时间 						<span class="comment">#将键变为定时失效</span></span><br><span class="line">rename 键名称 键新名称 						<span class="comment">#将键改名</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">type</span> 键名称 							<span class="comment">#查看键是什么类型的键</span></span><br><span class="line">info 								<span class="comment">#查看数据库的版本信息</span></span><br><span class="line">select 数字							<span class="comment">#切换数据库（0-15）</span></span><br><span class="line">move 键名称1 数据库号						<span class="comment">#将当前键移动到别的数据库</span></span><br><span class="line"></span><br><span class="line">flushdb 							<span class="comment">#清空当前数据库</span></span><br><span class="line">flushall 							<span class="comment">#清空所有数据库</span></span><br></pre></td></tr></table></figure>
+<p><br></p>
+<h2 id="给Redis设置初始密码"><a href="#给Redis设置初始密码" class="headerlink" title="给Redis设置初始密码"></a>给Redis设置初始密码</h2><p>1.首先打开redis主配置文件,修改requirepass添加密码.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /usr/local/redis/redis.conf</span></span><br><span class="line"></span><br><span class="line">定位特征：<span class="comment"># masterauth &lt;master-password&gt;</span></span><br><span class="line"></span><br><span class="line">requirepass 123									<span class="comment">#设置密码为123</span></span><br></pre></td></tr></table></figure></p>
+<p>2.重启redis,并登陆测试密码可用性.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># pkill redis                                                     #关闭redis</span></span><br><span class="line">[root@localhost ~]<span class="comment"># /usr/local/redis/bin/redis-server  /usr/local/redis/redis.conf  #启动数据库</span></span><br><span class="line">[root@localhost ~]<span class="comment"># /usr/local/redis/bin/redis-cli -p 6379 -a 123                   #登陆数据库</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="数据库的备份"><a href="#数据库的备份" class="headerlink" title="数据库的备份"></a>数据库的备份</h2><p>首先默认情况下,Redis会将备份文件存储在默认登陆目录下,文件名为dump.rdb,如果要将文件转移到其他位置应该修改其配置文件</p>
+<p>1.修改备份文件保存位置,写入以下内容.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /usr/local/redis/redis.conf</span></span><br><span class="line"></span><br><span class="line">定位特征：<span class="comment"># Note that you must specify a directory here</span></span><br><span class="line"></span><br><span class="line">dir /usr/<span class="built_in">local</span>/redis								<span class="comment">#指定数据库保存位置</span></span><br></pre></td></tr></table></figure></p>
+<p>2.登陆数据库保存重启数据库即可.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># /usr/local/redis/bin/redis-cli -p 6379 -a 123456               #登陆数据库</span></span><br><span class="line">[root@localhost ~]<span class="comment"># save                                                           #保存数据</span></span><br><span class="line">[root@localhost ~]<span class="comment"># pkill redis                                                    #关闭redis</span></span><br><span class="line">[root@localhost ~]<span class="comment"># /usr/local/redis/bin/redis-server /usr/local/redis/redis.conf  #启动数据库</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="Redis实现主从同步"><a href="#Redis实现主从同步" class="headerlink" title="Redis实现主从同步"></a>Redis实现主从同步</h2><p>首先需要两台Redis服务器,分别配置主从同步即可</p>
+<p>1.配置主Redis数据库,设置相应密码并启动.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /usr/local/redis/redis.conf</span></span><br><span class="line"></span><br><span class="line">daemonize  yes									<span class="comment">#设置以守护进程运行</span></span><br><span class="line">requirepass 123456								<span class="comment">#设置主服务器密码</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># /usr/local/redis/bin/redis-server /usr/local/redis/redis.conf   #启动数据库</span></span><br><span class="line">[root@localhost ~]<span class="comment"># /usr/local/redis/bin/redis-cli -p 6379 -a 123456                #登陆数据库</span></span><br></pre></td></tr></table></figure></p>
+<p>2.配置从Redis数据库,只需要制定主Redis数据库的地址端口和密码即可.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /usr/local/redis/redis.conf</span></span><br><span class="line"></span><br><span class="line">slaveof 127.0.0.1 6379                      <span class="comment">#指定主服务器(主服务器IP +端口号)</span></span><br><span class="line">masterauth   123456                         <span class="comment">#指定密码(主服务器的密码)</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="Redis-MySQL"><a href="#Redis-MySQL" class="headerlink" title="Redis +MySQL"></a>Redis +MySQL</h2><p>1.配置好LNMP环境</p>
+<p>配置过程请参考,Linux快速安装LNMP环境,此处不再重复.</p>
+<p>2.编译安装Redis,并启动服务,无需设置密码.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment">#安装依赖</span></span><br><span class="line">[root@localhost ~]<span class="comment"># wget https://jaist.dl.sourceforge.net/project/tcl/Tcl/8.5.18/tcl8.5.18-src.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># tar -xzvf tcl8.5.18-src.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd tcl8.5.18/unix/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ./configure</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make &amp;&amp; make install</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#安装Redis</span></span><br><span class="line">[root@localhost ~]<span class="comment"># wget http://download.redis.io/releases/redis-4.0.9.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># tar -xzvf redis-4.0.9.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd redis-4.0.9/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make &amp;&amp; make test</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make PREFIX=/usr/local/redis install</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cp -a redis.conf /usr/local/redis/</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#启动Redis</span></span><br><span class="line">[root@localhost ~]<span class="comment"># /usr/local/redis/bin/redis-server /usr/local/redis/redis.conf   #启动数据库</span></span><br><span class="line">[root@localhost ~]<span class="comment"># /usr/local/redis/bin/redis-cli -p 6379                          #链接数据库</span></span><br></pre></td></tr></table></figure></p>
+<p>3.安装PHP扩展模块,并配置php.ini文件.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment">#安装扩展模块</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># tar -xzvf phpredis-master.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd phpredis-master/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># phpize         #检测php模块</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ./configure --with-php-config=/usr/bin/php-config</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make &amp;&amp; make install</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#写入并重启php-fpm</span></span><br><span class="line">[root@localhost ~]<span class="comment"># vim /etc/php.ini</span></span><br><span class="line"></span><br><span class="line">extension=redis.so</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl restart php-fpm</span></span><br></pre></td></tr></table></figure></p>
+<p>4.配置MySQL测试字段.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">MariaDB [(none)]&gt; create database mytest;</span><br><span class="line">Query OK, 1 row affected (0.01 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [(none)]&gt; use mytest;</span><br><span class="line">Database changed</span><br><span class="line"></span><br><span class="line">MariaDB [mytest]&gt; create table <span class="built_in">test</span>(id int,name char(8),primary key(id));</span><br><span class="line">Query OK, 0 rows affected (0.01 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [mytest]&gt; insert into <span class="built_in">test</span> values(1,<span class="string">'a1'</span>),(2,<span class="string">'a2'</span>),(3,<span class="string">'a3'</span>),(4,<span class="string">'a4'</span>),(5,<span class="string">'a5'</span>);</span><br><span class="line">Query OK, 5 rows affected (0.00 sec)</span><br><span class="line">Records: 5  Duplicates: 0  Warnings: 0</span><br><span class="line"></span><br><span class="line">MariaDB [mytest]&gt; select * from mytest.test;</span><br></pre></td></tr></table></figure></p>
+<p>5.创建PHP测试文件.<br><figure class="highlight php"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /usr/share/nginx/html/test.php</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">$redis = <span class="keyword">new</span> Redis();</span><br><span class="line">$redis-&gt;connect(<span class="string">'127.0.0.1'</span>,<span class="number">6379</span>) <span class="keyword">or</span> <span class="keyword">die</span> (<span class="string">"could net connect redis server"</span>);</span><br><span class="line">$query = <span class="string">"select * from test limit 4"</span>;</span><br><span class="line"><span class="keyword">for</span> ($key = <span class="number">1</span>; $key &lt; <span class="number">4</span>; $key++)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">if</span> (!$redis-&gt;get($key))</span><br><span class="line">	&#123;</span><br><span class="line">		$connect = mysql_connect(<span class="string">'127.0.0.1'</span>,<span class="string">'root'</span>,<span class="string">'123'</span>);</span><br><span class="line">		mysql_select_db(mytest);</span><br><span class="line">		$result = mysql_query($query);</span><br><span class="line">		</span><br><span class="line">		<span class="keyword">while</span> ($row = mysql_fetch_assoc($result))</span><br><span class="line">		&#123;</span><br><span class="line">			$redis-&gt;set($row[<span class="string">'id'</span>],$row[<span class="string">'name'</span>]);</span><br><span class="line">		&#125; </span><br><span class="line">		$myserver = <span class="string">'mysql'</span>;</span><br><span class="line">		<span class="keyword">break</span>;</span><br><span class="line">		&#125; </span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">		&#123;</span><br><span class="line">			$myserver = <span class="string">"redis"</span>;</span><br><span class="line">			$data[$key] = $redis-&gt;get($key);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125; </span><br><span class="line">	</span><br><span class="line">	<span class="keyword">echo</span> $myserver;</span><br><span class="line">	<span class="keyword">echo</span> <span class="string">"&lt;br&gt;"</span>;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">for</span> ($key = <span class="number">1</span>; $key &lt; <span class="number">4</span>; $key++)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">echo</span> <span class="string">"number is &lt;b&gt;&lt;font color=#FF0000&gt;$key&lt;/font&gt;&lt;/b&gt;"</span>;</span><br><span class="line">		<span class="keyword">echo</span> <span class="string">"&lt;br&gt;"</span>;</span><br><span class="line">		<span class="keyword">echo</span> <span class="string">"name is &lt;b&gt;&lt;font color=#FF0000&gt;$data[$key]&lt;/font&gt;&lt;/b&gt;"</span>;</span><br><span class="line">		<span class="keyword">echo</span> <span class="string">"&lt;br&gt;"</span>;</span><br><span class="line">	&#125;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/09/15/Linux 服务配置/Redis数据库配置与应用/">Redis 数据库配置与应用</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年09月15日 - 12:09</p>
+  <p><span>最后更新:</span>2019年04月16日 - 20:04</p>
+  <p><span>原始链接:</span><a href="/2018/09/15/Linux 服务配置/Redis数据库配置与应用/" title="Redis 数据库配置与应用">https://www.mkdirs.com/2018/09/15/Linux 服务配置/Redis数据库配置与应用/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux-服务配置/" rel="tag"> <i class="fa fa-tag"></i> Linux 服务配置</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/08/10/Linux 服务配置/使用Squid部署代理服务/" rel="next" title="使用Squid部署代理服务">
+                <i class="fa fa-chevron-left"></i> 使用Squid部署代理服务
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/09/15/Linux 服务配置/部署MooseFS分布式文件系统/" rel="prev" title="部署MooseFS分布式文件系统">
+                部署MooseFS分布式文件系统 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#编译安装Redis"><span class="nav-text">编译安装Redis</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据库操作的基本语句"><span class="nav-text">数据库操作的基本语句</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆字符串类型的操作-String◆-lt-一个字符串-对应一个数据-gt"><span class="nav-text">◆字符串类型的操作:String◆ &lt;一个字符串,对应一个数据&gt;</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆哈希类型-Hash◆-lt-一个字符有多个字段-每个字段拥有独立的键值-gt"><span class="nav-text">◆哈希类型:Hash◆ &lt;一个字符有多个字段,每个字段拥有独立的键值&gt;</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆集合-Set◆-lt-交集-并集-补集-gt"><span class="nav-text">◆集合:Set◆ &lt;交集,并集,补集&gt;</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆双向队列-List◆-lt-将多个字符排列起来-gt"><span class="nav-text">◆双向队列:List◆ &lt;将多个字符排列起来&gt;</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆有序集合-Zset◆-lt-相当于集合每个元素之后增加一个数字（必须为数字）相当于分数-gt"><span class="nav-text">◆有序集合:Zset◆ &lt;相当于集合每个元素之后增加一个数字（必须为数字）相当于分数&gt;</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆全局命令◆-lt-常用参数-gt"><span class="nav-text">◆全局命令◆ &lt;常用参数&gt;</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#给Redis设置初始密码"><span class="nav-text">给Redis设置初始密码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据库的备份"><span class="nav-text">数据库的备份</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis实现主从同步"><span class="nav-text">Redis实现主从同步</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis-MySQL"><span class="nav-text">Redis +MySQL</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

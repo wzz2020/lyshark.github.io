@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Linux 是一套免费使用和自由传播的类Unix操作系统,是一个基于POSIX和UNIX的多用户、多任务、支持多线程和多CPU的操作系统.它能运行主要的UNIX工具软件、应用程序和网络协议.它支持32位和64位硬件.Linux继承了Unix以网络为核心的设计思想,是一个性能稳定的多用户网络操作系统. 虽然使用源码编译安装可以具有提高速度个性化的定制等优点,但对于 Linux发行商来说,则不容易管理">
+<meta name="keywords" content="Linux 系统管理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux系统软件包的管理(4)">
+<meta property="og:url" content="https://www.mkdirs.com/2018/11/15/Linux 系统管理/Linux系统软件包的管理-4/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="Linux 是一套免费使用和自由传播的类Unix操作系统,是一个基于POSIX和UNIX的多用户、多任务、支持多线程和多CPU的操作系统.它能运行主要的UNIX工具软件、应用程序和网络协议.它支持32位和64位硬件.Linux继承了Unix以网络为核心的设计思想,是一个性能稳定的多用户网络操作系统. 虽然使用源码编译安装可以具有提高速度个性化的定制等优点,但对于 Linux发行商来说,则不容易管理">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-04-16T12:34:52.857Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux系统软件包的管理(4)">
+<meta name="twitter:description" content="Linux 是一套免费使用和自由传播的类Unix操作系统,是一个基于POSIX和UNIX的多用户、多任务、支持多线程和多CPU的操作系统.它能运行主要的UNIX工具软件、应用程序和网络协议.它支持32位和64位硬件.Linux继承了Unix以网络为核心的设计思想,是一个性能稳定的多用户网络操作系统. 虽然使用源码编译安装可以具有提高速度个性化的定制等优点,但对于 Linux发行商来说,则不容易管理">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/11/15/Linux 系统管理/Linux系统软件包的管理-4/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Linux系统软件包的管理(4) | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/11/15/Linux 系统管理/Linux系统软件包的管理-4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Linux系统软件包的管理(4)
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-11-15 10:02:53" itemprop="dateCreated datePublished" datetime="2018-11-15T10:02:53+08:00">2018-11-15</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-16 20:34:52" itemprop="dateModified" datetime="2019-04-16T20:34:52+08:00">2019-04-16</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Linux-系统管理/" itemprop="url" rel="index"><span itemprop="name">Linux 系统管理</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Linux 是一套免费使用和自由传播的类Unix操作系统,是一个基于POSIX和UNIX的多用户、多任务、支持多线程和多CPU的操作系统.它能运行主要的UNIX工具软件、应用程序和网络协议.它支持32位和64位硬件.Linux继承了Unix以网络为核心的设计思想,是一个性能稳定的多用户网络操作系统.</p>
+<p>虽然使用源码编译安装可以具有提高速度个性化的定制等优点,但对于 Linux发行商来说,则不容易管理软件包,毕竟不是每个人都会进行源码编译的，如果能够将软件预先在相同的硬体与系统上面编译好在发布的话,不就能够让相同的 Linux 发行版,同时拥有相投的版本了吗,如果再加上简易的安装/移除/管理等机制的话,对于软体控管就会更加简单,大多数现代类 Unix 操作系统都提供了一个集中的软件包管理机制,以帮助用户搜索、安装和管理软件,而软件通常以「包」的形式存储在仓库「repository」中,对软件包的使用和管理被称为包管理,本章我们将介绍 RedHat 系统中为我们提供的解决方案,RPM和YUM包管理机制.</p>
+<a id="more"></a>
+<p>由于自由软件的蓬勃发展,加上大型 Unix-Like 主机的强大性能,让很多软件开发者将他们的软件发布出来,后来 Linux 发展起来后,由一些企业或社区打包成为特定的发行版,RedHat就是这方面的龙头老大,但后来发现这些发行版的软件管理机制相当的混乱,没有一种统一的管理方式,这时候各大厂商开始着力研究如何有效的管理这些文件,RedHat提出了rpm和Yum仓库的解决方案,时至今日Yum已成为服务器上使用最多的软件管理工具.此外还有一种dpkg格式的软件安装包,是社区来维护的,下面我们来具体介绍这两种软件包吧.</p>
+<blockquote>
+<p>目前在 Linux 界软件安装方式最常见的有两种,分别是:</p>
+<blockquote>
+<p>● DPKG 包<br>这个机制最早是由 Debian Linux 社区所开发出来的,通过 dpkg 的包管理, Debian 打包软件就能够简单的安装,同时还能提供安装后的软件维护与更新,只要是衍生于 Debian 的其他 Linux 发行版都 dpkg 这个机制来管理软件的,包括 B2D,Ubuntu,Kali Linux 等.</p>
+<p>● RPM 包<br>这个机制最早是由 Red Hat 这家公司开发出来的,后来实在很好用,因此很多 Linux 发行版,就使用这个机制来作为软件安装的管理方式,包括 RedHat,Fedora,CentOS,SuSE等知名厂商都在使用它.</p>
+</blockquote>
+</blockquote>
+<p>如前所述,不论是DPKG还是RPM,这些软件包或多或少都会有依赖关系问题,那么各大 Linux 发行商是如何解决这个问题的呢 ?</p>
+<p>目前的 Linux 发行商,在dpkg管理机制上就开发出 APT 包管理工具, RPM 则依开发商的不同,有RedHat系统的YUM,以及SuSE系统的YOU,Mandriva系统的urpmi都在使用RPM下面我们使用的是RedHat系统,所以说使用的管理机制为 RPM 机制,所以我们使用YUM,下面就让我们来谈谈 RPM 与 YUM 的关系吧.<br><br></p>
+<h2 id="软件管理之RPM"><a href="#软件管理之RPM" class="headerlink" title="软件管理之RPM"></a>软件管理之RPM</h2><p>RPM 全名是 “RedHat Package Manager” 简称则为 RPM 顾名思义,当初这个软件管理的机制就是由 Red Hat 这家公司开发出来的 RPM 是以一种数据库记录的方式来将你所需要的软件安装到你的 Linux 系统的一套管理机制.</p>
+<p>RPM命令是RPM软件包的管理工具,rpm原本是Red Hat Linux发行版专门用来管理Linux各项套件的程序,由于它遵循GPL规则且功能强大方便,因而广受欢迎,逐渐受到其他发行版的采用,RPM套件管理方式的出现,让Linux易于安装,升级,间接提升了Linux的适用度.</p>
+<blockquote>
+<p>那么 RPM 包的特点有哪些呢 ?</p>
+<blockquote>
+<p>⦁ 有专门的工具进行安装、卸载、升级和管理软件,管理起来更加方便.<br>⦁ 安装简洁、速度快,由于使用RPM无需编译所以安装效率非常高.<br>⦁ RPM包由于经过了封装,所以我们无法直接获取其源代码.<br>⦁ 由于经过了封装,所以其功能选择性差,功能定制不灵活.</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>RPM包的命名方式有哪些 ? i386,i586,i686,noarch,x86_64代表的含义是 ?<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ls -lh</span></span><br><span class="line">total 3.1M</span><br><span class="line">-r--r--r--. 1 root root 1.8M Jan 17  2018 <span class="built_in">bind</span>-9.9.4-61.el7.x86_64.rpm</span><br><span class="line">-r--r--r--. 1 root root 1.2M Jan  8  2018 httpd-2.4.6-80.el7.x86_64.rpm</span><br><span class="line"></span><br><span class="line"><span class="built_in">bind</span>      .9.9.4    -61    .el7    .x86_64    .rpm</span><br><span class="line">↑           ↑        ↑       ↑        ↑        ↑</span><br><span class="line">①           ②        ③       ④        ⑤        ⑥</span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<blockquote>
+<p>1.软件名称：本例软件名为bind<br>2.软件版本：本例软件版本为9.9.4-61<br>3.发布次数：本例修改了61次<br>4.编译平台：编译平台有(el8=RHEL8,el7=RHEL7,el6=RHEL6)<br>5.适合平台：平台有(i386,i586,i686,noarch,x86_64)<br>6.打包格式：这里是rpm包,还有一种gpkg包.</p>
+</blockquote>
+<p>好了,看了这么多内容,下面我们开始进入正题,分别来介绍这些命令的含义吧.</p>
+<h3 id="◆RPM-安装软件◆"><a href="#◆RPM-安装软件◆" class="headerlink" title="◆RPM 安装软件◆"></a>◆RPM 安装软件◆</h3><p>因为安装软件是ROOT的工作,因此你得要是ROOT的身份才能够使用RPM这个命令的,用RPM来安装很简单,下面我们就来先看他的参数说明吧.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># rpm --help</span></span><br><span class="line"></span><br><span class="line">命令语法：[ rpm [选项] 包名称 ]</span><br><span class="line"></span><br><span class="line">        -i              <span class="comment">#安装一个新的rpm软件包</span></span><br><span class="line">        -v              <span class="comment">#显示安装详细过程</span></span><br><span class="line">        -h              <span class="comment">#以"#"号显示安装的进度</span></span><br><span class="line"></span><br><span class="line">        --nodeps        <span class="comment">#不检测依赖安装</span></span><br><span class="line">        --force         <span class="comment">#强制安装,不管软件是否存在,都强制重新安装(修复软件)</span></span><br><span class="line">        --<span class="built_in">test</span>          <span class="comment">#测试安装,不真正安装,检测软件依赖关系</span></span><br><span class="line">        --prefix        <span class="comment">#指定安装路径,不按照默认路径安装</span></span><br><span class="line">        --replacefiles  <span class="comment">#以覆盖写入方式安装</span></span><br><span class="line">        --replacepkgs   <span class="comment">#重复安装软件</span></span><br><span class="line">        --justdb        <span class="comment">#更新软件在数据库内的相关信息</span></span><br><span class="line">        --nosignature   <span class="comment">#忽略数字证书检测</span></span><br><span class="line">        --noscripts     <span class="comment">#禁止软件安装过程中执行某些命令</span></span><br></pre></td></tr></table></figure>
+<p>一般来说RPM的安装选项与参数大约就是这些了,通常建议直接使用 -ivh 就好了,如果安装的过程中发现问题,一个一个去将问题找出来,尽量不要使用 “暴力安装” ,就是通过 –force 去强制安装,因为可能会发生很多不可预期的问题,除非你很清楚的知道使用上面的参数后,安装的结果是你预期的.</p>
+<h3 id="◆RPM-查询信息◆"><a href="#◆RPM-查询信息◆" class="headerlink" title="◆RPM 查询信息◆"></a>◆RPM 查询信息◆</h3><p>RPM在查询的时候,其实查询的地方是在 /var/lib/rpm/ 这个目录下的数据文件,另外RPM也可以查询未安装的RPM软件资料,下面我们先来看看可用的参数吧.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># rpm --help</span></span><br><span class="line"></span><br><span class="line">命令语法：[ rpm [选项] 包名称 ]</span><br><span class="line"></span><br><span class="line">[查询已安装软件]</span><br><span class="line"></span><br><span class="line">        -q 软件名        <span class="comment">#查看指定软件是否安装</span></span><br><span class="line">        -qa              <span class="comment">#查看系统中所有已安装的软件</span></span><br><span class="line">        -qi 软件名       <span class="comment">#查看指定软件的详细信息</span></span><br><span class="line">        -qc 软件名       <span class="comment">#列出软件所以设置文件</span></span><br><span class="line">        -qd 软件名       <span class="comment">#列出软件所以帮助文件</span></span><br><span class="line">        -ql 软件名       <span class="comment">#查看指定软件安装的目录和文件列表</span></span><br><span class="line">        -qR 软件名       <span class="comment">#查看指定软件的依赖关系</span></span><br><span class="line">        –qf 文件或目录   <span class="comment">#查询文件或者目录,是由哪个软件包安装产生的</span></span><br><span class="line"></span><br><span class="line">[查询未安装软件]</span><br><span class="line"></span><br><span class="line">        -qpi 包全名      <span class="comment">#查看指定未安装软件的详细信息</span></span><br><span class="line">        -qpl 包全名      <span class="comment">#查看指定未安装软件的默认安装位置(预览)</span></span><br><span class="line">        -qpR 包全名      <span class="comment">#查看指定未安装软件的依赖关系</span></span><br></pre></td></tr></table></figure>
+<p><strong>实例1：</strong>使用<code>rpm -qi</code>查看一个软件的详细说明.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># rpm -qi tree</span></span><br><span class="line"></span><br><span class="line">Name        : tree</span><br><span class="line">Version     : 1.6.0</span><br><span class="line">Release     : 10.el7</span><br><span class="line">Architecture: x86_64</span><br><span class="line">Install Date: Thu 15 Nov 2018 07:18:16 AM EST</span><br><span class="line">Group       : Applications/File</span><br><span class="line">Size        : 89505</span><br><span class="line">License     : GPLv2+</span><br><span class="line">Signature   : RSA/SHA256, Wed 02 Apr 2014 05:33:48 PM EDT, Key ID 199e2f91fd431d51</span><br><span class="line">Source RPM  : tree-1.6.0-10.el7.src.rpm</span><br><span class="line">Build Date  : Mon 27 Jan 2014 12:29:58 PM EST</span><br><span class="line">Build Host  : x86-020.build.eng.bos.redhat.com</span><br><span class="line">Relocations : (not relocatable)</span><br><span class="line">Packager    : Red Hat, Inc. &lt;http://bugzilla.redhat.com/bugzilla&gt;</span><br><span class="line">Vendor      : Red Hat, Inc.</span><br><span class="line">URL         : http://mama.indstate.edu/users/ice/tree/</span><br><span class="line">Summary     : File system tree viewer</span><br><span class="line">Description :</span><br><span class="line">The tree utility recursively displays the contents of directories <span class="keyword">in</span> a</span><br><span class="line">tree-like format.  Tree is basically a UNIX port of the DOS tree</span><br><span class="line">utility.</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例2：</strong>使用<code>rpm -ql</code>查看软件安装释放的目录.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># rpm -ql tree</span></span><br><span class="line"></span><br><span class="line">/usr/bin/tree</span><br><span class="line">/usr/share/doc/tree-1.6.0</span><br><span class="line">/usr/share/doc/tree-1.6.0/LICENSE</span><br><span class="line">/usr/share/doc/tree-1.6.0/README</span><br><span class="line">/usr/share/man/man1/tree.1.gz</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例3：</strong>使用<code>rpm -qR</code>查看软件依赖关系.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># rpm -qR tree</span></span><br><span class="line"></span><br><span class="line">libc.so.6()(64bit)</span><br><span class="line">libc.so.6(GLIBC_2.14)(64bit)</span><br><span class="line">libc.so.6(GLIBC_2.2.5)(64bit)</span><br><span class="line">libc.so.6(GLIBC_2.3)(64bit)</span><br><span class="line">libc.so.6(GLIBC_2.3.4)(64bit)</span><br><span class="line">libc.so.6(GLIBC_2.4)(64bit)</span><br><span class="line">rpmlib(CompressedFileNames) &lt;= 3.0.4-1</span><br><span class="line">rpmlib(FileDigests) &lt;= 4.6.0-1</span><br><span class="line">rpmlib(PayloadFilesHavePrefix) &lt;= 4.0-1</span><br><span class="line">rtld(GNU_HASH)</span><br><span class="line">rpmlib(PayloadIsXz) &lt;= 5.2-1</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例4：</strong>使用<code>rpm -qf</code>查看指定文件是由那个包安装的.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># rpm -qf /bin/bash</span></span><br><span class="line">bash-4.2.46-30.el7.x86_64</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># rpm -qf /bin/ls</span></span><br><span class="line">coreutils-8.22-21.el7.x86_64</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例5：</strong>使用<code>rpm -qpi</code>查看一个未安装软件详细信息.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># rpm -qpi bind-9.9.4-61.el7.x86_64.rpm</span></span><br><span class="line"></span><br><span class="line">warning: <span class="built_in">bind</span>-9.9.4-61.el7.x86_64.rpm: Header V3 RSA/SHA256 Signature, key ID fd431d51: NOKEY</span><br><span class="line">Name        : <span class="built_in">bind</span></span><br><span class="line">Epoch       : 32</span><br><span class="line">Version     : 9.9.4</span><br><span class="line">Release     : 61.el7</span><br><span class="line">Architecture: x86_64</span><br><span class="line">Install Date: (not installed)</span><br><span class="line">Group       : System Environment/Daemons</span><br><span class="line">Size        : 4556343</span><br><span class="line">License     : ISC</span><br><span class="line">Signature   : RSA/SHA256, Wed 17 Jan 2018 05:28:47 AM EST, Key ID 199e2f91fd431d51</span><br><span class="line">Source RPM  : <span class="built_in">bind</span>-9.9.4-61.el7.src.rpm</span><br><span class="line">Build Date  : Wed 17 Jan 2018 04:15:44 AM EST</span><br><span class="line">Build Host  : x86-034.build.eng.bos.redhat.com</span><br><span class="line">Relocations : (not relocatable)</span><br><span class="line">Packager    : Red Hat, Inc. &lt;http://bugzilla.redhat.com/bugzilla&gt;</span><br><span class="line">Vendor      : Red Hat, Inc.</span><br><span class="line">URL         : http://www.isc.org/products/BIND/</span><br><span class="line">Summary     : The Berkeley Internet Name Domain (BIND) DNS (Domain Name System) server</span><br><span class="line">Description :</span><br><span class="line">BIND (Berkeley Internet Name Domain) is an implementation of the DNS</span><br><span class="line">(Domain Name System) protocols. BIND includes a DNS server (named),</span><br><span class="line"><span class="built_in">which</span> resolves host names to IP addresses; a resolver library</span><br><span class="line">(routines <span class="keyword">for</span> applications to use when interfacing with DNS); and</span><br><span class="line">tools <span class="keyword">for</span> verifying that the DNS server is operating properly.</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆RPM-升级软件◆"><a href="#◆RPM-升级软件◆" class="headerlink" title="◆RPM 升级软件◆"></a>◆RPM 升级软件◆</h3><p>使用 RPM 来升级真是太简单了,就以 -Uvh 或 -Fvh 来升级即可,而 -Uvh 与 -Fvh 可以用的选项与参数,跟 install 是一样的,不过 -U 与 -F 的意义还是不太一样的,下面我们来开一下它的配置信息吧.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># rpm --help</span></span><br><span class="line"></span><br><span class="line">命令语法：[ rpm [选项] 包名称 ]</span><br><span class="line"></span><br><span class="line">        -v              <span class="comment">#显示安装详细过程</span></span><br><span class="line">        -h              <span class="comment">#以"#"号显示安装的进度</span></span><br><span class="line">        -U              <span class="comment">#升级安装,若没安装,则直接安装,若安装有旧版本,则升级安装</span></span><br><span class="line">        -F              <span class="comment">#升级安装,若没安装,则不安装,必须有旧版本,才进行升级安装</span></span><br></pre></td></tr></table></figure>
+<p>由上面的说明来看,如果你想要大量的升级系统旧版本的软件,使用 -Fvh 则是比较好的作法,因为没有安装的软件不会安装到你的系统,但是需要注意的是,如果你使用的是 -Fvh ,偏偏你的机器上没有安装该软件,那么该软件并不会被安装在你的 Linux 主机上面,所以请重新以 ivh 来安装吧.</p>
+<h3 id="◆RPM-验证证书◆"><a href="#◆RPM-验证证书◆" class="headerlink" title="◆RPM 验证证书◆"></a>◆RPM 验证证书◆</h3><p>验证(Verify)的功能主要在于提供系统管理员一个有用的管理机制,作用的方式是使用 “/var/lib/rpm” 下面的数据库数据内容来比对目前 Linux 系统的环境下的所有软件信息,也就是说当你有文件不小心遗失,或者因为你误删除掉了某软件的文件,我们就用这个简单的方法来验证一下原本的软件系统吧,好让你了解这一阵子到底是修改到哪些文件,下面我们先来看一下它的常用参数吧.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># rpm --help</span></span><br><span class="line"></span><br><span class="line">命令语法：[ rpm [选项] 包名称 ]</span><br><span class="line"></span><br><span class="line">        -V 软件名        <span class="comment">#验证指定软件安装后的完整性,及文件的元数据是否发生变化</span></span><br><span class="line">        -Va             <span class="comment">#列出目前系统上所有被改动过的文件</span></span><br><span class="line">        -Vf 文件名       <span class="comment">#验证指定文件是否被修改过</span></span><br><span class="line">        -Vp 文件名       <span class="comment">#列出该软件内可能被改动过的文件</span></span><br></pre></td></tr></table></figure>
+<p>下面,我们通过验证一个文件,看其是否被修改过吧.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># rpm -Vf /etc/profile</span></span><br><span class="line"></span><br><span class="line">S.5....T.      c           /etc/profile</span><br><span class="line"><span class="comment">#↑ 验证结果     ↑ 文件类型   ↑ 文件位置</span></span><br></pre></td></tr></table></figure></p>
+<p>你会发现在文件名 /etc/profile 之前有个 c 然后就是一堆奇怪的文字了,那个c代表的是配置文件,至于最前面的八个选项,我们在下面说明一下吧:</p>
+<blockquote>
+<p>验证结果具体的信息：</p>
+<blockquote>
+<p>s ————-&gt; 文件大小是否改变<br>M ————-&gt; 权限是否被改变<br>5 ————-&gt; 文件的MD5校验和是否改变（即文件内容）<br>D ————-&gt; 主从设备号是否改变（/dev/）<br>L ————-&gt; 文件路径是否改变<br>U ————-&gt; 文件的属主是否改变<br>G ————-&gt; 文件的属组是否改变<br>T ————-&gt; 文件的修改时间是否改变</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>文件类型具体分类：</p>
+<blockquote>
+<p>c ————-&gt; 配置文件<br>d ————-&gt; 普通文件<br>g ————-&gt; 鬼子文件,该文件不应在RPM包中<br>l ————-&gt; 授权文件<br>r ————-&gt; 描述文件</p>
+</blockquote>
+</blockquote>
+<p>经过验证的功能,你就可以知道那个文件被更动过,那么如果该文件的变更是预期中的,那么就没有什么大问题,但是如果该文件是非预期的,那么是否被入侵了了呢,所以说一般配置文件被改动比较正常,要是二进制文件被改动,可能是被入侵了,我们就要提高警惕了啊,毕竟对于一个运维人员来说,背黑锅还是很不爽的啊.</p>
+<p>谈完了程序的验证后,不知道你有没有发现一个问题,那就是,验证只能验证程序内的数据与 /var/lib/rpm/里面的数据是否对应而已,如果该程序数据库所提供的数据本身就有问题,那你使用验证的手段也无法确定该软件的正确性啊.下面就出现了数字证书的概念.</p>
+<p>就像你自己的签名一样,我们的软件开发商原厂所推出的软件也会有一个厂商自己的证书系统,只是这个证书被数字化了而已,厂商可以生成一个专属的数字证书,并将该证书的公钥(public key) 放入其发行版中,当你要安装一个RPM时,系统会执行以下流程：</p>
+<blockquote>
+<p>⦁ 首先必须找到原厂的公钥文件,然后进行安装<br>⦁ 然后安装RPM包时,会去提取RPM包中的证书信息,然后和本机安装的原厂证书进行验证<br>⦁ 如果验证通过,则允许安装;如果验证不通过,则不允许安装并警告</p>
+</blockquote>
+<p>我们 RedHat 使用的数字证书系统为 GNU 计划的 GnuPG (GNU Privacy Guard, GPG)可以通过加密运算,算出独一无二的专属金钥系统或者是数字证书系统,我们也会知道首先必须要安装原厂的GPG数位证书的公钥才行,以下是数字证书的存放位置,其有两份,操作系统中有一份,原厂光盘里也有一份.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ls -lh /etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release</span></span><br><span class="line"></span><br><span class="line">-rw-r--r--. 1 root root 3.2K Feb 28  2018 /etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ls -lh /mnt/RPM-GPG-KEY-redhat-release</span></span><br><span class="line"></span><br><span class="line">-r--r--r--. 1 root root 3.2K Feb 28  2018 /mnt/RPM-GPG-KEY-redhat-release</span><br></pre></td></tr></table></figure></p>
+<p>从上面的输出结果,可知证书的位置,下面我们开始安装它.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release</span></span><br></pre></td></tr></table></figure></p>
+<p>那安装完成之后,那我们先列出金钥软件名称后,再以 -qi 的方式来查询看一下软件的信息吧.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># rpm -qa |grep pubkey</span></span><br><span class="line">gpg-pubkey-2fa658e0-45700c69</span><br><span class="line">gpg-pubkey-fd431d51-4ae0493b</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># rpm -qi gpg-pubkey-2fa658e0-45700c69</span></span><br><span class="line">Name        : gpg-pubkey</span><br><span class="line">Version     : 2fa658e0</span><br><span class="line">Release     : 45700c69</span><br><span class="line">Architecture: (none)</span><br><span class="line">Install Date: Thu 15 Nov 2018 09:39:17 AM EST</span><br><span class="line">Group       : Public Keys</span><br><span class="line">Size        : 0</span><br><span class="line">License     : pubkey</span><br><span class="line">Signature   : (none)</span><br><span class="line">Source RPM  : (none)</span><br><span class="line">Build Date  : Fri 01 Dec 2006 06:05:13 AM EST</span><br><span class="line">Build Host  : localhost</span><br><span class="line">Relocations : (not relocatable)</span><br><span class="line">Packager    : Red Hat, Inc. (auxiliary key) &lt;security@redhat.com&gt;</span><br><span class="line">Summary     : gpg(Red Hat, Inc. (auxiliary key) &lt;security@redhat.com&gt;)</span><br><span class="line">Description :</span><br><span class="line">-----BEGIN PGP PUBLIC KEY BLOCK-----</span><br><span class="line">Version: rpm-4.11.3 (NSS-3)</span><br><span class="line"></span><br><span class="line">mQGiBEVwDGkRBACwPhZIpvkjI8wV9sFTDoqyPLx1ub8Sd/w+YuI5Ovm49mvvEQVT</span><br><span class="line">VLg8FgE5JlST59AbsLDyVtRa9CxIvN5syBVrWWWtHtDnnylFBcqG/A6J3bI4E9/A</span><br><span class="line">UtSL5Zxbav0+utP6f3wOpxQrxc+WIDVgpurdBKAQ3dsobGBqypeX6FXZ5wCgou6C</span><br><span class="line">=d/bm</span><br><span class="line">-----END PGP PUBLIC KEY BLOCK-----</span><br></pre></td></tr></table></figure></p>
+<p>重点就是最后面出现的那一串乱码啦,那可是作为数字证书非常重要的一环,如果你忘记加上数字证书,很可能很多原版软件就不能让你安装,除非你利用 rpm 时选择略过证书.</p>
+<h3 id="◆RPM-卸载软件◆"><a href="#◆RPM-卸载软件◆" class="headerlink" title="◆RPM 卸载软件◆"></a>◆RPM 卸载软件◆</h3><p>移除的选项很简单,直接通过 -e 即可移除,不过经常发生由于软件依赖关系而无法卸载的情况,下面看一下他的参数吧</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># rpm --help</span></span><br><span class="line"></span><br><span class="line">命令语法：[ rpm [选项] 包名称 ]</span><br><span class="line"></span><br><span class="line">        -e        <span class="comment">#卸载软件(注意卸载顺序)</span></span><br><span class="line">        --nodeps  <span class="comment">#不检测依赖卸载</span></span><br></pre></td></tr></table></figure>
+<p>由于 RPM 软件常常会安装/移除/升级等,某些动作或许可能会导致 RPM 数据库 /var/lib/rpm/ 内的数据损坏,果真如此的话,我们可以使用 –rebuilddb 这个选项来重建一下数据库文件.</p>
+<h3 id="◆RPM-提取文件◆"><a href="#◆RPM-提取文件◆" class="headerlink" title="◆RPM 提取文件◆"></a>◆RPM 提取文件◆</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">例如提取tree目录下的文件并恢复到指定文件</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ls -l</span></span><br><span class="line">total 48</span><br><span class="line">-rw-rw-r-- 1 root root 47508 Jul  4  2014 tree-1.6.0-10.el7.x86_64.rpm</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># rpm2cpio tree-1.6.0-10.el7.x86_64.rpm |cpio -idv     #提取tree包中的文件</span></span><br><span class="line">./usr/bin/tree</span><br><span class="line">./usr/share/doc/tree-1.6.0</span><br><span class="line">./usr/share/doc/tree-1.6.0/LICENSE</span><br><span class="line">./usr/share/doc/tree-1.6.0/README</span><br><span class="line">./usr/share/man/man1/tree.1.gz</span><br><span class="line">177 blocks</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ll</span></span><br><span class="line">total 48</span><br><span class="line">-rw-rw-r-- 1 root root 47508 Jul  4  2014 tree-1.6.0-10.el7.x86_64.rpm</span><br><span class="line">drwxr-xr-x 4 root root    30 Sep 20 05:17 usr</span><br></pre></td></tr></table></figure>
+<p><br></p>
+<h2 id="软件管理之YUM"><a href="#软件管理之YUM" class="headerlink" title="软件管理之YUM"></a>软件管理之YUM</h2><p>我们在本章一开始开始的地方谈到过 YUM 这个东西,这个 YUM 是通过分析 RPM 的标头数据后,根据各软件的相关性,制作出软件依赖解决方案,然后可以自动处理软件的依赖属性问题,以解决软件安装或移除与升级的问题,事实上RedHat在放出系统时,已经搭建好了提供给全球使用的软件源,所以理论上,我们不需要处理任何设定值,只要能够连接上Intelnet,就可以使用Yum来更新数据了.</p>
+<h3 id="◆本地YUM源配置◆"><a href="#◆本地YUM源配置◆" class="headerlink" title="◆本地YUM源配置◆"></a>◆本地YUM源配置◆</h3><p>虽然Yum工具,只需要你的主机连接互联网,就可以直接使用,但是有些时候我们需要自定义Yum源实现加速,下面我们将配置一个本地Yum源,来使用光盘中的软件,其他网络配置操作步骤相同,只是会在baseurl参数后面会有所区别.</p>
+<p>1.首先默认情况下,我们的系统是没有给我们配置Yum源的,在这里我们需要在指定配置文件中创建一个以.repo结尾的文件.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cat /etc/yum.repos.d/redhat.repo</span></span><br><span class="line"></span><br><span class="line">[server]</span><br><span class="line">name=<span class="string">"redhat yum"</span></span><br><span class="line">baseurl=file:///mnt</span><br><span class="line">enabled=1</span><br><span class="line">gpgcheck=0</span><br><span class="line"></span><br><span class="line">&gt;&gt;[server]   ----------&gt; 代表容器的名称,可以随便写</span><br><span class="line">&gt;&gt;name       ----------&gt; 给容器起的名字,可自定义</span><br><span class="line">&gt;&gt;mirrorlist ----------&gt; 列出容器可以使用的镜像站点,不用可屏蔽</span><br><span class="line">&gt;&gt;baseurl    ----------&gt; 默认镜像地址,可写本地地址,也可写FTP地址</span><br><span class="line">&gt;&gt;enabled=1  ----------&gt; 就是让容器启动</span><br><span class="line">&gt;&gt;gpgcheck=0 ----------&gt; 关闭证书检测</span><br><span class="line">&gt;&gt;gpgkey     ----------&gt; 证书保存位置</span><br></pre></td></tr></table></figure></p>
+<p>2.第一步配置完毕以后,接下来我们来检查一下配置是否生效,和生成缓存文件.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum repolist all</span></span><br><span class="line">Loaded plugins: product-id, search-disabled-repos, subscription-manager</span><br><span class="line">This system is not registered with an entitlement server. You can use subscription-manager.</span><br><span class="line">repo id   repo name                                               status</span><br><span class="line">Server   <span class="string">"rhel7"</span>                                                  enabled: 5,099</span><br><span class="line">repolist: 5,099</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># yum makecache</span></span><br><span class="line">Loaded plugins: product-id, search-disabled-repos, subscription-manager</span><br><span class="line">This system is not registered with an entitlement server. You can use subscription-manager.</span><br><span class="line">Server                                                             | 4.3 kB  00:00:00</span><br><span class="line">Metadata Cache Created</span><br></pre></td></tr></table></figure></p>
+<p>到此本地Yum仓库就配置好啦,下面是一些拓展信息.</p>
+<blockquote>
+<p>阿里云Yum源仓库地址<br>wget <a href="http://mirrors.aliyun.com/repo/Centos-6.repo" target="_blank" rel="noopener">http://mirrors.aliyun.com/repo/Centos-6.repo</a><br>wget <a href="http://mirrors.aliyun.com/repo/Centos-7.repo" target="_blank" rel="noopener">http://mirrors.aliyun.com/repo/Centos-7.repo</a></p>
+</blockquote>
+<blockquote>
+<p>网易Yum源仓库地址</p>
+<p>wget <a href="http://mirrors.163.com/.help/CentOS6-Base-163.repo" target="_blank" rel="noopener">http://mirrors.163.com/.help/CentOS6-Base-163.repo</a><br>wget <a href="http://mirrors.163.com/.help/CentOS7-Base-163.repo" target="_blank" rel="noopener">http://mirrors.163.com/.help/CentOS7-Base-163.repo</a></p>
+</blockquote>
+<blockquote>
+<p>常用RPM包查询网站</p>
+<p>curl <a href="https://centos.pkgs.org/" target="_blank" rel="noopener">https://centos.pkgs.org/</a><br>curl <a href="http://rpmfind.net/" target="_blank" rel="noopener">http://rpmfind.net/</a><br>curl <a href="https://dl.fedoraproject.org/pub/" target="_blank" rel="noopener">https://dl.fedoraproject.org/pub/</a></p>
+</blockquote>
+<h3 id="◆网络YUM源配置◆"><a href="#◆网络YUM源配置◆" class="headerlink" title="◆网络YUM源配置◆"></a>◆网络YUM源配置◆</h3><p>由于RedHat默认自带的YUM源需要注册才能更新,我们想不花钱也可以更新,需要将RedHat的YUM源替换成Centos的,如果你直接使用的是Centos的系统那么这一步可以跳过了,你可以直接使用官方提供的YUM仓库地址,下面我们来看一下如何替换RHEL系统的YUM文件吧.</p>
+<p>1.查看RHEL7里面默认安装的YUM包文件,强制删除自带的YUM包,再见.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># rpm -qa |grep "yum"</span></span><br><span class="line">yum-rhn-plugin-2.0.1-10.el7.noarch</span><br><span class="line">yum-metadata-parser-1.1.4-10.el7.x86_64</span><br><span class="line">yum-3.4.3-158.el7.noarch</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># rpm -qa |grep "yum" |xargs rpm -e --nodeps</span></span><br><span class="line">[root@localhost ~]<span class="comment"># rpm -qa |grep "python-urlgrabber" |xargs rpm -e --nodeps</span></span><br><span class="line">[root@localhost ~]<span class="comment"># rpm -qa |grep yum</span></span><br></pre></td></tr></table></figure></p>
+<p>3.下载好Centos的YUM包文件,并忽略依赖,强制安装.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># wget https://mirrors.aliyun.com/centos/7/os/x86_64/Packages/yum-metadata-parser-1.1.4-10.el7.x86_64.rpm</span></span><br><span class="line">[root@localhost ~]<span class="comment"># wget https://mirrors.aliyun.com/centos/7/os/x86_64/Packages/yum-3.4.3-161.el7.centos.noarch.rpm</span></span><br><span class="line">[root@localhost ~]<span class="comment"># wget https://mirrors.aliyun.com/centos/7/os/x86_64/Packages/yum-plugin-fastestmirror-1.1.31-50.el7.noarch.rpm</span></span><br><span class="line">[root@localhost ~]<span class="comment"># wget https://mirrors.aliyun.com/centos/7/os/x86_64/Packages/yum-utils-1.1.31-50.el7.noarch.rpm</span></span><br><span class="line">[root@localhost ~]<span class="comment"># wget https://mirrors.aliyun.com/centos/7/os/x86_64/Packages/python-urlgrabber-3.10-9.el7.noarch.rpm</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ls -lh</span></span><br><span class="line">total 1.6M</span><br><span class="line">-rw-r--r-- 1 root root 109K Nov 12 10:19 python-urlgrabber-3.10-9.el7.noarch.rpm</span><br><span class="line">-rw-r--r-- 1 root root 1.3M Nov 12 10:27 yum-3.4.3-161.el7.centos.noarch.rpm</span><br><span class="line">-rw-r--r-- 1 root root  28K Jul  4  2014 yum-metadata-parser-1.1.4-10.el7.x86_64.rpm</span><br><span class="line">-rw-r--r-- 1 root root  34K Nov 12 10:27 yum-plugin-fastestmirror-1.1.31-50.el7.noarch.rpm</span><br><span class="line">-rw-r--r-- 1 root root 122K Nov 12 10:27 yum-utils-1.1.31-50.el7.noarch.rpm</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># rpm -ivh --nodeps *.rpm</span></span><br></pre></td></tr></table></figure></p>
+<p>4.更换YUM源地址,此处我们使用阿里云的源.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># rm -fr /etc/yum.repos.d/*</span></span><br><span class="line">[root@localhost ~]<span class="comment"># wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo</span></span><br></pre></td></tr></table></figure></p>
+<p>5.修改CentOS-Base.repo文件中的$releasever全部替换为版本号7,直接更新缓存即可.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/yum.repos.d/CentOS-Base.repo</span></span><br><span class="line"></span><br><span class="line">:%s/<span class="variable">$releasever</span>/7/g</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># yum clean all</span></span><br><span class="line">[root@localhost ~]<span class="comment"># yum makecache</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="◆YUM-仓库查询◆"><a href="#◆YUM-仓库查询◆" class="headerlink" title="◆YUM 仓库查询◆"></a>◆YUM 仓库查询◆</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum --help</span></span><br><span class="line"></span><br><span class="line">命令语法：[ yum [选项] 包名称 ]</span><br><span class="line"></span><br><span class="line">        -y              <span class="comment">#自动化安装,无需应答</span></span><br><span class="line">        installroot     <span class="comment">#安装时指定安装位置</span></span><br><span class="line">        search          <span class="comment">#搜索指定包文件</span></span><br><span class="line">        list            <span class="comment">#显示全部可用列表</span></span><br><span class="line">        info            <span class="comment">#显示软件相关信息</span></span><br><span class="line">        grouplist       <span class="comment">#查询所有已安装和可安装的软件组</span></span><br><span class="line">        groupinfo       <span class="comment">#列出软件组中包含的软件</span></span><br><span class="line">        provides        <span class="comment">#通过关键字查找安装包</span></span><br></pre></td></tr></table></figure>
+<p><strong>指定安装位置:</strong> 使用<code>installroot</code>指定软件安装位置.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y --installroot=/tmp/ tree</span></span><br><span class="line">Loaded plugins: product-id, search-disabled-repos, subscription-manager</span><br><span class="line">This system is not registered with an entitlement server. You can use subscription-manager.</span><br><span class="line">Server                                                                  | 4.3 kB  00:00:00</span><br><span class="line">(1/2): Server/group_gz                                                  | 145 kB  00:00:00</span><br><span class="line">(2/2): Server/primary_db                                                | 4.1 MB  00:00:00</span><br><span class="line">Package tree-1.6.0-10.el7.x86_64 already installed and latest version</span><br><span class="line">Nothing to <span class="keyword">do</span></span><br><span class="line">[root@localhost ~]<span class="comment">#</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>查软件信息:</strong> 使用<code>yum info</code>命令查看软件具体信息.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum info tree</span></span><br><span class="line">Loaded plugins: product-id, search-disabled-repos, subscription-manager</span><br><span class="line">This system is not registered with an entitlement server. You can use subscription-manager.</span><br><span class="line">Installed Packages</span><br><span class="line">Name        : tree</span><br><span class="line">Arch        : x86_64</span><br><span class="line">Version     : 1.6.0</span><br><span class="line">Release     : 10.el7</span><br><span class="line">Size        : 87 k</span><br><span class="line">Repo        : installed</span><br><span class="line">From repo   : Server</span><br><span class="line">Summary     : File system tree viewer</span><br><span class="line">URL         : http://mama.indstate.edu/users/ice/tree/</span><br><span class="line">License     : GPLv2+</span><br><span class="line">Description : The tree utility recursively displays the contents of directories <span class="keyword">in</span> a</span><br><span class="line">            : tree-like format.  Tree is basically a UNIX port of the DOS tree</span><br><span class="line">            : utility.</span><br></pre></td></tr></table></figure></p>
+<p><strong>查包文件:</strong> 使用<code>provides</code>通过关键字查询指定包,如下可知<code>tree</code>命令是由<code>tree-1.6.0-10.el7.x86_64</code>包安装的.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum provides tree</span></span><br><span class="line">Loaded plugins: product-id, search-disabled-repos, subscription-manager</span><br><span class="line">This system is not registered with an entitlement server. You can use subscription-manager.</span><br><span class="line">tree-1.6.0-10.el7.x86_64 : File system tree viewer</span><br><span class="line">Repo        : Server</span><br><span class="line"></span><br><span class="line">tree-1.6.0-10.el7.x86_64 : File system tree viewer</span><br><span class="line">Repo        : @Server</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆YUM-清理缓存◆"><a href="#◆YUM-清理缓存◆" class="headerlink" title="◆YUM 清理缓存◆"></a>◆YUM 清理缓存◆</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum clean packages       #清除缓存目录下的软件包</span></span><br><span class="line">[root@localhost ~]<span class="comment"># yum clean headers        #清除缓存目录下的 headers</span></span><br><span class="line">[root@localhost ~]<span class="comment"># yum clean oldheaders     #清除缓存目录下旧的 headers</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># yum clean all            #清除下载的临时软件包和缓存</span></span><br><span class="line">[root@localhost ~]<span class="comment"># yum makecache            #建立软件包缓存，提高查询速度</span></span><br><span class="line">[root@localhost ~]<span class="comment"># yum update               #更新所有需要更新的软件&amp;内核</span></span><br></pre></td></tr></table></figure>
+<h3 id="◆yum安装卸载◆"><a href="#◆yum安装卸载◆" class="headerlink" title="◆yum安装卸载◆"></a>◆yum安装卸载◆</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install [软件名]              #全部安装</span></span><br><span class="line">[root@localhost ~]<span class="comment"># yum groupinsall [软件组名]        #安装程序组</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># yum  remove [软件名]              #删除软件</span></span><br><span class="line">[root@localhost ~]<span class="comment"># yum  groupremove [软件组名]       #删除软件组</span></span><br></pre></td></tr></table></figure>
+<h3 id="◆yum更新升级◆"><a href="#◆yum更新升级◆" class="headerlink" title="◆yum更新升级◆"></a>◆yum更新升级◆</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum update [软件名]              #全部更新</span></span><br><span class="line">[root@localhost ~]<span class="comment"># yum check-update                #检查可更新的程序</span></span><br><span class="line">[root@localhost ~]<span class="comment"># yum upgrade [软件名]             #升级指定程序包</span></span><br><span class="line">[root@localhost ~]<span class="comment"># yum groupupdate [组软件名]       #升级程序组</span></span><br></pre></td></tr></table></figure>
+<h3 id="◆安装图形界面◆"><a href="#◆安装图形界面◆" class="headerlink" title="◆安装图形界面◆"></a>◆安装图形界面◆</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum -y install xorg*</span></span><br><span class="line">[root@localhost ~]<span class="comment"># yum -y groupinstall "X Window System"</span></span><br><span class="line">[root@localhost ~]<span class="comment"># yum -y groupinstall Desktop</span></span><br><span class="line">[root@localhost ~]<span class="comment"># yum -y groupinstall "Chinese Support"</span></span><br><span class="line">[root@localhost ~]<span class="comment"># startx</span></span><br></pre></td></tr></table></figure>
+<p><br></p>
+<h2 id="软件管理之DPKG"><a href="#软件管理之DPKG" class="headerlink" title="软件管理之DPKG"></a>软件管理之DPKG</h2><p>“dpkg”是”Debian Packager”的简写,为”Debian”专门开发的软件管理系统,方便软件的安装、更新及移除.所有源自”Debian”的”Linux “发行版都使用”dpkg”,这个机制最早是由 Debian Linux 社区所开发出来的,通过 dpkg 的包管理, Debian 打包软件就能够简单的安装,同时还能提供安装后的软件维护与更新,只要是衍生于 Debian 的其他 Linux 发行版都 dpkg 这个机制来管理软件的,dpkg本身是一个底层的工具.上层的工具,如APT,被用于从远程获取软件包以及处理复杂的软件包关系,包括 B2D,Ubuntu,Kali Linux 等.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">root@kali:~<span class="comment"># dpkg --help</span></span><br><span class="line"></span><br><span class="line">命令语法：[ dpkg [选项] 包名称 ]</span><br><span class="line"></span><br><span class="line">        -i              <span class="comment">#安装软件包</span></span><br><span class="line">        -r              <span class="comment">#删除软件包</span></span><br><span class="line">        -P              <span class="comment">#删除软件包的同时删除其配置文件</span></span><br><span class="line">        -L              <span class="comment">#显示软件包文件列表</span></span><br><span class="line">        -l              <span class="comment">#显示已安装软件包列表</span></span><br><span class="line">        -c              <span class="comment">#显示软件包内文件列表</span></span><br><span class="line">        -s              <span class="comment">#显示指定软件包的详细状态</span></span><br><span class="line">        --unpack        <span class="comment">#解开软件包</span></span><br><span class="line">        --confiugre     <span class="comment">#配置软件包</span></span><br></pre></td></tr></table></figure>
+<p><strong>安装软件:</strong> 通过使用<code>-i</code>选项安装<code>pack.deb</code>软件.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">root@kali:~<span class="comment"># dpkg -i pack.deb</span></span><br><span class="line">root@kali:~<span class="comment"># dpkg --install pack.deb</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>删除软件:</strong> 通过使用<code>-rP</code>选项删除<code>pack.deb</code>软件(包括配置文件).<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">root@kali:~<span class="comment"># dpkg -rP pack.deb</span></span><br><span class="line">root@kali:~<span class="comment"># dpkg --remove pack.deb</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>列出软件包:</strong> 通过使用<code>-l</code>选项列出系统已安装的软件包.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">root@kali:~<span class="comment"># dpkg -l</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>详细信息:</strong> 通过使用<code>-s</code>显示指定软件详细信息.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">root@kali:~<span class="comment"># dpkg -s bash</span></span><br><span class="line">root@kali:~<span class="comment"># dpkg -I bash</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="软件管理之APT"><a href="#软件管理之APT" class="headerlink" title="软件管理之APT"></a>软件管理之APT</h2><p>Advanced Package Tool又名apt-get,是一款适用于Unix和Linux系统的应用程序管理器.最初于1998年发布,用于检索应用程序并将其加载到Debian Linux系统.Apt-get成名的原因之一在于其出色的解决软件依赖关系的能力.其通常使用.deb-formatted文件,但经过修改后可以使用apt-rpm处理红帽的Package Manager(RPM)文件,Apt-get在Linux社区得到广泛使用,成为用来管理桌面、笔记本和网络的重要工具.随着Linux在企业中的普及,Windows和Mac用户了解如何使用apt-get加载应用程序有一定的好处.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">root@kali:~<span class="comment"># apt --help</span></span><br><span class="line"></span><br><span class="line">命令语法：[ apt [选项] 包名称 ]</span><br><span class="line"></span><br><span class="line">        -i              <span class="comment">#安装软件包</span></span><br><span class="line">        list            <span class="comment">#根据名称列出软件包</span></span><br><span class="line">        search          <span class="comment">#搜索软件包描述</span></span><br><span class="line">        show            <span class="comment">#显示软件包细节</span></span><br><span class="line">        install         <span class="comment">#安装软件包</span></span><br><span class="line">        remove          <span class="comment">#移除软件包</span></span><br><span class="line">        autoremove      <span class="comment">#卸载所有自动安装且不再使用的软件包</span></span><br><span class="line">        update          <span class="comment">#更新可用软件包列表</span></span><br><span class="line">        upgrade         <span class="comment">#通过安装/升级软件来更新系统</span></span><br></pre></td></tr></table></figure>
+<p><strong>apt-get安装:</strong><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">root@kali:~<span class="comment"># sudo apt-get install package             #安装包</span></span><br><span class="line">root@kali:~<span class="comment"># sudo apt-get install package --reinstall #重新安装包</span></span><br><span class="line">root@kali:~<span class="comment"># sudo apt-get -f install                  #修复安装</span></span><br><span class="line">root@kali:~<span class="comment"># sudo apt-get bulid-dep package           #安装相关的编译环境</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>apt-get删除:</strong><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">root@kali:~<span class="comment"># sudo apt-get remove package              #删除包</span></span><br><span class="line">root@kali:~<span class="comment"># sudo apt-get remove package --purge      #完全删除包</span></span><br><span class="line">root@kali:~<span class="comment"># sudo apt-get -f autoremove               #把软件附加项也删掉</span></span><br><span class="line">root@kali:~<span class="comment"># sudo apt-get autoremove --purge software #删除的更彻底些</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>apt-get更新:</strong><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">root@kali:~<span class="comment"># sudo apt-get update                       #更新源</span></span><br><span class="line">root@kali:~<span class="comment"># sudo apt-get upgrade                      #更新已安装的包</span></span><br><span class="line">root@kali:~<span class="comment"># sudo apt-get dist-upgrade                 #升级系统</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>apt-get修复:</strong><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">root@kali:~<span class="comment"># sudo apt-get source package                  #下载该包的源代码</span></span><br><span class="line">root@kali:~<span class="comment"># sudo apt-get clean &amp;&amp; sudo apt-get autoclean #清楚无用的包</span></span><br><span class="line">root@kali:~<span class="comment"># sudo apt-get check                           #检查是否有损坏的依赖</span></span><br><span class="line">root@kali:~<span class="comment"># sudo dpkg -i package                         #安装后缀是deb的</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>apt-get搜索:</strong><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">root@kali:~<span class="comment"># sudo apt-cache search package                #搜索软件包</span></span><br><span class="line">root@kali:~<span class="comment"># sudo apt-cache show package                  #获取软件包信息</span></span><br><span class="line">root@kali:~<span class="comment"># sudo apt-cache depends package               #了解使用该包依赖哪些包</span></span><br><span class="line">root@kali:~<span class="comment"># sudo apt-cache redepends package             #查看该包被哪些包依赖</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/11/15/Linux 系统管理/Linux系统软件包的管理-4/">Linux系统软件包的管理(4)</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年11月15日 - 10:11</p>
+  <p><span>最后更新:</span>2019年04月16日 - 20:04</p>
+  <p><span>原始链接:</span><a href="/2018/11/15/Linux 系统管理/Linux系统软件包的管理-4/" title="Linux系统软件包的管理(4)">https://www.mkdirs.com/2018/11/15/Linux 系统管理/Linux系统软件包的管理-4/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux-系统管理/" rel="tag"> <i class="fa fa-tag"></i> Linux 系统管理</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/14/Linux 系统管理/Linux系统用户与属组管理-3/" rel="next" title="Linux系统用户与属组管理(3)">
+                <i class="fa fa-chevron-left"></i> Linux系统用户与属组管理(3)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/11/16/Linux 系统管理/Linux系统文件压缩与备份-5/" rel="prev" title="Linux系统文件压缩与备份(5)">
+                Linux系统文件压缩与备份(5) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#软件管理之RPM"><span class="nav-text">软件管理之RPM</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆RPM-安装软件◆"><span class="nav-text">◆RPM 安装软件◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆RPM-查询信息◆"><span class="nav-text">◆RPM 查询信息◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆RPM-升级软件◆"><span class="nav-text">◆RPM 升级软件◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆RPM-验证证书◆"><span class="nav-text">◆RPM 验证证书◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆RPM-卸载软件◆"><span class="nav-text">◆RPM 卸载软件◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆RPM-提取文件◆"><span class="nav-text">◆RPM 提取文件◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#软件管理之YUM"><span class="nav-text">软件管理之YUM</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆本地YUM源配置◆"><span class="nav-text">◆本地YUM源配置◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆网络YUM源配置◆"><span class="nav-text">◆网络YUM源配置◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆YUM-仓库查询◆"><span class="nav-text">◆YUM 仓库查询◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆YUM-清理缓存◆"><span class="nav-text">◆YUM 清理缓存◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆yum安装卸载◆"><span class="nav-text">◆yum安装卸载◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆yum更新升级◆"><span class="nav-text">◆yum更新升级◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆安装图形界面◆"><span class="nav-text">◆安装图形界面◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#软件管理之DPKG"><span class="nav-text">软件管理之DPKG</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#软件管理之APT"><span class="nav-text">软件管理之APT</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

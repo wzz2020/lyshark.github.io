@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="MariaDB数据库管理系统是MySQL的一个分支,主要由开源社区在维护,采用GPL授权许可MariaDB的目的是完全兼容MySQL,包括API和命令行,MySQL由于现在闭源了,而能轻松成为MySQL的代替品.在存储引擎方面,使用XtraDB来代替MySQL的InnoDB,MariaDB由MySQL的创始人Michael Widenius主导开发,他早前曾以10亿美元的价格,将自己创建的公司My">
+<meta name="keywords" content="MariaDB">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MariaDB 实现读写分离(15)">
+<meta property="og:url" content="https://www.mkdirs.com/2018/12/30/MariaDB/MariaDB-实现读写分离-15/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="MariaDB数据库管理系统是MySQL的一个分支,主要由开源社区在维护,采用GPL授权许可MariaDB的目的是完全兼容MySQL,包括API和命令行,MySQL由于现在闭源了,而能轻松成为MySQL的代替品.在存储引擎方面,使用XtraDB来代替MySQL的InnoDB,MariaDB由MySQL的创始人Michael Widenius主导开发,他早前曾以10亿美元的价格,将自己创建的公司My">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-12-31T03:15:08.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MariaDB 实现读写分离(15)">
+<meta name="twitter:description" content="MariaDB数据库管理系统是MySQL的一个分支,主要由开源社区在维护,采用GPL授权许可MariaDB的目的是完全兼容MySQL,包括API和命令行,MySQL由于现在闭源了,而能轻松成为MySQL的代替品.在存储引擎方面,使用XtraDB来代替MySQL的InnoDB,MariaDB由MySQL的创始人Michael Widenius主导开发,他早前曾以10亿美元的价格,将自己创建的公司My">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/12/30/MariaDB/MariaDB-实现读写分离-15/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>MariaDB 实现读写分离(15) | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/12/30/MariaDB/MariaDB-实现读写分离-15/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">MariaDB 实现读写分离(15)
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-30 13:55:36" itemprop="dateCreated datePublished" datetime="2018-12-30T13:55:36+08:00">2018-12-30</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-12-31 11:15:08" itemprop="dateModified" datetime="2018-12-31T11:15:08+08:00">2018-12-31</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/MariaDB/" itemprop="url" rel="index"><span itemprop="name">MariaDB</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>MariaDB数据库管理系统是MySQL的一个分支,主要由开源社区在维护,采用GPL授权许可MariaDB的目的是完全兼容MySQL,包括API和命令行,MySQL由于现在闭源了,而能轻松成为MySQL的代替品.在存储引擎方面,使用XtraDB来代替MySQL的InnoDB,MariaDB由MySQL的创始人Michael Widenius主导开发,他早前曾以10亿美元的价格,将自己创建的公司MySQL AB卖给了SUN,此后,随着SUN被甲骨文收购MySQL的所有权也落入Oracle的手中.MariaDB名称来自MichaelWidenius的女儿Maria的名字.</p>
+<a id="more"></a>
+<p>MyCat是一个彻底开源的,面向企业应用开发的大数据库集群,支持事务、ACID、可以替代MySQL的加强版数据库,<br>其功能有可以视为MySQL集群的企业级数据库,用来替代昂贵的Oracle集群.融合了内存缓存技术、NoSQL技术、HDFS大数据的新型SQLServer,结合传统数据库和新型分布式数据仓库的新一代企业级数据库产品.<br><br></p>
+<h2 id="MyCat-读写分离"><a href="#MyCat-读写分离" class="headerlink" title="MyCat 读写分离"></a>MyCat 读写分离</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">192.168.1.5  MyCat   Server</span><br><span class="line"></span><br><span class="line">192.168.1.11 Master  主MariaDB</span><br><span class="line">192.168.1.12 Slave1  从1</span><br><span class="line">192.168.1.13 Slave2  从2</span><br></pre></td></tr></table></figure>
+<p>1.在配置读写分离前请确保你的主机有四台,分别在每台主机安装MariaDB数据库,并初始化,需要注意的是MyCat服务端的MariaDB不需要初始化.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y mariadb mariadb-server</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl start mariadb</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl enable mariadb</span></span><br></pre></td></tr></table></figure></p>
+<p>2.在MyCat服务端安装JDK环境,由于MyCat是使用Java开发的,在这里我们要先配置一下JDK环境.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># tar -xzvf jdk-8u171-linux-x64.tar.gz -C /usr/local/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># mv /usr/local/jdk1.8.0_171/ /usr/local/jdk</span></span><br><span class="line">[root@localhost ~]<span class="comment"># vim /etc/profile</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#------------------------------------------------------------------</span></span><br><span class="line"><span class="comment">#JAVA-JDK-PATH</span></span><br><span class="line"><span class="built_in">export</span> JAVA_HOME=/usr/<span class="built_in">local</span>/jdk</span><br><span class="line"><span class="built_in">export</span> JAVA_BIN=/usr/<span class="built_in">local</span>/jdk/bin</span><br><span class="line"><span class="built_in">export</span> PATH=<span class="variable">$PATH</span>:<span class="variable">$JAVA_HOME</span>/bin</span><br><span class="line"><span class="built_in">export</span> CLASSPATH=.:<span class="variable">$JAVA_HOME</span>/lib/dt.jar:<span class="variable">$JAVA_HOME</span>/lib/tools.jar</span><br><span class="line"><span class="built_in">export</span> JAVA_HOME JAVA_BIN PATH CLASSPATH</span><br><span class="line"><span class="comment">#------------------------------------------------------------------</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># source /etc/profile</span></span><br><span class="line">[root@localhost ~]<span class="comment"># java -version</span></span><br><span class="line">java version <span class="string">"1.8.0_171"</span></span><br><span class="line">Java(TM) SE Runtime Environment (build 1.8.0_171-b11)</span><br><span class="line">Java HotSpot(TM) 64-Bit Server VM (build 25.171-b11, mixed mode)</span><br></pre></td></tr></table></figure></p>
+<p>3.此步骤需要进入每一个数据库创建授权用户,也就是给MyCAT准备的使用数据库的授权用户.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mysql -uroot -p</span></span><br><span class="line">Welcome to the MariaDB monitor.  Commands end with ; or \g.</span><br><span class="line">Your MariaDB connection id is 10</span><br><span class="line">Server version: 5.5.60-MariaDB MariaDB Server</span><br><span class="line"></span><br><span class="line">Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.</span><br><span class="line"></span><br><span class="line">Type <span class="string">'help;'</span> or <span class="string">'\h'</span> <span class="keyword">for</span> <span class="built_in">help</span>. Type <span class="string">'\c'</span> to clear the current input statement.</span><br><span class="line"></span><br><span class="line">MariaDB [(none)]&gt; create database MyCatDB;</span><br><span class="line">Query OK, 1 row affected (0.00 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [(none)]&gt; grant all on MyCatDB.* to <span class="string">"MyCat"</span>@<span class="string">"%"</span> identified by <span class="string">"123123"</span>;</span><br><span class="line">Query OK, 0 rows affected (0.01 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [(none)]&gt; grant all on MyCatDB.* to <span class="string">"MyCat"</span>@<span class="string">"localhost"</span> identified by <span class="string">"123123"</span>;</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br></pre></td></tr></table></figure></p>
+<p>4.解压MyCat工具,并修改MyCat用户授权文件,写入MyCat登陆账户,这里配置文件有很多选项,我们不需要动,只需要修改以下几个地方就行.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># wget http://dl.mycat.io/1.6.5/Mycat-server-1.6.5-release-20180122220033-linux.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># tar -xzvf Mycat-server-1.6.5-release-20180122220033-linux.tar.gz -C /usr/local/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># vim /usr/local/mycat/conf/server.xml</span></span><br><span class="line"></span><br><span class="line">        &lt;user name=<span class="string">"root"</span> defaultAccount=<span class="string">"true"</span>&gt;			<span class="comment">#指定MyCat登陆用户名</span></span><br><span class="line">                &lt;property name=<span class="string">"password"</span>&gt;123456&lt;/property&gt;		<span class="comment">#指定密码</span></span><br><span class="line">                &lt;property name=<span class="string">"schemas"</span>&gt;MyCatDB&lt;/property&gt;		<span class="comment">#指定同步数据库</span></span><br><span class="line">        &lt;/user&gt;</span><br><span class="line"></span><br><span class="line">        &lt;user name=<span class="string">"user"</span>&gt;						<span class="comment">#指定MyCat登陆用户名</span></span><br><span class="line">                &lt;property name=<span class="string">"password"</span>&gt;123456&lt;/property&gt;		<span class="comment">#指定密码</span></span><br><span class="line">                &lt;property name=<span class="string">"schemas"</span>&gt;MyCatDB&lt;/property&gt;		<span class="comment">#指定同步数据库</span></span><br><span class="line">                &lt;property name=<span class="string">"readOnly"</span>&gt;<span class="literal">true</span>&lt;/property&gt;		<span class="comment">#指定只读</span></span><br><span class="line">        &lt;/user&gt;</span><br></pre></td></tr></table></figure></p>
+<p>5.修改MyCat读写分离策略,这里我们删除源文件,并自己创建一个,写入以下内容.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /usr/local/mycat/conf/schema.xml</span></span><br><span class="line"></span><br><span class="line">&lt;?xml version=<span class="string">"1.0"</span>?&gt;</span><br><span class="line">&lt;!DOCTYPE mycat:schema SYSTEM <span class="string">"schema.dtd"</span>&gt;</span><br><span class="line">&lt;mycat:schema xmlns:mycat=<span class="string">"http://io.mycat/"</span>&gt;</span><br><span class="line"></span><br><span class="line">&lt;schema name=<span class="string">"MyCatDB"</span> checkSQLschema=<span class="string">"false"</span> sqlMaxLimit=<span class="string">"100"</span> dataNode=<span class="string">"dn_test"</span>&gt; &lt;/schema&gt;</span><br><span class="line">&lt;dataNode name=<span class="string">"dn_test"</span> dataHost=<span class="string">"localhost"</span> database=<span class="string">"MyCatDB"</span> /&gt;</span><br><span class="line"></span><br><span class="line">&lt;dataHost name=<span class="string">"localhost"</span> maxCon=<span class="string">"1000"</span> minCon=<span class="string">"10"</span> balance=<span class="string">"1"</span> writeType=<span class="string">"0"</span> dbType=<span class="string">"mysql"</span> dbDriver=<span class="string">"native"</span> switchType=<span class="string">"1"</span>  slaveThreshold=<span class="string">"100"</span>&gt;</span><br><span class="line">                </span><br><span class="line">                &lt;heartbeat&gt;select user()&lt;/heartbeat&gt;</span><br><span class="line">                &lt;writeHost host=<span class="string">"Master1"</span> url=<span class="string">"192.168.1.11:3306"</span> user=<span class="string">"MyCat"</span> password=<span class="string">"123123"</span>&gt;			<span class="comment">#配置写主机</span></span><br><span class="line">                &lt;readHost host=<span class="string">"Slave1"</span> url=<span class="string">"192.168.1.12:3306"</span> user=<span class="string">"MyCat"</span> password=<span class="string">"123123"</span> /&gt;			<span class="comment">#配置读主机</span></span><br><span class="line">		&lt;readHost host=<span class="string">"Slave2"</span> url=<span class="string">"192.168.1.13:3306"</span> user=<span class="string">"MyCat"</span> password=<span class="string">"123123"</span> /&gt;			<span class="comment">#配置读主机</span></span><br><span class="line">                &lt;/writeHost&gt;</span><br><span class="line">        &lt;/dataHost&gt;</span><br><span class="line">&lt;/mycat:schema&gt;</span><br></pre></td></tr></table></figure></p>
+<p>6.启动MyCat若无报错则说明启动成功,查看端口看虚拟端口是否开启成功.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># /usr/local/mycat/bin/mycat start</span></span><br><span class="line">[root@localhost ~]<span class="comment"># netstat -an |grep "9066"                 #虚拟schema管理端口</span></span><br><span class="line">[root@localhost ~]<span class="comment"># netstat -an |grep "8066"                 #虚拟schema登陆端口</span></span><br></pre></td></tr></table></figure></p>
+<p>7.在MyCat服务主机登陆数据库,测试同步效果.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mysql -uroot -p123456 -h 127.0.0.1 -P 9066</span></span><br><span class="line"></span><br><span class="line">Welcome to the MariaDB monitor.  Commands <span class="keyword">end</span> <span class="keyword">with</span> ; or \g.</span><br><span class="line">Your MySQL connection id is 2</span><br><span class="line">Server version: 5.6.29-mycat-1.6.5-<span class="keyword">release</span><span class="number">-20180122220033</span> MyCat <span class="keyword">Server</span> (monitor)</span><br><span class="line"></span><br><span class="line">Copyright (c) <span class="number">2000</span>, <span class="number">2018</span>, <span class="keyword">Oracle</span>, MariaDB Corporation Ab <span class="keyword">and</span> others.</span><br><span class="line"></span><br><span class="line"><span class="keyword">Type</span> <span class="string">'help;'</span> <span class="keyword">or</span> <span class="string">'\h'</span> <span class="keyword">for</span> help. <span class="keyword">Type</span> <span class="string">'\c'</span> <span class="keyword">to</span> <span class="keyword">clear</span> the <span class="keyword">current</span> <span class="keyword">input</span> statement.</span><br><span class="line"></span><br><span class="line">MySQL [(<span class="keyword">none</span>)]&gt; <span class="keyword">show</span> @@heartbeat;                                                       <span class="comment">#RS_CODE为1表示心跳正常</span></span><br><span class="line">+<span class="comment">---------+-------+--------------+------+---------+-------+--------+---------+--------------+---------------------+-------+</span></span><br><span class="line">| NAME    | TYPE  | HOST         | PORT | RS_CODE | RETRY | STATUS | TIMEOUT | EXECUTE_TIME | LAST_ACTIVE_TIME    | <span class="keyword">STOP</span>  |</span><br><span class="line">+<span class="comment">---------+-------+--------------+------+---------+-------+--------+---------+--------------+---------------------+-------+</span></span><br><span class="line">| Master1 | mysql | <span class="number">192.168</span><span class="number">.1</span><span class="number">.11</span> | <span class="number">3306</span> |      <span class="number">-1</span> |     <span class="number">0</span> | idle   |       <span class="number">0</span> | <span class="number">0</span>,<span class="number">16</span>,<span class="number">16</span>      | <span class="number">2018</span><span class="number">-12</span><span class="number">-21</span> <span class="number">01</span>:<span class="number">29</span>:<span class="number">43</span> | <span class="literal">false</span> |</span><br><span class="line">| Slave1  | mysql | <span class="number">192.168</span><span class="number">.1</span><span class="number">.12</span> | <span class="number">3306</span> |      <span class="number">-1</span> |     <span class="number">0</span> | idle   |       <span class="number">0</span> | <span class="number">34</span>,<span class="number">31</span>,<span class="number">31</span>     | <span class="number">2018</span><span class="number">-12</span><span class="number">-21</span> <span class="number">01</span>:<span class="number">29</span>:<span class="number">43</span> | <span class="literal">false</span> |</span><br><span class="line">| Slave2  | mysql | <span class="number">192.168</span><span class="number">.1</span><span class="number">.13</span> | <span class="number">3306</span> |      <span class="number">-1</span> |     <span class="number">0</span> | idle   |       <span class="number">0</span> | <span class="number">1</span>,<span class="number">16</span>,<span class="number">16</span>      | <span class="number">2018</span><span class="number">-12</span><span class="number">-21</span> <span class="number">01</span>:<span class="number">29</span>:<span class="number">43</span> | <span class="literal">false</span> |</span><br><span class="line">+<span class="comment">---------+-------+--------------+------+---------+-------+--------+---------+--------------+---------------------+-------+</span></span><br><span class="line"><span class="number">3</span> <span class="keyword">rows</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MySQL [(<span class="keyword">none</span>)]&gt; <span class="keyword">show</span> @@datasource;                                                      <span class="comment">#查看读写分离的机器配置情况</span></span><br><span class="line">+<span class="comment">----------+---------+-------+--------------+------+------+--------+------+------+---------+-----------+------------+</span></span><br><span class="line">| DATANODE | NAME    | TYPE  | HOST         | PORT | W/R  | ACTIVE | IDLE | SIZE | <span class="keyword">EXECUTE</span> | READ_LOAD | WRITE_LOAD |</span><br><span class="line">+<span class="comment">----------+---------+-------+--------------+------+------+--------+------+------+---------+-----------+------------+</span></span><br><span class="line">| dn_test  | Master1 | mysql | <span class="number">192.168</span><span class="number">.1</span><span class="number">.11</span> | <span class="number">3306</span> | W    |      <span class="number">0</span> |    <span class="number">0</span> | <span class="number">1000</span> |       <span class="number">0</span> |         <span class="number">0</span> |          <span class="number">0</span> |</span><br><span class="line">| dn_test  | Slave1  | mysql | <span class="number">192.168</span><span class="number">.1</span><span class="number">.12</span> | <span class="number">3306</span> | R    |      <span class="number">0</span> |    <span class="number">0</span> | <span class="number">1000</span> |       <span class="number">0</span> |         <span class="number">0</span> |          <span class="number">0</span> |</span><br><span class="line">| dn_test  | Slave2  | mysql | <span class="number">192.168</span><span class="number">.1</span><span class="number">.13</span> | <span class="number">3306</span> | R    |      <span class="number">0</span> |    <span class="number">0</span> | <span class="number">1000</span> |       <span class="number">0</span> |         <span class="number">0</span> |          <span class="number">0</span> |</span><br><span class="line">+<span class="comment">----------+---------+-------+--------------+------+------+--------+------+------+---------+-----------+------------+</span></span><br><span class="line"><span class="number">3</span> <span class="keyword">rows</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.01</span> sec)</span><br><span class="line"></span><br><span class="line">MySQL [(<span class="keyword">none</span>)]&gt;</span><br></pre></td></tr></table></figure></p>
+<p>8.登录MyCat代理端,测试读写分离服务.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mysql -uroot -p123456 -h127.0.0.1 -P 8066</span></span><br><span class="line"></span><br><span class="line">Welcome to the MariaDB monitor.  Commands end with ; or \g.</span><br><span class="line">Your MySQL connection id is 3</span><br><span class="line">Server version: 5.6.29-mycat-1.6.5-release-20180122220033 MyCat Server (OpenCloundDB)</span><br><span class="line"></span><br><span class="line">Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.</span><br><span class="line"></span><br><span class="line">Type <span class="string">'help;'</span> or <span class="string">'\h'</span> <span class="keyword">for</span> <span class="built_in">help</span>. Type <span class="string">'\c'</span> to clear the current input statement.</span><br><span class="line"></span><br><span class="line">MySQL [(none)]&gt;</span><br><span class="line">MySQL [(none)]&gt;</span><br><span class="line">MySQL [(none)]&gt;</span><br><span class="line">MySQL [(none)]&gt; show databases;</span><br><span class="line">+----------+</span><br><span class="line">| DATABASE |</span><br><span class="line">+----------+</span><br><span class="line">| MyCatDB  |</span><br><span class="line">+----------+</span><br><span class="line">1 row <span class="keyword">in</span> <span class="built_in">set</span> (0.00 sec)</span><br><span class="line"></span><br><span class="line">MySQL [(none)]&gt;</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="Web监控页配置"><a href="#Web监控页配置" class="headerlink" title="Web监控页配置"></a>Web监控页配置</h2><p>1.首先我们先来下载MyCat以及Zookeeper.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># wget http://www-eu.apache.org/dist/zookeeper/zookeeper-3.4.12/zookeeper-3.4.12.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># wget http://dl.mycat.io/mycat-web-1.0/Mycat-web-1.0-SNAPSHOT-20170102153329-linux.tar.gz</span></span><br></pre></td></tr></table></figure></p>
+<p>2.在MyCat服务端安装JDK环境,由于MyCat是使用Java开发的,在这里我们要先配置一下JDK环境.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># tar -xzvf jdk-8u171-linux-x64.tar.gz -C /usr/local/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># mv /usr/local/jdk1.8.0_171/ /usr/local/jdk</span></span><br><span class="line">[root@localhost ~]<span class="comment"># vim /etc/profile</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#------------------------------------------------------------------</span></span><br><span class="line"><span class="comment">#JAVA-JDK-PATH</span></span><br><span class="line"><span class="built_in">export</span> JAVA_HOME=/usr/<span class="built_in">local</span>/jdk</span><br><span class="line"><span class="built_in">export</span> JAVA_BIN=/usr/<span class="built_in">local</span>/jdk/bin</span><br><span class="line"><span class="built_in">export</span> PATH=<span class="variable">$PATH</span>:<span class="variable">$JAVA_HOME</span>/bin</span><br><span class="line"><span class="built_in">export</span> CLASSPATH=.:<span class="variable">$JAVA_HOME</span>/lib/dt.jar:<span class="variable">$JAVA_HOME</span>/lib/tools.jar</span><br><span class="line"><span class="built_in">export</span> JAVA_HOME JAVA_BIN PATH CLASSPATH</span><br><span class="line"><span class="comment">#------------------------------------------------------------------</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># source /etc/profile</span></span><br><span class="line">[root@localhost ~]<span class="comment"># java -version</span></span><br><span class="line">java version <span class="string">"1.8.0_171"</span></span><br><span class="line">Java(TM) SE Runtime Environment (build 1.8.0_171-b11)</span><br><span class="line">Java HotSpot(TM) 64-Bit Server VM (build 25.171-b11, mixed mode)</span><br></pre></td></tr></table></figure></p>
+<p>3.配置MariaDB开启<code>lower_case_table_names</code>选项,每台都要开启.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y mariadb mariadb-server</span></span><br><span class="line">[root@localhost ~]<span class="comment"># vim /etc/my.cnf</span></span><br><span class="line"></span><br><span class="line">[mysqld]</span><br><span class="line">lower_case_table_names = 1</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl restart mariadb</span></span><br></pre></td></tr></table></figure></p>
+<p>4.安装zookeeper,其主要用来统计数据.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># tar -xzvf zookeeper-3.4.12.tar.gz -C /usr/local/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd /usr/local/zookeeper-3.4.12/conf/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cp zoo_sample.cfg zoo.cfg</span></span><br><span class="line">[root@localhost ~]<span class="comment"># vim zoo.cfg</span></span><br><span class="line"></span><br><span class="line">dataDir=/usr/<span class="built_in">local</span>/...</span><br><span class="line">dataLogDir=/usr/<span class="built_in">local</span>/...</span><br></pre></td></tr></table></figure></p>
+<p>5.运行zookeeper<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cd /usr/local/zookeeper-3.4.12/bin/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ./zkServer.sh start</span></span><br><span class="line">[root@localhost ~]<span class="comment"># netstat -ant | grep 2181</span></span><br><span class="line">tcp  0    0 :::2181       :::*           LISTEN </span><br><span class="line"></span><br><span class="line">如果出现错误：nohup: failed to run <span class="built_in">command</span> `java’: No such file or directory</span><br><span class="line">可以在zkServer.sh中的首行添加如下代码</span><br><span class="line"></span><br><span class="line"><span class="built_in">export</span> JAVA_HOME=/usr/lib/jdk</span><br><span class="line"><span class="built_in">export</span> PATH=<span class="variable">$JAVA_HOME</span>/bin:<span class="variable">$PATH</span></span><br></pre></td></tr></table></figure></p>
+<p>6.最后一步,安装并运行Mycat-Web<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># tar -xzvf Mycat-web-1.0-SNAPSHOT-20170102153329-linux.tar.gz -C /usr/local</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd /usr/local/mycat-web</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ./start.sh &amp;</span></span><br><span class="line">[root@localhost ~]<span class="comment"># netstat  -an | grep "8082"</span></span><br><span class="line">tcp  0    0 :::8082       :::*           LISTEN </span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># curl http://localhost:8082/mycat</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/12/30/MariaDB/MariaDB-实现读写分离-15/">MariaDB 实现读写分离(15)</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年12月30日 - 13:12</p>
+  <p><span>最后更新:</span>2018年12月31日 - 11:12</p>
+  <p><span>原始链接:</span><a href="/2018/12/30/MariaDB/MariaDB-实现读写分离-15/" title="MariaDB 实现读写分离(15)">https://www.mkdirs.com/2018/12/30/MariaDB/MariaDB-实现读写分离-15/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/MariaDB/" rel="tag"> <i class="fa fa-tag"></i> MariaDB</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/30/MariaDB/MariaDB-主从同步与热备-14/" rel="next" title="MariaDB 主从同步与热备(14)">
+                <i class="fa fa-chevron-left"></i> MariaDB 主从同步与热备(14)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/01/07/Python/Python-语言简介与入门-1/" rel="prev" title="Python 语言简介与入门(1)">
+                Python 语言简介与入门(1) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#MyCat-读写分离"><span class="nav-text">MyCat 读写分离</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Web监控页配置"><span class="nav-text">Web监控页配置</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

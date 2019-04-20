@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Shell 是一个用 C 语言编写的程序,它是用户使用 Linux 的桥梁,Shell 既是一种命令语言,又是一种程序设计语言.Shell 是指一种应用程序,这个应用程序提供了一个界面,用户通过这个界面访问操作系统内核的服务.Ken Thompson 的 sh 是第一种 Unix Shell,Windows Explorer 是一个典型的图形界面 Shell,本笔记主要记录各种原创脚本,各种运维常">
+<meta name="keywords" content="Linux 系统管理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux Shell常用脚本整理">
+<meta property="og:url" content="https://www.mkdirs.com/2018/09/18/Linux 系统管理/Linux Shell常用脚本整理/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="Shell 是一个用 C 语言编写的程序,它是用户使用 Linux 的桥梁,Shell 既是一种命令语言,又是一种程序设计语言.Shell 是指一种应用程序,这个应用程序提供了一个界面,用户通过这个界面访问操作系统内核的服务.Ken Thompson 的 sh 是第一种 Unix Shell,Windows Explorer 是一个典型的图形界面 Shell,本笔记主要记录各种原创脚本,各种运维常">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-04-16T12:35:40.553Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux Shell常用脚本整理">
+<meta name="twitter:description" content="Shell 是一个用 C 语言编写的程序,它是用户使用 Linux 的桥梁,Shell 既是一种命令语言,又是一种程序设计语言.Shell 是指一种应用程序,这个应用程序提供了一个界面,用户通过这个界面访问操作系统内核的服务.Ken Thompson 的 sh 是第一种 Unix Shell,Windows Explorer 是一个典型的图形界面 Shell,本笔记主要记录各种原创脚本,各种运维常">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/09/18/Linux 系统管理/Linux Shell常用脚本整理/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Linux Shell常用脚本整理 | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/09/18/Linux 系统管理/Linux Shell常用脚本整理/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Linux Shell常用脚本整理
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-09-18 21:01:01" itemprop="dateCreated datePublished" datetime="2018-09-18T21:01:01+08:00">2018-09-18</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-16 20:35:40" itemprop="dateModified" datetime="2019-04-16T20:35:40+08:00">2019-04-16</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Linux-系统管理/" itemprop="url" rel="index"><span itemprop="name">Linux 系统管理</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Shell 是一个用 C 语言编写的程序,它是用户使用 Linux 的桥梁,Shell 既是一种命令语言,又是一种程序设计语言.<br>Shell 是指一种应用程序,这个应用程序提供了一个界面,用户通过这个界面访问操作系统内核的服务.<br>Ken Thompson 的 sh 是第一种 Unix Shell,Windows Explorer 是一个典型的图形界面 Shell,本笔记主要记录各种原创脚本,各种运维常用的运维脚本,目的是方便后期使用,如果你觉得好可以使用,但是转载请保留出处.</p>
+<a id="more"></a>
+<p><br><br><b>轮询检测Apache状态并启用钉钉报警◆</b><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line">shell_user=<span class="string">"root"</span></span><br><span class="line">shell_domain=<span class="string">"apache"</span></span><br><span class="line"></span><br><span class="line">shell_list=<span class="string">"/root/ip_list"</span></span><br><span class="line">shell_row=`cat <span class="variable">$shell_list</span> |wc -l`</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">trans_text</span></span>()&#123;</span><br><span class="line">text=<span class="variable">$1</span></span><br><span class="line"></span><br><span class="line">curl <span class="string">'https://oapi.dingtalk.com/robot/send?access_token=b4fcf5862088a1bc7f2bf66a'</span> -H<span class="string">'Content-Type: application/json'</span> -d<span class="string">'&#123;　　　　　　#指定钉钉机器人hook地址</span></span><br><span class="line"><span class="string">            "msgtype": "text", </span></span><br><span class="line"><span class="string">            "text": &#123;</span></span><br><span class="line"><span class="string">            "content": "'</span><span class="string">"<span class="variable">$text</span>"</span><span class="string">'"</span></span><br><span class="line"><span class="string">        &#125;, </span></span><br><span class="line"><span class="string">&#125;'</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">apache_check_80</span></span>()&#123;</span><br><span class="line">    ip=<span class="variable">$1</span></span><br><span class="line">    URL=<span class="string">"http://<span class="variable">$ip</span>/index.html"</span></span><br><span class="line">    HTTP_CODE=`curl -o /dev/null -s -w <span class="string">"%&#123;http_code&#125;"</span> <span class="string">"<span class="variable">$&#123;URL&#125;</span>"</span>`</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> [ <span class="variable">$HTTP_CODE</span> != 200 ]</span><br><span class="line">        <span class="keyword">then</span></span><br><span class="line">            trans_text <span class="string">"</span></span><br><span class="line"><span class="string">                            =================================================================</span></span><br><span class="line"><span class="string">                                \n <span class="variable">$ip</span> Apache 服务器状态异常，网页返回码: '"</span><span class="variable">$HTTP_CODE</span><span class="string">"' 请及时处理 ! \n</span></span><br><span class="line"><span class="string">                                ================================================================= \n"</span></span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> <span class="literal">true</span></span><br><span class="line"><span class="keyword">do</span></span><br><span class="line"></span><br><span class="line">shell_list=<span class="string">"/root/ip_list"</span></span><br><span class="line">shell_row=`cat <span class="variable">$shell_list</span> |wc -l`</span><br><span class="line">    <span class="keyword">for</span> temp <span class="keyword">in</span> `seq 1 <span class="variable">$shell_row</span>`</span><br><span class="line">    <span class="keyword">do</span></span><br><span class="line">            Ip_Addr=`cat <span class="variable">$shell_list</span> |head -n <span class="variable">$temp</span> |tail -n 1`</span><br><span class="line">        apache_check_80 <span class="variable">$Ip_Addr</span></span><br><span class="line">    <span class="keyword">done</span></span><br><span class="line"></span><br><span class="line">    sleep 10</span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure></p>
+<p><br><br><b>一台监控主机，一台被监控主机。被监控主机分区使用率大于80%，就发告警邮件。放到crontab里面，每10分钟执行一次。</b><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment">#！/bin/bash</span></span><br><span class="line"></span><br><span class="line">FSMAX=<span class="string">"80"</span>     </span><br><span class="line">remote_user=<span class="string">'root'</span>  </span><br><span class="line">remote_ip=(IP地址列表)  </span><br><span class="line">ip_num=<span class="string">'0'</span>      </span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> [ <span class="string">"<span class="variable">$ip_num</span>"</span> -le <span class="string">"<span class="variable">$(expr $&#123;#remote_ip[@]&#125; -l)</span>"</span>]  </span><br><span class="line"><span class="keyword">do</span>  </span><br><span class="line">read_num=<span class="string">'1'</span>           </span><br><span class="line">        ssh <span class="string">"<span class="variable">$remote_user</span>"</span>@<span class="string">"<span class="variable">$&#123;remote_ip[$ip_num]&#125;</span>"</span>  df -h &gt; /tmp/diskcheck_tmp</span><br><span class="line">        grep <span class="string">'^/dev/*'</span>  /tmp/diskcheck_tmp | awk <span class="string">'&#123;print $5&#125;'</span>|sed <span class="string">'s/\%//g'</span>  &gt; /tmp/diskcheck_num_tmp</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> [ <span class="string">"<span class="variable">$read_num</span>"</span> -le $(wc -l &lt; /tmp/diskcheck_num_tmp) ]  </span><br><span class="line">        <span class="keyword">do</span></span><br><span class="line">                size=$(sed -n <span class="string">"<span class="variable">$read_num</span>"</span> <span class="string">'p'</span>  /tmp/diskcheck_num_tmp)</span><br><span class="line">                <span class="keyword">if</span> [ <span class="string">"size"</span> -gt <span class="string">"<span class="variable">$FSMAX</span>"</span> ]</span><br><span class="line">                <span class="keyword">then</span>                       </span><br><span class="line">                        $(grep <span class="string">'^/dev/*'</span>  /tmp/diskcheck_tmp |sed -n <span class="variable">$read_num</span><span class="string">'p'</span>  &gt; /tmp/disk_check_mail)</span><br><span class="line">                        $(<span class="built_in">echo</span> <span class="variable">$&#123;remote_ip[$ip_num]&#125;</span>) &gt;&gt; /tmp/disk_check_mail)</span><br><span class="line">                        $(mail  -s <span class="string">"diskcheck_alert"</span>  admin  &lt;  /tmp/disk_check_mail)</span><br><span class="line">                <span class="keyword">fi</span>                         </span><br><span class="line"></span><br><span class="line">                read_num=$(expr  <span class="variable">$read_num</span> + 1)</span><br><span class="line">        <span class="keyword">done</span>               </span><br><span class="line"></span><br><span class="line">        ip_num=$(expr  <span class="variable">$ip_num</span> + 1)</span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure></p>
+<p><br><br><b>监控主机的磁盘空间,当使用空间超过90％就通过发mail来发警告</b><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash  </span></span><br><span class="line"><span class="comment">#monitor available disk space  </span></span><br><span class="line"><span class="comment">#提取本服务器的IP地址信息    </span></span><br><span class="line">IP=`ifconfig eth0 | grep <span class="string">"inet addr"</span> | cut -f 2 -d <span class="string">":"</span> | cut -f 1 -d <span class="string">" "</span>`      </span><br><span class="line">SPACE=` df -hP | awk <span class="string">'&#123;print int($5)&#125;'</span>`  </span><br><span class="line"><span class="keyword">if</span> [ <span class="variable">$SPACE</span> -ge 90 ]  </span><br><span class="line"><span class="keyword">then</span>  </span><br><span class="line">  <span class="built_in">echo</span> <span class="string">"<span class="variable">$IP</span> 服务器 磁盘空间 使用率已经超过90%，请及时处理。"</span>|mail -s <span class="string">"<span class="variable">$IP</span> 服务器硬盘告警"</span>   fty89@163.com  </span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure></p>
+<p><br><br><b>实现FTP自动上传</b><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#! /bin/bash</span></span><br><span class="line"></span><br><span class="line">ftp -n &lt;&lt; END_FTP  </span><br><span class="line">open 192.168.1.22  </span><br><span class="line">user  <span class="built_in">test</span> testing      //用户名<span class="built_in">test</span>  密码：testing  </span><br><span class="line">binary  </span><br><span class="line">prompt  off    //关闭提示  </span><br><span class="line">mput   files     //上传files文件  </span><br><span class="line">close  </span><br><span class="line"><span class="built_in">bye</span>  </span><br><span class="line">END_FTP</span><br></pre></td></tr></table></figure></p>
+<p><br><br><b>mysqlbak.sh备份数据库目录脚本</b><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line">DAY=`date +%Y%m%d`</span><br><span class="line">SIZE=`du -sh /var/lib/mysql`</span><br><span class="line"><span class="built_in">echo</span> <span class="string">"Date: <span class="variable">$DAY</span>"</span> &gt;&gt; /tmp/dbinfo.txt</span><br><span class="line"><span class="built_in">echo</span> <span class="string">"Data Size: <span class="variable">$SIZE</span>"</span> &gt;&gt; /tmp/dbinfo.txt</span><br><span class="line"><span class="built_in">cd</span> /opt/dbbak &amp;&gt; /dev/null || mkdir /opt/dbbak</span><br><span class="line">tar zcf /opt/dbbak/mysqlbak-<span class="variable">$&#123;DAY&#125;</span>.tar.gz /var/lib/mysql /tmp/dbinfo.txt &amp;&gt; /dev/null</span><br><span class="line">rm -f /tmp/dbinfo.txt</span><br><span class="line"></span><br><span class="line">crontab<span class="_">-e</span></span><br><span class="line">55 23 */3 * * /opt/dbbak/dbbak.sh</span><br></pre></td></tr></table></figure></p>
+<p><br><br><b>打印彩虹</b><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">declare</span> -a ary</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> `seq 40 49`</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line"></span><br><span class="line">    ary[<span class="variable">$i</span>]=<span class="string">" "</span></span><br><span class="line">    <span class="built_in">echo</span> -en <span class="string">"\e[<span class="variable">$i</span>;5m <span class="variable">$&#123;ary[@]&#125;</span>\e[;0m"</span></span><br><span class="line">    </span><br><span class="line"><span class="keyword">done</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="built_in">declare</span> -a ary</span><br><span class="line"><span class="keyword">for</span> s <span class="keyword">in</span> `seq 1 10000`</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> `seq 40 49`</span><br><span class="line">    <span class="keyword">do</span></span><br><span class="line">        ary[<span class="variable">$i</span>]=<span class="string">" "</span></span><br><span class="line">        <span class="built_in">echo</span> -en <span class="string">"\e[<span class="variable">$i</span>;5m <span class="variable">$&#123;ary[@]&#125;</span>\e[;0m"</span>    </span><br><span class="line">    <span class="keyword">done</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure></p>
+<p><br><br><b>打印菱形</b><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (( i = 1; i &lt; 12; i++))</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">    <span class="keyword">if</span> [[ <span class="variable">$i</span> -le 6 ]]</span><br><span class="line">    <span class="keyword">then</span></span><br><span class="line">        <span class="keyword">for</span> ((j = $((12-i)); j &gt; i; j--))</span><br><span class="line">        <span class="keyword">do</span></span><br><span class="line">            <span class="built_in">echo</span> -n <span class="string">" "</span></span><br><span class="line">        <span class="keyword">done</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> ((m = 1; m &lt;= $((2*i-1)); m++))</span><br><span class="line">        <span class="keyword">do</span></span><br><span class="line">             <span class="built_in">echo</span> -n <span class="string">"* "</span></span><br><span class="line">        <span class="keyword">done</span></span><br><span class="line">            <span class="built_in">echo</span> <span class="string">""</span></span><br><span class="line"><span class="comment">#*****************************************************************************</span></span><br><span class="line">    <span class="keyword">elif</span> [[ <span class="variable">$i</span> -gt 6 ]]</span><br><span class="line">    <span class="keyword">then</span></span><br><span class="line">        n=$((12-i))</span><br><span class="line">        <span class="keyword">for</span> ((j = $((12-n)); j &gt; n; j--))</span><br><span class="line">        <span class="keyword">do</span></span><br><span class="line">            <span class="built_in">echo</span> -n <span class="string">" "</span></span><br><span class="line">        <span class="keyword">done</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> ((m = 1; m &lt;= $((2*n-1)); m++))</span><br><span class="line">        <span class="keyword">do</span></span><br><span class="line">                        <span class="built_in">echo</span> -n <span class="string">"* "</span></span><br><span class="line">        <span class="keyword">done</span></span><br><span class="line">            <span class="built_in">echo</span> <span class="string">""</span></span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure></p>
+<p><br><br><b>expect实现远程登陆自动交互</b><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/expect -f</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">set</span> ipaddress [lindex <span class="variable">$argv</span> 0]</span><br><span class="line"></span><br><span class="line"><span class="built_in">set</span> passwd [lindex <span class="variable">$argv</span> 1]</span><br><span class="line"></span><br><span class="line"><span class="built_in">set</span> timeout 30</span><br><span class="line"></span><br><span class="line">spawn ssh-copy-id root@<span class="variable">$ipaddress</span></span><br><span class="line"></span><br><span class="line">expect &#123;</span><br><span class="line"></span><br><span class="line"><span class="string">"yes/no"</span> &#123; send <span class="string">"yes\r"</span>;exp_continue &#125;</span><br><span class="line"></span><br><span class="line"><span class="string">"password:"</span> &#123; send <span class="string">"<span class="variable">$passwd</span>\r"</span> &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">#expect "*from*"</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#send "mkdir -p ./tmp/testfile\r"</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#send "exit\r"</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#expect "#" #i# 命令运行完, 你要期待一个结果, 结果就是返回shell提示符了(是# 或者$)</span></span><br></pre></td></tr></table></figure></p>
+<p><br><br><b>http心跳检测</b><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">URL=<span class="string">"http://192.168.22.191/index.html"</span></span><br><span class="line"></span><br><span class="line">THHP_CODE=`curl -o /dev/null -s -w <span class="string">"%&#123;http_code&#125;"</span> <span class="string">"<span class="variable">$&#123;URL&#125;</span>"</span>`</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> [ <span class="variable">$HTTP_CODE</span> != 200 ]</span><br><span class="line"><span class="keyword">then</span></span><br><span class="line">    <span class="built_in">echo</span> -e <span class="string">"apache code:"</span><span class="variable">$HTTP_CODE</span><span class="string">""</span></span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure></p>
+<p><br><br><b>PV过量自动实现防火墙封IP</b><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">log</span>=/tmp/tmp.log</span><br><span class="line"></span><br><span class="line">[ -f <span class="variable">$log</span> ] || touch <span class="variable">$log</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> add_iptales()</span><br><span class="line">&#123;</span><br><span class="line">        <span class="keyword">while</span> <span class="built_in">read</span> line</span><br><span class="line">        <span class="keyword">do</span></span><br><span class="line">                ip=`<span class="built_in">echo</span> <span class="variable">$line</span> |awk <span class="string">'&#123;print $2&#125;'</span>`</span><br><span class="line">                count=`<span class="built_in">echo</span> <span class="variable">$line</span> |awk <span class="string">'&#123;print $1&#125;'</span>`</span><br><span class="line">                        <span class="keyword">if</span> [ <span class="variable">$count</span> -gt 100 ] &amp;&amp; [ `iptables -L -n |grep <span class="string">"<span class="variable">$ip</span>"</span> |wc -l` -lt 1 ]</span><br><span class="line">                                <span class="keyword">then</span></span><br><span class="line">                                        iptables -I INPUT -s <span class="variable">$ip</span> -j DROP</span><br><span class="line">                                        <span class="built_in">echo</span> -e <span class="string">"<span class="variable">$list</span> isdropped"</span>&gt;&gt;/tmp/droplist.log</span><br><span class="line">                        <span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">done</span>&lt;<span class="variable">$log</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> main()</span><br><span class="line">&#123;</span><br><span class="line">        <span class="keyword">while</span> <span class="literal">true</span></span><br><span class="line">        <span class="keyword">do</span></span><br><span class="line">                netstat -an|grep <span class="string">"EST"</span> |awk -F <span class="string">'[:]+'</span> <span class="string">'&#123;print $6&#125;'</span>|sort |uniq -c &gt;<span class="variable">$log</span></span><br><span class="line">                add_iptales</span><br><span class="line">                sleep 180</span><br><span class="line">        <span class="keyword">done</span></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">main</span><br></pre></td></tr></table></figure></p>
+<p><br><br><b>shell实现自动安装</b><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> MyInstall</span><br><span class="line">&#123;</span><br><span class="line">        <span class="keyword">if</span> ! rpm -qa |grep -q <span class="string">"^<span class="variable">$1</span>"</span></span><br><span class="line">        <span class="keyword">then</span></span><br><span class="line"></span><br><span class="line">                yum install <span class="variable">$1</span></span><br><span class="line">                <span class="keyword">if</span> [ $? -eq 0 ]</span><br><span class="line">                <span class="keyword">then</span></span><br><span class="line">                        <span class="built_in">echo</span> -e <span class="string">"<span class="variable">$i</span> install is ok\n"</span></span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                        <span class="built_in">echo</span> -e <span class="string">"<span class="variable">$1</span> install no\n"</span></span><br><span class="line">                <span class="keyword">fi</span></span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">                <span class="built_in">echo</span> -e <span class="string">"yi an zhuang ! \n"</span></span><br><span class="line">        <span class="keyword">fi</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> ins <span class="keyword">in</span> mysql php httpd</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">        MyInstall <span class="variable">$ins</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure></p>
+<p><br><br><b>shell实现插入排序</b><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">declare</span> -a array</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> `seq 1 10`</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">    array[<span class="variable">$i</span>]=<span class="variable">$RANDOM</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">done</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> -e <span class="string">"Array_1:  <span class="variable">$&#123;array[@]&#125;</span>"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (( x=1;x&lt;=9;x++ ))</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">    <span class="keyword">for</span>(( y=1;y&lt;=9;y++ ))</span><br><span class="line">    <span class="keyword">do</span></span><br><span class="line">        <span class="keyword">if</span> [ <span class="variable">$&#123;array[$y]&#125;</span> -gt <span class="variable">$&#123;array[$y+1]&#125;</span> ]</span><br><span class="line">        <span class="keyword">then</span></span><br><span class="line">            temp=<span class="variable">$&#123;array[$y]&#125;</span></span><br><span class="line">            array[<span class="variable">$y</span>]=<span class="variable">$&#123;array[$y+1]&#125;</span></span><br><span class="line">            array[<span class="variable">$y</span>+1]=<span class="variable">$temp</span></span><br><span class="line">        <span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">done</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">done</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> -e <span class="string">"Array_2:  <span class="variable">$&#123;array[@]&#125;</span>"</span></span><br></pre></td></tr></table></figure></p>
+<p><br><br><b>bash实现动态进度条</b><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line">i=0</span><br><span class="line">bar=<span class="string">''</span></span><br><span class="line">index=0</span><br><span class="line">arr=( <span class="string">"|"</span> <span class="string">"/"</span> <span class="string">"-"</span> <span class="string">"\\"</span> )</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> [ <span class="variable">$i</span> -le 100 ]</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">    <span class="built_in">let</span> index=index%4</span><br><span class="line">    <span class="built_in">printf</span> <span class="string">"[%-100s][%d%%][\e[43;46;1m%c\e[0m]\r"</span> <span class="string">"<span class="variable">$bar</span>"</span> <span class="string">"<span class="variable">$i</span>"</span> <span class="string">"<span class="variable">$&#123;arr[$index]&#125;</span>"</span></span><br><span class="line">    <span class="built_in">let</span> i++</span><br><span class="line">    <span class="built_in">let</span> index++</span><br><span class="line">    usleep 30000</span><br><span class="line">    bar+=<span class="string">'#'</span></span><br><span class="line">    clear</span><br><span class="line"><span class="keyword">done</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">printf</span> <span class="string">"\n"</span></span><br></pre></td></tr></table></figure></p>
+<p><br><br><b>根据文件内容创建账号</b><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> Uname <span class="keyword">in</span> `cat /root/useradd.txt |gawk <span class="string">'&#123;print $1&#125;'</span>`</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line"></span><br><span class="line">                id <span class="variable">$Uname</span> &amp;&gt; /dev/null</span><br><span class="line">                <span class="keyword">if</span> [ $? -eq 0 ]</span><br><span class="line">                <span class="keyword">then</span></span><br><span class="line">                        <span class="built_in">echo</span> -e <span class="string">"这个账号已存在!"</span></span><br><span class="line">                        <span class="built_in">continue</span></span><br><span class="line">                <span class="keyword">fi</span></span><br><span class="line">        <span class="keyword">for</span> Upasswd <span class="keyword">in</span> `cat /root/useradd.txt |gawk <span class="string">'&#123;print $2&#125;'</span>`</span><br><span class="line">        <span class="keyword">do</span></span><br><span class="line">                useradd <span class="variable">$Uname</span> &amp;&gt; /dev/null</span><br><span class="line">                <span class="built_in">echo</span> <span class="string">"<span class="variable">$Upasswd</span>"</span> |passwd --stdin <span class="variable">$Uname</span> &amp;&gt; /dev/null</span><br><span class="line">                <span class="keyword">if</span> [ $? -eq 0 ]</span><br><span class="line">                <span class="keyword">then</span></span><br><span class="line">                        <span class="built_in">echo</span> -e <span class="string">"账号创建成功!"</span></span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                        <span class="built_in">echo</span> -e <span class="string">"创建失败!"</span></span><br><span class="line">                <span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">done</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure></p>
+<p><br><br><b>实现红色进度条</b><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">declare</span> -a ary</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> `seq 0 20`</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line"></span><br><span class="line">    ary[<span class="variable">$i</span>]=<span class="string">" "</span></span><br><span class="line">    <span class="built_in">echo</span> -en <span class="string">"\e[41;5m <span class="variable">$&#123;ary[@]&#125;</span>\e[;0m"</span></span><br><span class="line">    sleep 1</span><br><span class="line">    </span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure></p>
+<p><br><br><b>监控服务器网卡流量</b><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> : ; <span class="keyword">do</span></span><br><span class="line">speedtime=<span class="string">'date +%m"-"%d" "%k":"%M'</span></span><br><span class="line">speedday=<span class="string">'date +%m"-"%d'</span></span><br><span class="line">speedrx_before=<span class="string">'ifconfig eth0|sed -n "8"p|awk '</span>&#123;<span class="built_in">print</span> <span class="variable">$2</span>&#125;<span class="string">'|cut -c7-'</span></span><br><span class="line">speedtx_before=<span class="string">'ifconfig eth0|sed -n "8"p|awk '</span>&#123;<span class="built_in">print</span> <span class="variable">$6</span>&#125;<span class="string">'|cut -c7-'</span></span><br><span class="line">sleep 2</span><br><span class="line">speedrx_after=<span class="string">'ifconfig eth0|sed -n "8"p|awk '</span>&#123;<span class="built_in">print</span> <span class="variable">$2</span>&#125;<span class="string">'|cut -c7-'</span></span><br><span class="line">speedtx_after=<span class="string">'ifconfig eth0|sed -n "8"p|awk '</span>&#123;<span class="built_in">print</span> <span class="variable">$6</span>&#125;<span class="string">'|cut -c7-'</span></span><br><span class="line">speedrx_result=$[(speedrx_after-speedrx_before)/256]</span><br><span class="line">speedtx_result=$[(speedtx_after-speedtx_before)/256]</span><br><span class="line"><span class="built_in">echo</span><span class="string">"<span class="variable">$speedday</span><span class="variable">$speedtime</span> Now_In_Speed: "</span><span class="variable">$speedrx_result</span><span class="string">"kbps Now_OUt_Speed: "</span><span class="variable">$speedtx_result</span><span class="string">"kbps"</span></span><br><span class="line">sleep 2</span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure></p>
+<p><br><br><b>检测CPU剩余百分比</b><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#Inspect CPU</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#Sun Jul 31 17:25:41 CST 2016</span></span><br><span class="line"></span><br><span class="line">PATH=/usr/<span class="built_in">local</span>/bin:/bin:/usr/bin:/usr/<span class="built_in">local</span>/sbin:/usr/sbin:/sbin:/home/wl/bin</span><br><span class="line"><span class="built_in">export</span> PATH</span><br><span class="line"></span><br><span class="line">TERM=linux</span><br><span class="line"><span class="built_in">export</span> TERM</span><br><span class="line"></span><br><span class="line">CpuResult=$(top -bn 1 | grep <span class="string">"Cpu"</span> | awk <span class="string">'&#123;print $5&#125;'</span> | sed <span class="string">'s/\..*$//g'</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> [[ <span class="variable">$CpuResult</span> &lt; 20 ]];<span class="keyword">then</span></span><br><span class="line">  <span class="built_in">echo</span> <span class="string">"CPU WARNING : <span class="variable">$CpuResult</span>"</span> &gt; /service/script/.cpu_in.txt</span><br><span class="line">  top -bn 1 &gt;&gt; /service/script./cpu_in.txt</span><br><span class="line">  mail -s <span class="string">"Inspcet CPU"</span> wl &lt; /service/script/.cpu_in.txt</span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure></p>
+<p><br><br><b>检测磁盘剩余空间</b><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#Insepct Harddisk , If the remaining space is more than 80%, the message is sent to the wl</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#Tue Aug  2 09:45:56 CST 2016</span></span><br><span class="line"></span><br><span class="line">PATH=/usr/<span class="built_in">local</span>/bin:/bin:/usr/bin:/usr/<span class="built_in">local</span>/sbin:/usr/sbin:/sbin:/home/wl/bin</span><br><span class="line"></span><br><span class="line"><span class="built_in">export</span> PATH</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> RemainingSpace <span class="keyword">in</span> $(df -h | awk <span class="string">'&#123;print $5&#125;'</span> | grep -v <span class="string">'Use'</span> | sed -e <span class="string">'s/[%]//g'</span>)</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">  <span class="keyword">if</span> [[ <span class="variable">$RemainingSpace</span> &gt; 80 ]];<span class="keyword">then</span></span><br><span class="line">    <span class="built_in">echo</span> -e <span class="string">"<span class="variable">$RemainingSpace</span>"</span></span><br><span class="line">    <span class="built_in">echo</span> -e <span class="string">"<span class="variable">$(df -h | grep $RemainingSpace)</span>"</span> &gt; /service/script/.HarddiskWarning</span><br><span class="line">    mail -s <span class="string">"disk Warning"</span> wl &lt; /service/script/.HarddiskWarning</span><br><span class="line">  <span class="keyword">fi</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure></p>
+<p><br><br><b>bash-实现检测apache状态并钉钉报警</b><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">trans_text</span></span>()&#123;</span><br><span class="line">    text=<span class="variable">$1</span></span><br><span class="line">curl <span class="string">'https://oapi.dingtalk.com/robot/send?access_token=b4fcf5862088a1bc7f2bf66aea051869e62ff5879fa0e0fddb0db9b1494781c2'</span> -H<span class="string">'Content-Type: application/json'</span> -d<span class="string">'</span></span><br><span class="line"><span class="string">&#123;</span></span><br><span class="line"><span class="string">    "msgtype": "text", </span></span><br><span class="line"><span class="string">    "text": &#123;</span></span><br><span class="line"><span class="string">        "content": "'</span><span class="string">"<span class="variable">$text</span>"</span><span class="string">'"</span></span><br><span class="line"><span class="string">    &#125;, </span></span><br><span class="line"><span class="string">&#125;'</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">desk_check</span></span>()&#123;</span><br><span class="line">    </span><br><span class="line">    dftype=<span class="variable">$1</span></span><br><span class="line">    shell_row=`df |wc -l`</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> `seq 2 <span class="variable">$shell_row</span>`</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line"></span><br><span class="line">    temp=(`df -h |head -n <span class="variable">$i</span> |tail -n 1 |awk <span class="string">'&#123;print $5 "\t" $6&#125;'</span>`)</span><br><span class="line">    disk=<span class="string">"`echo <span class="variable">$&#123;temp[0]&#125;</span> |cut -d "</span>%<span class="string">" -f 1`"</span></span><br><span class="line">    name=<span class="string">"<span class="variable">$&#123;temp[1]&#125;</span>"</span></span><br><span class="line">    hostname=`hostname`</span><br><span class="line">    IP=`ifconfig |grep -v <span class="string">"127.0.0.1"</span> |grep <span class="string">"inet addr:"</span> |sed <span class="string">'s/^.*inet addr://g'</span>|sed <span class="string">'s/ Bcas..*$//g'</span>`</span><br><span class="line">    <span class="comment">#echo -e "$disk     $name"</span></span><br><span class="line">    Dat=`date <span class="string">"+%F %T"</span>`</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> [ <span class="variable">$disk</span> -ge <span class="variable">$dftype</span> ]</span><br><span class="line">    <span class="keyword">then</span></span><br><span class="line">        <span class="built_in">echo</span>  <span class="string">"</span></span><br><span class="line"><span class="string">                            ======================== \n</span></span><br><span class="line"><span class="string">                    &gt;磁盘分区异常&lt; \n</span></span><br><span class="line"><span class="string">               主机名: <span class="variable">$hostname</span> \n        </span></span><br><span class="line"><span class="string">               IP地址: <span class="variable">$IP</span> \n</span></span><br><span class="line"><span class="string">                分区名: <span class="variable">$name</span> \n</span></span><br><span class="line"><span class="string">               使用率: <span class="variable">$disk</span> %\n </span></span><br><span class="line"><span class="string">               发生时间: <span class="variable">$Dat</span> \n</span></span><br><span class="line"><span class="string">                          ========================= \n"</span></span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line"><span class="keyword">done</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">apache_check</span></span>()&#123;</span><br><span class="line">    url=<span class="variable">$1</span></span><br><span class="line">URL=<span class="string">"http://<span class="variable">$url</span>/"</span></span><br><span class="line">HTTP_CODE=`curl -o /dev/null -s -w <span class="string">"%&#123;http_code&#125;"</span> <span class="string">"<span class="variable">$&#123;URL&#125;</span>"</span>`</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> [ <span class="variable">$HTTP_CODE</span> != 200 ]</span><br><span class="line">    <span class="keyword">then</span></span><br><span class="line">        <span class="built_in">echo</span>  <span class="string">"</span></span><br><span class="line"><span class="string">                           ======================== \n</span></span><br><span class="line"><span class="string">                   &gt;Apache服务异常&lt;</span></span><br><span class="line"><span class="string">                           主机名: <span class="variable">$hostname</span> \n         </span></span><br><span class="line"><span class="string">                           IP地址: <span class="variable">$IP</span> \n</span></span><br><span class="line"><span class="string">                           返回代码: <span class="variable">$HTTP_CODE</span> \n</span></span><br><span class="line"><span class="string">                           发生时间: <span class="variable">$Dat</span> \n</span></span><br><span class="line"><span class="string">                          ========================= \n"</span>                        </span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> <span class="literal">true</span></span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">    desk_check 10</span><br><span class="line">    apache_check 127.0.0.1</span><br><span class="line"></span><br><span class="line">    sleep 10</span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure></p>
+<p><br><br><b>bash实现内存检测</b><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#Inspect Memory : If the memory is less than 500 , then send mail to wl</span></span><br><span class="line"></span><br><span class="line">PATH=/usr/<span class="built_in">local</span>/bin:/bin:/usr/bin:/usr/<span class="built_in">local</span>/sbin:/usr/sbin:/sbin:/home/wl/bin</span><br><span class="line"></span><br><span class="line"><span class="built_in">export</span> PATH</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">MEM=$(free -m | grep <span class="string">"Mem"</span> | awk <span class="string">'&#123;print $4&#125;'</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> [[ MEM &lt; 500 ]];<span class="keyword">then</span></span><br><span class="line">  <span class="built_in">echo</span> -e <span class="string">"Memory Warning : Memory free <span class="variable">$MEM</span>"</span> &gt; /service/script/.MemoryWarning</span><br><span class="line">  mail -s <span class="string">"Memory Warning"</span> wl &lt; /service/script/.MemoryWarning</span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure></p>
+<p><br><br><b>剩余inode检测</b><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#Inspcet Inode : If the free INODE is less than 200, the message is sent to the wl</span></span><br><span class="line"></span><br><span class="line">PATH=/usr/<span class="built_in">local</span>/bin:/bin:/usr/bin:/usr/<span class="built_in">local</span>/sbin:/usr/sbin:/sbin:/home/wl/bin</span><br><span class="line"></span><br><span class="line"><span class="built_in">export</span> PATH</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> FreeInode <span class="keyword">in</span> $(df -i | grep -v <span class="string">"Filesystem"</span> | awk <span class="string">'&#123;print $4&#125;'</span>)</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">  <span class="keyword">if</span> [[ <span class="variable">$FreeInode</span> &lt; 200 ]];<span class="keyword">then</span></span><br><span class="line">    <span class="built_in">echo</span> -e <span class="string">"<span class="variable">$(df -i | grep "$FreeInode")</span>"</span> &gt; /service/script/.FreeInode</span><br><span class="line">    mail -s <span class="string">"FreeInode Warning"</span> wl &lt; /service/script/.FreeInode</span><br><span class="line">  <span class="keyword">fi</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure></p>
+<p><br><br><b>判断哪些用户登陆了系统</b><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">declare</span> -i count=0</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> <span class="literal">true</span>;<span class="keyword">do</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> who |grep -q -E <span class="string">"^wang"</span></span><br><span class="line">        <span class="keyword">then</span></span><br><span class="line">                <span class="built_in">echo</span> -e <span class="string">"用户wang 登陆了系统\n 这是第<span class="variable">$count</span> 次!"</span></span><br><span class="line">                <span class="built_in">break</span></span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">                <span class="built_in">let</span> count++</span><br><span class="line">        <span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line">        sleep 3</span><br><span class="line"><span class="keyword">done</span></span><br><span class="line">~    </span><br><span class="line"></span><br><span class="line">示例：找出UID为偶数的所有用户，显示其用户名和ID号；</span><br><span class="line"></span><br><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"><span class="keyword">while</span> <span class="built_in">read</span> line; <span class="keyword">do</span></span><br><span class="line">    userid=$(<span class="built_in">echo</span> <span class="variable">$line</span> | cut -d: -f3)</span><br><span class="line">    <span class="keyword">if</span> [ $[<span class="variable">$userid</span>%2] -eq 0 ]; <span class="keyword">then</span></span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$line</span> | cut -d: -f1,3</span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line"><span class="keyword">done</span> &lt; /etc/passwd</span><br></pre></td></tr></table></figure></p>
+<p><br><br><b>批量创建账号</b><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line">sum=1</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> [ <span class="variable">$sum</span> -le 30 ]</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">    <span class="keyword">if</span> [ <span class="variable">$sum</span> -le 9 ]</span><br><span class="line">    <span class="keyword">then</span></span><br><span class="line">        user=<span class="string">"user_0<span class="variable">$sum</span>"</span></span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        user=<span class="string">"user_<span class="variable">$sum</span>"</span></span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line">        useradd <span class="variable">$user</span></span><br><span class="line">        <span class="built_in">echo</span> <span class="string">"123456"</span> |passwd --stdin <span class="variable">$user</span></span><br><span class="line">        chage -d 0 <span class="variable">$user</span></span><br><span class="line">        <span class="built_in">let</span> sum=sum+1</span><br><span class="line"></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure></p>
+<p><br><br><b>批量扫面存活</b><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"><span class="comment">#By:lyshark</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#nmap 192.168.22.0/24&gt;ip</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">MAC=`cat ip |awk <span class="string">'$1 == "MAC" &amp;&amp; $NF == "(VMware)"&#123;print $3&#125;'</span>`</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> `seq 1 20`</span><br><span class="line"></span><br><span class="line"><span class="keyword">do</span></span><br><span class="line"></span><br><span class="line">temp=`<span class="built_in">echo</span> <span class="variable">$&#123;MAC[@]&#125;</span> |awk <span class="string">'&#123;print $i&#125;'</span>`</span><br><span class="line"></span><br><span class="line">IP=`cat /ip |grep  -B5 <span class="variable">$temp</span> |grep <span class="string">"Nmap scan"</span>|awk <span class="string">'&#123;print $5&#125;'</span>`</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="built_in">echo</span> <span class="variable">$IP</span> |awk <span class="string">'&#123;print $1&#125;'</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure></p>
+<p><br><br><b>正则匹配IP</b><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">^[0-9]&#123;0,2&#125;|^1[0-9]&#123;0,2&#125;|^2[0-5]&#123;0,2&#125;</span><br><span class="line"></span><br><span class="line"> egrep <span class="string">"(^[0-9]&#123;1,2&#125;|^1[0-9]&#123;0,2&#125;|^2[0-5]&#123;0,2&#125;)\.([0-9]&#123;1,2&#125;|1[0-9]&#123;0,2&#125;|2[0-5]&#123;0,2&#125;)\.([0-9]&#123;1,2&#125;|1[0-9]&#123;0,2&#125;|2[0-5]&#123;0,2&#125;)\.([0-9]&#123;1,2&#125;|1[0-9]&#123;0,2&#125;|2[0-5]&#123;0,2&#125;)$"</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">([0-9]&#123;1,2&#125;|1[0-9]&#123;0,2&#125;|2[0-5]&#123;0,2&#125;)</span><br><span class="line">([0-9]&#123;1,2&#125;|1[0-9]&#123;0,2&#125;|2[0-5]&#123;0,2&#125;)</span><br><span class="line">([0-9]&#123;1,2&#125;|1[0-9]&#123;0,2&#125;|2[0-5]&#123;0,2&#125;)</span><br><span class="line">([0-9]&#123;1,2&#125;|1[0-9]&#123;0,2&#125;|2[0-5]&#123;0,2&#125;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">egrep <span class="string">"((25[0-5]|2[0-4][0-9]|((1[0-9]&#123;2&#125;)|([1-9]?[0-9])))\.)&#123;3&#125;(25[0-5]|2[0-4][0-9]|((1[0-9]&#123;2&#125;)|([1-9]?[0-9])))"</span></span><br><span class="line"></span><br><span class="line">ls |egrep <span class="string">"((25[0-5]|2[0-4][0-9]|((1[0-9]&#123;2&#125;)|([1-9]?[0-9])))\.)&#123;3&#125;(25[0-5]|2[0-4][0-9]|((1[0-9]&#123;2&#125;)|([1-9]?[0-9])$))"</span></span><br></pre></td></tr></table></figure></p>
+<p><br><br><b>正则匹配邮箱</b><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">egrep <span class="string">"^[0-9a-zA-Z][0-9a-zA-Z_]&#123;1,16&#125;[0-9a-zA-Z]\@[0-9a-zA-Z-]*([0-9a-zA-Z])?\.(com|com.cn|net|org|cn)$"</span> rui</span><br><span class="line"></span><br><span class="line">ls |egrep <span class="string">"^(([1-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.)&#123;3&#125;([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-4])$"</span></span><br></pre></td></tr></table></figure></p>
+<p><br><br><b>实现布片效果</b><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> ary_go</span><br><span class="line">&#123;</span><br><span class="line">    <span class="variable">$1</span> <span class="variable">$2</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> (( i=0;i&lt;=<span class="variable">$1</span>;i++ ))</span><br><span class="line">    <span class="keyword">do</span></span><br><span class="line">        <span class="keyword">for</span> (( s=0;s&lt;=<span class="variable">$2</span>;s++ ))</span><br><span class="line">        <span class="keyword">do</span></span><br><span class="line">            <span class="keyword">if</span> [ $[<span class="variable">$i</span>%2] == 0 ]</span><br><span class="line">            <span class="keyword">then</span></span><br><span class="line">        </span><br><span class="line">                <span class="keyword">if</span> [ $[<span class="variable">$s</span>%2] == 0 ]</span><br><span class="line">                <span class="keyword">then</span></span><br><span class="line">                    <span class="built_in">echo</span> -en <span class="string">"  "</span></span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                    <span class="built_in">echo</span> -en <span class="string">"\e[;44m  \e[;m"</span></span><br><span class="line">                <span class="keyword">fi</span></span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                                                <span class="keyword">if</span> [ $[<span class="variable">$s</span>%2] == 0 ]</span><br><span class="line">                                <span class="keyword">then</span></span><br><span class="line">                                        <span class="built_in">echo</span> -en <span class="string">"\e[;42m  \e[;m"</span></span><br><span class="line">                                <span class="keyword">else</span></span><br><span class="line">                                        <span class="built_in">echo</span> -en <span class="string">"  "</span></span><br><span class="line">                                <span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">            <span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">done</span></span><br><span class="line">            <span class="built_in">echo</span> </span><br><span class="line"></span><br><span class="line">    <span class="keyword">done</span></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">ary_go 25 50</span><br></pre></td></tr></table></figure></p>
+<p><br><br><b>剔除白名单以外的用户</b><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line">w | awk <span class="string">'NR&gt;=3 &#123;printf $1 "\t" $2 "\t" $3 "\n"&#125;'</span> &gt; /tmp/who.txt</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> $(awk <span class="string">'&#123;printf $1&#125;'</span> /tmp/bai.txt)</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">        k=$(egrep -v <span class="string">"<span class="variable">$i</span>"</span> /tmp/who.txt | awk <span class="string">'&#123;printf $2&#125; "\n"'</span> | awk <span class="string">'&#123;printf $2 "\n"&#125;'</span>)</span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="variable">$k</span></span><br><span class="line">        <span class="keyword">do</span></span><br><span class="line">                pkill -9 -t <span class="string">"<span class="variable">$j</span>"</span></span><br><span class="line">        <span class="keyword">done</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/09/18/Linux 系统管理/Linux Shell常用脚本整理/">Linux Shell常用脚本整理</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年09月18日 - 21:09</p>
+  <p><span>最后更新:</span>2019年04月16日 - 20:04</p>
+  <p><span>原始链接:</span><a href="/2018/09/18/Linux 系统管理/Linux Shell常用脚本整理/" title="Linux Shell常用脚本整理">https://www.mkdirs.com/2018/09/18/Linux 系统管理/Linux Shell常用脚本整理/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux-系统管理/" rel="tag"> <i class="fa fa-tag"></i> Linux 系统管理</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/09/17/Linux 服务配置/PXE+Kickstart 自动化部署系统/" rel="next" title="PXE+Kickstart 自动化部署系统">
+                <i class="fa fa-chevron-left"></i> PXE+Kickstart 自动化部署系统
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/11/08/Linux 服务配置/编译LNMP部署动态网站环境/" rel="prev" title="编译LNMP部署动态网站环境">
+                编译LNMP部署动态网站环境 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

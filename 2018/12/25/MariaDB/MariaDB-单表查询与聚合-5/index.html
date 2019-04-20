@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="MariaDB数据库管理系统是MySQL的一个分支,主要由开源社区在维护,采用GPL授权许可MariaDB的目的是完全兼容MySQL,包括API和命令行,MySQL由于现在闭源了,而能轻松成为MySQL的代替品.在存储引擎方面,使用XtraDB来代替MySQL的InnoDB,MariaDB由MySQL的创始人Michael Widenius主导开发,他早前曾以10亿美元的价格,将自己创建的公司My">
+<meta name="keywords" content="MariaDB">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MariaDB 单表查询与聚合(5)">
+<meta property="og:url" content="https://www.mkdirs.com/2018/12/25/MariaDB/MariaDB-单表查询与聚合-5/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="MariaDB数据库管理系统是MySQL的一个分支,主要由开源社区在维护,采用GPL授权许可MariaDB的目的是完全兼容MySQL,包括API和命令行,MySQL由于现在闭源了,而能轻松成为MySQL的代替品.在存储引擎方面,使用XtraDB来代替MySQL的InnoDB,MariaDB由MySQL的创始人Michael Widenius主导开发,他早前曾以10亿美元的价格,将自己创建的公司My">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-12-25T09:42:22.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MariaDB 单表查询与聚合(5)">
+<meta name="twitter:description" content="MariaDB数据库管理系统是MySQL的一个分支,主要由开源社区在维护,采用GPL授权许可MariaDB的目的是完全兼容MySQL,包括API和命令行,MySQL由于现在闭源了,而能轻松成为MySQL的代替品.在存储引擎方面,使用XtraDB来代替MySQL的InnoDB,MariaDB由MySQL的创始人Michael Widenius主导开发,他早前曾以10亿美元的价格,将自己创建的公司My">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/12/25/MariaDB/MariaDB-单表查询与聚合-5/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>MariaDB 单表查询与聚合(5) | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/12/25/MariaDB/MariaDB-单表查询与聚合-5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">MariaDB 单表查询与聚合(5)
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-25 10:41:09 / 修改时间：17:42:22" itemprop="dateCreated datePublished" datetime="2018-12-25T10:41:09+08:00">2018-12-25</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/MariaDB/" itemprop="url" rel="index"><span itemprop="name">MariaDB</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>MariaDB数据库管理系统是MySQL的一个分支,主要由开源社区在维护,采用GPL授权许可MariaDB的目的是完全兼容MySQL,包括API和命令行,MySQL由于现在闭源了,而能轻松成为MySQL的代替品.在存储引擎方面,使用XtraDB来代替MySQL的InnoDB,MariaDB由MySQL的创始人Michael Widenius主导开发,他早前曾以10亿美元的价格,将自己创建的公司MySQL AB卖给了SUN,此后,随着SUN被甲骨文收购MySQL的所有权也落入Oracle的手中.MariaDB名称来自MichaelWidenius的女儿Maria的名字.</p>
+<a id="more"></a>
+<p>数据库管理系统的一个最重要的功能就是数据查询,数据查询不应只是简单查询数据库中存储的数据,还应该根据需要对数据进行筛选,以及确定数据以什么样的格式显示.MySQL提供了功能强大、灵活的语句来实现这些操作,下面将介绍如何使用SELECT语句查询数据表中的一列或多列数据、使用集合函数显示查询结果.<br><br></p>
+<h2 id="查询语句简介"><a href="#查询语句简介" class="headerlink" title="查询语句简介"></a>查询语句简介</h2><p>首先,MySQL从数据表中查询数据的基本语句为<code>SELECT</code>语句,<code>SELECT</code>语句的基本格式如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [none]&gt; SELECT [predicate]</span><br><span class="line"></span><br><span class="line">	&#123; * | table.* | [table.]field1 [AS alias1] [,[table.]field2 [AS alias2] [,...]]&#125;</span><br><span class="line"></span><br><span class="line">	FROM tableexpression [,...] [IN externaldatabase]</span><br><span class="line">		[WHERE...]</span><br><span class="line">		[GROUP BY...]</span><br><span class="line">		[HAVING...]</span><br><span class="line">		[ORDER BY...]</span><br><span class="line">		[<span class="keyword">WITH</span> OWNERACCESS <span class="keyword">OPTION</span>]</span><br></pre></td></tr></table></figure></p>
+<p>SELECT语句的可选参数比较多,对于一般的运维工作,大路边上的就足够了,接下来我们将从最简单的查询语句开始一步步深入学习各种语句的灵活运用,在开始之前请创建以下表结构,方便后期的查询练习.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [none]&gt; create database lyshark;</span><br><span class="line">MariaDB [lyshark]&gt; use lyshark;</span><br><span class="line">MariaDB [lyshark]&gt; create table lyshark</span><br><span class="line">    -&gt; (</span><br><span class="line">    -&gt; Uid char(10) not null,</span><br><span class="line">    -&gt; Gid int not null,</span><br><span class="line">    -&gt; Name char(255) not null,</span><br><span class="line">    -&gt; Price decimal(8,2) not null,</span><br><span class="line">    -&gt; primary key(Uid)</span><br><span class="line">    -&gt; );</span><br><span class="line">Query OK, 0 rows affected (0.01 sec)</span><br></pre></td></tr></table></figure></p>
+<p>并在表结构中插入以下语句,也就是更新一下数据,下面的数据直接复制粘贴到数据库即可,无需一个个插入.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> lyshark(Uid,Gid,<span class="keyword">Name</span>,Price) <span class="keyword">values</span>(<span class="string">'a1'</span>,<span class="number">101</span>,<span class="string">'apple'</span>,<span class="number">5.2</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> lyshark(Uid,Gid,<span class="keyword">Name</span>,Price) <span class="keyword">values</span>(<span class="string">'b1'</span>,<span class="number">101</span>,<span class="string">'blackberry'</span>,<span class="number">10.2</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> lyshark(Uid,Gid,<span class="keyword">Name</span>,Price) <span class="keyword">values</span>(<span class="string">'bs1'</span>,<span class="number">102</span>,<span class="string">'orange'</span>,<span class="number">11.2</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> lyshark(Uid,Gid,<span class="keyword">Name</span>,Price) <span class="keyword">values</span>(<span class="string">'bs2'</span>,<span class="number">105</span>,<span class="string">'melon'</span>,<span class="number">8.2</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> lyshark(Uid,Gid,<span class="keyword">Name</span>,Price) <span class="keyword">values</span>(<span class="string">'t1'</span>,<span class="number">102</span>,<span class="string">'bannana'</span>,<span class="number">10.3</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> lyshark(Uid,Gid,<span class="keyword">Name</span>,Price) <span class="keyword">values</span>(<span class="string">'t2'</span>,<span class="number">102</span>,<span class="string">'grape'</span>,<span class="number">5.3</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> lyshark(Uid,Gid,<span class="keyword">Name</span>,Price) <span class="keyword">values</span>(<span class="string">'o2'</span>,<span class="number">103</span>,<span class="string">'coconut'</span>,<span class="number">9.2</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> lyshark(Uid,Gid,<span class="keyword">Name</span>,Price) <span class="keyword">values</span>(<span class="string">'c0'</span>,<span class="number">101</span>,<span class="string">'cherry'</span>,<span class="number">3.2</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> lyshark(Uid,Gid,<span class="keyword">Name</span>,Price) <span class="keyword">values</span>(<span class="string">'a2'</span>,<span class="number">103</span>,<span class="string">'apricot'</span>,<span class="number">2.2</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> lyshark(Uid,Gid,<span class="keyword">Name</span>,Price) <span class="keyword">values</span>(<span class="string">'l2'</span>,<span class="number">104</span>,<span class="string">'lemon'</span>,<span class="number">6.4</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> lyshark(Uid,Gid,<span class="keyword">Name</span>,Price) <span class="keyword">values</span>(<span class="string">'b2'</span>,<span class="number">104</span>,<span class="string">'berry'</span>,<span class="number">7.6</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> lyshark(Uid,Gid,<span class="keyword">Name</span>,Price) <span class="keyword">values</span>(<span class="string">'m1'</span>,<span class="number">106</span>,<span class="string">'mango'</span>,<span class="number">15.7</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> lyshark(Uid,Gid,<span class="keyword">Name</span>,Price) <span class="keyword">values</span>(<span class="string">'m2'</span>,<span class="number">105</span>,<span class="string">'xbabay'</span>,<span class="number">2.6</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> lyshark(Uid,Gid,<span class="keyword">Name</span>,Price) <span class="keyword">values</span>(<span class="string">'t4'</span>,<span class="number">107</span>,<span class="string">'xbababa'</span>,<span class="number">3.6</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> lyshark(Uid,Gid,<span class="keyword">Name</span>,Price) <span class="keyword">values</span>(<span class="string">'m3'</span>,<span class="number">105</span>,<span class="string">'xxtt'</span>,<span class="number">11.6</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> lyshark(Uid,Gid,<span class="keyword">Name</span>,Price) <span class="keyword">values</span>(<span class="string">'b5'</span>,<span class="number">107</span>,<span class="string">'xxxx'</span>,<span class="number">3.6</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> lyshark(Uid,Gid,<span class="keyword">Name</span>,Price) <span class="keyword">values</span>(<span class="string">'lyshark'</span>,<span class="number">999</span>,<span class="string">'lysharks'</span>,<span class="number">999</span>);</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="MariaDB-常规查询"><a href="#MariaDB-常规查询" class="headerlink" title="MariaDB 常规查询"></a>MariaDB 常规查询</h2><h3 id="◆基本的字段查询◆"><a href="#◆基本的字段查询◆" class="headerlink" title="◆基本的字段查询◆"></a>◆基本的字段查询◆</h3><p>select 语句查询记录最简单的检索方式,实现的方法是使用<code>(*)</code>通配符,指定查找所有列的名称,,语法规则如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> 表名;</span><br></pre></td></tr></table></figure></p>
+<p><strong>查询所有字段:</strong> 使用<code>*</code>通配符,查询<code>lyshark</code>表中的所有字段.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select * from lyshark;</span><br><span class="line"></span><br><span class="line">+<span class="comment">---------+-----+------------+--------+</span></span><br><span class="line">| Uid     | Gid | Name       | Price  |</span><br><span class="line">+<span class="comment">---------+-----+------------+--------+</span></span><br><span class="line">| a1      | 101 | apple      |   5.20 |</span><br><span class="line">| a2      | 103 | apricot    |   2.20 |</span><br><span class="line">| b1      | 101 | blackberry |  10.20 |</span><br><span class="line">| b2      | 104 | berry      |   7.60 |</span><br><span class="line">| b5      | 107 | xxxx       |   3.60 |</span><br><span class="line">| bs1     | 102 | orange     |  11.20 |</span><br><span class="line">| bs2     | 105 | melon      |   8.20 |</span><br><span class="line">| c0      | 101 | cherry     |   3.20 |</span><br><span class="line">| l2      | 104 | lemon      |   6.40 |</span><br><span class="line">| lyshark | 999 | lysharks   | 999.00 |</span><br><span class="line">| m1      | 106 | mango      |  15.70 |</span><br><span class="line">| m2      | 105 | xbabay     |   2.60 |</span><br><span class="line">| m3      | 105 | xxtt       |  11.60 |</span><br><span class="line">| o2      | 103 | coconut    |   9.20 |</span><br><span class="line">| t1      | 102 | bannana    |  10.30 |</span><br><span class="line">| t2      | 102 | grape      |   5.30 |</span><br><span class="line">| t4      | 107 | xbababa    |   3.60 |</span><br><span class="line">+<span class="comment">---------+-----+------------+--------+</span></span><br><span class="line">17 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>查询指定字段:</strong> 使用<code>Uid,Name</code>来指定查询的字段.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select Uid,Name from lyshark;</span><br><span class="line"></span><br><span class="line">+<span class="comment">---------+------------+</span></span><br><span class="line">| Uid     | Name       |</span><br><span class="line">+<span class="comment">---------+------------+</span></span><br><span class="line">| a1      | apple      |</span><br><span class="line">| a2      | apricot    |</span><br><span class="line">| b1      | blackberry |</span><br><span class="line">| b2      | berry      |</span><br><span class="line">| b5      | xxxx       |</span><br><span class="line">| bs1     | orange     |</span><br><span class="line">| bs2     | melon      |</span><br><span class="line">| c0      | cherry     |</span><br><span class="line">| l2      | lemon      |</span><br><span class="line">| lyshark | lysharks   |</span><br><span class="line">| m1      | mango      |</span><br><span class="line">| m2      | xbabay     |</span><br><span class="line">| m3      | xxtt       |</span><br><span class="line">| o2      | coconut    |</span><br><span class="line">| t1      | bannana    |</span><br><span class="line">| t2      | grape      |</span><br><span class="line">| t4      | xbababa    |</span><br><span class="line">+<span class="comment">---------+------------+</span></span><br><span class="line">17 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆查询指定的记录◆"><a href="#◆查询指定的记录◆" class="headerlink" title="◆查询指定的记录◆"></a>◆查询指定的记录◆</h3><p>我们也可以根据自己的需求通过添加where过滤数据,遍历我们需要的指定数据,语法规则如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">select</span> 字段名<span class="number">1</span>,字段名<span class="number">2.</span>...字段名n  <span class="keyword">from</span> 表名 <span class="keyword">where</span> 查询条件</span><br></pre></td></tr></table></figure></p>
+<p>在我们的where子句中,MySQL支持条件判断符,支持如下内容:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">操作符</th>
+<th style="text-align:left">说明信息</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">=</td>
+<td style="text-align:left">相等</td>
+</tr>
+<tr>
+<td style="text-align:left">&lt;&gt;,!=</td>
+<td style="text-align:left">不等于</td>
+</tr>
+<tr>
+<td style="text-align:left">&lt;</td>
+<td style="text-align:left">小于</td>
+</tr>
+<tr>
+<td style="text-align:left">&lt;=</td>
+<td style="text-align:left">小于或等于</td>
+</tr>
+<tr>
+<td style="text-align:left">&gt;</td>
+<td style="text-align:left">大于</td>
+</tr>
+<tr>
+<td style="text-align:left">&gt;=</td>
+<td style="text-align:left">大于或等于</td>
+</tr>
+<tr>
+<td style="text-align:left">BETWEEN</td>
+<td style="text-align:left">位于两值之间</td>
+</tr>
+</tbody>
+</table>
+<p><strong>实例1:</strong> 查询<code>lyshark</code>表中,价格正好为<code>10.2</code>元的水果的名称,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select Name,Price from lyshark where price=10.2;</span><br><span class="line"></span><br><span class="line">+<span class="comment">------------+-------+</span></span><br><span class="line">| Name       | Price |</span><br><span class="line">+<span class="comment">------------+-------+</span></span><br><span class="line">| blackberry | 10.20 |</span><br><span class="line">+<span class="comment">------------+-------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.01</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例2:</strong> 查询<code>lyshark</code>表中,<code>apple</code>水果的价格,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select Name,Price from lyshark where Name='apple';</span><br><span class="line"></span><br><span class="line">+<span class="comment">-------+-------+</span></span><br><span class="line">| Name  | Price |</span><br><span class="line">+<span class="comment">-------+-------+</span></span><br><span class="line">| apple |  5.20 |</span><br><span class="line">+<span class="comment">-------+-------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例3:</strong> 查询<code>lyshark</code>表中,价格小于<code>10</code>元的水果的名称列表,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select Name,Price from lyshark where Price &lt;10;</span><br><span class="line"></span><br><span class="line">+<span class="comment">---------+-------+</span></span><br><span class="line">| Name    | Price |</span><br><span class="line">+<span class="comment">---------+-------+</span></span><br><span class="line">| apple   |  5.20 |</span><br><span class="line">| apricot |  2.20 |</span><br><span class="line">| berry   |  7.60 |</span><br><span class="line">| xxxx    |  3.60 |</span><br><span class="line">| melon   |  8.20 |</span><br><span class="line">| cherry  |  3.20 |</span><br><span class="line">| lemon   |  6.40 |</span><br><span class="line">| xbabay  |  2.60 |</span><br><span class="line">| coconut |  9.20 |</span><br><span class="line">| grape   |  5.30 |</span><br><span class="line">| xbababa |  3.60 |</span><br><span class="line">+<span class="comment">---------+-------+</span></span><br><span class="line">11 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆带IN关键字查询◆"><a href="#◆带IN关键字查询◆" class="headerlink" title="◆带IN关键字查询◆"></a>◆带IN关键字查询◆</h3><p>in关键字用来查询指定的范围,使用in操作符应将所有检索条件用括号括起来,in的语法规则如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">select</span> 字段名 <span class="keyword">from</span> 表名称 <span class="keyword">where</span> 字段名 <span class="keyword">in</span>(关键字<span class="number">1</span>,关键字<span class="number">2</span>) <span class="keyword">order</span> <span class="keyword">by</span> 字段名(以那个字段作为排序方式);</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例1:</strong> 查询字段<code>Gid为101,102</code>的所有记录,并以<code>Name</code>字段排序,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select Gid,Name,Price from lyshark where Gid in(101,102) order by Name;</span><br><span class="line"></span><br><span class="line">+<span class="comment">-----+------------+-------+</span></span><br><span class="line">| Gid | Name       | Price |</span><br><span class="line">+<span class="comment">-----+------------+-------+</span></span><br><span class="line">| 101 | apple      |  5.20 |</span><br><span class="line">| 102 | bannana    | 10.30 |</span><br><span class="line">| 101 | blackberry | 10.20 |</span><br><span class="line">| 101 | cherry     |  3.20 |</span><br><span class="line">| 102 | grape      |  5.30 |</span><br><span class="line">| 102 | orange     | 11.20 |</span><br><span class="line">+<span class="comment">-----+------------+-------+</span></span><br><span class="line">6 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例3:</strong> 查询字段<code>Gid为101,103</code>的所有记录,并以<code>Price字段排序</code>,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select Gid,Name,Price from lyshark where Gid in(101,103) order by Price;</span><br><span class="line"></span><br><span class="line">+<span class="comment">-----+------------+-------+</span></span><br><span class="line">| Gid | Name       | Price |</span><br><span class="line">+<span class="comment">-----+------------+-------+</span></span><br><span class="line">| 103 | apricot    |  2.20 |</span><br><span class="line">| 101 | cherry     |  3.20 |</span><br><span class="line">| 101 | apple      |  5.20 |</span><br><span class="line">| 103 | coconut    |  9.20 |</span><br><span class="line">| 101 | blackberry | 10.20 |</span><br><span class="line">+<span class="comment">-----+------------+-------+</span></span><br><span class="line">5 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例4:</strong> 查询字段<code>Gid不等于101,103</code>的所有记录,并以<code>Price字段排序</code>,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select Gid,Name,Price from lyshark where Gid not in(101,103) order by Price;</span><br><span class="line"></span><br><span class="line">+<span class="comment">-----+----------+--------+</span></span><br><span class="line">| Gid | Name     | Price  |</span><br><span class="line">+<span class="comment">-----+----------+--------+</span></span><br><span class="line">| 105 | xbabay   |   2.60 |</span><br><span class="line">| 107 | xbababa  |   3.60 |</span><br><span class="line">| 107 | xxxx     |   3.60 |</span><br><span class="line">| 102 | grape    |   5.30 |</span><br><span class="line">| 104 | lemon    |   6.40 |</span><br><span class="line">| 104 | berry    |   7.60 |</span><br><span class="line">| 105 | melon    |   8.20 |</span><br><span class="line">| 102 | bannana  |  10.30 |</span><br><span class="line">| 102 | orange   |  11.20 |</span><br><span class="line">| 105 | xxtt     |  11.60 |</span><br><span class="line">| 106 | mango    |  15.70 |</span><br><span class="line">| 999 | lysharks | 999.00 |</span><br><span class="line">+<span class="comment">-----+----------+--------+</span></span><br><span class="line">12 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆带BETWEEN范围查询◆"><a href="#◆带BETWEEN范围查询◆" class="headerlink" title="◆带BETWEEN范围查询◆"></a>◆带BETWEEN范围查询◆</h3><p><code>Bettween And</code>用于查询某个范围内的值,该关键字有两个参数,即范围的开始值和结束值,满足字段的条件才会返回字段,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">select</span> 字段名 <span class="keyword">from</span> 表名称 <span class="keyword">where</span> 字段名 <span class="keyword">between</span> 范围<span class="number">1</span> <span class="keyword">and</span> 范围<span class="number">2</span> ;</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例1:</strong> 查询价格在<code>2.00元 到 10.20元</code>之间的水果名称和价格,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select Name,Price from lyshark where Price between 2.00 and 10.20;</span><br><span class="line"></span><br><span class="line">+<span class="comment">------------+-------+</span></span><br><span class="line">| Name       | Price |</span><br><span class="line">+<span class="comment">------------+-------+</span></span><br><span class="line">| apple      |  5.20 |</span><br><span class="line">| apricot    |  2.20 |</span><br><span class="line">| blackberry | 10.20 |</span><br><span class="line">| berry      |  7.60 |</span><br><span class="line">| xxxx       |  3.60 |</span><br><span class="line">| melon      |  8.20 |</span><br><span class="line">| cherry     |  3.20 |</span><br><span class="line">| lemon      |  6.40 |</span><br><span class="line">| xbabay     |  2.60 |</span><br><span class="line">| coconut    |  9.20 |</span><br><span class="line">| grape      |  5.30 |</span><br><span class="line">| xbababa    |  3.60 |</span><br><span class="line">+<span class="comment">------------+-------+</span></span><br><span class="line">12 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例2:</strong> 查询价格不在<code>2.00元 到 10.20元</code>之间的水果名称和价格,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select Name,Price from lyshark where Price not between 2.00 and 10.20;</span><br><span class="line"></span><br><span class="line">+<span class="comment">----------+--------+</span></span><br><span class="line">| Name     | Price  |</span><br><span class="line">+<span class="comment">----------+--------+</span></span><br><span class="line">| orange   |  11.20 |</span><br><span class="line">| lysharks | 999.00 |</span><br><span class="line">| mango    |  15.70 |</span><br><span class="line">| xxtt     |  11.60 |</span><br><span class="line">| bannana  |  10.30 |</span><br><span class="line">+<span class="comment">----------+--------+</span></span><br><span class="line">5 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆带LIKE的字符匹配查询◆"><a href="#◆带LIKE的字符匹配查询◆" class="headerlink" title="◆带LIKE的字符匹配查询◆"></a>◆带LIKE的字符匹配查询◆</h3><p>Like通配符可以匹配指定字段模糊查询,SQL语句中支持多种通配符,可以和Like一起使用的通配符有<code>%</code> 和<code>_</code>,语法规则如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">select</span> 字段名 <span class="keyword">from</span> 表名称 <span class="keyword">where</span> 字段名 <span class="keyword">Like</span> <span class="string">'b%'</span>;</span><br></pre></td></tr></table></figure></p>
+<p><strong>%:匹配任意长度的字符,包括零字符</strong>: 查询<code>Name</code>字段中,所有以<code>b字母开头</code>的水果名称,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select Gid,Name,Price from lyshark where Name like 'b%' order by Price;</span><br><span class="line"></span><br><span class="line">+<span class="comment">-----+------------+-------+</span></span><br><span class="line">| Gid | Name       | Price |</span><br><span class="line">+<span class="comment">-----+------------+-------+</span></span><br><span class="line">| 104 | berry      |  7.60 |</span><br><span class="line">| 101 | blackberry | 10.20 |</span><br><span class="line">| 102 | bannana    | 10.30 |</span><br><span class="line">+<span class="comment">-----+------------+-------+</span></span><br><span class="line">3 rows in <span class="keyword">set</span> (<span class="number">0.01</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>%:匹配任意长度的字符,包括零字符</strong>: 查询<code>Name</code>字段中,包含所有<code>g字母</code>的水果(注意不是开头,只要Name字段包含g字母通通匹配),SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select Gid,Name,Price from lyshark where Name like '%g%' order by Price;</span><br><span class="line"></span><br><span class="line">+<span class="comment">-----+--------+-------+</span></span><br><span class="line">| Gid | Name   | Price |</span><br><span class="line">+<span class="comment">-----+--------+-------+</span></span><br><span class="line">| 102 | grape  |  5.30 |</span><br><span class="line">| 102 | orange | 11.20 |</span><br><span class="line">| 106 | mango  | 15.70 |</span><br><span class="line">+<span class="comment">-----+--------+-------+</span></span><br><span class="line">3 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>%:匹配任意长度的字符,包括零字符</strong>: 查询<code>Name</code>字段中,以<code>b开头</code>,并且以<code>y 结尾</code>的水果的名称,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select Name,Price from lyshark where Name like 'b%y' order by Price;</span><br><span class="line"></span><br><span class="line">+<span class="comment">------------+-------+</span></span><br><span class="line">| Name       | Price |</span><br><span class="line">+<span class="comment">------------+-------+</span></span><br><span class="line">| berry      |  7.60 |</span><br><span class="line">| blackberry | 10.20 |</span><br><span class="line">+<span class="comment">------------+-------+</span></span><br><span class="line">2 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>注释:通过以上查询结果,可以看出<code>%</code>用于匹配在指定位置的任意数目的字符.</p>
+<hr>
+<p><strong>下划线通配符_,一次只能匹配任意一个字符</strong>: 查询以字母<code>y结尾</code>,并且<code>y 前面只有4个字母</code>的记录&lt;SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select Gid,Name from lyshark where Name like '____y';</span><br><span class="line"></span><br><span class="line">+<span class="comment">-----+-------+</span></span><br><span class="line">| Gid | Name  |</span><br><span class="line">+<span class="comment">-----+-------+</span></span><br><span class="line">| 104 | berry |</span><br><span class="line">+<span class="comment">-----+-------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>如上:下划线通配符,一次只能匹配任意单个字符,如果要匹配多个字符,则需要使用相同个数的下划线代替.</p>
+<h3 id="◆匹配查询一个空值◆"><a href="#◆匹配查询一个空值◆" class="headerlink" title="◆匹配查询一个空值◆"></a>◆匹配查询一个空值◆</h3><p>空值不同于0,也不同于空字符串,空值一般表示数据未知、不适用或将在以后添加数据，,在<code>SELECT</code>语句中使用<code>IS NULL子句</code>,可以查询某字段内容为空的记录,这里为了方便演示,需要再次创建一个数据表.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; create table test</span><br><span class="line">    -&gt; (</span><br><span class="line">    -&gt; Uid int not null auto_increment,</span><br><span class="line">    -&gt; Name char(50) not null,</span><br><span class="line">    -&gt; Email char(255) null,</span><br><span class="line">    -&gt; primary key(Uid)</span><br><span class="line">    -&gt; );</span><br><span class="line">Query OK, 0 rows affected (0.01 sec)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> <span class="keyword">test</span>(<span class="keyword">Name</span>,Email) <span class="keyword">values</span>(<span class="string">"admin"</span>,<span class="string">"123123@163.com"</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> <span class="keyword">test</span>(<span class="keyword">Name</span>,Email) <span class="keyword">values</span>(<span class="string">"lyshark"</span>,<span class="string">"1181506874@qq.com"</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> <span class="keyword">test</span>(<span class="keyword">Name</span>) <span class="keyword">values</span>(<span class="string">"root"</span>);</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例1:</strong> 查询<code>test表</code>中,<code>Email字段</code>为空的记录,并显示出所有字段的值.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select * from test where Email is null;</span><br><span class="line"></span><br><span class="line">+<span class="comment">-----+------+-------+</span></span><br><span class="line">| Uid | Name | Email |</span><br><span class="line">+<span class="comment">-----+------+-------+</span></span><br><span class="line">|   3 | root | NULL  |</span><br><span class="line">+<span class="comment">-----+------+-------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例2:</strong> 查询<code>test表</code>中,<code>Email字段</code>不为空的记录,并显示出所有字段的值.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select * from test where Email is not null;</span><br><span class="line"></span><br><span class="line">+<span class="comment">-----+---------+-------------------+</span></span><br><span class="line">| Uid | Name    | Email             |</span><br><span class="line">+<span class="comment">-----+---------+-------------------+</span></span><br><span class="line">|   1 | admin   | 123123@163.com    |</span><br><span class="line">|   2 | lyshark | 1181506874@qq.com |</span><br><span class="line">+<span class="comment">-----+---------+-------------------+</span></span><br><span class="line">2 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆带AND多条件查询◆"><a href="#◆带AND多条件查询◆" class="headerlink" title="◆带AND多条件查询◆"></a>◆带AND多条件查询◆</h3><p>在使用Select语句时,可以增加查询的限制条件,这样可以使查询的结果更加精确,我们可以在<code>where 子句</code>中使用<code>and操作符</code>,来限定相应的查询条件,使用and连接多个查询条件时,不同表达式之间应该用and分割开来,语法如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">select</span> 表名称 <span class="keyword">from</span> 字段名 <span class="keyword">where</span> 字段名 = <span class="string">"xx"</span> <span class="keyword">and</span> 字段名 &gt;= <span class="number">10</span>;</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例1:</strong> 在<code>lyshark表中</code>,<code>查询Gid等于101,并且Price大于等于5</code>的水果价格和名称,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select Gid,Name,Price from lyshark where Gid='101' and Price &gt;=5;</span><br><span class="line"></span><br><span class="line">+<span class="comment">-----+------------+-------+</span></span><br><span class="line">| Gid | Name       | Price |</span><br><span class="line">+<span class="comment">-----+------------+-------+</span></span><br><span class="line">| 101 | apple      |  5.20 |</span><br><span class="line">| 101 | blackberry | 10.20 |</span><br><span class="line">+<span class="comment">-----+------------+-------+</span></span><br><span class="line">2 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例2:</strong> 在<code>lyshark表中</code>,<code>查询Gid=101 或者 Gid=102,并且Price &gt; 5 并且 Name=&#39;apple&#39;</code>的水果的价格和名称,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select Gid,Name,Price from lyshark where Gid in('101','102') and Price &gt;= 5 and Name='apple';</span><br><span class="line"></span><br><span class="line">+<span class="comment">-----+-------+-------+</span></span><br><span class="line">| Gid | Name  | Price |</span><br><span class="line">+<span class="comment">-----+-------+-------+</span></span><br><span class="line">| 101 | apple |  5.20 |</span><br><span class="line">+<span class="comment">-----+-------+-------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆带OR的多条件查询◆"><a href="#◆带OR的多条件查询◆" class="headerlink" title="◆带OR的多条件查询◆"></a>◆带OR的多条件查询◆</h3><p>在使用Select语句时,可以增加查询的限制条件,这样可以使查询的结果更加精确,我们可以在<code>where 子句</code>中使用<code>or操作符</code>,来限定相应的查询条件,通过or连接多个查询条件,不同表达式之间应该用or分割开来,语法规则如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">select</span> 表名称 <span class="keyword">from</span> 字段名 <span class="keyword">where</span> 字段名 = <span class="string">"xx"</span> <span class="keyword">or</span> 字段名 &gt;= <span class="number">10</span>;</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例1:</strong> 在<code>lyshark表中</code>,查询<code>Gid=101 或者 Gid=102</code>的水果记录,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select * from lyshark where Gid=101 or Gid=102;</span><br><span class="line"></span><br><span class="line">+<span class="comment">-----+-----+------------+-------+</span></span><br><span class="line">| Uid | Gid | Name       | Price |</span><br><span class="line">+<span class="comment">-----+-----+------------+-------+</span></span><br><span class="line">| a1  | 101 | apple      |  5.20 |</span><br><span class="line">| b1  | 101 | blackberry | 10.20 |</span><br><span class="line">| bs1 | 102 | orange     | 11.20 |</span><br><span class="line">| c0  | 101 | cherry     |  3.20 |</span><br><span class="line">| t1  | 102 | bannana    | 10.30 |</span><br><span class="line">| t2  | 102 | grape      |  5.30 |</span><br><span class="line">+<span class="comment">-----+-----+------------+-------+</span></span><br><span class="line">6 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例2:</strong> 另一种查询方式,使用in语句查询,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select * from lyshark where Gid in(101,102);</span><br><span class="line"></span><br><span class="line">+<span class="comment">-----+-----+------------+-------+</span></span><br><span class="line">| Uid | Gid | Name       | Price |</span><br><span class="line">+<span class="comment">-----+-----+------------+-------+</span></span><br><span class="line">| a1  | 101 | apple      |  5.20 |</span><br><span class="line">| b1  | 101 | blackberry | 10.20 |</span><br><span class="line">| bs1 | 102 | orange     | 11.20 |</span><br><span class="line">| c0  | 101 | cherry     |  3.20 |</span><br><span class="line">| t1  | 102 | bannana    | 10.30 |</span><br><span class="line">| t2  | 102 | grape      |  5.30 |</span><br><span class="line">+<span class="comment">-----+-----+------------+-------+</span></span><br><span class="line">6 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆使查询结果不重复◆"><a href="#◆使查询结果不重复◆" class="headerlink" title="◆使查询结果不重复◆"></a>◆使查询结果不重复◆</h3><p>有时候我们的查询结果有重复的选项,当我们不想看重复数据时可以使用distinct关键字,实现去重,SQL语法如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">distinct</span> 指定不重复的字段 <span class="keyword">From</span> 表名称;</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例:</strong><code>查询lyshark表</code>中<code>Gid字段的值</code>,且Gid字段如果有重复的则不显示,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select distinct Gid from lyshark;</span><br><span class="line"></span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">| Gid  |</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">|  101 |</span><br><span class="line">|  103 |</span><br><span class="line">|  104 |</span><br><span class="line">|  107 |</span><br><span class="line">|  102 |</span><br><span class="line">|  105 |</span><br><span class="line">| 9999 |</span><br><span class="line">|  106 |</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">8 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆LIMIT限制查询结果◆"><a href="#◆LIMIT限制查询结果◆" class="headerlink" title="◆LIMIT限制查询结果◆"></a>◆LIMIT限制查询结果◆</h3><p>在select返回所有匹配的行,有可能是表中所有的行,如仅需要返回第一行或者是前几行数据,那么使用limit关键字即可实现,先看一下SQL语法规则:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> 表名称 <span class="keyword">limit</span> [位置偏移,]输出的行数;</span><br><span class="line"></span><br><span class="line"><span class="comment">#其中位置偏移是表示从哪一行开始显示，如果不指定默认从1开始</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>实例1:</strong> 显示<code>lyshark表</code>的<code>前5行</code>数据,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select * from lyshark limit 5;</span><br><span class="line"></span><br><span class="line">+<span class="comment">-----+-----+------------+-------+</span></span><br><span class="line">| Uid | Gid | Name       | Price |</span><br><span class="line">+<span class="comment">-----+-----+------------+-------+</span></span><br><span class="line">| a1  | 101 | apple      |  5.20 |</span><br><span class="line">| a2  | 103 | apricot    |  2.20 |</span><br><span class="line">| b1  | 101 | blackberry | 10.20 |</span><br><span class="line">| b2  | 104 | berry      |  7.60 |</span><br><span class="line">| b5  | 107 | xxxx       |  3.60 |</span><br><span class="line">+<span class="comment">-----+-----+------------+-------+</span></span><br><span class="line">5 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例2:</strong> 显示<code>lyshark表</code>,<code>从第5个记录</code>的位置开始显示,<code>行数长度为3</code>的记录,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select * from lyshark limit 5,3;  #从第5行开始获取,获取后面的三条数据</span><br><span class="line"></span><br><span class="line">+<span class="comment">-----+-----+--------+-------+</span></span><br><span class="line">| Uid | Gid | Name   | Price |</span><br><span class="line">+<span class="comment">-----+-----+--------+-------+</span></span><br><span class="line">| bs1 | 102 | orange | 11.20 |</span><br><span class="line">| bs2 | 105 | melon  |  8.20 |</span><br><span class="line">| c0  | 101 | cherry |  3.20 |</span><br><span class="line">+<span class="comment">-----+-----+--------+-------+</span></span><br><span class="line">3 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="MariaDB-查询排序"><a href="#MariaDB-查询排序" class="headerlink" title="MariaDB 查询排序"></a>MariaDB 查询排序</h2><p>从前面的章节中,我们可以使用<code>order by</code>来进行排列的规划,下面具体说明:排序分为,单列排序,多列排序,指定排序方向,这几种模式,想来看一下它的SQL写法吧:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> 表名称<span class="keyword">order</span> <span class="keyword">by</span> 指定排序字段;</span><br></pre></td></tr></table></figure></p>
+<p><strong>单列排序:</strong> 查询<code>lyshark表</code>中的所有内容,且<code>以Gid字段</code>为基准排序,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select * from lyshark order by Gid;</span><br><span class="line"></span><br><span class="line">+<span class="comment">---------+-----+------------+--------+</span></span><br><span class="line">| Uid     | Gid | Name       | Price  |</span><br><span class="line">+<span class="comment">---------+-----+------------+--------+</span></span><br><span class="line">| a1      | 101 | apple      |   5.20 |</span><br><span class="line">| b1      | 101 | blackberry |  10.20 |</span><br><span class="line">| c0      | 101 | cherry     |   3.20 |</span><br><span class="line">| t2      | 102 | grape      |   5.30 |</span><br><span class="line">| t1      | 102 | bannana    |  10.30 |</span><br><span class="line">| bs1     | 102 | orange     |  11.20 |</span><br><span class="line">| a2      | 103 | apricot    |   2.20 |</span><br><span class="line">| o2      | 103 | coconut    |   9.20 |</span><br><span class="line">| l2      | 104 | lemon      |   6.40 |</span><br><span class="line">| b2      | 104 | berry      |   7.60 |</span><br><span class="line">| m2      | 105 | xbabay     |   2.60 |</span><br><span class="line">| m3      | 105 | xxtt       |  11.60 |</span><br><span class="line">| bs2     | 105 | melon      |   8.20 |</span><br><span class="line">| m1      | 106 | mango      |  15.70 |</span><br><span class="line">| b5      | 107 | xxxx       |   3.60 |</span><br><span class="line">| t4      | 107 | xbababa    |   3.60 |</span><br><span class="line">| lyshark | 999 | lysharks   | 999.00 |</span><br><span class="line">+<span class="comment">---------+-----+------------+--------+</span></span><br><span class="line">17 rows in <span class="keyword">set</span> (<span class="number">0.01</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>多列排序:</strong> 查询<code>lyshark表</code>中的所有内容,先按照<code>Gid排序</code>,再按照<code>Price排序</code>,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select * from lyshark order by Gid,Price;</span><br><span class="line"></span><br><span class="line">+<span class="comment">---------+-----+------------+--------+</span></span><br><span class="line">| Uid     | Gid | Name       | Price  |</span><br><span class="line">+<span class="comment">---------+-----+------------+--------+</span></span><br><span class="line">| c0      | 101 | cherry     |   3.20 |</span><br><span class="line">| a1      | 101 | apple      |   5.20 |</span><br><span class="line">| b1      | 101 | blackberry |  10.20 |</span><br><span class="line">| t2      | 102 | grape      |   5.30 |</span><br><span class="line">| t1      | 102 | bannana    |  10.30 |</span><br><span class="line">| bs1     | 102 | orange     |  11.20 |</span><br><span class="line">| a2      | 103 | apricot    |   2.20 |</span><br><span class="line">| o2      | 103 | coconut    |   9.20 |</span><br><span class="line">| l2      | 104 | lemon      |   6.40 |</span><br><span class="line">| b2      | 104 | berry      |   7.60 |</span><br><span class="line">| m2      | 105 | xbabay     |   2.60 |</span><br><span class="line">| bs2     | 105 | melon      |   8.20 |</span><br><span class="line">| m3      | 105 | xxtt       |  11.60 |</span><br><span class="line">| m1      | 106 | mango      |  15.70 |</span><br><span class="line">| b5      | 107 | xxxx       |   3.60 |</span><br><span class="line">| t4      | 107 | xbababa    |   3.60 |</span><br><span class="line">| lyshark | 999 | lysharks   | 999.00 |</span><br><span class="line">+<span class="comment">---------+-----+------------+--------+</span></span><br><span class="line">17 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>上方排序的注意事项:</p>
+<blockquote>
+<p>在对多列进行排序的时候,首先排序的第一列必须有相同的列值,才会对第二列进行排序<br>如果第一列数据中所有值都是唯一的,将不再对第二列进行排序</p>
+</blockquote>
+</blockquote>
+<p><strong>指定排序方向:</strong> </p>
+<p>默认情况下,查询数据是按照字幕升序进行排序的<code>(A-Z)</code>,一般而言降序时使用<code>(desc)</code>,升序时使用<code>(asc)</code></p>
+<p>1.查询<code>lyshark表</code>中的<code>Name和Price字段</code>,对结果<code>按Price降序方式排列</code>,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select Name,Price from lyshark order by Price desc;</span><br><span class="line"></span><br><span class="line">+<span class="comment">------------+-----------+</span></span><br><span class="line">| Name       | Price     |</span><br><span class="line">+<span class="comment">------------+-----------+</span></span><br><span class="line">| lysharks   | 999999.99 |</span><br><span class="line">| mango      |     15.70 |</span><br><span class="line">| xxtt       |     11.60 |</span><br><span class="line">| orange     |     11.20 |</span><br><span class="line">| bannana    |     10.30 |</span><br><span class="line">| blackberry |     10.20 |</span><br><span class="line">| coconut    |      9.20 |</span><br><span class="line">| melon      |      8.20 |</span><br><span class="line">| berry      |      7.60 |</span><br><span class="line">| lemon      |      6.40 |</span><br><span class="line">| grape      |      5.30 |</span><br><span class="line">| apple      |      5.20 |</span><br><span class="line">| xxxx       |      3.60 |</span><br><span class="line">| xbababa    |      3.60 |</span><br><span class="line">| cherry     |      3.20 |</span><br><span class="line">| xbabay     |      2.60 |</span><br><span class="line">| apricot    |      2.20 |</span><br><span class="line">+<span class="comment">------------+-----------+</span></span><br><span class="line">17 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>2.查询<code>lyshark表</code>中的<code>Name和Price字段</code>,先按照<code>Price降序排列</code>,再<code>按照Name字段升序排列</code>,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select Name,Price from lyshark order by Price desc,Name asc;</span><br><span class="line"></span><br><span class="line">+<span class="comment">------------+-----------+</span></span><br><span class="line">| Name       | Price     |</span><br><span class="line">+<span class="comment">------------+-----------+</span></span><br><span class="line">| lysharks   | 999999.99 |</span><br><span class="line">| mango      |     15.70 |</span><br><span class="line">| xxtt       |     11.60 |</span><br><span class="line">| orange     |     11.20 |</span><br><span class="line">| bannana    |     10.30 |</span><br><span class="line">| blackberry |     10.20 |</span><br><span class="line">| coconut    |      9.20 |</span><br><span class="line">| melon      |      8.20 |</span><br><span class="line">| berry      |      7.60 |</span><br><span class="line">| lemon      |      6.40 |</span><br><span class="line">| grape      |      5.30 |</span><br><span class="line">| apple      |      5.20 |</span><br><span class="line">| xbababa    |      3.60 |</span><br><span class="line">| xxxx       |      3.60 |</span><br><span class="line">| cherry     |      3.20 |</span><br><span class="line">| xbabay     |      2.60 |</span><br><span class="line">| apricot    |      2.20 |</span><br><span class="line">+<span class="comment">------------+-----------+</span></span><br><span class="line">17 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="MariaDB-分组查询"><a href="#MariaDB-分组查询" class="headerlink" title="MariaDB 分组查询"></a>MariaDB 分组查询</h2><p>分组查询,是对数据按照某个或多个字段进行分组,MySQL中使用<code>group by</code>关键字对数据进行分组,基本语法形式为:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">[group by 字段] [having &lt;条件表达式&gt;]</span><br><span class="line"></span><br><span class="line"><span class="comment">#字段值为进行分组时所依据的列名称：having&lt;条件表达式&gt;指定满足表达式限定条件的结果将被显示</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="◆GROUP-BY创建分组◆"><a href="#◆GROUP-BY创建分组◆" class="headerlink" title="◆GROUP BY创建分组◆"></a>◆GROUP BY创建分组◆</h3><p><code>GROUP BY</code>关键字通常和集合函数一起使用,例如:MAXO、MINO、COUNTO、SUMO、AVGO.例如,要返回每个水果供应商提供的水果种类,这时就要在分组过程中用到<code>COUNTO函数</code>,把数据分为多个逻辑组,并对每个组进行集合计算.</p>
+<p><strong>实例1:</strong> 根据<code>Gid对lyshark表</code>中的数据进行分组,并<code>显示出每个编号对应水果的个数</code>,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select Gid,count(*) as Name from lyshark group by Gid;</span><br><span class="line"></span><br><span class="line">+<span class="comment">-----+------+</span></span><br><span class="line">| Gid | Name |</span><br><span class="line">+<span class="comment">-----+------+</span></span><br><span class="line">| 101 |    3 |</span><br><span class="line">| 102 |    3 |</span><br><span class="line">| 103 |    2 |</span><br><span class="line">| 104 |    2 |</span><br><span class="line">| 105 |    3 |</span><br><span class="line">| 106 |    1 |</span><br><span class="line">| 107 |    2 |</span><br><span class="line">| 999 |    1 |</span><br><span class="line">+<span class="comment">-----+------+</span></span><br><span class="line">8 rows in <span class="keyword">set</span> (<span class="number">0.08</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>上面的查询结果,显示Gid表示供应商的<code>ID Name字段</code>使用<code>COUNTO函数</code>计算得出.<code>GROUP BY</code>子句按照Gid排序并对数据分组,可以看到ID为<code>10l、102、105</code>的供应商分别提供3种水果,ID为<code>103、104、107</code>的供应商分别提供2种水果,ID为106的供应商只提供1种水果.</p>
+<p><strong>实例2:</strong> 根据Gid对<code>lyshark表</code>中的数据进行分组,并显示出每个编号对应水果的具体信息,SQL语句如下:</p>
+<p>如果要查看每个供应商提供的水果的种类的名称,该怎么办呢? MySQL中可以在<code>GROUP
+BY</code>子句中使用<code>GROUP CONCATO</code>函数,将每个分组中各个字段的值显示出来.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select Gid,group_concat(Name) as Name from lyshark group by Gid;</span><br><span class="line"></span><br><span class="line">+<span class="comment">-----+-------------------------+</span></span><br><span class="line">| Gid | Name                    |</span><br><span class="line">+<span class="comment">-----+-------------------------+</span></span><br><span class="line">| 101 | apple,blackberry,cherry |</span><br><span class="line">| 102 | grape,bannana,orange    |</span><br><span class="line">| 103 | apricot,coconut         |</span><br><span class="line">| 104 | lemon,berry             |</span><br><span class="line">| 105 | xbabay,xxtt,melon       |</span><br><span class="line">| 106 | mango                   |</span><br><span class="line">| 107 | xxxx,xbababa            |</span><br><span class="line">+<span class="comment">-----+-------------------------+</span></span><br><span class="line">7 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆使用having过滤分组◆"><a href="#◆使用having过滤分组◆" class="headerlink" title="◆使用having过滤分组◆"></a>◆使用having过滤分组◆</h3><p><code>group by</code>可以与<code>having</code>一起限定显示记录所需满足的条件,只有满足条件的分组才会被显示.</p>
+<p><strong>实例:</strong> 根据Gid对<code>lyshark表</code>中的数据进行分组,并显示水果种类大于1的分组信息,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select Gid,group_concat(Name) as Name</span><br><span class="line">    -&gt; from lyshark</span><br><span class="line">    -&gt; group by Gid having count(Name) &gt; 1;</span><br><span class="line"></span><br><span class="line">+<span class="comment">-----+-------------------------+</span></span><br><span class="line">| Gid | Name                    |</span><br><span class="line">+<span class="comment">-----+-------------------------+</span></span><br><span class="line">| 101 | apple,blackberry,cherry |</span><br><span class="line">| 102 | grape,bannana,orange    |</span><br><span class="line">| 103 | apricot,coconut         |</span><br><span class="line">| 104 | lemon,berry             |</span><br><span class="line">| 105 | xbabay,xxtt,melon       |</span><br><span class="line">| 107 | xxxx,xbababa            |</span><br><span class="line">+<span class="comment">-----+-------------------------+</span></span><br><span class="line">6 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆在Group-by子句中使用with-rollup◆"><a href="#◆在Group-by子句中使用with-rollup◆" class="headerlink" title="◆在Group by子句中使用with rollup◆"></a>◆在Group by子句中使用with rollup◆</h3><p>使用<code>with rollup</code>关键字之后,在所有查询的分组记录之后添加一条记录,该记录计算查询出的所有记录的总和,即统计记录数量.</p>
+<p><strong>实例:</strong> 根据Gid对<code>lyshark表</code>中的数据进行分组,并显示记录数量,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select Gid,count(*) as Name</span><br><span class="line">    -&gt; from lyshark</span><br><span class="line">    -&gt; group by Gid with rollup;</span><br><span class="line"></span><br><span class="line">+<span class="comment">-----+------+</span></span><br><span class="line">| Gid | Name |</span><br><span class="line">+<span class="comment">-----+------+</span></span><br><span class="line">| 101 |    3 |</span><br><span class="line">| 102 |    3 |</span><br><span class="line">| 103 |    2 |</span><br><span class="line">| 104 |    2 |</span><br><span class="line">| 105 |    3 |</span><br><span class="line">| 106 |    1 |</span><br><span class="line">| 107 |    2 |</span><br><span class="line">| NULL |   16 |    <span class="comment">#本行就是记录上面的统计总和</span></span><br><span class="line">+<span class="comment">-----+------+</span></span><br><span class="line">8 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆使用多字段分组◆"><a href="#◆使用多字段分组◆" class="headerlink" title="◆使用多字段分组◆"></a>◆使用多字段分组◆</h3><p>使用<code>GROUP BY</code>可以对多个字段进行分组,<code>GROUP BY关键字</code>后面跟需要分组的字段,MySQL根据多字段的值来进行层次分组,分组层次从左到右,即先按第1个字段分组,然后在第1个字段值相同的记录中,再根据第2个字段的值进行分组依次类推.</p>
+<p><strong>实例:</strong> 根据<code>Gid和Name字段</code>对<code>lyshark表</code>中的数据进行分组,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select * from lyshark group by Gid,Name;</span><br><span class="line"></span><br><span class="line">+<span class="comment">-----+-----+------------+-------+</span></span><br><span class="line">| Uid | Gid | Name       | Price |</span><br><span class="line">+<span class="comment">-----+-----+------------+-------+</span></span><br><span class="line">| a1  | 101 | apple      |  5.20 |</span><br><span class="line">| b1  | 101 | blackberry | 10.20 |</span><br><span class="line">| c0  | 101 | cherry     |  3.20 |</span><br><span class="line">| t1  | 102 | bannana    | 10.30 |</span><br><span class="line">| t2  | 102 | grape      |  5.30 |</span><br><span class="line">| bs1 | 102 | orange     | 11.20 |</span><br><span class="line">| a2  | 103 | apricot    |  2.20 |</span><br><span class="line">| o2  | 103 | coconut    |  9.20 |</span><br><span class="line">| b2  | 104 | berry      |  7.60 |</span><br><span class="line">| l2  | 104 | lemon      |  6.40 |</span><br><span class="line">| bs2 | 105 | melon      |  8.20 |</span><br><span class="line">| m2  | 105 | xbabay     |  2.60 |</span><br><span class="line">| m3  | 105 | xxtt       | 11.60 |</span><br><span class="line">| m1  | 106 | mango      | 15.70 |</span><br><span class="line">| t4  | 107 | xbababa    |  3.60 |</span><br><span class="line">| b5  | 107 | xxxx       |  3.60 |</span><br><span class="line">+<span class="comment">-----+-----+------------+-------+</span></span><br><span class="line">16 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>从上面可以看到,查询记录先按照Gid进行分组,在对Name字段不同的取值进行分组.</p>
+<h3 id="◆group-by和order-by-一起使用◆"><a href="#◆group-by和order-by-一起使用◆" class="headerlink" title="◆group by和order by 一起使用◆"></a>◆group by和order by 一起使用◆</h3><p>某些情况下,需要对分组进行排序,<code>order by</code>用来对查询的记录排序,如果和<code>group by</code>一起使用可以完成对分组的排序,为了演示效果,首先创建一个表结构,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; create table orderitems</span><br><span class="line">    -&gt; (</span><br><span class="line">    -&gt; o_num int not null,</span><br><span class="line">    -&gt; o_item int not null,</span><br><span class="line">    -&gt; f_id char(10) not null,</span><br><span class="line">    -&gt; quantity int not null,</span><br><span class="line">    -&gt; item_price decimal(8,2) not null,</span><br><span class="line">    -&gt; primary key(o_num,o_item)</span><br><span class="line">    -&gt; );</span><br><span class="line">Query OK, 0 rows affected (0.02 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; desc orderitems;</span><br><span class="line">+<span class="comment">------------+--------------+------+-----+---------+-------+</span></span><br><span class="line">| Field      | Type         | Null | Key | Default | Extra |</span><br><span class="line">+<span class="comment">------------+--------------+------+-----+---------+-------+</span></span><br><span class="line">| o_num      | int(11)      | NO   | PRI | NULL    |       |</span><br><span class="line">| o_item     | int(11)      | NO   | PRI | NULL    |       |</span><br><span class="line">| f_id       | char(10)     | NO   |     | NULL    |       |</span><br><span class="line">| quantity   | int(11)      | NO   |     | NULL    |       |</span><br><span class="line">| item_price | decimal(8,2) | NO   |     | NULL    |       |</span><br><span class="line">+<span class="comment">------------+--------------+------+-----+---------+-------+</span></span><br><span class="line">5 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> orderitems(o_num,o_item,f_id,quantity,item_price) <span class="keyword">values</span>(<span class="number">30001</span>,<span class="number">1</span>,<span class="string">'a1'</span>,<span class="number">10</span>,<span class="number">5.2</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> orderitems(o_num,o_item,f_id,quantity,item_price) <span class="keyword">values</span>(<span class="number">30001</span>,<span class="number">2</span>,<span class="string">'b2'</span>,<span class="number">3</span>,<span class="number">7.6</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> orderitems(o_num,o_item,f_id,quantity,item_price) <span class="keyword">values</span> (<span class="number">30001</span>,<span class="number">3</span>,<span class="string">'bs1'</span>,<span class="number">5</span>,<span class="number">11.2</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> orderitems(o_num,o_item,f_id,quantity,item_price) <span class="keyword">values</span> (<span class="number">30001</span>,<span class="number">4</span>,<span class="string">'bs2'</span>,<span class="number">15</span>,<span class="number">9.2</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> orderitems(o_num,o_item,f_id,quantity,item_price) <span class="keyword">values</span> (<span class="number">30002</span>,<span class="number">1</span>,<span class="string">'b3'</span>,<span class="number">2</span>,<span class="number">20.0</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> orderitems(o_num,o_item,f_id,quantity,item_price) <span class="keyword">values</span> (<span class="number">30003</span>,<span class="number">1</span>,<span class="string">'c0'</span>,<span class="number">100</span>,<span class="number">10</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> orderitems(o_num,o_item,f_id,quantity,item_price) <span class="keyword">values</span> (<span class="number">30004</span>,<span class="number">1</span>,<span class="string">'o2'</span>,<span class="number">50</span>,<span class="number">2.50</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> orderitems(o_num,o_item,f_id,quantity,item_price) <span class="keyword">values</span> (<span class="number">30005</span>,<span class="number">1</span>,<span class="string">'c0'</span>,<span class="number">5</span>,<span class="number">10</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> orderitems(o_num,o_item,f_id,quantity,item_price) <span class="keyword">values</span> (<span class="number">30005</span>,<span class="number">2</span>,<span class="string">'b1'</span>,<span class="number">10</span>,<span class="number">8.99</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> orderitems(o_num,o_item,f_id,quantity,item_price) <span class="keyword">values</span> (<span class="number">30005</span>,<span class="number">3</span>,<span class="string">'a2'</span>,<span class="number">10</span>,<span class="number">2.2</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> orderitems(o_num,o_item,f_id,quantity,item_price) <span class="keyword">values</span> (<span class="number">30005</span>,<span class="number">4</span>,<span class="string">'m1'</span>,<span class="number">5</span>,<span class="number">14.99</span>);</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例1:</strong> 查询订单价格<code>大于100</code>的订单号和总订单价格,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select o_num,sum(quantity * item_price) as orderTotal </span><br><span class="line">    -&gt; from orderitems</span><br><span class="line">    -&gt; group by o_num</span><br><span class="line">    -&gt; having sum(quantity * item_price) &gt;=100;</span><br><span class="line"></span><br><span class="line">+<span class="comment">-------+------------+</span></span><br><span class="line">| o_num | orderTotal |</span><br><span class="line">+<span class="comment">-------+------------+</span></span><br><span class="line">| 30001 |     268.80 |</span><br><span class="line">| 30003 |    1000.00 |</span><br><span class="line">| 30004 |     125.00 |</span><br><span class="line">| 30005 |     236.85 |</span><br><span class="line">+<span class="comment">-------+------------+</span></span><br><span class="line">4 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>以上可以看到,返回结果中并没有按照大小顺序排列,接下来使用<code>order by</code>关键字实现自动排序.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select o_num,sum(quantity * item_price) as orderTotal</span><br><span class="line">    -&gt; from orderitems</span><br><span class="line">    -&gt; group by o_num</span><br><span class="line">    -&gt; having sum(quantity * item_price) &gt;=100</span><br><span class="line">    -&gt; order by orderTotal;</span><br><span class="line"></span><br><span class="line">+<span class="comment">-------+------------+</span></span><br><span class="line">| o_num | orderTotal |</span><br><span class="line">+<span class="comment">-------+------------+</span></span><br><span class="line">| 30004 |     125.00 |</span><br><span class="line">| 30005 |     236.85 |</span><br><span class="line">| 30001 |     268.80 |</span><br><span class="line">| 30003 |    1000.00 |</span><br><span class="line">+<span class="comment">-------+------------+</span></span><br><span class="line">4 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="MariaDB-聚合查询"><a href="#MariaDB-聚合查询" class="headerlink" title="MariaDB 聚合查询"></a>MariaDB 聚合查询</h2><p>有时候我们并不需要返回实际表中的数据,而只是对数据进行总结.MySQL提供一些查询功能,可以对获取的数据进行分析和报告,这些函数的功能有:计算数据表中记录行数的总数、计算某个字段列下数据的总和,以及计算表中某个字段下的最大值、最小值或者平均值,下面将依次演示说明.</p>
+<h3 id="◆构建练习环境◆"><a href="#◆构建练习环境◆" class="headerlink" title="◆构建练习环境◆"></a>◆构建练习环境◆</h3><p>为了演示效果,首先创建一个表结构,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; create table test1</span><br><span class="line">    -&gt; (</span><br><span class="line">    -&gt; o_num int not null,</span><br><span class="line">    -&gt; o_item int not null,</span><br><span class="line">    -&gt; f_id char(10) not null,</span><br><span class="line">    -&gt; quantity int not null,</span><br><span class="line">    -&gt; item_price decimal(8,2) not null,</span><br><span class="line">    -&gt; primary key(o_num,o_item)</span><br><span class="line">    -&gt; );</span><br><span class="line">Query OK, 0 rows affected (0.02 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; desc test1;</span><br><span class="line">+<span class="comment">------------+--------------+------+-----+---------+-------+</span></span><br><span class="line">| Field      | Type         | Null | Key | Default | Extra |</span><br><span class="line">+<span class="comment">------------+--------------+------+-----+---------+-------+</span></span><br><span class="line">| o_num      | int(11)      | NO   | PRI | NULL    |       |</span><br><span class="line">| o_item     | int(11)      | NO   | PRI | NULL    |       |</span><br><span class="line">| f_id       | char(10)     | NO   |     | NULL    |       |</span><br><span class="line">| quantity   | int(11)      | NO   |     | NULL    |       |</span><br><span class="line">| item_price | decimal(8,2) | NO   |     | NULL    |       |</span><br><span class="line">+<span class="comment">------------+--------------+------+-----+---------+-------+</span></span><br><span class="line">rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>然后插入一些测试数据,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> test1(o_num,o_item,f_id,quantity,item_price) <span class="keyword">values</span>(<span class="number">30001</span>,<span class="number">1</span>,<span class="string">'a1'</span>,<span class="number">10</span>,<span class="number">5.2</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> test1(o_num,o_item,f_id,quantity,item_price) <span class="keyword">values</span>(<span class="number">30001</span>,<span class="number">2</span>,<span class="string">'b2'</span>,<span class="number">3</span>,<span class="number">7.6</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> test1(o_num,o_item,f_id,quantity,item_price) <span class="keyword">values</span> (<span class="number">30001</span>,<span class="number">3</span>,<span class="string">'bs1'</span>,<span class="number">5</span>,<span class="number">11.2</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> test1(o_num,o_item,f_id,quantity,item_price) <span class="keyword">values</span> (<span class="number">30001</span>,<span class="number">4</span>,<span class="string">'bs2'</span>,<span class="number">15</span>,<span class="number">9.2</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> test1(o_num,o_item,f_id,quantity,item_price) <span class="keyword">values</span> (<span class="number">30002</span>,<span class="number">1</span>,<span class="string">'b3'</span>,<span class="number">2</span>,<span class="number">20.0</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> test1(o_num,o_item,f_id,quantity,item_price) <span class="keyword">values</span> (<span class="number">30003</span>,<span class="number">1</span>,<span class="string">'c0'</span>,<span class="number">100</span>,<span class="number">10</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> test1(o_num,o_item,f_id,quantity,item_price) <span class="keyword">values</span> (<span class="number">30004</span>,<span class="number">1</span>,<span class="string">'o2'</span>,<span class="number">50</span>,<span class="number">2.50</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> test1(o_num,o_item,f_id,quantity,item_price) <span class="keyword">values</span> (<span class="number">30005</span>,<span class="number">1</span>,<span class="string">'c0'</span>,<span class="number">5</span>,<span class="number">10</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> test1(o_num,o_item,f_id,quantity,item_price) <span class="keyword">values</span> (<span class="number">30005</span>,<span class="number">2</span>,<span class="string">'b1'</span>,<span class="number">10</span>,<span class="number">8.99</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> test1(o_num,o_item,f_id,quantity,item_price) <span class="keyword">values</span> (<span class="number">30005</span>,<span class="number">3</span>,<span class="string">'a2'</span>,<span class="number">10</span>,<span class="number">2.2</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> test1(o_num,o_item,f_id,quantity,item_price) <span class="keyword">values</span> (<span class="number">30005</span>,<span class="number">4</span>,<span class="string">'m1'</span>,<span class="number">5</span>,<span class="number">14.99</span>);</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆COUNT-函数◆"><a href="#◆COUNT-函数◆" class="headerlink" title="◆COUNT()函数◆"></a>◆COUNT()函数◆</h3><p>简介：返回某列的行数<br>功能：此函数统计表中包含的记录行的总数,或者根据查询结果返回列中包含的数据行数</p>
+<p><strong>计算总行数:count(*)</strong> 查询<code>test1</code>表总行数,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select count(*) as temp from test1;   #as temp -&gt;表示定义总数的名称是temp</span><br><span class="line"></span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">| temp |</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">|   11 |</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>计算指定字段总行数:count(字段名)</strong> 查询<code>test1</code>表中<code>o_num</code>字段总数,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select count(o_num) as temp from test1;</span><br><span class="line"></span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">| temp |</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">|   11 |</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)    注释：如果列中有<span class="literal">NULL</span>则不会被记录</span><br></pre></td></tr></table></figure></p>
+<p><strong>综合起来:</strong> 查询<code>test1</code>表,<code>group by</code>关键字先以<code>o_num进行分组</code>,然后<code>计算每个分组中的总记录条数</code>,SQL语句如下：<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select o_num,count(o_item) from test1 group by o_num;</span><br><span class="line"></span><br><span class="line">+<span class="comment">-------+---------------+</span></span><br><span class="line">| o_num | count(o_item) |</span><br><span class="line">+<span class="comment">-------+---------------+</span></span><br><span class="line">| 30001 |             4 |</span><br><span class="line">| 30002 |             1 |</span><br><span class="line">| 30003 |             1 |</span><br><span class="line">| 30004 |             1 |</span><br><span class="line">| 30005 |             4 |</span><br><span class="line">+<span class="comment">-------+---------------+</span></span><br><span class="line">5 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆SUM-函数◆"><a href="#◆SUM-函数◆" class="headerlink" title="◆SUM()函数◆"></a>◆SUM()函数◆</h3><p>简介：返回某列的和<br>功能：此函数是一个求总和的函数,返回指定列值的总和</p>
+<p><strong>实例1:</strong> 在<code>test1</code>表中<code>查询30005号订单</code>,一共购买的水果总量,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; desc test1;</span><br><span class="line">+<span class="comment">------------+--------------+------+-----+---------+-------+</span></span><br><span class="line">| Field      | Type         | Null | Key | Default | Extra |</span><br><span class="line">+<span class="comment">------------+--------------+------+-----+---------+-------+</span></span><br><span class="line">| o_num      | int(11)      | NO   | PRI | NULL    |       |</span><br><span class="line">| o_item     | int(11)      | NO   | PRI | NULL    |       |</span><br><span class="line">| f_id       | char(10)     | NO   |     | NULL    |       |</span><br><span class="line">| quantity   | int(11)      | NO   |     | NULL    |       |</span><br><span class="line">| item_price | decimal(8,2) | NO   |     | NULL    |       |</span><br><span class="line">+<span class="comment">------------+--------------+------+-----+---------+-------+</span></span><br><span class="line">5 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; <span class="keyword">select</span> <span class="keyword">sum</span>(quantity) <span class="keyword">as</span> temp</span><br><span class="line">    -&gt; <span class="keyword">from</span> test1</span><br><span class="line">    -&gt; <span class="keyword">where</span> o_num=<span class="number">30005</span>;</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">| temp |</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">|   30 |</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>以上可看到,<code>sum(quantity)</code>函数返回订单中所有水果数量之和,where子句指定查询的订单号为<code>30005</code>.</p>
+<p><strong>实例2:</strong> 在<code>test1</code>表中,使用<code>sum()函数</code>,统计不同订单号中订购水果总量,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; desc test1;</span><br><span class="line">+<span class="comment">------------+--------------+------+-----+---------+-------+</span></span><br><span class="line">| Field      | Type         | Null | Key | Default | Extra |</span><br><span class="line">+<span class="comment">------------+--------------+------+-----+---------+-------+</span></span><br><span class="line">| o_num      | int(11)      | NO   | PRI | NULL    |       |</span><br><span class="line">| o_item     | int(11)      | NO   | PRI | NULL    |       |</span><br><span class="line">| f_id       | char(10)     | NO   |     | NULL    |       |</span><br><span class="line">| quantity   | int(11)      | NO   |     | NULL    |       |</span><br><span class="line">| item_price | decimal(8,2) | NO   |     | NULL    |       |</span><br><span class="line">+<span class="comment">------------+--------------+------+-----+---------+-------+</span></span><br><span class="line">5 rows in <span class="keyword">set</span> (<span class="number">0.01</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; <span class="keyword">select</span> o_num,<span class="keyword">sum</span>(quantity) <span class="keyword">as</span> temp</span><br><span class="line">    -&gt; <span class="keyword">from</span> test1</span><br><span class="line">    -&gt; <span class="keyword">group</span> <span class="keyword">by</span> o_num;</span><br><span class="line">+<span class="comment">-------+------+</span></span><br><span class="line">| o_num | temp |</span><br><span class="line">+<span class="comment">-------+------+</span></span><br><span class="line">| 30001 |   33 |</span><br><span class="line">| 30002 |    2 |</span><br><span class="line">| 30003 |  100 |</span><br><span class="line">| 30004 |   50 |</span><br><span class="line">| 30005 |   30 |</span><br><span class="line">+<span class="comment">-------+------+</span></span><br><span class="line">5 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>以上可知,<code>group by</code>按照订单号<code>o_num进行了分组</code>,sum()函数计算每个分组中订购水果的总量.</p>
+<h3 id="◆AVG-函数◆"><a href="#◆AVG-函数◆" class="headerlink" title="◆AVG()函数◆"></a>◆AVG()函数◆</h3><p>简介：返回某列的平均值<br>功能：avg()函数通过计算返回的行数和每一行数据的和,求得指定列数据的平均值</p>
+<p><strong>实例1:</strong> 在<code>test1</code>表中,查询<code>编号o_num为30005</code>的,字段的平均值,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select * from test1;</span><br><span class="line">+<span class="comment">-------+--------+------+----------+------------+</span></span><br><span class="line">| o_num | o_item | f_id | quantity | item_price |</span><br><span class="line">+<span class="comment">-------+--------+------+----------+------------+</span></span><br><span class="line">| 30001 |      1 | a1   |       10 |       5.20 |</span><br><span class="line">| 30001 |      2 | b2   |        3 |       7.60 |</span><br><span class="line">| 30001 |      3 | bs1  |        5 |      11.20 |</span><br><span class="line">| 30001 |      4 | bs2  |       15 |       9.20 |</span><br><span class="line">| 30002 |      1 | b3   |        2 |      20.00 |</span><br><span class="line">| 30003 |      1 | c0   |      100 |      10.00 |</span><br><span class="line">| 30004 |      1 | o2   |       50 |       2.50 |</span><br><span class="line">| 30005 |      1 | c0   |        5 |      10.00 |</span><br><span class="line">| 30005 |      2 | b1   |       10 |       8.99 |</span><br><span class="line">| 30005 |      3 | a2   |       10 |       2.20 |</span><br><span class="line">| 30005 |      4 | m1   |        5 |      14.99 |</span><br><span class="line">+<span class="comment">-------+--------+------+----------+------------+</span></span><br><span class="line">11 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; <span class="keyword">select</span> <span class="keyword">avg</span>(item_price) <span class="keyword">as</span> temp</span><br><span class="line">    -&gt; <span class="keyword">from</span> test1</span><br><span class="line">    -&gt; <span class="keyword">where</span> o_num=<span class="number">30005</span>;</span><br><span class="line">+<span class="comment">----------+</span></span><br><span class="line">| temp     |</span><br><span class="line">+<span class="comment">----------+</span></span><br><span class="line">| 9.045000 |</span><br><span class="line">+<span class="comment">----------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例2:</strong> 在<code>test1</code>表中,查询<code>重复字段o_num</code>的所有<code>item_price</code>字段的平均值,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select * from test1;</span><br><span class="line">+<span class="comment">-------+--------+------+----------+------------+</span></span><br><span class="line">| o_num | o_item | f_id | quantity | item_price |</span><br><span class="line">+<span class="comment">-------+--------+------+----------+------------+</span></span><br><span class="line">| 30001 |      1 | a1   |       10 |       5.20 |</span><br><span class="line">| 30001 |      2 | b2   |        3 |       7.60 |</span><br><span class="line">| 30001 |      3 | bs1  |        5 |      11.20 |</span><br><span class="line">| 30001 |      4 | bs2  |       15 |       9.20 |</span><br><span class="line">| 30002 |      1 | b3   |        2 |      20.00 |</span><br><span class="line">| 30003 |      1 | c0   |      100 |      10.00 |</span><br><span class="line">| 30004 |      1 | o2   |       50 |       2.50 |</span><br><span class="line">| 30005 |      1 | c0   |        5 |      10.00 |</span><br><span class="line">| 30005 |      2 | b1   |       10 |       8.99 |</span><br><span class="line">| 30005 |      3 | a2   |       10 |       2.20 |</span><br><span class="line">| 30005 |      4 | m1   |        5 |      14.99 |</span><br><span class="line">+<span class="comment">-------+--------+------+----------+------------+</span></span><br><span class="line">11 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; <span class="keyword">select</span> o_num,<span class="keyword">avg</span>(item_price)</span><br><span class="line">    -&gt; <span class="keyword">from</span> test1</span><br><span class="line">    -&gt; <span class="keyword">group</span> <span class="keyword">by</span> o_num;</span><br><span class="line">+<span class="comment">-------+-----------------+</span></span><br><span class="line">| o_num | avg(item_price) |</span><br><span class="line">+<span class="comment">-------+-----------------+</span></span><br><span class="line">| 30001 |        8.300000 |</span><br><span class="line">| 30002 |       20.000000 |</span><br><span class="line">| 30003 |       10.000000 |</span><br><span class="line">| 30004 |        2.500000 |</span><br><span class="line">| 30005 |        9.045000 |</span><br><span class="line">+<span class="comment">-------+-----------------+</span></span><br><span class="line">5 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆MAX-函数◆"><a href="#◆MAX-函数◆" class="headerlink" title="◆MAX()函数◆"></a>◆MAX()函数◆</h3><p>简介：返回某列的最大值<br>功能：max()返回指定列中的最大值</p>
+<p><strong>实例1:</strong> 在<code>test1</code>表中,<code>查询item_price字段中最大</code>的数据,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select * from test1;</span><br><span class="line">+<span class="comment">-------+--------+------+----------+------------+</span></span><br><span class="line">| o_num | o_item | f_id | quantity | item_price |</span><br><span class="line">+<span class="comment">-------+--------+------+----------+------------+</span></span><br><span class="line">| 30001 |      1 | a1   |       10 |       5.20 |</span><br><span class="line">| 30001 |      2 | b2   |        3 |       7.60 |</span><br><span class="line">| 30001 |      3 | bs1  |        5 |      11.20 |</span><br><span class="line">| 30001 |      4 | bs2  |       15 |       9.20 |</span><br><span class="line">| 30002 |      1 | b3   |        2 |      20.00 |</span><br><span class="line">| 30003 |      1 | c0   |      100 |      10.00 |</span><br><span class="line">| 30004 |      1 | o2   |       50 |       2.50 |</span><br><span class="line">| 30005 |      1 | c0   |        5 |      10.00 |</span><br><span class="line">| 30005 |      2 | b1   |       10 |       8.99 |</span><br><span class="line">| 30005 |      3 | a2   |       10 |       2.20 |</span><br><span class="line">| 30005 |      4 | m1   |        5 |      14.99 |</span><br><span class="line">+<span class="comment">-------+--------+------+----------+------------+</span></span><br><span class="line">11 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; <span class="keyword">select</span> <span class="keyword">max</span>(item_price) <span class="keyword">as</span> <span class="keyword">max</span> <span class="keyword">from</span> test1;</span><br><span class="line">+<span class="comment">-------+</span></span><br><span class="line">| max   |</span><br><span class="line">+<span class="comment">-------+</span></span><br><span class="line">| 20.00 |</span><br><span class="line">+<span class="comment">-------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; <span class="keyword">select</span> o_num,<span class="keyword">max</span>(item_price) <span class="keyword">as</span> <span class="keyword">max</span> <span class="keyword">from</span> test1;   <span class="comment">#加上ID号，方便区分</span></span><br><span class="line">+<span class="comment">-------+-------+</span></span><br><span class="line">| o_num | max   |</span><br><span class="line">+<span class="comment">-------+-------+</span></span><br><span class="line">| 30001 | 20.00 |</span><br><span class="line">+<span class="comment">-------+-------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.01</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>也可以对上面的查询结果进行排序,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select o_num,max(item_price) as max from test1 group by o_num;</span><br><span class="line"></span><br><span class="line">+<span class="comment">-------+-------+</span></span><br><span class="line">| o_num | max   |</span><br><span class="line">+<span class="comment">-------+-------+</span></span><br><span class="line">| 30001 | 11.20 |</span><br><span class="line">| 30002 | 20.00 |</span><br><span class="line">| 30003 | 10.00 |</span><br><span class="line">| 30004 |  2.50 |</span><br><span class="line">| 30005 | 14.99 |</span><br><span class="line">+<span class="comment">-------+-------+</span></span><br><span class="line">5 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆MIN-函数◆"><a href="#◆MIN-函数◆" class="headerlink" title="◆MIN()函数◆"></a>◆MIN()函数◆</h3><p>简介：返回某列的最小值<br>功能：min()函数返回查询列中的最小值</p>
+<p><strong>实例1:</strong> 在<code>test1</code>表中,<code>查询item_price字段</code>,最小的值,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select * from test1;</span><br><span class="line">+<span class="comment">-------+--------+------+----------+------------+</span></span><br><span class="line">| o_num | o_item | f_id | quantity | item_price |</span><br><span class="line">+<span class="comment">-------+--------+------+----------+------------+</span></span><br><span class="line">| 30001 |      1 | a1   |       10 |       5.20 |</span><br><span class="line">| 30001 |      2 | b2   |        3 |       7.60 |</span><br><span class="line">| 30001 |      3 | bs1  |        5 |      11.20 |</span><br><span class="line">| 30001 |      4 | bs2  |       15 |       9.20 |</span><br><span class="line">| 30002 |      1 | b3   |        2 |      20.00 |</span><br><span class="line">| 30003 |      1 | c0   |      100 |      10.00 |</span><br><span class="line">| 30004 |      1 | o2   |       50 |       2.50 |</span><br><span class="line">| 30005 |      1 | c0   |        5 |      10.00 |</span><br><span class="line">| 30005 |      2 | b1   |       10 |       8.99 |</span><br><span class="line">| 30005 |      3 | a2   |       10 |       2.20 |</span><br><span class="line">| 30005 |      4 | m1   |        5 |      14.99 |</span><br><span class="line">+<span class="comment">-------+--------+------+----------+------------+</span></span><br><span class="line">11 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; <span class="keyword">select</span> <span class="keyword">min</span>(item_price) <span class="keyword">as</span> <span class="keyword">min</span> <span class="keyword">from</span> test1;</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">| min  |</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">| 2.20 |</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>也可以对上面的结果排序输出,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select o_num,min(item_price) as min from lyshark group by item_price;</span><br><span class="line">+<span class="comment">-------+-------+</span></span><br><span class="line">| o_num | min   |</span><br><span class="line">+<span class="comment">-------+-------+</span></span><br><span class="line">| 30005 |  2.20 |</span><br><span class="line">| 30004 |  2.50 |</span><br><span class="line">| 30001 |  5.20 |</span><br><span class="line">| 30001 |  7.60 |</span><br><span class="line">| 30005 |  8.99 |</span><br><span class="line">| 30001 |  9.20 |</span><br><span class="line">| 30003 | 10.00 |</span><br><span class="line">| 30001 | 11.20 |</span><br><span class="line">| 30005 | 14.99 |</span><br><span class="line">| 30002 | 20.00 |</span><br><span class="line">+<span class="comment">-------+-------+</span></span><br><span class="line">10 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/12/25/MariaDB/MariaDB-单表查询与聚合-5/">MariaDB 单表查询与聚合(5)</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年12月25日 - 10:12</p>
+  <p><span>最后更新:</span>2018年12月25日 - 17:12</p>
+  <p><span>原始链接:</span><a href="/2018/12/25/MariaDB/MariaDB-单表查询与聚合-5/" title="MariaDB 单表查询与聚合(5)">https://www.mkdirs.com/2018/12/25/MariaDB/MariaDB-单表查询与聚合-5/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/MariaDB/" rel="tag"> <i class="fa fa-tag"></i> MariaDB</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/24/MariaDB/MariaDB-数据类型与运算符-4/" rel="next" title="MariaDB 数据类型与运算符(4)">
+                <i class="fa fa-chevron-left"></i> MariaDB 数据类型与运算符(4)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/26/MariaDB/MariaDB-连接查询与子查询-6/" rel="prev" title="MariaDB 连接查询与子查询(6)">
+                MariaDB 连接查询与子查询(6) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#查询语句简介"><span class="nav-text">查询语句简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MariaDB-常规查询"><span class="nav-text">MariaDB 常规查询</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆基本的字段查询◆"><span class="nav-text">◆基本的字段查询◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆查询指定的记录◆"><span class="nav-text">◆查询指定的记录◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆带IN关键字查询◆"><span class="nav-text">◆带IN关键字查询◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆带BETWEEN范围查询◆"><span class="nav-text">◆带BETWEEN范围查询◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆带LIKE的字符匹配查询◆"><span class="nav-text">◆带LIKE的字符匹配查询◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆匹配查询一个空值◆"><span class="nav-text">◆匹配查询一个空值◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆带AND多条件查询◆"><span class="nav-text">◆带AND多条件查询◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆带OR的多条件查询◆"><span class="nav-text">◆带OR的多条件查询◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆使查询结果不重复◆"><span class="nav-text">◆使查询结果不重复◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆LIMIT限制查询结果◆"><span class="nav-text">◆LIMIT限制查询结果◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MariaDB-查询排序"><span class="nav-text">MariaDB 查询排序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MariaDB-分组查询"><span class="nav-text">MariaDB 分组查询</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆GROUP-BY创建分组◆"><span class="nav-text">◆GROUP BY创建分组◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆使用having过滤分组◆"><span class="nav-text">◆使用having过滤分组◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆在Group-by子句中使用with-rollup◆"><span class="nav-text">◆在Group by子句中使用with rollup◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆使用多字段分组◆"><span class="nav-text">◆使用多字段分组◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆group-by和order-by-一起使用◆"><span class="nav-text">◆group by和order by 一起使用◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MariaDB-聚合查询"><span class="nav-text">MariaDB 聚合查询</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆构建练习环境◆"><span class="nav-text">◆构建练习环境◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆COUNT-函数◆"><span class="nav-text">◆COUNT()函数◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆SUM-函数◆"><span class="nav-text">◆SUM()函数◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆AVG-函数◆"><span class="nav-text">◆AVG()函数◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆MAX-函数◆"><span class="nav-text">◆MAX()函数◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆MIN-函数◆"><span class="nav-text">◆MIN()函数◆</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

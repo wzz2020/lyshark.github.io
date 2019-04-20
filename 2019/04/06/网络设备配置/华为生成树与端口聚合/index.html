@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="交换机(Switch)是一种用于电信号转发的网络设备,它可以为接入交换机的任意两个网络节点提供独享的电信号通路,最常见的交换机是以太网交换机,其他常见的还有电话语音交换机、光纤交换机等,交换机是集线器的升级替代产品,理论上讲交换机就是按照通信两端传输信息的需求,将需要的信息发送到目标设备上的网络组件.">
+<meta name="keywords" content="网络设备配置,huawei">
+<meta property="og:type" content="article">
+<meta property="og:title" content="华为生成树与端口聚合">
+<meta property="og:url" content="https://www.mkdirs.com/2019/04/06/网络设备配置/华为生成树与端口聚合/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="交换机(Switch)是一种用于电信号转发的网络设备,它可以为接入交换机的任意两个网络节点提供独享的电信号通路,最常见的交换机是以太网交换机,其他常见的还有电话语音交换机、光纤交换机等,交换机是集线器的升级替代产品,理论上讲交换机就是按照通信两端传输信息的需求,将需要的信息发送到目标设备上的网络组件.">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20190408095242.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20190408120823.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20190408150929.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20190408153847.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20190408165319.jpg">
+<meta property="og:updated_time" content="2019-04-16T06:12:51.282Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="华为生成树与端口聚合">
+<meta name="twitter:description" content="交换机(Switch)是一种用于电信号转发的网络设备,它可以为接入交换机的任意两个网络节点提供独享的电信号通路,最常见的交换机是以太网交换机,其他常见的还有电话语音交换机、光纤交换机等,交换机是集线器的升级替代产品,理论上讲交换机就是按照通信两端传输信息的需求,将需要的信息发送到目标设备上的网络组件.">
+<meta name="twitter:image" content="https://www.mkdirs.com/picture/20190408095242.jpg">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2019/04/06/网络设备配置/华为生成树与端口聚合/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>华为生成树与端口聚合 | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2019/04/06/网络设备配置/华为生成树与端口聚合/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">华为生成树与端口聚合
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-04-06 15:54:13" itemprop="dateCreated datePublished" datetime="2019-04-06T15:54:13+08:00">2019-04-06</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-16 14:12:51" itemprop="dateModified" datetime="2019-04-16T14:12:51+08:00">2019-04-16</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/网络设备配置/" itemprop="url" rel="index"><span itemprop="name">网络设备配置</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>交换机(Switch)是一种用于电信号转发的网络设备,它可以为接入交换机的任意两个网络节点提供独享的电信号通路,最常见的交换机是以太网交换机,其他常见的还有电话语音交换机、光纤交换机等,交换机是集线器的升级替代产品,理论上讲交换机就是按照通信两端传输信息的需求,将需要的信息发送到目标设备上的网络组件.</p>
+<a id="more"></a>
+<p><br></p>
+<h2 id="STP-技术简介"><a href="#STP-技术简介" class="headerlink" title="STP 技术简介"></a>STP 技术简介</h2><h3 id="◆冗余技术概述◆"><a href="#◆冗余技术概述◆" class="headerlink" title="◆冗余技术概述◆"></a>◆冗余技术概述◆</h3><p>冗余技术又称为储备技术,是利用并联模型来提高网络可靠性的一种手段,它通过向网络中增加备用的链路,当一条通信信道出现故障时,自动切换到备用的通信信道,从而提高网络的稳定性和可靠性.</p>
+<p>冗余技术虽然可以提高网络的稳定性和可靠性,但是也会产生许多的问题,如果两个交换机相连的话会造成交换机环路,出现的问题就是随机出现网络不通的现象,严重的话还会导致网络广播风暴,重复拷贝帧,MAC地址表不稳地等情况,但如果是智能交换机的话则不会出现此种情况,以下将分别介绍这几种环路的基本原理.</p>
+<p><strong>广播风暴:</strong> 在物理网络中出现环路现象,且没有采取解决措施的情况下,一旦域内有某个主机发送了广播帧,则当域内的交换机接收到数据后,就会不停的发送和转发广播帧,从而形成网络广播风暴,网络广播风暴会长时间占用网络带宽,和交换机CPU资源,影响网络性能,甚至引起整个网络瘫痪.</p>
+<p><strong>重复拷贝帧:</strong> 重复拷贝帧也称多帧复制,是指单播帧可能被多次复制传送到目标主机上去,此时数据帧的多个副本会保存在目标主机上,从而造成主机资源的浪费,甚至会造成目的主机无法选择其他来源的数据帧而导致数据丢失,简单的来讲就是数据分别从两个口进入了目的主机,导致目的主机MAC地址表中存在多个数据帧,有时还会导致数据的多次覆盖,从而无法接收到准确的数据.</p>
+<p><strong>MAC地址表不稳定:</strong> 一般情况下交换机接收到数据时,会将接收数据帧的端口与发送主机MAC地址的对应关系添加到本机的MAC地址表中,那么如果交换机在不同的端口接收到同一个数据帧的多份副本,将造成MAC地址表在短时间内被多次修改,和循环重复的覆盖,从而影响MAC地址表的稳定性.</p>
+<p>以上几种情况是冗余技术的技术瓶颈所在,在实际的应用中网络的结构往往会很复杂,有更多的冗余链路,从而会产生更多的交换机环路,因此所带来的网络广播风暴,多帧复制会更加的严重,就因为这种需求,STP就由此诞生了.</p>
+<h3 id="◆STP生成树协议◆"><a href="#◆STP生成树协议◆" class="headerlink" title="◆STP生成树协议◆"></a>◆STP生成树协议◆</h3><p>为了解决网络冗余链路所产生的问题,IEEE定义了802.1D协议,即生成树协议STP,利用生成树协议可以避免帧在环路中的增生和无限循环,生成树的主要思想是,当两个交换机之间存在多条链路时,通过一定的算法只激活其中最主要的一条链路,而将其他冗余链路阻塞掉变为备用链路,当主链路出现问题时,生成树协议将自动启用备用链路,整个过程不需要认为干预.</p>
+<p>STP协议中定义了,根桥(RootBridge),根端口(Root Port),指定端口(Designated Port),路径开销(Path Cost)等概念,目的在于通过构建一棵自然树的方法阻塞冗余链路,同时实现链路备份和链路最优化.</p>
+<p>STP协议的通信,是通过桥协议数据单元(BPDU)进行通信的,它是运行STP的交换机之间交流消息帧,所有的支持STP协议的交换机都能接收并处理BPDU报文.</p>
+<blockquote>
+<p><strong>STP工作过程:</strong> 选举根桥-&gt;选举根端口-&gt;选举指定端口-&gt;STP阻塞非根</p>
+<blockquote>
+<p>1.选举根桥:交换机假定自己是根,然后发送BPDU报文给其他交换机,最终选出ID号最小的交换机作为根桥.<br>2.选举根端口:每台非根交换机都会选举出一个根端口,并且仅有一个根端口,并按照优先级选择一个根端口.<br>3.选举指定端口:选择一条网桥到根桥的路径成本最小的路径,或者发送方的网桥ID最大的作为指定端口.<br>4.选择阻塞端口:至此,就会根据STP算法,从多个链路中选择性的阻塞掉一些端口的数据通信.</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p><strong>STP端口状态:</strong></p>
+<blockquote>
+<p>1.阻塞(Blocking):端口只接受BPDU,不能接收或发送数据,也不能把学习到的MAC地址天机到MAC地址表中.<br>2.转发(Forwarding):端口能够接收并转发数据,也能够学习MAC地址,并添加到MAC地址表中.<br>3.侦听(Listening):该状态是从阻塞到转发状态过程中的临时状态,该状态只能发送和接受BPDU数据.<br>4.学习(Learning):该状态是从阻塞到转发状态过程中的临时状态,该状态不能够发送或接收数据.<br>5.关闭(Disable):该状态端口只提供网络管理服务,不能接受发送任何数据,也就是停止服务的状态.</p>
+</blockquote>
+</blockquote>
+<h3 id="◆RSTP-快速生成树◆"><a href="#◆RSTP-快速生成树◆" class="headerlink" title="◆RSTP 快速生成树◆"></a>◆RSTP 快速生成树◆</h3><p>STP协议虽然解决了链路闭合引起的死循环问题,但是在端口从阻塞状态到转发状态间经过了一个只学习MAC地址但不参与转发的过程,产生了转发延时(默认15秒),从而使得生成树的收敛过程需要较长的时间,一般是转发延时的两倍.</p>
+<p>为了解决STP收敛时间过长的缺点,IEEE又推出了802.1w标准,定义了<code>RSTP(快速生成树)</code>协议.RSTP协议在网络配置参数发生变化时,能够显著的减少网络的收敛时间,由于RSTP是从STP发展而来的,其与STP协议保持高度的兼容性,RSTP协议规定,在某些情况下,处于阻塞状态的端口不必经历<code>阻塞-&gt;侦听-&gt;学习-&gt;转发</code>这一个过程,就可以直接进入转发状态.</p>
+<blockquote>
+<p><strong>RSTP协议只有以下三种:</strong></p>
+<blockquote>
+<p>1.丢弃(Discarding):RSTP将STP中的阻塞,禁用,和侦听统称为丢弃模式.<br>2.学习(Learning):拓扑有所变动情况下,端口处于学习状态并学习MAC地址,将其添加到MAC地址表.<br>3.转发(Forwarding):在网络拓扑稳定后,端口处于转发状态,并开始转发数据包.</p>
+</blockquote>
+</blockquote>
+<p>以上就是生成树协议的常用内容,对比后会发现,RSTP的收敛时间明显低于STP,解决了数据同步过慢的问题所在.<br><br></p>
+<h2 id="生成树的配置"><a href="#生成树的配置" class="headerlink" title="生成树的配置"></a>生成树的配置</h2><p>接下来通过一个具体的实例,来完成生成树的配置命令和配置流程的实践,以下实验我们将把<code>LSW1(三层交换)</code>配置成根桥,将<code>LSW2(二层交换)</code>配置为备份根桥,实验拓扑结构如下图:</p>
+<p><img src="/picture/20190408095242.jpg" alt="blockchain"></p>
+<p><strong>判断根桥:</strong> 首先我们需要判断当前的根桥是哪一个设备,我们分别在四台交换机上执行<code>display stp</code>命令或者执行<code>display stp brief</code>命令,来查询默认那一台是根桥设备,以下根据查询到的结果可以知道,<code>32768.4c1f-cc07-18c4</code>的MAC地址为根桥设备.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;LSW1&gt; display stp                                              // 判断根桥命令</span><br><span class="line">&lt;LSW2&gt; display stp</span><br><span class="line">&lt;LSW3&gt; display stp</span><br><span class="line">&lt;LSW4&gt; display stp</span><br><span class="line">-------[CIST Global Info][Mode MSTP]-------</span><br><span class="line">CIST Bridge         :32768.4c1f-cc25-08bd                         // 本机优先级</span><br><span class="line">Config Times        :Hello 2s MaxAge 20s FwDly 15s MaxHop 20      // 数据包发送时间</span><br><span class="line">Active Times        :Hello 2s MaxAge 20s FwDly 15s MaxHop 20</span><br><span class="line">CIST Root/ERPC      :32768.4c1f-cc07-18c4 / 20000                 // 根桥MAC地址</span><br><span class="line">CIST RegRoot/IRPC   :32768.4c1f-cc25-08bd / 0                     // 备份根桥MAC地址</span><br><span class="line"></span><br><span class="line">&lt;LSW1&gt; display stp brief                                          // 查询接口状态</span><br><span class="line"> MSTID  Port                        Role  STP State     Protection</span><br><span class="line">   0    GigabitEthernet0/0/1        DESI  FORWARDING      NONE</span><br><span class="line">   0    GigabitEthernet0/0/2        ROOT  FORWARDING      NONE</span><br></pre></td></tr></table></figure></p>
+<p><strong>指定根桥:</strong> 我们想让<code>LSW1(三层交换)</code>作为根桥设备,此时可在三层交换机上,直接通过以下命令,更换根桥设备.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;LSW1&gt; system-view</span><br><span class="line">[LSW1] stp root primary</span><br><span class="line">[LSW1] display stp</span><br><span class="line">-------[CIST Global Info][Mode MSTP]-------</span><br><span class="line">CIST Bridge         :0    .4c1f-cc25-08bd                       // 本机桥ID</span><br><span class="line">Config Times        :Hello 2s MaxAge 20s FwDly 15s MaxHop 20</span><br><span class="line">Active Times        :Hello 2s MaxAge 20s FwDly 15s MaxHop 20</span><br><span class="line">CIST Root/ERPC      :0    .4c1f-cc25-08bd / 0                   // 根桥ID</span><br><span class="line">CIST RegRoot/IRPC   :0    .4c1f-cc25-08bd / 0</span><br></pre></td></tr></table></figure></p>
+<p><strong>指定备份根桥:</strong> 接下来将<code>LSW2(二层交换)</code>指定为备份根桥,当<code>LSW1(三层交换)</code>出现故障后,<code>LSW2(二层交换)</code>将被选举为根桥设备,从而保证网络的正常运转,修改方式通过以下命令即可实现.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;LSW2&gt; system-view</span><br><span class="line">[LSW2] stp root secondary</span><br><span class="line"></span><br><span class="line">[LSW2] display stp</span><br><span class="line">-------[CIST Global Info][Mode MSTP]-------</span><br><span class="line">CIST Bridge         :4096 .4c1f-cc45-2199</span><br><span class="line">Config Times        :Hello 2s MaxAge 20s FwDly 15s MaxHop 20</span><br><span class="line">Active Times        :Hello 2s MaxAge 20s FwDly 15s MaxHop 20</span><br><span class="line">CIST Root/ERPC      :0    .4c1f-cc25-08bd / 200000            // 根桥MAC地址</span><br><span class="line">CIST RegRoot/IRPC   :4096 .4c1f-cc45-2199 / 0                 // 备份根桥MAC地址</span><br><span class="line">CIST RootPortId     :128.1</span><br></pre></td></tr></table></figure></p>
+<p>此时配置到这里,我们可以手动关闭<code>LSW1(三层交换)</code>,然后去查看<code>LSW2(二层交换)</code>,通过<code>display stp</code>命令,你会发现当三层交换机关机的时候,二层交换机默认变成了根桥,顶替了<code>LSW1(三层交换)</code>的工作,当<code>LSW1(三层交换)</code>启动后,默认会将<code>LSW1(三层交换)</code>再次恢复成根桥.<br><br></p>
+<h2 id="配置端口聚合"><a href="#配置端口聚合" class="headerlink" title="配置端口聚合"></a>配置端口聚合</h2><p>在我们的实际生产环境中,常常将交换机之间用多条链路连接起来,以获得更高的传输能力和网络性能,但根据之前的生成树协议,当交换机之间有冗余链路时,实际工作的链路只有一条,也就是说生成树协议阻碍了网络传输能力的提高.</p>
+<p>为了解决生成树协议的传输能力的不足,出现了一种名为<code>端口聚合</code>的技术,它将多条物理链路组合成一条逻辑线路,实现链路带宽的增加,且还具有冗余作用,当其中部分链路出现故障时,其他链路还可以继续传输数据.</p>
+<blockquote>
+<p>但是并不是所有的端口都可以任意聚合,端口聚合需要满足以下条件.</p>
+<blockquote>
+<p>1.聚合的端口配置需要相同,包括端口速率和传输介质等.<br>2.聚合的端口必须属于同一个VLAN,也就是不许再一个虚拟局域网中.<br>3.聚合的端口类型必须相同,二层端口只能二层聚合,三层端口只能三层聚合.</p>
+</blockquote>
+</blockquote>
+<p>端口聚合形成的逻辑端口称为<code>聚合端口</code>,端口聚合后原来端口的属性就会被聚合端口的属性所覆盖,也不能在源端口上做任何配置,实现端口聚合后,即使网络链路出现故障,只要不是所有链路都故障,网络还是可以继续运行的,只不过网络传输速度会降低而已.</p>
+<p>下面将用一个具体的实例讲解端口聚合的配置方法和配置过程,包括创建聚合端口,配置聚合端口的工作方式和配置负载平衡,首先分别创建<code>两个三层交换机</code>,并通过网线<code>Gig 0/0/1-3</code>三条冗余链路相连接,拓扑图如下:</p>
+<p><img src="/picture/20190408120823.jpg" alt="blockchain"></p>
+<p><strong>创建聚合端口:</strong> 在两台交换机上创建<code>Eth-Trunk接口</code>并加入成员接口,配置如下.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#----在LSW1上操作-------------------------</span><br><span class="line">&lt;Huawei&gt; system-view</span><br><span class="line">[Huawei] sysname LSW1                                         // 重命名交换机</span><br><span class="line">[LSW1] interface Eth-Trunk 1                                  // 配置聚合号</span><br><span class="line">[LSW1-Eth-Trunk1] trunkport GigabitEthernet 0/0/1 to 0/0/3    // 选择1-3号端口</span><br><span class="line">[LSW1-Eth-Trunk1] quit</span><br><span class="line"></span><br><span class="line">#----在LSW2上操作-------------------------</span><br><span class="line">&lt;Huawei&gt; system-view</span><br><span class="line">[Huawei] sysname LSW2</span><br><span class="line">[LSW2] interface Eth-Trunk 1</span><br><span class="line">[LSW2-Eth-Trunk1] trunkport GigabitEthernet 0/0/1 to 0/0/3</span><br><span class="line">[LSW2-Eth-Trunk1] quit</span><br></pre></td></tr></table></figure></p>
+<p><strong>创建VLAN:</strong> 在两台交换机上分别创建<code>VLAN10</code>和<code>VLAN20</code>并将主机加入到相应的虚拟局域网内.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#----在LSW1上操作-------------------------</span><br><span class="line">[LSW1] vlan batch 10 20                                        // 创建VLAN10与20</span><br><span class="line">[LSW1] interface GigabitEthernet 0/0/4                         // 选择Gig0/0/4端口</span><br><span class="line">[LSW1-GigabitEthernet0/0/4] port link-type trunk               // 配置成trunk</span><br><span class="line">[LSW1-GigabitEthernet0/0/4] port trunk allow-pass vlan 10      // 应用到vlan10</span><br><span class="line">[LSW1-GigabitEthernet0/0/4] quit</span><br><span class="line">[LSW1] interface GigabitEthernet 0/0/5</span><br><span class="line">[LSW1-GigabitEthernet0/0/5] port link-type trunk</span><br><span class="line">[LSW1-GigabitEthernet0/0/5] port trunk allow-pass vlan 20</span><br><span class="line">[LSW1-GigabitEthernet0/0/5] quit</span><br><span class="line"></span><br><span class="line">#----在LSW2上操作-------------------------</span><br><span class="line">[LSW2] vlan batch 10 20</span><br><span class="line">[LSW2] interface GigabitEthernet 0/0/4</span><br><span class="line">[LSW2-GigabitEthernet0/0/4] port link-type trunk</span><br><span class="line">[LSW2-GigabitEthernet0/0/4] port trunk allow-pass vlan 10</span><br><span class="line">[LSW2-GigabitEthernet0/0/4] quit</span><br><span class="line">[LSW2] interface GigabitEthernet 0/0/5</span><br><span class="line">[LSW2-GigabitEthernet0/0/5] port link-type trunk</span><br><span class="line">[LSW2-GigabitEthernet0/0/5] port trunk allow-pass vlan 20</span><br><span class="line">[LSW2-GigabitEthernet0/0/5] quit</span><br></pre></td></tr></table></figure></p>
+<p><strong>配置端口聚合:</strong> 配置<code>Eth-Trunk1</code>接口允许<code>VLAN10和VLAN20</code>通过,两台交换机都需要配置.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#----在LSW1上操作-------------------------</span><br><span class="line">[LSW1] interface Eth-Trunk 1</span><br><span class="line">[LSW1-Eth-Trunk1] port link-type trunk                   // 将接口设置为trunk</span><br><span class="line">[LSW1-Eth-Trunk1] port trunk allow-pass vlan 10 20       // 配置允许的VLAN</span><br><span class="line">[LSW1-Eth-Trunk1] load-balance src-dst-mac               // 配置负载平衡方式</span><br><span class="line"></span><br><span class="line">#----在LSW2上操作-------------------------</span><br><span class="line">[LSW2] interface Eth-Trunk 1</span><br><span class="line">[LSW2-Eth-Trunk1] port link-type trunk</span><br><span class="line">[LSW2-Eth-Trunk1] port trunk allow-pass vlan 10 20</span><br><span class="line">[LSW2-Eth-Trunk1] load-balance src-dst-mac</span><br></pre></td></tr></table></figure></p>
+<p><strong>查询端口聚合:</strong> 配置完成后,可以查询所有的集合列表情况,查看所有聚合表命令如下.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[LSW1] display interface Eth-Trunk</span><br><span class="line"></span><br><span class="line">Eth-Trunk1 current state : UP</span><br><span class="line">Line protocol current state : UP</span><br><span class="line">Description:</span><br><span class="line">Switch Port, PVID :    1, Hash arithmetic : According to SA-XOR-DA,Maximal BW: 3</span><br><span class="line">G, Current BW: 3G, The Maximum Frame Length is 9216</span><br><span class="line">IP Sending Frames&apos; Format is PKTFMT_ETHNT_2, Hardware address is 4c1f-cc22-6944</span><br><span class="line">Current system time: 2019-04-08 12:42:34-08:00</span><br><span class="line">    Input bandwidth utilization  :    0%</span><br><span class="line">    Output bandwidth utilization :    0%</span><br><span class="line">-----------------------------------------------------</span><br><span class="line">PortName                      Status      Weight</span><br><span class="line">-----------------------------------------------------</span><br><span class="line">GigabitEthernet0/0/1          UP          1</span><br><span class="line">GigabitEthernet0/0/2          UP          1</span><br><span class="line">GigabitEthernet0/0/3          UP          1</span><br><span class="line">-----------------------------------------------------</span><br><span class="line">The Number of Ports in Trunk : 3</span><br><span class="line">The Number of UP Ports in Trunk : 3</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="配置边缘端口"><a href="#配置边缘端口" class="headerlink" title="配置边缘端口"></a>配置边缘端口</h2><p>对于运行生成树协议的二层网络,与终端相连的端口不用参与生成树计算,这些端口参与计算会影响网络拓扑的收敛速度,而且这些端口的状态改变也可能会引起网络震荡,导致用户流最中断.此时,可以通过执行命令<code>stp edged-port enable</code>将当前端口配置成<code>边缘端口</code>,该端口便不再参与生成树计算,从而帮助加快网络拓扑的收敛时间以及加强网络的稳定性.</p>
+<p>需要注意:当前端口配置成边缘端口后,如果收到<code>BPDU报文</code>,那么交换设备会自动将边缘端口设置为非边缘端口,并重新进行生成树计算,接下来将通过一个实验来演示边缘端口的配置,其配置拓扑图如下所示:</p>
+<p><img src="/picture/20190408150929.jpg" alt="blockchain"></p>
+<p><strong>给指定端口配置:</strong> 这里我们指定配置两台交换机的边缘端口,将<code>Ge0/0/2</code>配置为边缘端口.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#----在LSW1上操作-------------------------</span><br><span class="line">&lt;Huawei&gt; system-view</span><br><span class="line">[LSW1] stp mode rstp                                   // 设置成快速生成树</span><br><span class="line">[LSW1] interface GigabitEthernet 0/0/2                 // 选择要配置的接口</span><br><span class="line">[LSW1-GigabitEthernet0/0/2] stp edged-port enable      // 配置成边缘接口</span><br><span class="line"></span><br><span class="line">#----在LSW2上操作-------------------------</span><br><span class="line">&lt;Huawei&gt; system-view</span><br><span class="line">[LSW2] stp mode rstp                                   // 设置成快速生成树</span><br><span class="line">[LSW2] interface GigabitEthernet 0/0/2                 // 选择要配置的接口</span><br><span class="line">[LSW2-GigabitEthernet0/0/2] stp edged-port enable      // 配置成边缘接口</span><br></pre></td></tr></table></figure></p>
+<p><strong>给全局端口配置:</strong> 也可以给将边缘端口配置为全局模式,以下案例将配置全局端口.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[LSW1] stp mode rstp                  // 配置成快速生成树</span><br><span class="line">[LSW1] stp edged-port default         // 配置边缘端口为全局模式</span><br><span class="line"></span><br><span class="line">[LSW1] interface GigabitEthernet 0/0/1              // 选择接口</span><br><span class="line">[LSW1-GigabitEthernet0/0/1] stp edged-port disable  // 配置为非边缘端口</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="配置端口隔离"><a href="#配置端口隔离" class="headerlink" title="配置端口隔离"></a>配置端口隔离</h2><p>端口隔离可以将两个或多个主机或群组实现物理隔离,从而禁止同网段主机的数据通信,下面的小案例将实现端口隔离,其效果是<code>PC1与PC2之间不能互相访问</code>,<code>PC1与PC3之间可以互相访问</code>,<code>PC2与PC3之间可以互相访问</code>,其拓扑结构如下:</p>
+<p><img src="/picture/20190408153847.jpg" alt="blockchain"></p>
+<p><strong>配置模式:</strong> 配置端口隔离模式为二层隔离三层互通.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;Huawei&gt;system-view</span><br><span class="line">[Huawei]port-isolate mode l2</span><br></pre></td></tr></table></figure></p>
+<p><strong>配置隔离:</strong> 配置<code>GE0/0/1</code>和<code>GE0/0/2</code>的端口隔离功能.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[Huawei] interface GigabitEthernet 0/0/1</span><br><span class="line">[Huawei-GigabitEthernet0/0/1] port-isolate enable group 1</span><br><span class="line">[Huawei-GigabitEthernet0/0/1] quit</span><br><span class="line"></span><br><span class="line">[Huawei] interface GigabitEthernet 0/0/2</span><br><span class="line">[Huawei-GigabitEthernet0/0/2] port-isolate enable group 1</span><br><span class="line">[Huawei-GigabitEthernet0/0/2] quit</span><br></pre></td></tr></table></figure></p>
+<p><strong>端口防环路:</strong> 适用与华为交换机,防止下级环路自动<code>shutdown</code>下级有环路的端口.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;Huawei&gt;system-view</span><br><span class="line">[Huawei]loopback-detect enable             // 全局模式启用环路检测功能</span><br><span class="line"></span><br><span class="line">[Huawei] interface GigabitEthernet 0/0/1  // 如果下级有环路shutdown本端口</span><br><span class="line">[Huawei-GigabitEthernet0/0/1] loopback-detect action shutdown</span><br></pre></td></tr></table></figure></p>
+<p><strong>查询隔离参数:</strong> 配置完成后可使用<code>display current-configuration</code>命令查询配置参数.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[Huawei]display current-configuration </span><br><span class="line">....</span><br><span class="line">interface GigabitEthernet0/0/1</span><br><span class="line"> port-isolate enable group 1</span><br><span class="line">#</span><br><span class="line">interface GigabitEthernet0/0/2</span><br><span class="line"> port-isolate enable group 1</span><br><span class="line">....</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="配置端口安全"><a href="#配置端口安全" class="headerlink" title="配置端口安全"></a>配置端口安全</h2><p>在实际的生产环境中,对于有较高安全要求的设备,可以使用<code>端口安全技术(Port Security)</code>来提高网络的安全性,端口安全技术可在接入层验证接入设备,防止未经允许的设备接入到网络中,还可以限制端口接入的设备数量,防止过多设备接入网络,影响网络速率.</p>
+<p>在网络中MAC地址是设备中不变的物理地址,控制MAC地址接入就控制了交换机的端口接入,所以端口安全也是对MAC的的安全.在交换机中<code>CAM(Content Addressable Memory,内容可寻址内存表)表</code>,又叫MAC地址表,其中记录了与交换机相连的设备的MAC地址、端口号、所属vlan等对应关系.</p>
+<blockquote>
+<p>华为交换机MAC地址表分为三张</p>
+<blockquote>
+<p>1、静态MAC地址表,手工绑定,优先级高于动态MAC地址表<br>2、动态MAC地址表,交换机收到数据帧后会将源mac学习到MAC地址表中<br>3、黑洞MAC地址表,手工绑定或自动学习,用于丢弃指定MAC地址</p>
+</blockquote>
+</blockquote>
+<p>接下来看一个具体的实例,来实现端口安全的配置,包括端口绑定端口违规的处理等,实验拓扑图参数如下:</p>
+<p><img src="/picture/20190408165319.jpg" alt="blockchain"></p>
+<p><strong>配置静态MAC地址:</strong> 静态指定允许接入的设备的MAC地址,首先要知道MAC地址是多少.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;Huawei&gt; system-view</span><br><span class="line">[Huawei] port-group group-member Gig0/0/1 to Gig0/0/3           // 选择1-3号端口</span><br><span class="line">[Huawei-port-group] port-security enable                        // 开启端口安全功能</span><br><span class="line">[Huawei-port-group] port-security max-mac-num 1                 // 限制安全MAC地址最大数量为1个</span><br><span class="line">[Huawei-port-group] port-security protect-action shutdown       // 违规后默认关闭端口</span><br><span class="line">[Huawei-port-group] mac-address learning disable action discard // 禁止MAC地址学习功能</span><br><span class="line">[Huawei-port-group] quit</span><br><span class="line"></span><br><span class="line">#----配置MAC地址静态绑定-------------------------</span><br><span class="line">#将mac地址绑定到接口 Gig0/0/1 到 Gig0/0/2 在vlan1中有效</span><br><span class="line">[Huawei] mac-address static 5489-9887-165B GigabitEthernet 0/0/1 vlan 1</span><br><span class="line">[Huawei] mac-address static 5489-98B4-3791 GigabitEthernet 0/0/2 vlan 1</span><br><span class="line">[Huawei] mac-address static 5489-98E3-0DCA GigabitEthernet 0/0/3 vlan 1</span><br><span class="line"></span><br><span class="line">#----查询MAC地址绑定与分配------------------------</span><br><span class="line">[Huawei] display mac-address                               // 查询绑定信息列表</span><br><span class="line">MAC address table of slot 0:</span><br><span class="line">-------------------------------------------------------------------------------</span><br><span class="line">MAC Address    VLAN/       PEVLAN CEVLAN Port            Type      LSP/LSR-ID  </span><br><span class="line">               VSI/SI                                              MAC-Tunnel  </span><br><span class="line">-------------------------------------------------------------------------------</span><br><span class="line">5489-98e3-0dca 1           -      -      GE0/0/3         static    -           </span><br><span class="line">5489-9887-165b 1           -      -      GE0/0/1         static    -           </span><br><span class="line">5489-98b4-3791 1           -      -      GE0/0/2         static    -           </span><br><span class="line">-------------------------------------------------------------------------------</span><br><span class="line">Total matching items on slot 0 displayed = 3</span><br></pre></td></tr></table></figure></p>
+<p><strong>配置动态MAC地址:</strong> 动态分配接入设备的MAC地址,此配置无需绑定MAC地址,会接入最先访问的主机MAC地址.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#-----------------------------------------------</span><br><span class="line">#此功能是将动态学习到的MAC地址设置为安全属性,其他没有被学习到的非安全属性的MAC的帧将被端口丢弃</span><br><span class="line"></span><br><span class="line">&lt;Huawei&gt; system-view</span><br><span class="line">[Huawei] port-group group-member Gig0/0/1 to Gig0/0/3           // 选择1-3号端口</span><br><span class="line">[Huawei-port-group] port-security enable                        // 开启端口安全功能</span><br><span class="line">[Huawei-port-group] port-security max-mac-num 1                 // 限制安全MAC地址最大为1</span><br><span class="line">[Huawei-port-group] port-security protect-action protect        // 配置处理动作为丢弃</span><br><span class="line">[Huawei-port-group] port-security aging-time 300                // 配置老化时间300s</span><br><span class="line">[Huawei-port-group] quit</span><br><span class="line"></span><br><span class="line">#----查询MAC地址绑定与分配------------------------</span><br><span class="line">[Huawei] display mac-address</span><br><span class="line">MAC address table of slot 0:</span><br><span class="line">-------------------------------------------------------------------------------</span><br><span class="line">MAC Address    VLAN/       PEVLAN CEVLAN Port            Type      LSP/LSR-ID  </span><br><span class="line">               VSI/SI                                              MAC-Tunnel  </span><br><span class="line">-------------------------------------------------------------------------------</span><br><span class="line">5489-98e3-0dca 1           -      -      GE0/0/3         security  -           </span><br><span class="line">5489-9887-165b 1           -      -      GE0/0/1         security  -           </span><br><span class="line">5489-98b4-3791 1           -      -      GE0/0/2         security  -           </span><br><span class="line">-------------------------------------------------------------------------------</span><br><span class="line">Total matching items on slot 0 displayed = 3</span><br></pre></td></tr></table></figure></p>
+<p>在端口安全动态MAC地址中,配置如上的话,在<code>Gig0/0/1-3端口</code>学习到的第一个MAC地址设置为安全MAC地址,此外其他MAC地址在接入端口的话都不给予转发,在300s后刷新安全MAC地址表,并且重新学习安全MAC地址,<code>(哪个MAC地址)先到</code>就先被学到端口并设置为安全MAC地址,但是在交换机重启后安全MAC地址会被清空重新学习.</p>
+<p><strong>配置贴粘MAC地址:</strong> 此功能与动态MAC功能一致,唯一不同的是粘贴MAC地址不会老化,切交换重启后依然存在.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;Huawei&gt; system-view</span><br><span class="line">[Huawei] port-group group-member Gig0/0/1 to Gig0/0/3           // 选择1-3号端口</span><br><span class="line">[Huawei-port-group] port-security enable                        // 开启端口安全功能</span><br><span class="line">[Huawei-port-group] port-security mac-address sticky            // 打开安全粘贴MAC功能</span><br><span class="line">[Huawei-port-group] port-security max-mac-num 1                 // 限制安全MAC地址最大为1</span><br><span class="line">[Huawei-port-group] quit</span><br><span class="line"></span><br><span class="line">#----配置MAC地址静态绑定-------------------------</span><br><span class="line">#手工绑定粘贴MAC地址和所属vlan1的操作</span><br><span class="line"></span><br><span class="line">[Huawei] interface GigabitEthernet 0/0/1                         // 选择绑定接口</span><br><span class="line">[Huawei] port-security mac-address sticky 5489-9887-165B vlan 1  // 绑定指定的MAC地址</span><br><span class="line">[Huawei] port-security protect-action shutdown                   // 违规端口自动关闭</span><br><span class="line">[Huawei] quit</span><br><span class="line"></span><br><span class="line">[Huawei] interface GigabitEthernet 0/0/2</span><br><span class="line">[Huawei] port-security mac-address sticky 5489-98B4-3791 vlan 1</span><br><span class="line">[Huawei] port-security protect-action shutdown</span><br><span class="line">[Huawei] quit</span><br><span class="line"></span><br><span class="line">[Huawei] interface GigabitEthernet 0/0/3</span><br><span class="line">[Huawei] port-security mac-address sticky 5489-98E3-0DCA vlan 1</span><br><span class="line">[Huawei] port-security protect-action shutdown</span><br><span class="line">[Huawei] quit</span><br><span class="line"></span><br><span class="line">#----查询端口绑定情况----------------------------</span><br><span class="line">[Huawei] display mac-address </span><br><span class="line">MAC address table of slot 0:</span><br><span class="line">-------------------------------------------------------------------------------</span><br><span class="line">MAC Address    VLAN/       PEVLAN CEVLAN Port            Type      LSP/LSR-ID  </span><br><span class="line">               VSI/SI                                              MAC-Tunnel  </span><br><span class="line">-------------------------------------------------------------------------------</span><br><span class="line">5489-98e3-0dca 1           -      -      GE0/0/3         sticky    -           </span><br><span class="line">5489-9887-165b 1           -      -      GE0/0/1         sticky    -           </span><br><span class="line">5489-98b4-3791 1           -      -      GE0/0/2         sticky    -           </span><br><span class="line">-------------------------------------------------------------------------------</span><br><span class="line">Total matching items on slot 0 displayed = 3</span><br></pre></td></tr></table></figure></p>
+<p>此功能配置完成后,相当于对设备进行了严格的限制,当有其他的机器链接到不该链接的接口上时,也无法连接网路.<br><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2019/04/06/网络设备配置/华为生成树与端口聚合/">华为生成树与端口聚合</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2019年04月06日 - 15:04</p>
+  <p><span>最后更新:</span>2019年04月16日 - 14:04</p>
+  <p><span>原始链接:</span><a href="/2019/04/06/网络设备配置/华为生成树与端口聚合/" title="华为生成树与端口聚合">https://www.mkdirs.com/2019/04/06/网络设备配置/华为生成树与端口聚合/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/网络设备配置/" rel="tag"> <i class="fa fa-tag"></i> 网络设备配置</a>
+          
+            <a href="/tags/huawei/" rel="tag"> <i class="fa fa-tag"></i> huawei</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/03/网络设备配置/华为交换机配置笔记/" rel="next" title="华为交换机配置笔记">
+                <i class="fa fa-chevron-left"></i> 华为交换机配置笔记
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/09/网络设备配置/华为路由器配置笔记/" rel="prev" title="华为路由器配置笔记">
+                华为路由器配置笔记 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#STP-技术简介"><span class="nav-text">STP 技术简介</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆冗余技术概述◆"><span class="nav-text">◆冗余技术概述◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆STP生成树协议◆"><span class="nav-text">◆STP生成树协议◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆RSTP-快速生成树◆"><span class="nav-text">◆RSTP 快速生成树◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#生成树的配置"><span class="nav-text">生成树的配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置端口聚合"><span class="nav-text">配置端口聚合</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置边缘端口"><span class="nav-text">配置边缘端口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置端口隔离"><span class="nav-text">配置端口隔离</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置端口安全"><span class="nav-text">配置端口安全</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="ACL 访问控制列表(Access Control Lists),是应用在路由器(或三层交换机)接口上的指令列表,用来告诉路由器哪些数据可以接收,哪些数据是需要被拒绝的,ACL的定义是基于协议的,它适用于所有的路由协议,并根据预先定义好的规则对数据包进行过滤,从而更好的控制数据的流入与流出. NAT 网络地址转换(Network Address Translation),是一个互联网工程任务组的标">
+<meta name="keywords" content="网络设备配置,Cisco">
+<meta property="og:type" content="article">
+<meta property="og:title" content="思科设备ACL与NAT技术">
+<meta property="og:url" content="https://www.mkdirs.com/2019/03/21/网络设备配置/思科设备ACL与NAT技术/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="ACL 访问控制列表(Access Control Lists),是应用在路由器(或三层交换机)接口上的指令列表,用来告诉路由器哪些数据可以接收,哪些数据是需要被拒绝的,ACL的定义是基于协议的,它适用于所有的路由协议,并根据预先定义好的规则对数据包进行过滤,从而更好的控制数据的流入与流出. NAT 网络地址转换(Network Address Translation),是一个互联网工程任务组的标">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20190321184152.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20190322104720.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20190322135822.jpg">
+<meta property="og:updated_time" content="2019-04-16T06:13:13.684Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="思科设备ACL与NAT技术">
+<meta name="twitter:description" content="ACL 访问控制列表(Access Control Lists),是应用在路由器(或三层交换机)接口上的指令列表,用来告诉路由器哪些数据可以接收,哪些数据是需要被拒绝的,ACL的定义是基于协议的,它适用于所有的路由协议,并根据预先定义好的规则对数据包进行过滤,从而更好的控制数据的流入与流出. NAT 网络地址转换(Network Address Translation),是一个互联网工程任务组的标">
+<meta name="twitter:image" content="https://www.mkdirs.com/picture/20190321184152.jpg">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2019/03/21/网络设备配置/思科设备ACL与NAT技术/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>思科设备ACL与NAT技术 | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2019/03/21/网络设备配置/思科设备ACL与NAT技术/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">思科设备ACL与NAT技术
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-03-21 16:50:21" itemprop="dateCreated datePublished" datetime="2019-03-21T16:50:21+08:00">2019-03-21</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-16 14:13:13" itemprop="dateModified" datetime="2019-04-16T14:13:13+08:00">2019-04-16</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/网络设备配置/" itemprop="url" rel="index"><span itemprop="name">网络设备配置</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>ACL 访问控制列表(Access Control Lists),是应用在路由器(或三层交换机)接口上的指令列表,用来告诉路由器哪些数据可以接收,哪些数据是需要被拒绝的,ACL的定义是基于协议的,它适用于所有的路由协议,并根据预先定义好的规则对数据包进行过滤,从而更好的控制数据的流入与流出.</p>
+<p>NAT 网络地址转换(Network Address Translation),是一个互联网工程任务组的标准,它可以实现内部私有IP地址和公网IP地址的转换,能够起到节约公网IP地址的作用,以下将介绍NAT的三种方式,静态转换、动态转换和端口复用技术.</p>
+<a id="more"></a>
+<p><br></p>
+<h2 id="思科ACL访问控制"><a href="#思科ACL访问控制" class="headerlink" title="思科ACL访问控制"></a>思科ACL访问控制</h2><p>路由器接口的访问控制取决于应用在其上的ACL,数据在进出网络前,路由器会根据ACL对其进行匹配,匹配成功将对数据进行过滤或者是转发,匹配失败则丢弃数据包,目前主要有三种ACL控制,<code>标准ACL</code>,<code>扩展ACL</code>,<code>命名ACL</code>,我们只介绍前两种.</p>
+<p>在路由器上应用ACL时,可以为每种协议,每个端口,每个方向,和每个接口,配置一个ACL,一般称为3p原则.</p>
+<p><img src="/picture/20190321184152.jpg" alt="NetWork"></p>
+<h3 id="◆标准ACL配置◆"><a href="#◆标准ACL配置◆" class="headerlink" title="◆标准ACL配置◆"></a>◆标准ACL配置◆</h3><p>标准ALCL只能通过源地址进行访问过滤与控制,因此只能阻止/允许来自指定IP地址的访问请求.</p>
+<p><strong>配置交换机:</strong> 首先配置交换机,这里开启<code>3个端口Fa0/1-3</code>,并配置<code>端口速率100</code>.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Switch0&gt; enable</span><br><span class="line">Switch0&gt;# configure terminal</span><br><span class="line"></span><br><span class="line">Switch0(config)# interface range fa0/1-3</span><br><span class="line">Switch0(config-if-range)# speed 100</span><br><span class="line">Switch0(config-if-range)# no shutdown</span><br><span class="line">Switch0(config-if-range)# exit</span><br></pre></td></tr></table></figure></p>
+<p><strong>配置路由器:</strong> 接着配置路由器,开启路由器的<code>Fa0/0和Fa0/1端口</code>,并配置上网关地址.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Router0&gt; enable</span><br><span class="line">Router0# configure terminal</span><br><span class="line"></span><br><span class="line">Router0(config)# interface GigabitEthernet 0/0</span><br><span class="line">Router0(config-if)# ip address 192.168.1.254 255.255.255.0</span><br><span class="line">Router0(config-if)# no shutdown</span><br><span class="line">Router0(config-if)# exit</span><br><span class="line"></span><br><span class="line">Router0(config)# interface GigabitEthernet 0/1</span><br><span class="line">Router0(config-if)# ip address 192.168.2.254 255.255.255.0</span><br><span class="line">Router0(config-if)# no shutdown</span><br><span class="line">Router0(config-if)# exit</span><br></pre></td></tr></table></figure></p>
+<p><strong>配置标准ACL:</strong> 在路由器上配置一条标准的ACL规则,<code>禁止PC0访问Server0</code>服务器.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Router0&gt; enable</span><br><span class="line">Router0# configure terminal</span><br><span class="line"></span><br><span class="line">Router0(config)# access-list 1 deny 192.168.1.1 0.0.0.0    // 拒绝192.168.1.1访问Server0</span><br><span class="line">Router0(config)# access-list 1 permit any                  // 设置默认允许所有,兜底操作</span><br><span class="line">Router0(config)#</span><br><span class="line">Router0(config)# interface GigabitEthernet 0/0             // 选择接口Gig0/0</span><br><span class="line">Router0(config-if)# ip access-group 1 in                   // 将以上配置条目应用到当前接口上</span><br><span class="line">#Router0(config-if)# ip access-group 1 out                 // 控制出口流量(可省略)</span><br></pre></td></tr></table></figure></p>
+<p><strong>测试过滤效果:</strong> 配置完规则以后,我们测试一下效果,使用<code>PC0无法访问server服务器</code>而是用<code>PC1则可以访问</code>.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">PC0&gt; ping 192.168.2.1</span><br><span class="line"></span><br><span class="line">Pinging 192.168.2.1 with 32 bytes of data:</span><br><span class="line">Reply from 192.168.1.254: Destination host unreachable.</span><br><span class="line"></span><br><span class="line">PC1&gt; ping 192.168.2.1</span><br><span class="line"></span><br><span class="line">Pinging 192.168.2.1 with 32 bytes of data:</span><br><span class="line">Reply from 192.168.2.1: bytes=32 time=0ms TTL=127</span><br></pre></td></tr></table></figure></p>
+<p>这里需要注意一点,如果你有两个路由器相连,那么ACL规则应该设置在距离限制的目标较近的路由器上,否则可能会出现有效数据在到达目标之前就被过滤掉了.</p>
+<h3 id="◆拓展ACL配置◆"><a href="#◆拓展ACL配置◆" class="headerlink" title="◆拓展ACL配置◆"></a>◆拓展ACL配置◆</h3><p>标准ACL只能使用源地址作为匹配条件,无法对访问进行精确的控制,为了解决这一问题,可以采用扩展ACL来对数据加以限制.</p>
+<p><strong>配置交换机:</strong> 首先配置交换机,这里开启<code>4个端口Fa0/1-4</code>,并配置端口<code>速率为100</code>.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Switch0&gt; enable</span><br><span class="line">Switch0&gt;# configure terminal</span><br><span class="line"></span><br><span class="line">Switch0(config)# interface range fa0/1-4</span><br><span class="line">Switch0(config-if-range)# speed 100</span><br><span class="line">Switch0(config-if-range)# no shutdown</span><br><span class="line">Switch0(config-if-range)# exit</span><br></pre></td></tr></table></figure></p>
+<p><strong>配置路由器:</strong> 接着配置路由器,开启路由器的<code>Fa0/0和Fa0/1端口</code>,并配置上网关地址.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Router0&gt; enable</span><br><span class="line">Router0# configure terminal</span><br><span class="line"></span><br><span class="line">Router0(config)# interface GigabitEthernet 0/0</span><br><span class="line">Router0(config-if)# ip address 192.168.1.254 255.255.255.0</span><br><span class="line">Router0(config-if)# no shutdown</span><br><span class="line">Router0(config-if)# exit</span><br><span class="line"></span><br><span class="line">Router0(config)# interface GigabitEthernet 0/0</span><br><span class="line">Router0(config-if)# ip address 192.168.2.254 255.255.255.0</span><br><span class="line">Router0(config-if)# no shutdown</span><br><span class="line">Router0(config-if)# exit</span><br></pre></td></tr></table></figure></p>
+<p><strong>配置拓展ACL:</strong> 配置拓展ACL规则,<code>禁止PC0访问192.168.2.1</code>,<code>禁止PC1访问192.168.2.1主机的80端口</code>,允许其他所有.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Router0&gt; enable</span><br><span class="line">Router0# configure terminal</span><br><span class="line"></span><br><span class="line">Router0(config)# access-list 100 deny ip host 192.168.1.1 host 192.168.2.1               // 拒绝IP地址</span><br><span class="line">Router0(config)# access-list 100 deny TCP host 192.168.1.2 eq 80 host 192.168.2.1 eq 80  // 拒绝TCP=80</span><br><span class="line">Router0(config)# access-list 100 permit ip any any                                       // 默认允许</span><br><span class="line"></span><br><span class="line">Router0(config)# interface GigabitEthernet 0/0               // 选择接口GigabitEthernet 0/0</span><br><span class="line">Router0(config-if)# ip access-group 100 in                   // 将以上配置条目应用到当前接口上</span><br><span class="line">Router0(config-if)# ip access-group 100 out                  // 将以上配置条目应用到当前接口上</span><br><span class="line">Router0# show access-list                                    // 查询配置结果</span><br></pre></td></tr></table></figure></p>
+<p><strong>测试过滤效果:</strong> 配置完规则后测试下,经测试<code>PC0无法访问Server0</code>,而<code>PC1无法访问目标主机的80端口</code>其他主机放行.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">PC0&gt; ping 192.168.2.1</span><br><span class="line">Pinging 192.168.2.1 with 32 bytes of data:</span><br><span class="line">Reply from 192.168.1.254: Destination host unreachable.</span><br><span class="line"></span><br><span class="line">PC1&gt; ping 192.168.2.1</span><br><span class="line">Pinging 192.168.2.1 with 32 bytes of data:</span><br><span class="line">Reply from 192.168.2.1: bytes=32 time=0ms TTL=127</span><br></pre></td></tr></table></figure></p>
+<p>与标准ACL相比,扩展ACL能够更加精确的匹配和过滤数据包,因此扩展ACL的放置位置应该离源地址越近越好,这样才能够有效的提高链路的使用效率.<br><br></p>
+<h2 id="思科NAT地址转换"><a href="#思科NAT地址转换" class="headerlink" title="思科NAT地址转换"></a>思科NAT地址转换</h2><p>NAT 网络地址转换(Network Address Translation),是一个互联网工程任务组的标准,它可以实现内部私有IP地址和公网IP地址的转换,能够起到节约公网IP地址的作用,以下将介绍NAT的三种方式,静态转换、动态转换和端口复用技术.</p>
+<p>NAT技术中有四种地址即,内部本地地址,内部全局地址,外部本地地址,外部全局地址.</p>
+<h3 id="◆配置静态NAT◆"><a href="#◆配置静态NAT◆" class="headerlink" title="◆配置静态NAT◆"></a>◆配置静态NAT◆</h3><p>静态NAT是指将内部本地地址与内部全局地址进行对应转换,某个本地地址只能转换为某个全局地址,通过配置静态NAT可以实现内部网络对外部网络的访问,也可以实现外部网络对内部网络中某个设备的访问.</p>
+<p><img src="/picture/20190322104720.jpg" alt="NetWork"></p>
+<p><strong>配置交换机:</strong> 首先配置交换机,这里开启<code>4个端口Fa0/1-4</code>,并配置端口<code>速率为100</code>.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Switch0&gt; enable</span><br><span class="line">Switch0&gt;# configure terminal</span><br><span class="line"></span><br><span class="line">Switch0(config)# interface range fa0/1-4</span><br><span class="line">Switch0(config-if-range)# speed 100</span><br><span class="line">Switch0(config-if-range)# no shutdown</span><br><span class="line">Switch0(config-if-range)# exit</span><br></pre></td></tr></table></figure></p>
+<p><strong>配置路由器:</strong> 接着配置路由器,开启路由器的<code>Fa0/0和Se0/0/0端口</code>,并配置上网关地址.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Router&gt; enable</span><br><span class="line">Router# configure terminal</span><br><span class="line"></span><br><span class="line">#----在Router10上操作-------------------------</span><br><span class="line">Router0(config)# interface fa0/0</span><br><span class="line">Router0(config-if)# ip address 192.168.1.1 255.255.255.0</span><br><span class="line">Router0(config-if)# no shutdown</span><br><span class="line">Router0(config-if)# exit</span><br><span class="line"></span><br><span class="line">Router0(config)# interface se0/0/0</span><br><span class="line">Router0(config-if)# ip address 10.10.10.1 255.0.0.0</span><br><span class="line">Router0(config-if)# no shutdown</span><br><span class="line">Router0(config-if)# exit</span><br><span class="line"></span><br><span class="line">#----在Router1上操作-------------------------</span><br><span class="line">Router1(config)# interface se0/0/0</span><br><span class="line">Router1(config-if)# ip address 10.10.10.2 255.0.0.0</span><br><span class="line">Router1(config-if)# no shutdown</span><br><span class="line">Router1(config-if)# exit</span><br></pre></td></tr></table></figure></p>
+<p><strong>配置静态NAT:</strong> 在路由器<code>Router0</code>上配置静态NAT,将私有地址转为全局地址<code>(内网地址--&gt;外网地址)</code>.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Router&gt; enable</span><br><span class="line">Router# configure terminal</span><br><span class="line"></span><br><span class="line">Router0(config)# ip nat inside source static 192.168.1.2 10.10.10.20  // 配置NAT条目1</span><br><span class="line">Router0(config)# ip nat inside source static 192.168.1.3 10.10.10.30  // 配置NAT条目2</span><br><span class="line">Router0(config)# ip nat inside source static 192.168.1.4 10.10.10.40  // 配置NAT条目3</span><br><span class="line"></span><br><span class="line">Router0(config)# interface fa0/0                                      // 选择内部端口</span><br><span class="line">Router0(config-if)# ip nat inside                                     // 应用到定义的内部接口</span><br><span class="line">Router0(config-if)#</span><br><span class="line">Router0(config-if)# interface serial0/0/0                             // 选择外部接口</span><br><span class="line">Router0(config-if)# ip nat outside                                    // 应用到定义的外部接口</span><br><span class="line">Router0(config-if)# exit</span><br></pre></td></tr></table></figure></p>
+<p><strong>查询NAT配置:</strong> 配置完成后,我们可以使用<code>show ip nat translation命令</code>,来查询端口情况.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Router0# show ip nat translation</span><br><span class="line"></span><br><span class="line">Pro  Inside global     Inside local       Outside local      Outside global</span><br><span class="line">---  10.10.10.20       192.168.1.2        ---                ---</span><br><span class="line">---  10.10.10.30       192.168.1.3        ---                ---</span><br><span class="line">---  10.10.10.40       192.168.1.4        ---                ---</span><br></pre></td></tr></table></figure></p>
+<p><strong>测试通信情况:</strong> 此时测试下通信情况,在<code>PC0-PC2主机可Ping通Router1</code>,同样<code>Router1可Ping通PC0-PC2</code>.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">PC0&gt; ping 10.10.10.2</span><br><span class="line">Pinging 10.10.10.2 with 32 bytes of data:</span><br><span class="line">Reply from 10.10.10.2: bytes=32 time=1ms TTL=254</span><br><span class="line"></span><br><span class="line">Router1# ping 10.10.10.20</span><br><span class="line">Type escape sequence to abort.</span><br><span class="line">Sending 5, 100-byte ICMP Echos to 10.10.10.20, timeout is 2 seconds:</span><br><span class="line">!!!!!</span><br><span class="line">Success rate is 100 percent (5/5), round-trip min/avg/max = 1/5/9 ms</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆配置动态NAT◆"><a href="#◆配置动态NAT◆" class="headerlink" title="◆配置动态NAT◆"></a>◆配置动态NAT◆</h3><p>动态NAT是指内部本地地址与内部全局地址进行转换时,内部地址可以随机转换为指定的外部全局地址,此过程是动态分配的不需要认为干预,从而减少了配置的工作量.</p>
+<p>但需要注意的是,配置动态NAT只能实现内部网络对互联网的访问,无法实现互联网中的主机对内部网络中的主机的访问,也就是说,它是一种单向的NAT技术.</p>
+<p><strong>清除NAT列表:</strong> 动态NAT的配置我们同样适用上面的拓扑图,只是在NAT的配置上有些小改动.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Router0# clear ip nat translation *             // 清除动态NAT转换列表</span><br><span class="line">Router0# show ip access-list                    // 显示ACL配置信息</span><br><span class="line">Router0# show ip nat statistics                 // 查看NAT转换统计信息</span><br><span class="line">Router0# clear ip nat statistics                // 清除NAT转换统计信息</span><br></pre></td></tr></table></figure></p>
+<p><strong>配置交换机:</strong> 首先配置交换机,这里开启<code>4个端口Fa0/1-4</code>,并配置端口<code>速率为100</code>.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Switch0&gt; enable</span><br><span class="line">Switch0&gt;# configure terminal</span><br><span class="line"></span><br><span class="line">Switch0(config)# interface range fa0/1-4</span><br><span class="line">Switch0(config-if-range)# speed 100</span><br><span class="line">Switch0(config-if-range)# no shutdown</span><br><span class="line">Switch0(config-if-range)# exit</span><br></pre></td></tr></table></figure></p>
+<p><strong>配置路由器:</strong> 接着配置路由器,开启路由器的<code>Fa0/0和Se0/0/0端口</code>,并配置上网关地址.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Router&gt; enable</span><br><span class="line">Router# configure terminal</span><br><span class="line"></span><br><span class="line">#----在Router0上操作-------------------------</span><br><span class="line">Router0(config)# interface fa0/0</span><br><span class="line">Router0(config-if)# ip address 192.168.1.1 255.255.255.0</span><br><span class="line">Router0(config-if)# no shutdown</span><br><span class="line">Router0(config-if)# exit</span><br><span class="line"></span><br><span class="line">Router0(config)# interface se0/0/0</span><br><span class="line">Router0(config-if)# ip address 10.10.10.1 255.0.0.0</span><br><span class="line">Router0(config-if)# no shutdown</span><br><span class="line">Router0(config-if)# exit</span><br><span class="line"></span><br><span class="line">#----在Router1上操作-------------------------</span><br><span class="line">Router1(config)# interface se0/0/0</span><br><span class="line">Router1(config-if)# ip address 10.10.10.2 255.0.0.0</span><br><span class="line">Router1(config-if)# no shutdown</span><br><span class="line">Router1(config-if)# exit</span><br></pre></td></tr></table></figure></p>
+<p><strong>配置动态NAT:</strong> 这里分配外网IP范围是<code>10.10.10.20-40</code>,内部地址范围是<code>192.168.1.0/24</code>,并绑定好接口.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Router0&gt; enable</span><br><span class="line">Router0# configure terminal</span><br><span class="line"></span><br><span class="line">Router0(config)# ip nat pool NAT 10.10.10.20 10.10.10.40 netmask 255.0.0.0 //定义内部全局IP地址池</span><br><span class="line">Router0(config)# access-list 1 permit 192.168.1.0 0.0.0.255       // 定义可转换的内部本地IP地址</span><br><span class="line">Router0(config)# ip nat inside source list 1 pool NAT   //配置动态NAT映射,将NAT地址池与ACL关联</span><br><span class="line"></span><br><span class="line">Router0(config)# interface fa0/0                      // 配置内部端口</span><br><span class="line">Router0(config-if)# ip nat inside</span><br><span class="line"></span><br><span class="line">Router0(config-if)# interface serial0/0/0             // 配置外部端口</span><br><span class="line">Router0(config-if)# ip nat outside</span><br><span class="line">Router0(config-if)# no shutdown</span><br></pre></td></tr></table></figure></p>
+<p><strong>查询NAT配置:</strong> 配置完成后,我们可以使用<code>show ip nat translation命令</code>,来查询端口情况.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Router0# show ip nat translation</span><br><span class="line"></span><br><span class="line">Pro  Inside global     Inside local       Outside local      Outside global</span><br><span class="line">icmp 10.10.10.21:5     192.168.1.3:5      10.10.10.2:5       10.10.10.2:5</span><br><span class="line">icmp 10.10.10.21:6     192.168.1.3:6      10.10.10.2:6       10.10.10.2:6</span><br><span class="line">icmp 10.10.10.22:9     192.168.1.3:9      10.10.10.2:9       10.10.10.2:9</span><br><span class="line">icmp 10.10.10.23:10    192.168.1.2:10     10.10.10.2:10      10.10.10.2:10</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆多路复用PAT◆"><a href="#◆多路复用PAT◆" class="headerlink" title="◆多路复用PAT◆"></a>◆多路复用PAT◆</h3><p>端口多路复用即端口地址转换<code>(PAT,Port Address Translation)</code>,是指将内部本地IP地址动态的转换为单一的内部全局IP地址和端口号,内部全局IP地址只是用一个,而不是一组地址池,也就是一个IP地址绑定多个端口,从而更大的节约了IP地址的资源短缺.</p>
+<p><img src="/picture/20190322135822.jpg" alt="NetWork"></p>
+<p><strong>配置交换机:</strong> 首先配置交换机,这里开启<code>4个端口Fa0/1-4</code>,并配置端口<code>速率为100</code>.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Switch0&gt; enable</span><br><span class="line">Switch0&gt;# configure terminal</span><br><span class="line"></span><br><span class="line">Switch0(config)# interface range fa0/1-4</span><br><span class="line">Switch0(config-if-range)# speed 100</span><br><span class="line">Switch0(config-if-range)# no shutdown</span><br><span class="line">Switch0(config-if-range)# exit</span><br></pre></td></tr></table></figure></p>
+<p><strong>配置路由器:</strong> 接着配置路由器,开启路由器的<code>Fa0/0和Se0/0/0端口</code>,并配置上网关地址.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Router&gt; enable</span><br><span class="line">Router# configure terminal</span><br><span class="line"></span><br><span class="line">#----在Router0上操作-------------------------</span><br><span class="line">Router0(config)# interface fa0/0</span><br><span class="line">Router0(config-if)# ip address 192.168.1.1 255.255.255.0</span><br><span class="line">Router0(config-if)# no shutdown</span><br><span class="line">Router0(config-if)# exit</span><br><span class="line"></span><br><span class="line">Router0(config)# interface se0/0/0</span><br><span class="line">Router0(config-if)# ip address 10.10.10.1 255.0.0.0</span><br><span class="line">Router0(config-if)# no shutdown</span><br><span class="line">Router0(config-if)# exit</span><br><span class="line"></span><br><span class="line">#----在Router1上操作-------------------------</span><br><span class="line">Router1(config)# interface se0/0/0</span><br><span class="line">Router1(config-if)# ip address 10.10.10.2 255.0.0.0</span><br><span class="line">Router1(config-if)# no shutdown</span><br><span class="line">Router1(config-if)# exit</span><br></pre></td></tr></table></figure></p>
+<p><strong>配置多路复用PAT:</strong> 在路由器<code>Router0</code>上配置PAT,多路复用.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Router&gt; enable</span><br><span class="line">Router# configure terminal</span><br><span class="line"></span><br><span class="line">Router0(config)# ip nat pool PAT 10.10.10.10 10.10.10.10 netmask 255.0.0.0  // 定义外网IP地址</span><br><span class="line">Router0(config)# access-list 1 permit 192.168.1.0 0.0.0.255                 // 定义ACL</span><br><span class="line">Router0(config)# ip nat inside source list 1 pool PAT overload              // 将地址池与ACL绑定</span><br><span class="line"></span><br><span class="line">Router0(config)# interface fa0/0                 // 定义连接内部网络的接口</span><br><span class="line">Router0(config-if)# ip nat inside</span><br><span class="line">Router0(config-if)# interface serial0/0/0        // 定义链接外部网络的接口</span><br><span class="line">Router0(config-if)# ip nat outside</span><br></pre></td></tr></table></figure></p>
+<p><strong>查询配置地址表:</strong> 最后可以检测一下是否能够连接到内部与外部的主机.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Router#show ip nat translations</span><br><span class="line"></span><br><span class="line">Pro  Inside global     Inside local       Outside local      Outside global</span><br><span class="line">icmp 10.10.10.10:1024  192.168.1.4:1      10.10.10.2:1       10.10.10.2:1024</span><br><span class="line">icmp 10.10.10.10:1025  192.168.1.2:8      10.10.10.2:8       10.10.10.2:1025</span><br><span class="line">icmp 10.10.10.10:1027  192.168.1.3:1      10.10.10.2:1       10.10.10.2:1027</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2019/03/21/网络设备配置/思科设备ACL与NAT技术/">思科设备ACL与NAT技术</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2019年03月21日 - 16:03</p>
+  <p><span>最后更新:</span>2019年04月16日 - 14:04</p>
+  <p><span>原始链接:</span><a href="/2019/03/21/网络设备配置/思科设备ACL与NAT技术/" title="思科设备ACL与NAT技术">https://www.mkdirs.com/2019/03/21/网络设备配置/思科设备ACL与NAT技术/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/网络设备配置/" rel="tag"> <i class="fa fa-tag"></i> 网络设备配置</a>
+          
+            <a href="/tags/Cisco/" rel="tag"> <i class="fa fa-tag"></i> Cisco</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/15/网络设备配置/思科路由器配置笔记/" rel="next" title="思科路由器配置笔记">
+                <i class="fa fa-chevron-left"></i> 思科路由器配置笔记
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/28/渗透测试/手工检测SQL注入漏洞/" rel="prev" title="手工检测SQL注入漏洞">
+                手工检测SQL注入漏洞 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#思科ACL访问控制"><span class="nav-text">思科ACL访问控制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆标准ACL配置◆"><span class="nav-text">◆标准ACL配置◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆拓展ACL配置◆"><span class="nav-text">◆拓展ACL配置◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#思科NAT地址转换"><span class="nav-text">思科NAT地址转换</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆配置静态NAT◆"><span class="nav-text">◆配置静态NAT◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆配置动态NAT◆"><span class="nav-text">◆配置动态NAT◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆多路复用PAT◆"><span class="nav-text">◆多路复用PAT◆</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

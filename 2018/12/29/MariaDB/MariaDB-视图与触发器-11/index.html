@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="MariaDB数据库管理系统是MySQL的一个分支,主要由开源社区在维护,采用GPL授权许可MariaDB的目的是完全兼容MySQL,包括API和命令行,MySQL由于现在闭源了,而能轻松成为MySQL的代替品.在存储引擎方面,使用XtraDB来代替MySQL的InnoDB,MariaDB由MySQL的创始人Michael Widenius主导开发,他早前曾以10亿美元的价格,将自己创建的公司My">
+<meta name="keywords" content="MariaDB">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MariaDB 视图与触发器(11)">
+<meta property="og:url" content="https://www.mkdirs.com/2018/12/29/MariaDB/MariaDB-视图与触发器-11/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="MariaDB数据库管理系统是MySQL的一个分支,主要由开源社区在维护,采用GPL授权许可MariaDB的目的是完全兼容MySQL,包括API和命令行,MySQL由于现在闭源了,而能轻松成为MySQL的代替品.在存储引擎方面,使用XtraDB来代替MySQL的InnoDB,MariaDB由MySQL的创始人Michael Widenius主导开发,他早前曾以10亿美元的价格,将自己创建的公司My">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-12-29T12:48:14.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MariaDB 视图与触发器(11)">
+<meta name="twitter:description" content="MariaDB数据库管理系统是MySQL的一个分支,主要由开源社区在维护,采用GPL授权许可MariaDB的目的是完全兼容MySQL,包括API和命令行,MySQL由于现在闭源了,而能轻松成为MySQL的代替品.在存储引擎方面,使用XtraDB来代替MySQL的InnoDB,MariaDB由MySQL的创始人Michael Widenius主导开发,他早前曾以10亿美元的价格,将自己创建的公司My">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/12/29/MariaDB/MariaDB-视图与触发器-11/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>MariaDB 视图与触发器(11) | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/12/29/MariaDB/MariaDB-视图与触发器-11/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">MariaDB 视图与触发器(11)
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-29 13:32:11 / 修改时间：20:48:14" itemprop="dateCreated datePublished" datetime="2018-12-29T13:32:11+08:00">2018-12-29</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/MariaDB/" itemprop="url" rel="index"><span itemprop="name">MariaDB</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>MariaDB数据库管理系统是MySQL的一个分支,主要由开源社区在维护,采用GPL授权许可MariaDB的目的是完全兼容MySQL,包括API和命令行,MySQL由于现在闭源了,而能轻松成为MySQL的代替品.在存储引擎方面,使用XtraDB来代替MySQL的InnoDB,MariaDB由MySQL的创始人Michael Widenius主导开发,他早前曾以10亿美元的价格,将自己创建的公司MySQL AB卖给了SUN,此后,随着SUN被甲骨文收购MySQL的所有权也落入Oracle的手中.MariaDB名称来自MichaelWidenius的女儿Maria的名字.</p>
+<a id="more"></a>
+<p>数据库中的视图是一个虚拟表,同真实的表一样,视图包含一系列带有名称的行和列数据,行和列数据来自由定义视图查询所引用的表,并且在引用视图时动态生成,视图是从一个或者多个表中导出的,视图的行为与表非常相似,但视图是一个虚拟表.在视图中用户可以使用<code>SELECT</code>语句查询数据,以及使用<code>INSERT、UPDATE和DELETE</code>修改记录,视图可以使用户操作方便,而且可以保障数据库系统的安全.</p>
+<p>触发器和存储过程一样,都是嵌入到MySQL的一段程序,触发器是由事件来触发某个操作,这些事件包括<code>INSERT、UPDATAE和DELETE语句</code>.如果定义了触发程序,当数据库执行这些语句的时候就会激发触发器执行相应的操作,触发程序是与表有关的命名数据库对象,当表上出现特定事件时,将激活该对象.</p>
+<h2 id="MariaDB-视图"><a href="#MariaDB-视图" class="headerlink" title="MariaDB 视图"></a>MariaDB 视图</h2><p><strong>视图的含义:</strong></p>
+<p>视图是一张虚拟表,是从数据库中一个或多个表中导出来的表,视图还可以从已经存在的视图基础上定义,视图一经定义便存储在数据库中,与其相对应的数据并没有像表那样在数据库中再存储一份,通过视图看到的数据只是存放在基本表中的数据.对视图的操作与对表的操作一样,可以对其进行查询、修改和删除.当对通过视图看到的数据进行修改时,相应的基本表的数据也要发生变化.同时,若基本表的数据发生变化,则这种变化也可以自动地反映到视图中.</p>
+<p>如下小例子:下面有个<code>student表</code>和 <code>info表</code>,现在我分别只想去除其中的<code>ID号,姓名,班级</code>,此时我们就需要用一个视图来解决,取出指定的字段.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> student (s_id <span class="built_in">int</span>,<span class="keyword">name</span> <span class="built_in">varchar</span>(<span class="number">40</span>));</span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> info (s_id <span class="built_in">int</span>,glass <span class="built_in">varchar</span>(<span class="number">40</span>),addr <span class="built_in">varchar</span>(<span class="number">90</span>));</span><br></pre></td></tr></table></figure></p>
+<p>视图提供了一个很好的解决方法,创建视图的信息来自表的部分信息,只取出需要的信息,这样既能满足需求也不破坏原有的表结构.</p>
+<p><strong>视图的作用:</strong></p>
+<p>视图不仅可以简化用户对于数据的理解,也可以简化他们的操作,那些被经常使用的查询可以定义为视图,从而使得用户不必为以后的操作每次指定全部条件.</p>
+<p>通过视图用户只能查询和修改他们所能见到的数据,数据库中的其他数据则既看不见也取不到,数据库授权命令可以使每个用户对数据库的检索限制到特定的数据库对象上,但不能授权到数据库特定行和特定的列上.通过视图,用户可以被限制在数据的不同子集上.<br><br></p>
+<h3 id="◆创建视图◆"><a href="#◆创建视图◆" class="headerlink" title="◆创建视图◆"></a>◆创建视图◆</h3><p><strong>在单表上创建视图:</strong></p>
+<p>1.首先创建一个基本表<code>table1</code>并插入测试数据.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; create table table1(quantity INT,price INT);</span><br><span class="line">Query OK, 0 rows affected (0.02 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; insert into table1 values(1,10);</span><br><span class="line">Query OK, 1 row affected (0.00 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; insert into table1 values(2,30);</span><br><span class="line">Query OK, 1 row affected (0.00 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; insert into table1 values(3,50);</span><br><span class="line">Query OK, 1 row affected (0.00 sec)</span><br></pre></td></tr></table></figure></p>
+<p>2.创建视图,在<code>table1</code>表上创建一个<code>view_tab1</code>视图,其中代码有三个字段<code>x,y,totle</code>,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; create view view_tab1(x,y,totle)</span><br><span class="line">    -&gt; AS SELECT quantity,price,quantity * price</span><br><span class="line">    -&gt; FROM table1;</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br></pre></td></tr></table></figure></p>
+<p>3.紧接着我们使用视图来查询创建的新表格.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select * from view_tab1;</span><br><span class="line">+<span class="comment">------+------+-------+</span></span><br><span class="line">| x    | y    | totle |</span><br><span class="line">+<span class="comment">------+------+-------+</span></span><br><span class="line">|    1 |   10 |    10 |</span><br><span class="line">|    2 |   30 |    60 |</span><br><span class="line">|    3 |   50 |   150 |</span><br><span class="line">+<span class="comment">------+------+-------+</span></span><br><span class="line">3 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>在多张表上创建视图:</strong></p>
+<p>1.首先创建两个测试表并插入一些数据,这里我们就创建要给<code>student</code>和<code>info</code>两个表,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; create table student</span><br><span class="line">    -&gt; (</span><br><span class="line">    -&gt; s_id INT,</span><br><span class="line">    -&gt; name VARCHAR(40)</span><br><span class="line">    -&gt; );</span><br><span class="line">Query OK, 0 rows affected (0.01 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; create table info</span><br><span class="line">    -&gt; (</span><br><span class="line">    -&gt; s_id INT,</span><br><span class="line">    -&gt; glass VARCHAR(40),</span><br><span class="line">    -&gt; addr VARCHAR(90)</span><br><span class="line">    -&gt; );</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; insert into student values(1,'wang'),(2,'rui');</span><br><span class="line">Query OK, 2 rows affected (0.33 sec)</span><br><span class="line">Records: 2  Duplicates: 0  Warnings: 0</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; insert into info values(1,'wuban','henan'),(2,'sanban','hebei'),(3,'yiban','s</span><br><span class="line">handong');</span><br><span class="line">Query OK, 3 rows affected (0.00 sec)</span><br><span class="line">Records: 3  Duplicates: 0  Warnings: 0</span><br></pre></td></tr></table></figure></p>
+<p>2.接下来我们创建一个视图<code>stu_glass</code>,其中有三个参数(id,name,glass),分别对应两个表的不同字段,并且通过<code>where条件</code>限定ID号相同的关联在一起.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; create view stu_glass(id,name,glass)</span><br><span class="line">    -&gt; AS select student.s_id,student.name,info.glass</span><br><span class="line">    -&gt; FROM student,info where student.s_id = info.s_id;</span><br><span class="line"></span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; select * from stu_glass;</span><br><span class="line">+<span class="comment">------+------+--------+</span></span><br><span class="line">| id   | name | glass  |</span><br><span class="line">+<span class="comment">------+------+--------+</span></span><br><span class="line">|    1 | wang | wuban  |</span><br><span class="line">|    2 | rui  | sanban |</span><br><span class="line">+<span class="comment">------+------+--------+</span></span><br><span class="line">2 rows in <span class="keyword">set</span> (<span class="number">0.01</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>以上例子就解决了刚开始那个问题,通过这个视图可以很好地保护基本表中的数据.</p>
+<h3 id="◆查看视图◆"><a href="#◆查看视图◆" class="headerlink" title="◆查看视图◆"></a>◆查看视图◆</h3><p><strong>使用desc查看视图表结构:</strong><br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; desc stu_glass;</span><br><span class="line">+<span class="comment">-------+-------------+------+-----+---------+-------+</span></span><br><span class="line">| Field | Type        | Null | Key | Default | Extra |</span><br><span class="line">+<span class="comment">-------+-------------+------+-----+---------+-------+</span></span><br><span class="line">| id    | int(11)     | YES  |     | NULL    |       |</span><br><span class="line">| name  | varchar(40) | YES  |     | NULL    |       |</span><br><span class="line">| glass | varchar(40) | YES  |     | NULL    |       |</span><br><span class="line">+<span class="comment">-------+-------------+------+-----+---------+-------+</span></span><br><span class="line">3 rows in <span class="keyword">set</span> (<span class="number">0.01</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>使用show table status查看视图:</strong><br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; show table status like 'stu_glass' \G</span><br><span class="line">*************************** 1. row ***************************</span><br><span class="line">           Name: stu_glass</span><br><span class="line">         Engine: NULL</span><br><span class="line">        Version: NULL</span><br><span class="line">     Row_format: NULL</span><br><span class="line">           Rows: NULL</span><br><span class="line"> Avg_row_length: NULL</span><br><span class="line">    Data_length: NULL</span><br><span class="line">Max_data_length: NULL</span><br><span class="line">   Index_length: NULL</span><br><span class="line">      Data_free: NULL</span><br><span class="line"> Auto_increment: NULL</span><br><span class="line">    Create_time: NULL</span><br><span class="line">    Update_time: NULL</span><br><span class="line">     Check_time: NULL</span><br><span class="line">      Collation: NULL</span><br><span class="line">       <span class="keyword">Checksum</span>: <span class="literal">NULL</span></span><br><span class="line"> Create_options: <span class="literal">NULL</span></span><br><span class="line">        <span class="keyword">Comment</span>: <span class="keyword">VIEW</span></span><br><span class="line"><span class="number">1</span> <span class="keyword">row</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>使用show create view查看视图详细信息:</strong><br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; show create view stu_glass \G</span><br><span class="line">*************************** 1. row ***************************</span><br><span class="line">                View: stu_glass</span><br><span class="line">         <span class="keyword">Create</span> <span class="keyword">View</span>: <span class="keyword">CREATE</span> ALGORITHM=UNDEFINED DEFINER=<span class="string">`root`</span>@<span class="string">`localhost`</span> <span class="keyword">SQL</span> <span class="keyword">SECURITY</span> DEFINER <span class="keyword">VIEW</span> <span class="string">`stu_glass`</span> <span class="keyword">AS</span> <span class="keyword">select</span> <span class="string">`student`</span>.<span class="string">`s_id`</span> <span class="keyword">AS</span> <span class="string">`id`</span>,<span class="string">`student`</span>.<span class="string">`name`</span> <span class="keyword">AS</span> <span class="string">`name`</span>,<span class="string">`info`</span>.<span class="string">`glass`</span> <span class="keyword">AS</span> <span class="string">`glass`</span> <span class="keyword">from</span> (<span class="string">`student`</span> <span class="keyword">join</span> <span class="string">`info`</span>) <span class="keyword">where</span> (<span class="string">`student`</span>.<span class="string">`s_id`</span> = <span class="string">`info`</span>.<span class="string">`s_id`</span>)</span><br><span class="line">character_set_client: utf8</span><br><span class="line">collation_connection: utf8_general_ci</span><br><span class="line"><span class="number">1</span> <span class="keyword">row</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>在views表中查看视图详细信息:</strong><br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select * from information_schema.views;   #查视图</span><br><span class="line">MariaDB [lyshark]&gt; select * from information_schema.tables;  #查表</span><br><span class="line">+<span class="comment">---------------+--------------+------------+</span></span><br><span class="line">| TABLE_CATALOG | TABLE_SCHEMA | TABLE_NAME |</span><br><span class="line">+<span class="comment">---------------+--------------+------------+</span></span><br><span class="line">| def           | lyshark      | stu_glass  |</span><br><span class="line">| def           | lyshark      | view_tab1  |</span><br><span class="line">| def           | lyshark      | view_tab2  |</span><br><span class="line">+<span class="comment">---------------+--------------+------------+</span></span><br><span class="line">3 rows in <span class="keyword">set</span> (<span class="number">0.01</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h3 id="◆更新与删除视图◆"><a href="#◆更新与删除视图◆" class="headerlink" title="◆更新与删除视图◆"></a>◆更新与删除视图◆</h3><p><strong>alter语句修改视图:</strong></p>
+<p>使用alter语句,修改视图<code>view_tab1</code>,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; desc view_tab1;</span><br><span class="line">+<span class="comment">-------+------------+------+-----+---------+-------+</span></span><br><span class="line">| Field | Type       | Null | Key | Default | Extra |</span><br><span class="line">+<span class="comment">-------+------------+------+-----+---------+-------+</span></span><br><span class="line">| x     | int(11)    | YES  |     | NULL    |       |</span><br><span class="line">| y     | int(11)    | YES  |     | NULL    |       |</span><br><span class="line">| totle | bigint(21) | YES  |     | NULL    |       |</span><br><span class="line">+<span class="comment">-------+------------+------+-----+---------+-------+</span></span><br><span class="line">3 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; <span class="keyword">alter</span> <span class="keyword">view</span> view_tab1</span><br><span class="line">    -&gt; <span class="keyword">AS</span> <span class="keyword">select</span> quantity <span class="keyword">from</span> table1;</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; desc view_tab1;</span><br><span class="line">+<span class="comment">----------+---------+------+-----+---------+-------+</span></span><br><span class="line">| Field    | Type    | Null | Key | Default | Extra |</span><br><span class="line">+<span class="comment">----------+---------+------+-----+---------+-------+</span></span><br><span class="line">| quantity | int(11) | YES  |     | NULL    |       |</span><br><span class="line">+<span class="comment">----------+---------+------+-----+---------+-------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>update更新视图:</strong><br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select * from stu_glass;</span><br><span class="line">+<span class="comment">------+------+--------+</span></span><br><span class="line">| id   | name | glass  |</span><br><span class="line">+<span class="comment">------+------+--------+</span></span><br><span class="line">|    1 | wang | wuban  |</span><br><span class="line">|    2 | rui  | sanban |</span><br><span class="line">+<span class="comment">------+------+--------+</span></span><br><span class="line">2 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; <span class="keyword">update</span> stu_glass <span class="keyword">SET</span> <span class="keyword">id</span>=<span class="number">3</span> <span class="keyword">where</span> <span class="keyword">name</span>=<span class="string">"rui"</span>;</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br><span class="line">Rows matched: 1  Changed: 0  Warnings: 0</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; select * from stu_glass;</span><br><span class="line">+<span class="comment">------+------+-------+</span></span><br><span class="line">| id   | name | glass |</span><br><span class="line">+<span class="comment">------+------+-------+</span></span><br><span class="line">|    1 | wang | wuban |</span><br><span class="line">|    3 | rui  | yiban |</span><br><span class="line">+<span class="comment">------+------+-------+</span></span><br><span class="line">2 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>删除视图中指定字段:</strong>注意,联合字段的视图无法删除.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select * from view_tab1;</span><br><span class="line">+<span class="comment">------+------+-------+</span></span><br><span class="line">| x    | y    | totle |</span><br><span class="line">+<span class="comment">------+------+-------+</span></span><br><span class="line">|    1 |   10 |    10 |</span><br><span class="line">|    2 |   30 |    60 |</span><br><span class="line">|    3 |   50 |   150 |</span><br><span class="line">+<span class="comment">------+------+-------+</span></span><br><span class="line">3 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; <span class="keyword">delete</span> <span class="keyword">from</span> view_tab1 <span class="keyword">where</span> x=<span class="number">1</span>;</span><br><span class="line">Query OK, 1 row affected (0.00 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; select * from view_tab1;</span><br><span class="line">+<span class="comment">------+------+-------+</span></span><br><span class="line">| x    | y    | totle |</span><br><span class="line">+<span class="comment">------+------+-------+</span></span><br><span class="line">|    2 |   30 |    60 |</span><br><span class="line">|    3 |   50 |   150 |</span><br><span class="line">+<span class="comment">------+------+-------+</span></span><br><span class="line">2 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>删除一个视图:</strong></p>
+<p>1.查询一下,我们比如要删除<code>view_tab1</code>和<code>view_tab2</code>两个视图.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select * from information_schema.views;   #查视图</span><br><span class="line">+<span class="comment">---------------+--------------+------------+</span></span><br><span class="line">| TABLE_CATALOG | TABLE_SCHEMA | TABLE_NAME |</span><br><span class="line">+<span class="comment">---------------+--------------+------------+</span></span><br><span class="line">| def           | lyshark      | stu_glass  |</span><br><span class="line">| def           | lyshark      | view_tab1  |</span><br><span class="line">| def           | lyshark      | view_tab2  |</span><br><span class="line">+<span class="comment">---------------+--------------+------------+</span></span><br><span class="line">3 rows in <span class="keyword">set</span> (<span class="number">0.01</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>2.通过<code>drop view</code>语句直接删除掉.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; drop view if exists view_tab1;</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; drop view if exists view_tab2;</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br></pre></td></tr></table></figure></p>
+<p>3.再次查询,发现没有了,删除成功.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select * from information_schema.views;</span><br><span class="line">+<span class="comment">---------------+--------------+------------+</span></span><br><span class="line">| TABLE_CATALOG | TABLE_SCHEMA | TABLE_NAME |</span><br><span class="line">+<span class="comment">---------------+--------------+------------+</span></span><br><span class="line">| def           | lyshark      | stu_glass  |</span><br><span class="line">+<span class="comment">---------------+--------------+------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="MariaDB触发器"><a href="#MariaDB触发器" class="headerlink" title="MariaDB触发器"></a>MariaDB触发器</h2><p>触发器(Trigger)是个特殊的存储过程,不同的是,执行存储过程要使用CALL语句来调用,而触发器的执行不需要使用CALL语句来调用,也不需要手工启动,只要当一个预定义的事件发生的时候,就会被MySQL自动调用,触发器可以查询其他表,而且可以包含复杂的SQL语句,它们主要用于满足复杂的业务规则或要求.</p>
+<p>一般来说创建触发器的基本语法如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">create</span> <span class="keyword">trigger</span> trigger_name trigger_time trigger_event</span><br><span class="line"><span class="keyword">ON</span> table_name <span class="keyword">FOR</span> <span class="keyword">EACH</span> <span class="keyword">ROW</span> trigger_stmt</span><br><span class="line"></span><br><span class="line"><span class="comment">#----------------------------------------------------------------</span></span><br><span class="line"><span class="comment">#[参数解释]</span></span><br><span class="line"></span><br><span class="line">trigger_name              <span class="comment">#触发器名称</span></span><br><span class="line">trigger_time              <span class="comment">#标识触发时机(befor/after)</span></span><br><span class="line">trigger_event             <span class="comment">#标识触发事件</span></span><br><span class="line">table_name                <span class="comment">#建立触发器表名,即在那张表上建立触发器</span></span><br><span class="line">trigger_stmt              <span class="comment">#触发器执行语句</span></span><br></pre></td></tr></table></figure></p>
+<p>而创建多个执行语句的触发器的语法如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">create</span> <span class="keyword">trigger</span> trigger_name trigger_time trigger_event</span><br><span class="line"><span class="keyword">ON</span> table_name <span class="keyword">FOR</span> <span class="keyword">EACH</span> <span class="keyword">ROW</span></span><br><span class="line"><span class="keyword">BEGIN</span></span><br><span class="line">执行语句块...</span><br><span class="line"><span class="keyword">END</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="◆创建触发器◆"><a href="#◆创建触发器◆" class="headerlink" title="◆创建触发器◆"></a>◆创建触发器◆</h3><p><strong>创建只有一条执行语句的触发器:</strong></p>
+<p>1.首先创建一个<code>account表</code>,表中有两个字段,分别是<code>acct_num字段(INT)</code>,<code>amount字段(float)</code>.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; create table account(acct_num INT,amount DECIMAL(10,2));</span><br><span class="line">Query OK, 0 rows affected (0.01 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; desc account;</span><br><span class="line">+<span class="comment">----------+---------------+------+-----+---------+-------+</span></span><br><span class="line">| Field    | Type          | Null | Key | Default | Extra |</span><br><span class="line">+<span class="comment">----------+---------------+------+-----+---------+-------+</span></span><br><span class="line">| acct_num | int(11)       | YES  |     | NULL    |       |</span><br><span class="line">| amount   | decimal(10,2) | YES  |     | NULL    |       |</span><br><span class="line">+<span class="comment">----------+---------------+------+-----+---------+-------+</span></span><br><span class="line">2 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>2.创建一个名为<code>ins_sum</code>的触发器,触发条件是向数据表<code>account</code>插入数据之前,对新插入的<code>amount</code>字段值进行求和计算.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; create trigger ins_sum BEFORE INSERT ON account</span><br><span class="line">    -&gt; FOR EACH ROW SET @sum=@sum+NEW.amount;</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; set @sum=0;</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; insert into account values(1,1.00),(2,2.00);</span><br><span class="line">Query OK, 2 rows affected (0.00 sec)</span><br><span class="line">Records: 2  Duplicates: 0  Warnings: 0</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; select @sum;</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">| @sum |</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">| 3.00 |</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>以上例子,首先创建一个<code>account</code>表,再向表<code>account</code>插入数据之前,计算所有新插入的<code>account</code>表的<code>amount</code>值之和,触发器的名称为<code>ins_sum</code>,条件是在向表中插入数据之前触发.</p>
+<p><strong>创建具有多条执行语句的触发器:</strong></p>
+<p>1.首相创建4个测试表格,并写入以下测试字段.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; create table test1(a1 INT);</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; create table test2(a2 INT);</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; create table test3(a3 INT NOT NULL AUTO_INCREMENT primary key);</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; create table test4(</span><br><span class="line">    -&gt; a4 INT NOT NULL AUTO_INCREMENT PRIMARY KEY,</span><br><span class="line">    -&gt; b4 INT DEFAULT 0</span><br><span class="line">    -&gt; );</span><br><span class="line">Query OK, 0 rows affected (0.07 sec)</span><br></pre></td></tr></table></figure></p>
+<p>2.创建一个包含多个执行语句的触发器,当<code>test1</code>有数据插入时,执行触发语句,代码如下:<br><figure class="highlight"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; DELIMITER //</span><br><span class="line">MariaDB [lyshark]&gt; create trigger testref BEFORE INSERT ON test1</span><br><span class="line">    -&gt; FOR EACH ROW</span><br><span class="line">    -&gt; BEGIN</span><br><span class="line">    -&gt; insert into test2 set a2=NEW.a1;</span><br><span class="line">    -&gt; delete from test3 where a3=NEW.a1;</span><br><span class="line">    -&gt; update test4 set b4=b4+1 where a4=NEW.a1;</span><br><span class="line">    -&gt; END</span><br><span class="line">    -&gt; //</span><br><span class="line">MariaDB [lyshark]&gt; DELIMITER ;;</span><br></pre></td></tr></table></figure></p>
+<p>以上代码创建了一个名为<code>testref</code>的触发器,这个触发器的触发条件是在向表<code>test1</code>插入数据前执行触发器的语句,具体执行代码如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; insert into test1 values (1),(3),(1),(7),(1),(4);</span><br><span class="line">Query OK, 6 rows affected (0.01 sec)</span><br><span class="line">Records: 6  Duplicates: 0  Warnings: 0</span><br></pre></td></tr></table></figure></p>
+<p>当test1表格插入数据后,其他表格也会出现相同的数据,这就是触发器所做的贡献.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select * from test1;</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">| a1   |</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">|    1 |</span><br><span class="line">|    3 |</span><br><span class="line">|    1 |</span><br><span class="line">|    7 |</span><br><span class="line">|    1 |</span><br><span class="line">|    4 |</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">6 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; <span class="keyword">select</span> * <span class="keyword">from</span> test2;</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">| a2   |</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">|    1 |</span><br><span class="line">|    3 |</span><br><span class="line">|    1 |</span><br><span class="line">|    7 |</span><br><span class="line">|    1 |</span><br><span class="line">|    4 |</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">6 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>关于触发器的另一个小实验:</strong></p>
+<p>1.先来创建一个数据表.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; create table myevent(id int,name char(20));</span><br><span class="line">Query OK, 0 rows affected (0.01 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; desc myevent;</span><br><span class="line">+<span class="comment">-------+----------+------+-----+---------+-------+</span></span><br><span class="line">| Field | Type     | Null | Key | Default | Extra |</span><br><span class="line">+<span class="comment">-------+----------+------+-----+---------+-------+</span></span><br><span class="line">| id    | int(11)  | YES  |     | NULL    |       |</span><br><span class="line">| name  | char(20) | YES  |     | NULL    |       |</span><br><span class="line">+<span class="comment">-------+----------+------+-----+---------+-------+</span></span><br><span class="line">2 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>2.创建一个<code>trig_insert</code>的触发器,在向表<code>account</code>插入数据之后会向表<code>myevent</code>插入一组数据,代码如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; create trigger trig_insert AFTER INSERT ON account</span><br><span class="line">    -&gt; FOR EACH ROW INSERT INTO myevent values(2,'after insert');</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br></pre></td></tr></table></figure></p>
+<p>3.此时我们执行插入语句,向<code>account</code>表插入数据,查询<code>myevent</code>表,发现自动添加上了,说明触发器生效了.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; insert into account values(1,1.00),(2,2.00);</span><br><span class="line">Query OK, 2 rows affected (0.01 sec)</span><br><span class="line">Records: 2  Duplicates: 0  Warnings: 0</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; select * from myevent;</span><br><span class="line">+<span class="comment">------+--------------+</span></span><br><span class="line">| id   | name         |</span><br><span class="line">+<span class="comment">------+--------------+</span></span><br><span class="line">|    2 | after <span class="keyword">insert</span> |</span><br><span class="line">|    <span class="number">2</span> | <span class="keyword">after</span> <span class="keyword">insert</span> |</span><br><span class="line">+<span class="comment">------+--------------+</span></span><br><span class="line"><span class="number">2</span> <span class="keyword">rows</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆查看与删除触发器◆"><a href="#◆查看与删除触发器◆" class="headerlink" title="◆查看与删除触发器◆"></a>◆查看与删除触发器◆</h3><p><strong>show triggers 查看所有触发器:</strong><br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; show triggers \G;</span><br><span class="line">*************************** 1. row ***************************</span><br><span class="line">             Trigger: ins_sum</span><br><span class="line">               Event: <span class="keyword">INSERT</span></span><br><span class="line">               <span class="keyword">Table</span>: <span class="keyword">account</span></span><br><span class="line">           <span class="keyword">Statement</span>: <span class="keyword">SET</span> @<span class="keyword">sum</span>=@<span class="keyword">sum</span>+NEW.amount</span><br><span class="line">              Timing: <span class="keyword">BEFORE</span></span><br><span class="line">             Created: <span class="literal">NULL</span></span><br><span class="line">            sql_mode:</span><br><span class="line">             Definer: root@localhost</span><br><span class="line">character_set_client: utf8</span><br><span class="line">collation_connection: utf8_general_ci</span><br><span class="line">  <span class="keyword">Database</span> <span class="keyword">Collation</span>: latin1_swedish_ci</span><br><span class="line">*************************** <span class="number">2.</span> <span class="keyword">row</span> ***************************</span><br><span class="line">             <span class="keyword">Trigger</span>: trig_insert</span><br><span class="line">               <span class="keyword">Event</span>: <span class="keyword">INSERT</span></span><br><span class="line">               <span class="keyword">Table</span>: <span class="keyword">account</span></span><br><span class="line">           <span class="keyword">Statement</span>: <span class="keyword">INSERT</span> <span class="keyword">INTO</span> myevent <span class="keyword">values</span>(<span class="number">2</span>,<span class="string">'after insert'</span>)</span><br><span class="line">              Timing: <span class="keyword">AFTER</span></span><br><span class="line">             Created: <span class="literal">NULL</span></span><br><span class="line">            sql_mode:</span><br><span class="line">             Definer: root@localhost</span><br><span class="line">character_set_client: utf8</span><br><span class="line">collation_connection: utf8_general_ci</span><br><span class="line">  <span class="keyword">Database</span> <span class="keyword">Collation</span>: latin1_swedish_ci</span><br></pre></td></tr></table></figure></p>
+<p><strong>在triggers表中查看触发器:</strong><br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select * from information_schema.triggers \G;</span><br><span class="line"></span><br><span class="line">*************************** 1. row ***************************</span><br><span class="line">           TRIGGER_CATALOG: def</span><br><span class="line">            TRIGGER_SCHEMA: lyshark</span><br><span class="line">              TRIGGER_NAME: ins_sum</span><br><span class="line">        EVENT_MANIPULATION: <span class="keyword">INSERT</span></span><br><span class="line">      EVENT_OBJECT_CATALOG: <span class="keyword">def</span></span><br><span class="line">       EVENT_OBJECT_SCHEMA: lyshark</span><br><span class="line">        EVENT_OBJECT_TABLE: <span class="keyword">account</span></span><br><span class="line">              ACTION_ORDER: <span class="number">0</span></span><br><span class="line">          ACTION_CONDITION: <span class="literal">NULL</span></span><br><span class="line">          ACTION_STATEMENT: <span class="keyword">SET</span> @<span class="keyword">sum</span>=@<span class="keyword">sum</span>+NEW.amount</span><br><span class="line">        ACTION_ORIENTATION: <span class="keyword">ROW</span></span><br><span class="line">             ACTION_TIMING: <span class="keyword">BEFORE</span></span><br><span class="line">ACTION_REFERENCE_OLD_TABLE: <span class="literal">NULL</span></span><br><span class="line">ACTION_REFERENCE_NEW_TABLE: <span class="literal">NULL</span></span><br><span class="line">  ACTION_REFERENCE_OLD_ROW: <span class="keyword">OLD</span></span><br><span class="line">  ACTION_REFERENCE_NEW_ROW: <span class="keyword">NEW</span></span><br><span class="line">                   CREATED: <span class="literal">NULL</span></span><br><span class="line">                  SQL_MODE:</span><br><span class="line">                   DEFINER: root@localhost</span><br><span class="line">      CHARACTER_SET_CLIENT: utf8</span><br><span class="line">      COLLATION_CONNECTION: utf8_general_ci</span><br><span class="line">        DATABASE_COLLATION: latin1_swedish_ci</span><br></pre></td></tr></table></figure></p>
+<p><strong>删除触发器:</strong> 删除<code>lyshark</code>数据库中的,<code>ins</code>触发器,SQL如下:</p>
+<p>1.先查询一下触发器的名称,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select TRIGGER_SCHEMA,TRIGGER_NAME from information_schema.triggers;</span><br><span class="line">+<span class="comment">----------------+--------------+</span></span><br><span class="line">| TRIGGER_SCHEMA | TRIGGER_NAME |</span><br><span class="line">+<span class="comment">----------------+--------------+</span></span><br><span class="line">| lyshark        | ins_sum      |</span><br><span class="line">| lyshark        | trig_insert  |</span><br><span class="line">| lyshark        | testref      |</span><br><span class="line">+<span class="comment">----------------+--------------+</span></span><br><span class="line">3 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>2.一条命令删除.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; drop trigger lyshark.ins_sum;</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/12/29/MariaDB/MariaDB-视图与触发器-11/">MariaDB 视图与触发器(11)</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年12月29日 - 13:12</p>
+  <p><span>最后更新:</span>2018年12月29日 - 20:12</p>
+  <p><span>原始链接:</span><a href="/2018/12/29/MariaDB/MariaDB-视图与触发器-11/" title="MariaDB 视图与触发器(11)">https://www.mkdirs.com/2018/12/29/MariaDB/MariaDB-视图与触发器-11/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/MariaDB/" rel="tag"> <i class="fa fa-tag"></i> MariaDB</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/28/MariaDB/MariaDB-存储过程与函数-10/" rel="next" title="MariaDB 存储过程与函数(10)">
+                <i class="fa fa-chevron-left"></i> MariaDB 存储过程与函数(10)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/30/MariaDB/MariaDB-用户与权限管理-12/" rel="prev" title="MariaDB 用户与权限管理(12)">
+                MariaDB 用户与权限管理(12) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#MariaDB-视图"><span class="nav-text">MariaDB 视图</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆创建视图◆"><span class="nav-text">◆创建视图◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆查看视图◆"><span class="nav-text">◆查看视图◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆更新与删除视图◆"><span class="nav-text">◆更新与删除视图◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MariaDB触发器"><span class="nav-text">MariaDB触发器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆创建触发器◆"><span class="nav-text">◆创建触发器◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆查看与删除触发器◆"><span class="nav-text">◆查看与删除触发器◆</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

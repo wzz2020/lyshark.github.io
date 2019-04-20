@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Python 的创始人为吉多·范罗苏姆(Guido van Rossum).1989年的圣诞节期间,吉多·范罗苏姆为了在阿姆斯特丹打发时间,决心开发一个新的脚本解释程序,作为ABC语言的一种继承.Python是纯粹的自由软件,源代码和解释器CPython遵循 GPL(GNU General Public License)协议.关于python的哲学：python崇尚:”优雅”、”明确”、”简单”,">
+<meta name="keywords" content="Python">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python 语言简介与入门(1)">
+<meta property="og:url" content="https://www.mkdirs.com/2019/01/07/Python/Python-语言简介与入门-1/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="Python 的创始人为吉多·范罗苏姆(Guido van Rossum).1989年的圣诞节期间,吉多·范罗苏姆为了在阿姆斯特丹打发时间,决心开发一个新的脚本解释程序,作为ABC语言的一种继承.Python是纯粹的自由软件,源代码和解释器CPython遵循 GPL(GNU General Public License)协议.关于python的哲学：python崇尚:”优雅”、”明确”、”简单”,">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-01-24T06:55:44.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Python 语言简介与入门(1)">
+<meta name="twitter:description" content="Python 的创始人为吉多·范罗苏姆(Guido van Rossum).1989年的圣诞节期间,吉多·范罗苏姆为了在阿姆斯特丹打发时间,决心开发一个新的脚本解释程序,作为ABC语言的一种继承.Python是纯粹的自由软件,源代码和解释器CPython遵循 GPL(GNU General Public License)协议.关于python的哲学：python崇尚:”优雅”、”明确”、”简单”,">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2019/01/07/Python/Python-语言简介与入门-1/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Python 语言简介与入门(1) | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2019/01/07/Python/Python-语言简介与入门-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Python 语言简介与入门(1)
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-01-07 12:09:40" itemprop="dateCreated datePublished" datetime="2019-01-07T12:09:40+08:00">2019-01-07</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-01-24 14:55:44" itemprop="dateModified" datetime="2019-01-24T14:55:44+08:00">2019-01-24</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Python/" itemprop="url" rel="index"><span itemprop="name">Python</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Python 的创始人为吉多·范罗苏姆(Guido van Rossum).1989年的圣诞节期间,吉多·范罗苏姆为了在阿姆斯特丹打发时间,决心开发一个新的脚本解释程序,作为ABC语言的一种继承.Python是纯粹的自由软件,源代码和解释器CPython遵循 GPL(GNU General Public License)协议.关于python的哲学：python崇尚:”优雅”、”明确”、”简单”,Python是用最简单最优雅最明确的方法来解决问题.</p>
+<a id="more"></a>
+<p><br></p>
+<h2 id="Python-语言简介"><a href="#Python-语言简介" class="headerlink" title="Python 语言简介"></a>Python 语言简介</h2><p>Python 是一种动态解释型的编程语言,Python 简单易学、功能强大,支持面向对象、与函数式编程.Python可以在 Windows、Unix等多个操作系统上使用,同时Python也被称为”胶水语言”,Python作为最流行的脚本语言之一,其具有内置的高级数据结构和简单有效的面向对象编程思想实现.同时语法简洁而清晰,类库丰富而强大,非常适合于进行快速原型开发,可以用最少的时间换取最高效的开发效率,另外Python可以运行在多种系统平台下,从而使得只需要编写一次代码,就可以在多个系统平台下都保持有同等的功能,这一点丝毫不逊色于Java虚拟机.</p>
+<p>Python 语言是由<code>Guido van Rossum(吉多·范罗苏姆)</code>,在1989年开发的,1989年的圣诞节期间,吉多·范罗苏姆为了在阿姆斯特丹打发时间,决心开发一个新的脚本解释程序,以作为ABC语言的一种继承,其设计思想是简洁明了Python的设计具有很强的可读性,相比其他语言经常使用英文关键字,其他语言的一些标点符号,它具有比其他语言更有特色语法结构.</p>
+<p>Python 语言已经诞生20多年了,正逐渐发展为主流程序设计语言之一,目前在TIOBE编程语言排行榜中长期占据第4的位次,由于Python 语言的动态性,程序解释执行的速度比编译型语言慢,但随着Python语言的不断优化,一些诸如PyPy项目的不断发展,以及计算机硬件技术的不断发展,动态语言已经越来越受到工业领域的重视,另外最大的一点好处是,Python是纯粹的自由软件,源代码和解释器CPython遵循<code>GPL(GNU General Public License)</code>协议,Python的哲学就是崇尚”优雅”、”明确”、”简单”,Python是用最简单最优雅最明确的方法来解决问题.<br><br></p>
+<h2 id="Python-语言特点"><a href="#Python-语言特点" class="headerlink" title="Python 语言特点"></a>Python 语言特点</h2><p>程序设计语言在不断发展,从最初的汇编语言到后来的C、Pascal语言,发展到现在的C++、Java等高级编程语言,程序设计的难度在不断减小,软件的开发和设计已经形成了一套标准,开发工作已经不再是复杂的任务.最初只能使用机器码编写代码,而现在可以使用具有良好调试功能的IDE环境编程,Python使用C语言开发,但是Python不再有C语言中的指针等复杂数据类型,Python的简洁性使得软件的代码大幅度地减少,开发任务进一步简化.</p>
+<p><strong>面向对象的特性:</strong><br>面向对象的程序设计解决了结构化程序设计的复杂性,使得程序设计更贴近现实生活.结构化程序设计把数据和逻辑混合在一起,不便于程序的维护.面向对象的程序设计抽象出对象的行为和属性,把行为和属性分离开,但又合理地组织在一起.Python语言具有很强的面向对象特性,而且简化了面向对象的实现,它消除了保护类型、抽象类、接口等面向对象的元素,使得面向对象的概念更容易理解.</p>
+<p><strong>内置的数据结构:</strong><br>Python提供了一些内置的数据结构,这些数据结构实现了类似Java中集合类的功能,Python的数据结构包括元组、列表、字典、集合等.内置数据结构的出现简化了程序的设计,元组相当于”只读”的数组,列表可以作为可变长度的数组使用,字典相当于Java中的HashTable类型.</p>
+<p><strong>语言本身的简洁性:</strong><br>Python语言的关键字比较少,它没有分号、begin、end等标记符号,代码块使用空格或制表键进缩进方式来分割,其代码简洁、短小,易于阅读,Python简化了相关循环语句,就算非常复杂的语句,也能够快速读懂.</p>
+<p><strong>语言本身的健壮性:</strong><br>Python提供了异常处理机制,能捕获程序的异常情况.此外Python的堆栈跟踪对象能够指出程序出错的位置和出错的原因,异常机制能够避免不安全退出的情况,同时能帮助程序员调试程序.</p>
+<p><strong>跨平台(类似Java):</strong><br>Python代码会先编译为与平台相关的二进制代码,然后再解释执行,这种方式类似java,Python的执行速度提高了,Python编写的应用程序可以运行在 Windows、UNIX、Linux等,不同的操作系统上.</p>
+<blockquote>
+<p>Python 的应用领域</p>
+<blockquote>
+<p>● 云计算:云计算最火的语言就是Pythhon,典型应用OpenStack框架就是使用Python开发的.<br>● WEB开发:众多优秀的WEB框架,众多大型网站均为Python开发,例如django框架.<br>● 人工智能:NumPy,SciPy,Matplotlib,Enthought,librarys这些框架是人工智能的主要实现.<br>● 系统运维:运维人员开发脚本进行自动化管理,由于所有的Linux/Mac默认集成Python环境.<br>● 金融计算:量化交易,金融分析,金融工程领域的广泛应用.<br>● 黑客编程:拥有大量的黑客攻击模块,可以很方便的使用这些模块.<br>● 图形GUI:PyQT,WxPython,TkInter等图形框架,现在已经逐步变得更加的完善.</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>Python 这些公司在用</p>
+<blockquote>
+<p>● 谷歌:Google App Engine 谷歌爬虫等项目都在大量使用Python<br>● CIA:美国中情局网站就是用Python开发的<br>● NASA:美国航天局(NASA)大量使用Python进行数据分析和运算<br>● YouTube:世界上最大的视频网站YouTube就是用Python开发的<br>● Dropbox:美国最大的在线云存储网站,全部用Python实现,每天网站处理10亿个文件的上传和下载<br>● Facebook:大量的基础库均通过Python实现的<br>● Redhat:世界上最流行的Linux发行版本中的yum包管理工具就是用python开发的<br>● 豆瓣:豆瓣公司几乎所有的业务均是通过Python开发</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>Python 语言的优缺点</p>
+<blockquote>
+<p>● 优雅:Python程序看上去总是简单易懂,可以编写那些非常非常复杂的程序.<br>● 效率:Python有非常强大的第三方库,避免重复造轮子,开发效率非常高.<br>● 高级语言:用Python语言编写程序的时候,你无需考虑诸如如何管理程序使用的内存的底层细节.<br>● 可移植性:由于开源本质,已经被移植在许多平台上,您写的程序可以不加修改的运行在任何系统上.<br>● 可扩展性:Python被称作胶水语言可以与各种语言实现的功能交互互相调用.<br>● 可嵌入性:你可以把Python嵌入你的C/C++程序,从而向你的程序用户提供脚本功能.<br>● 速度慢:Python是脚本语言,解释执行所以其执行效率很低,但一般工作足以应对.<br>● 代码不能加密:python是解释语言代码,无法加密,开源精神很重要.<br>● 线程不能利用多CPU问题:GIL即全局解释器锁,使得任何时刻仅有一个线程在执行.</p>
+</blockquote>
+</blockquote>
+<p>以上就是全部的关于Python的简单介绍了,具体如果想进一步了解Python的其他历史,请自行问度娘.<br><br></p>
+<h2 id="Python-编译安装"><a href="#Python-编译安装" class="headerlink" title="Python 编译安装"></a>Python 编译安装</h2><p>Python的开发环境安装和配置非常的简单,如果是Linux系统则会默认集成安装了Python环境,Python的可执行文件被放在了<code>/usr/local/bin</code>目录下,库函数被安装在了<code>/usr/local/python</code>目录中,接下来我们将使用源码的方式来编译安装一下Python解释器.</p>
+<p>1.首先安装gcc编译器,和Python的相关依赖包.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum -y install gcc zlib zlib-devel openssl openssl-devel libffi-devel</span></span><br><span class="line"></span><br><span class="line">Package gcc-4.8.5-36.el7.x86_64 already installed and latest version</span><br><span class="line">Package zlib-1.2.7-18.el7.x86_64 already installed and latest version</span><br><span class="line">Package zlib-devel-1.2.7-18.el7.x86_64 already installed and latest version</span><br><span class="line">Package 1:openssl-1.0.2k-16.el7.x86_64 already installed and latest version</span><br><span class="line">Package 1:openssl-devel-1.0.2k-16.el7.x86_64 already installed and latest version</span><br><span class="line">Package libffi-devel-3.0.13-18.el7.x86_64 already installed and latest version</span><br><span class="line">Nothing to <span class="keyword">do</span></span><br></pre></td></tr></table></figure></p>
+<p>2.这里我们需要编译并安装Python解释器.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y readline</span></span><br><span class="line">[root@localhost ~]<span class="comment"># wget https://www.python.org/ftp/python/3.7.0/Python-3.7.0.tgz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># tar xvzf Python-3.7.0.tgz -C /usr/src/python3.7</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd /usr/src/Python-3.7.0/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ./configure --prefix=/usr/local/python3.7</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make &amp;&amp; make altinstall</span></span><br></pre></td></tr></table></figure></p>
+<p>3.将Python头文件拷贝到标准目录,避免直接使用Python找不到所需的头文件.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cd /usr/local/include/python3.7/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cp -a ./* /usr/local/include/</span></span><br></pre></td></tr></table></figure></p>
+<p>4.接着我们备份一下旧版本的Python,并创建符号链接链接到新版本的Python上面.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cd /usr/bin/</span></span><br><span class="line">[root@localhost bin]<span class="comment"># mv python python.old</span></span><br><span class="line">[root@localhost bin]<span class="comment"># ln -s /usr/local/bin/python3.7 /usr/local/bin/python</span></span><br><span class="line">[root@localhost bin]<span class="comment"># rm -rf /usr/bin/python</span></span><br><span class="line">[root@localhost bin]<span class="comment"># cp /usr/local/bin/python3.7 /usr/bin/python</span></span><br></pre></td></tr></table></figure></p>
+<p>5.由于yum是用Python开发的,这里为了避免冲突要改掉他的配置.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /usr/bin/yum</span></span><br><span class="line"><span class="comment">#!/usr/bin/python2.7       ←此处将python改成python2.7</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># vim /usr/libexec/urlgrabber-ext-down</span></span><br><span class="line"><span class="comment">#!/usr/bin/python2.7       ←此处将python改成python2.7</span></span><br></pre></td></tr></table></figure></p>
+<p>6.最后测试python新版本是否生效了.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># python</span></span><br><span class="line">Python 3.7.0 (default, Apr 17 2018, 11:03:21) </span><br><span class="line">[GCC 4.8.5 20150623 (Red Hat 4.8.5-11)] on linux</span><br><span class="line">Type <span class="string">"help"</span>, <span class="string">"copyright"</span>, <span class="string">"credits"</span> or <span class="string">"license"</span> <span class="keyword">for</span> more information.</span><br><span class="line">&gt;&gt;&gt; <span class="built_in">exit</span>()</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="Python-输入输出"><a href="#Python-输入输出" class="headerlink" title="Python 输入输出"></a>Python 输入输出</h2><h3 id="◆Input标准输入◆"><a href="#◆Input标准输入◆" class="headerlink" title="◆Input标准输入◆"></a>◆Input标准输入◆</h3><p>python3中格式化输出默认接收的都视为字符串,如果需要数字则需要另外强制转换为int()转换为数字.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>name = input(<span class="string">"请输入你的名字:"</span>)</span><br><span class="line">请输入你的名字:lyshark</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(<span class="string">"Hello "</span> + name)</span><br><span class="line">Hello lyshark</span><br><span class="line"> </span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>age = input(<span class="string">"请输入你的年龄:"</span>)</span><br><span class="line">请输入你的年龄:<span class="number">22</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>type(age)</span><br><span class="line">&lt;<span class="class"><span class="keyword">class</span> '<span class="title">str</span>'&gt;         #默认情况是字符串</span></span><br><span class="line"><span class="class"> </span></span><br><span class="line">&gt;&gt;&gt; age1 = input("请输入你的年龄:")</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>age1 = int(age1)  <span class="comment">#此处强制类型转换</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>type(age1)</span><br><span class="line">&lt;<span class="class"><span class="keyword">class</span> '<span class="title">int</span>'&gt;         #再次查询已变成整形</span></span><br></pre></td></tr></table></figure></p>
+<p>输入密码时,如果想要不可见,需要利用getpass模块中的getpass方法,即:<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> getpass</span><br><span class="line">  </span><br><span class="line"><span class="comment"># 将用户输入的内容赋值给 pwd 变量</span></span><br><span class="line">pwd = getpass.getpass(<span class="string">"请输入密码："</span>)</span><br><span class="line">请输入密码：</span><br><span class="line"></span><br><span class="line"><span class="comment"># 打印输入的内容</span></span><br><span class="line">print(pwd)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆Print标准输出◆"><a href="#◆Print标准输出◆" class="headerlink" title="◆Print标准输出◆"></a>◆Print标准输出◆</h3><p><strong>输出字符串:</strong> 格式化输出字符串.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>str=<span class="string">"hello python"</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(str)</span><br><span class="line">hello python</span><br></pre></td></tr></table></figure></p>
+<p><strong>输出整数:</strong> 格式化输出整数.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>strHello=<span class="string">"the length of (%s) is %d"</span> %(<span class="string">"hello world"</span>,len(<span class="string">"hello world"</span>))</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(strHello)</span><br><span class="line">the length of (hello world) <span class="keyword">is</span> <span class="number">11</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>进制输出:</strong> 格式化输出十进制,十六进制,八进制.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>nHex=<span class="number">0x20</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(<span class="string">"十六进制=%x,十进制=%d,八进制=%o"</span>%(nHex,nHex,nHex))</span><br><span class="line">十六进制=<span class="number">20</span>,十进制=<span class="number">32</span>,八进制=<span class="number">40</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>二进制输出:</strong> 格式化输出二进制,可以使用python函数bin().<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>bin(<span class="number">155</span>)</span><br><span class="line"><span class="string">'0b10011011'</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>格式化输出浮点数(float):</strong><br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> math</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(<span class="string">"PI=%F"</span>%math.pi)</span><br><span class="line">PI=<span class="number">3.141593</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(<span class="string">"PI=%10.2f"</span>%math.pi)</span><br><span class="line">PI=      <span class="number">3.14</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(<span class="string">"PI=%-10.2f"</span>%math.pi)</span><br><span class="line">PI=<span class="number">3.14</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>格式化输出字符串(string):</strong><br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(<span class="string">"%3s"</span>%(<span class="string">"lyshark"</span>))</span><br><span class="line">lyshark</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(<span class="string">"%3s"</span>%(<span class="string">"lyshark"</span>))</span><br><span class="line">lyshark</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(<span class="string">"%.*s"</span>%(<span class="number">4</span>,<span class="string">"lyshark"</span>))</span><br><span class="line">lysh</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(<span class="string">"%10.3s"</span>%(<span class="string">"lyshark"</span>))</span><br><span class="line">       lys</span><br></pre></td></tr></table></figure></p>
+<p><strong>输出一个列表(list):</strong><br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>list=[<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="string">"lyshark"</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(list)</span><br><span class="line">[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="string">'lyshark'</span>]</span><br><span class="line">&gt;&gt;&gt;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>dic=&#123;<span class="number">1</span>:<span class="string">"A"</span>,<span class="number">2</span>:<span class="string">"b"</span>,<span class="number">3</span>:<span class="string">"c"</span>&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(dic)</span><br><span class="line">&#123;<span class="number">1</span>: <span class="string">'A'</span>, <span class="number">2</span>: <span class="string">'b'</span>, <span class="number">3</span>: <span class="string">'c'</span>&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>自动换行:</strong> print会自动在行末加上回车,如果不需回车,只需要加上,即可.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">0</span>,<span class="number">5</span>):</span><br><span class="line"><span class="meta">... </span>    print(i,)</span><br></pre></td></tr></table></figure></p>
+<p><strong>万能的%参数:</strong><br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>format=<span class="string">"%r %r %r %r"</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(format%(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>))</span><br><span class="line"><span class="number">1</span> <span class="number">2</span> <span class="number">3</span> <span class="number">4</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>格式化打印:</strong> 让多个print打印在一行内.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">print(<span class="string">'hello'</span>, end = <span class="string">" "</span>)  </span><br><span class="line">print(<span class="string">'world'</span>, end = <span class="string">"*"</span>)  </span><br><span class="line">print(<span class="string">'!'</span>)  </span><br><span class="line"><span class="string">""" </span></span><br><span class="line"><span class="string">输出结果是： </span></span><br><span class="line"><span class="string">hello world*! </span></span><br><span class="line"><span class="string">"""</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>字符串拼接:</strong><br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>str1=<span class="string">"hello"</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>str2=<span class="string">"lyshark"</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(str1+str2)</span><br><span class="line">hellolyshark</span><br></pre></td></tr></table></figure></p>
+<p><strong>拓展知识:</strong> 打印一个乘法口诀表.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>,<span class="number">10</span>):</span><br><span class="line">    <span class="keyword">for</span> m <span class="keyword">in</span> range (<span class="number">1</span>,i+<span class="number">1</span>):</span><br><span class="line">        sum = i * m</span><br><span class="line">        <span class="keyword">if</span> m &lt; i:</span><br><span class="line">            print(m, <span class="string">'*'</span>, i,  <span class="string">'='</span>, sum ,end= <span class="string">'   '</span>) </span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            print(m, <span class="string">'*'</span>, i, <span class="string">'='</span>, sum)</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="Python-模块概述"><a href="#Python-模块概述" class="headerlink" title="Python 模块概述"></a>Python 模块概述</h2><p><strong>sys模块:</strong><br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> sys</span><br><span class="line">  </span><br><span class="line">print(sys.argv)</span><br><span class="line"></span><br><span class="line">root@localhost:~$ python test.py helo world</span><br><span class="line"></span><br><span class="line">[<span class="string">'test.py'</span>, <span class="string">'helo'</span>, <span class="string">'world'</span>]      <span class="comment">#把执行脚本时传递的参数获取到了</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>os模块:</strong><br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> os</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>os.system(<span class="string">"df -h"</span>) <span class="comment">#调用系统命令</span></span><br></pre></td></tr></table></figure></p>
+<p>os.system()执行系统命令,如果有变量存储该执行的结果,该变量只会存储该命令执行成功或者失败返回值,不会存储命令执行的结果,os.system(“df -h”)会有返回值.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>result = os.system(<span class="string">"df -h"</span>)</span><br><span class="line">df: ‘/mnt/hgfs’: Protocol error</span><br><span class="line">Filesystem      Size  Used Avail Use% Mounted on</span><br><span class="line">udev            <span class="number">3.9</span>G     <span class="number">0</span>  <span class="number">3.9</span>G   <span class="number">0</span>% /dev</span><br><span class="line">tmpfs           <span class="number">797</span>M  <span class="number">9.4</span>M  <span class="number">788</span>M   <span class="number">2</span>% /run</span><br><span class="line">/dev/sda1       <span class="number">189</span>G   <span class="number">10</span>G  <span class="number">170</span>G   <span class="number">6</span>% /</span><br></pre></td></tr></table></figure></p>
+<p>如果需要保存命令执行的结果需哟使用os.popen(“系统命令”).read(),然后使用变量赋值输出.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>result = os.popen(<span class="string">"df -h"</span>).read()</span><br><span class="line"> </span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(result)</span><br><span class="line">Filesystem      Size  Used Avail Use% Mounted on</span><br><span class="line">udev            <span class="number">3.9</span>G     <span class="number">0</span>  <span class="number">3.9</span>G   <span class="number">0</span>% /dev</span><br><span class="line">tmpfs           <span class="number">797</span>M  <span class="number">9.4</span>M  <span class="number">788</span>M   <span class="number">2</span>% /run</span><br><span class="line">/dev/sda1       <span class="number">189</span>G   <span class="number">10</span>G  <span class="number">170</span>G   <span class="number">6</span>% /</span><br></pre></td></tr></table></figure></p>
+<p><strong>自己写个补全模块tab.py:</strong><br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python </span></span><br><span class="line"><span class="comment"># python startup file </span></span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> readline</span><br><span class="line"><span class="keyword">import</span> rlcompleter</span><br><span class="line"><span class="keyword">import</span> atexit</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="comment"># tab completion </span></span><br><span class="line">readline.parse_and_bind(<span class="string">'tab: complete'</span>)</span><br><span class="line"><span class="comment"># history file </span></span><br><span class="line">histfile = os.path.join(os.environ[<span class="string">'HOME'</span>], <span class="string">'.pythonhistory'</span>)</span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    readline.read_history_file(histfile)</span><br><span class="line"><span class="keyword">except</span> IOError:</span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line">atexit.register(readline.write_history_file, histfile)</span><br><span class="line"><span class="keyword">del</span> os, histfile, readline, rlcompleter</span><br></pre></td></tr></table></figure></p>
+<p>写完后保存,导入就可以使用,按下tab看到补全效果了.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> tab</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> os</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>os.</span><br><span class="line">Display all 238 possibilities? (y or n)</span><br><span class="line">os.EX_CANTCREAT             os.fchdir(</span><br><span class="line">os.EX_CONFIG                os.fchmod(</span><br><span class="line">os.EX_DATAERR               os.fchown(</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="Python-文件生成"><a href="#Python-文件生成" class="headerlink" title="Python 文件生成"></a>Python 文件生成</h2><p>Python 并非完全是解释性语言,它是有编译的,先把源码py文件编译成pyc或者pyo,然后由Python的虚拟机执行,相对于py文件来说,编译成pyc和pyo本质上和py没有太大区别,只是对于这个模块的加载速度提高了,并没有提高代码的执行速度,通常情况下不用主动去编译pyc文件,文档上说只要调用了<code>import model</code>那么model.py就会先编译成pyc然后加载.</p>
+<p>当python程序运行时,编译的结果则是保存在位于内存中的PyCodeObject中,当Python程序运行结束时,Python解释器则将PyCodeObject写回到pyc文件中.</p>
+<p>当python程序第二次运行时,首先程序会在硬盘中寻找pyc文件,如果找到,先对.pyc文件和.py文件的最近一次的修改时间进行判断,如果.pyc文件的修改时间晚于.py文件,说明.py文件中的源代码未修改过,则直接载入,否则就重复上面的过程.</p>
+<p>所以我们应该这样来定位PyCodeObject和pyc文件,我们说pyc文件其实是PyCodeObject的一种持久化保存方式.</p>
+<h3 id="◆生成PY文件◆"><a href="#◆生成PY文件◆" class="headerlink" title="◆生成PY文件◆"></a>◆生成PY文件◆</h3><p><strong>编译成pyc文件:</strong> 将我们写好的一个.py文件编译成.pyc文件.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ls -lh</span></span><br><span class="line">total <span class="number">4.0</span>K</span><br><span class="line">-rw-r--r--. <span class="number">1</span> root root <span class="number">43</span> Jan  <span class="number">8</span> <span class="number">02</span>:<span class="number">22</span> test.py</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># python -m test.py</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ls -lh</span></span><br><span class="line">total <span class="number">8.0</span>K</span><br><span class="line">-rw-r--r--. <span class="number">1</span> root root  <span class="number">43</span> Jan  <span class="number">8</span> <span class="number">02</span>:<span class="number">22</span> test.py</span><br><span class="line">-rw-r--r--. <span class="number">1</span> root root <span class="number">163</span> Jan  <span class="number">8</span> <span class="number">02</span>:<span class="number">25</span> test.pyo</span><br></pre></td></tr></table></figure></p>
+<p><strong>编译成pyo文件:</strong> 将我们写好的一个.py文件编译成.pyo文件.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ls -lh</span></span><br><span class="line">total <span class="number">4.0</span>K</span><br><span class="line">-rw-r--r--. <span class="number">1</span> root root <span class="number">43</span> Jan  <span class="number">8</span> <span class="number">02</span>:<span class="number">22</span> test.py</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># python  -O -m test.py</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ls -lh</span></span><br><span class="line">total <span class="number">8.0</span>K</span><br><span class="line">-rw-r--r--. <span class="number">1</span> root root  <span class="number">43</span> Jan  <span class="number">8</span> <span class="number">02</span>:<span class="number">22</span> test.py</span><br><span class="line">-rw-r--r--. <span class="number">1</span> root root <span class="number">163</span> Jan  <span class="number">8</span> <span class="number">02</span>:<span class="number">25</span> test.pyo</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆打包EXE文件◆"><a href="#◆打包EXE文件◆" class="headerlink" title="◆打包EXE文件◆"></a>◆打包EXE文件◆</h3><p>1.通过pip安装打包工具<code>pyinstaller</code>.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y python-pip</span></span><br><span class="line"></span><br><span class="line">Package python2-pip<span class="number">-8.1</span><span class="number">.2</span><span class="number">-6.</span>el7.noarch already installed <span class="keyword">and</span> latest version</span><br><span class="line">Nothing to do</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># pip install pyinstaller</span></span><br><span class="line">Collecting pyinstaller</span><br><span class="line">  Downloading https://files.pythonhosted.org/pyinstall</span><br></pre></td></tr></table></figure></p>
+<p>2.准备测试文件,执行以下命令加密生成可执行文件.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ls -lh</span></span><br><span class="line">total <span class="number">4.0</span>K</span><br><span class="line">-rw-r--r--. <span class="number">1</span> root root <span class="number">43</span> Jan  <span class="number">8</span> <span class="number">02</span>:<span class="number">22</span> test.py</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># pyinstaller -F ./test.py</span></span><br><span class="line"><span class="number">44</span> INFO: PyInstaller: <span class="number">3.4</span></span><br><span class="line"><span class="number">44</span> INFO: Python: <span class="number">2.7</span><span class="number">.5</span></span><br><span class="line"><span class="number">44</span> INFO: Platform: Linux<span class="number">-3.10</span><span class="number">.0</span><span class="number">-862.</span>el7.x86_64-x86_64-<span class="keyword">with</span>-centos<span class="number">-7.5</span><span class="number">.1804</span>-Core</span><br><span class="line"><span class="number">44</span> INFO: wrote /root/test.spec</span><br><span class="line"><span class="number">152</span> INFO: UPX <span class="keyword">is</span> <span class="keyword">not</span> available.</span><br><span class="line"><span class="number">155</span> INFO: Extending PYTHONPATH <span class="keyword">with</span> paths</span><br><span class="line">......</span><br></pre></td></tr></table></figure></p>
+<p>3.然后查看,在当前目录会看到生成个3个目录,其中<code>dist</code>目录中的内容,就是生成的可执行文件.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ls -lh</span></span><br><span class="line">total <span class="number">8.0</span>K</span><br><span class="line">drwxr-xr-x. <span class="number">3</span> root root  <span class="number">18</span> Jan  <span class="number">8</span> <span class="number">02</span>:<span class="number">29</span> build</span><br><span class="line">drwxr-xr-x. <span class="number">2</span> root root  <span class="number">18</span> Jan  <span class="number">8</span> <span class="number">02</span>:<span class="number">29</span> dist</span><br><span class="line">-rw-r--r--. <span class="number">1</span> root root  <span class="number">43</span> Jan  <span class="number">8</span> <span class="number">02</span>:<span class="number">22</span> test.py</span><br><span class="line">-rw-r--r--. <span class="number">1</span> root root <span class="number">786</span> Jan  <span class="number">8</span> <span class="number">02</span>:<span class="number">29</span> test.spec</span><br><span class="line"></span><br><span class="line">[root@localhost dist]<span class="comment"># ls -lh</span></span><br><span class="line">total <span class="number">4.7</span>M</span><br><span class="line">-rwxr-xr-x. <span class="number">1</span> root root <span class="number">4.6</span>M Jan  <span class="number">8</span> <span class="number">02</span>:<span class="number">29</span> test</span><br><span class="line"></span><br><span class="line">[root@localhost dist]<span class="comment"># ./test</span></span><br><span class="line">hello world</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2019/01/07/Python/Python-语言简介与入门-1/">Python 语言简介与入门(1)</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2019年01月07日 - 12:01</p>
+  <p><span>最后更新:</span>2019年01月24日 - 14:01</p>
+  <p><span>原始链接:</span><a href="/2019/01/07/Python/Python-语言简介与入门-1/" title="Python 语言简介与入门(1)">https://www.mkdirs.com/2019/01/07/Python/Python-语言简介与入门-1/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Python/" rel="tag"> <i class="fa fa-tag"></i> Python</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/30/MariaDB/MariaDB-实现读写分离-15/" rel="next" title="MariaDB 实现读写分离(15)">
+                <i class="fa fa-chevron-left"></i> MariaDB 实现读写分离(15)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/01/07/Python/Python-运算符与数据类型-2/" rel="prev" title="Python 运算符与数据类型(2)">
+                Python 运算符与数据类型(2) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Python-语言简介"><span class="nav-text">Python 语言简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Python-语言特点"><span class="nav-text">Python 语言特点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Python-编译安装"><span class="nav-text">Python 编译安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Python-输入输出"><span class="nav-text">Python 输入输出</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆Input标准输入◆"><span class="nav-text">◆Input标准输入◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆Print标准输出◆"><span class="nav-text">◆Print标准输出◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Python-模块概述"><span class="nav-text">Python 模块概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Python-文件生成"><span class="nav-text">Python 文件生成</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆生成PY文件◆"><span class="nav-text">◆生成PY文件◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆打包EXE文件◆"><span class="nav-text">◆打包EXE文件◆</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="路由器(Router),是连接因特网中各局域网、广域网的设备,它会根据信道的情况自动选择和设定路由,以最佳路径,按前后顺序发送信号,路由器工作在网络层,用来跨网段通信,路由器具有判断网络地址和选择IP路径的功能,它能在多网络互联环境中,建立灵活的连接,可用完全不同的数据分组和介质访问方法连接各种子网,路由器只接受源站或其他路由器的信息,属网络层的一种互联设备,因此路由器是互联网中必不可少的网络设备">
+<meta name="keywords" content="网络设备配置,Cisco">
+<meta property="og:type" content="article">
+<meta property="og:title" content="思科路由器配置笔记">
+<meta property="og:url" content="https://www.mkdirs.com/2019/03/15/网络设备配置/思科路由器配置笔记/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="路由器(Router),是连接因特网中各局域网、广域网的设备,它会根据信道的情况自动选择和设定路由,以最佳路径,按前后顺序发送信号,路由器工作在网络层,用来跨网段通信,路由器具有判断网络地址和选择IP路径的功能,它能在多网络互联环境中,建立灵活的连接,可用完全不同的数据分组和介质访问方法连接各种子网,路由器只接受源站或其他路由器的信息,属网络层的一种互联设备,因此路由器是互联网中必不可少的网络设备">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20190315155343.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20190315160112.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20190316171921.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20190317122102.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20190319145023.jpg">
+<meta property="og:updated_time" content="2019-04-16T06:13:09.012Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="思科路由器配置笔记">
+<meta name="twitter:description" content="路由器(Router),是连接因特网中各局域网、广域网的设备,它会根据信道的情况自动选择和设定路由,以最佳路径,按前后顺序发送信号,路由器工作在网络层,用来跨网段通信,路由器具有判断网络地址和选择IP路径的功能,它能在多网络互联环境中,建立灵活的连接,可用完全不同的数据分组和介质访问方法连接各种子网,路由器只接受源站或其他路由器的信息,属网络层的一种互联设备,因此路由器是互联网中必不可少的网络设备">
+<meta name="twitter:image" content="https://www.mkdirs.com/picture/20190315155343.jpg">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2019/03/15/网络设备配置/思科路由器配置笔记/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>思科路由器配置笔记 | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2019/03/15/网络设备配置/思科路由器配置笔记/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">思科路由器配置笔记
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-03-15 11:45:06" itemprop="dateCreated datePublished" datetime="2019-03-15T11:45:06+08:00">2019-03-15</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-16 14:13:09" itemprop="dateModified" datetime="2019-04-16T14:13:09+08:00">2019-04-16</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/网络设备配置/" itemprop="url" rel="index"><span itemprop="name">网络设备配置</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>路由器(Router),是连接因特网中各局域网、广域网的设备,它会根据信道的情况自动选择和设定路由,以最佳路径,按前后顺序发送信号,路由器工作在网络层,用来跨网段通信,路由器具有判断网络地址和选择IP路径的功能,它能在多网络互联环境中,建立灵活的连接,可用完全不同的数据分组和介质访问方法连接各种子网,路由器只接受源站或其他路由器的信息,属网络层的一种互联设备,因此路由器是互联网中必不可少的网络设备之一.</p>
+<a id="more"></a>
+<p>路由器,其最重要的功能就是路由,路由是指路由器接收到数据时选择最佳路径将数据穿过网络传输到目标地址的行为,每个路由器负责自己的本地数据的路由或转发,通过多个路由器依次接力将数据最终传递到目标主机,路由的工作流程包括<code>路由选择</code>和<code>路由转发</code>两个方面.<br><br></p>
+<h2 id="路由基本配置"><a href="#路由基本配置" class="headerlink" title="路由基本配置"></a>路由基本配置</h2><p>路由器与交换机不同,交换机不需要配置也可以正常工作,但是<code>路由器必须经过配置后才可以正常使用</code>,路由器的登陆方式基本和交换机保持一致,下面将用一个实例实现路由器的基本配置,包括配置路由器的主机名称,密码,控制台端口,WAN接口和LAN接口等,来实现一个基本的路由结构.</p>
+<p>首先我们准备两台<code>路由器(1841型号)</code>,需要注意的是设备之间的连接所选用的线路类型,一般情况下<code>路由器和PC之间使用交叉线</code>,<code>两台路由器相连接使用串行线</code>,配置成以下拓扑结构即可:</p>
+<p><img src="/picture/20190315155343.jpg" alt="NetWork"></p>
+<p>但在实际连接两个路由器时,发现没有<code>Serial接口</code>,这是因为该型号的路由器默认没有提供串口,我们可以在思科模拟器上选择<code>WIC-2T模块</code>,并将其拖入空的插槽处,重启交换机即可完成配置.</p>
+<p><img src="/picture/20190315160112.jpg" alt="NetWork"></p>
+<p>接着来看一下网络拓扑结构中,每个设备的具体配置参数,包括类型,IP地址,默认网关等信息.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[设备名称]   [设备接口]         [IP地址]           [默认网关]</span><br><span class="line">   PC1         ---          192.168.1.2/24      192.168.1.1</span><br><span class="line">   PC2         ---          192.168.2.2/24      192.168.2.1</span><br><span class="line"></span><br><span class="line"> Router0      Fa0/0         192.168.1.1/24         ---</span><br><span class="line">              Serial0/0/0   10.10.10.10/24         ---</span><br><span class="line"></span><br><span class="line"> Router1      Fa0/0         192.168.2.1/24         ---</span><br><span class="line">              Serial0/0/0   10.10.10.20/24         ---</span><br></pre></td></tr></table></figure></p>
+<p><strong>开启路由远程登陆:</strong> 这里我们将启用<code>Router1路由器</code>的远程登陆功能,并设置一个登陆密码为<code>lyshark</code>.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Router# enable</span><br><span class="line">Router# configure terminal</span><br><span class="line"></span><br><span class="line">Router(config)# hostname Router0             // 配置主机名为Router0</span><br><span class="line">Router0(config)# enable secret lyshark       // 配置特权模式密码为lyshark</span><br><span class="line"></span><br><span class="line">Router0(config)# line console 0              // 启用控制台</span><br><span class="line">Router0(config-line)# password lyshark       // 设置控制台登录密码</span><br><span class="line">Router0(config-line)# login                  // 允许用户登录</span><br><span class="line">Router0(config-line)# exit</span><br><span class="line"></span><br><span class="line">Router0(config)# line vty 0 2                // 配置序号为0-2的3个虚拟登陆终端</span><br><span class="line">Router0(config-line)# password lyshark       // 配置终端登录密码</span><br><span class="line">Router0(config-line)# login                  // 启用登陆终端</span><br></pre></td></tr></table></figure></p>
+<p><strong>配置WAN接口:</strong> 路由器通过WAN接口接入到互联网上,而常见的WAN接口都是串行接口用<code>Serial表示</code>,首先可以使用<code>show controller 命令</code>判断<code>Serial 0/0/0</code>是否为DCE端,然后决定是否要配置.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Router0&gt; show controller Serial0/0/0</span><br><span class="line"></span><br><span class="line">Interface Serial0/0/0</span><br><span class="line">Hardware is PowerQUICC MPC860</span><br><span class="line">DCE V.35, clock rate 2000000       // 此处判断是DEC端</span><br></pre></td></tr></table></figure></p>
+<p>根据上述标注显示内容<code>Srial0/0/0</code>为DCE端口,下面需要对两台路由分别配置时钟频率.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#----在Router0上操作-------------------------</span><br><span class="line">Router0&gt; enable</span><br><span class="line">Router0# configure terminal</span><br><span class="line">Router0(config)# interface Serial0/0/0                    // 选择串行接口Srial0/0/0</span><br><span class="line">Router0(config-if)# ip address 10.10.10.10 255.255.255.0  // 配置外网IP地址</span><br><span class="line">Router0(config-if)# clock rate 64000                      // 配置始终频率为6400</span><br><span class="line">Router0(config-if)# no shutdown                           // 开启端口</span><br><span class="line"></span><br><span class="line">#----在Router1上操作-------------------------</span><br><span class="line">Router1&gt; enable</span><br><span class="line">Router1# configure terminal</span><br><span class="line">Router1(config)# interface Serial0/0/0</span><br><span class="line">Router1(config-if)# ip address 10.10.10.20 255.255.255.0</span><br><span class="line">Router1(config-if)# clock rate 64000</span><br><span class="line">Router1(config-if)# no shutdown</span><br></pre></td></tr></table></figure></p>
+<p><strong>配置LAN接口:</strong> LAN接口用来指定内网通讯的地址,接下来分别对两台路由器做配置.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#----在Router0上操作-------------------------</span><br><span class="line">Router0&gt; enable</span><br><span class="line">Router0# configure terminal</span><br><span class="line">Router0(config)# interface fa0/0                        // 选择以太网接口fa0/0</span><br><span class="line">Router0(config)# ip address 192.168.1.1 255.255.255.0</span><br><span class="line">Router0(config)# no shutdown</span><br><span class="line"></span><br><span class="line">#----在Router1上操作-------------------------</span><br><span class="line">Router1&gt; enable</span><br><span class="line">Router1# configure terminal</span><br><span class="line">Router1(config)# interface fa0/0</span><br><span class="line">Router1(config)# ip address 192.168.2.1 255.255.255.0</span><br><span class="line">Router1(config)# no shutdown</span><br></pre></td></tr></table></figure></p>
+<p><strong>查配置信息:</strong> 最后可以使用<code>show ip route命令</code>,查看路由器的路由信息,确定网络是否正确连接.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Router0# show ip route</span><br><span class="line">Codes: C - connected, S - static, I - IGRP, R - RIP, M - mobile, B - BGP</span><br><span class="line">       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area</span><br><span class="line">       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2</span><br><span class="line">       E1 - OSPF external type 1, E2 - OSPF external type 2, E - EGP</span><br><span class="line">       i - IS-IS, L1 - IS-IS level-1, L2 - IS-IS level-2, ia - IS-IS inter area</span><br><span class="line">       * - candidate default, U - per-user static route, o - ODR</span><br><span class="line">       P - periodic downloaded static route</span><br><span class="line"></span><br><span class="line">Gateway of last resort is not set</span><br><span class="line"></span><br><span class="line">     10.0.0.0/24 is subnetted, 1 subnets</span><br><span class="line">C    10.10.10.0 is directly connected, Serial0/0/0            // 外网地址</span><br><span class="line">C    192.168.1.0/24 is directly connected, FastEthernet0/0    // 内网地址</span><br></pre></td></tr></table></figure></p>
+<p><strong>查接口信息:</strong> 也可以使用<code>show ip interface brief命令</code>,查看路由器的接口信息.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Router0# show ip interface brief</span><br><span class="line"></span><br><span class="line">Interface              IP-Address      OK? Method Status                Protocol </span><br><span class="line">FastEthernet0/0        192.168.1.1     YES manual up                    up</span><br><span class="line">Serial0/0/0            10.10.10.10     YES manual up                    up</span><br><span class="line">Serial0/0/1            unassigned      YES unset  administratively down down</span><br><span class="line">Vlan1                  unassigned      YES unset  administratively down down</span><br></pre></td></tr></table></figure></p>
+<p><strong>最后测试通信:</strong> 在路由器<code>Route0</code>上可以ping通<code>Route1</code>,每个主机也可以ping通自己网段的路由器.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Router0# ping 10.10.10.20</span><br><span class="line"></span><br><span class="line">Type escape sequence to abort.</span><br><span class="line">Sending 5, 100-byte ICMP Echos to 10.10.10.20, timeout is 2 seconds:</span><br><span class="line">!!!!!</span><br><span class="line">Success rate is 100 percent (5/5), round-trip min/avg/max = 1/2/6 ms</span><br></pre></td></tr></table></figure></p>
+<p>上述小实验到这里就算配置成功了,但是这里留下了一个疑问,那就是<code>PC0</code>Ping<code>PC1</code>无法通信,这就涉及到路由器没有相应的路由条目的问题,这些问题将在后面小实验中做解释.<br><br></p>
+<h2 id="配置静态路由"><a href="#配置静态路由" class="headerlink" title="配置静态路由"></a>配置静态路由</h2><p>静态路由需要管理员根据实际需求一条条自己手动配置,路由器不会自动生成所需的静态路由,静态路由中包括目标节点或目标网络的IP地址,还可以包括下一跳IP地址,以及在本路由器上使用该静态路由时的数据包出接口等,但是手动配置静态路由需要管理员非常了解网络的拓扑结构才能够完成配置,在网络规模较大时还需要耗费大量的经历和时间去维护,所以并不是所有的网络都适合配置静态路由.</p>
+<blockquote>
+<p><i class="fa fa-plus" aria-hidden="true"></i> 一般情况下以下几种情况可以考虑使用静态路由</p>
+<blockquote>
+<p>1.网络的拓扑结构相对较简单,比如就一台路由器和交换机的情况,可使用静态路由.<br>2.网络保密性要求较高,网络管理员需要控制链路或者控制路由表,则可使用静态路由.<br>3.网络仅通过单个ISP接入Internet,则该ISP就是网络唯一的出口,所以不需要配置静态路由.<br>4.路由资源有限,无法运行路由选择协议,在这种情况下,需要手动配置路由条目来更新路由表数据.</p>
+</blockquote>
+</blockquote>
+<p>接下来以一个实例具体介绍静态路由的配置流程,在思科模拟器中选择2台<code>1841路由器</code>,按照以下网络拓扑结构构建网路,然后为每台路由器配置静态路由,实现不同网络间的数据互通.</p>
+<p><img src="/picture/20190316171921.jpg" alt="NetWork"></p>
+<p><strong>配置客户主机:</strong> 首先我们根据上图的配置要求配置好IP地址网关等数据,下面的参数是具体的地址规划.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[设备名称]   [设备接口]         [IP地址]           [默认网关]</span><br><span class="line">   PC0         ---          192.168.1.2/24      192.168.1.1</span><br><span class="line">   PC1         ---          192.168.1.3/24      192.168.1.1</span><br><span class="line"></span><br><span class="line">   PC2         ---          192.168.2.2/24      192.168.2.1</span><br><span class="line">   PC3         ---          192.168.2.3/24      192.168.2.1</span><br><span class="line"></span><br><span class="line"> Router0      Fa0/0         192.168.1.1/24         ---</span><br><span class="line">              Serial0/0/0   10.10.10.10/24         ---</span><br><span class="line"></span><br><span class="line"> Router1      Fa0/0         192.168.2.1/24         ---</span><br><span class="line">              Serial0/0/0   10.10.10.20/24         ---</span><br></pre></td></tr></table></figure></p>
+<p><strong>配置路由器:</strong> 接着我们分别给路由器配置好地址参数,在这里<code>fa0/0端口</code>是内网IP地址,<code>serial0/0/0端口</code>则是外网IP地址,配置是应注意次序,如果配反了则看不到效果.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#----在Router0上操作-------------------------</span><br><span class="line">Router0&gt; enable</span><br><span class="line">Router0# configure terminal</span><br><span class="line"></span><br><span class="line">Router0(config)# interface fa0/0                          // 配置内网地址</span><br><span class="line">Router0(config-if)# ip address 192.168.1.1 255.255.255.0</span><br><span class="line">Router0(config-if)# no shutdown</span><br><span class="line"></span><br><span class="line">Router0(config)# interface serial0/0/0                    // 配置外网地址</span><br><span class="line">Router0(config-if)# clock rate 64000</span><br><span class="line">Router0(config-if)# ip address 10.10.10.10 255.255.255.0</span><br><span class="line">Router0(config-if)# no shutdown</span><br><span class="line"></span><br><span class="line">#----在Router1上操作-------------------------</span><br><span class="line">Router0&gt; enable</span><br><span class="line">Router0# configure terminal</span><br><span class="line"></span><br><span class="line">Router1(config)# interface fa0/0                          // 配置内网地址</span><br><span class="line">Router1(config-if)# ip address 192.168.2.1 255.255.255.0</span><br><span class="line">Router1(config-if)# no shutdown</span><br><span class="line"></span><br><span class="line">Router1(config)# interface serial0/0/0                    // 配置外网地址</span><br><span class="line">Router1(config-if)# clock rate 64000</span><br><span class="line">Router1(config-if)# ip address 10.10.10.20 255.255.255.0</span><br><span class="line">Router1(config-if)# no shutdown</span><br></pre></td></tr></table></figure></p>
+<p><strong>检测路由配置:</strong> 当配置好上面的步骤以后,PC0与PC1主机是可通信的,Route0与Route1也可通信,但PC0无法与PC3通信,原因就是因为路由器没有配置静态路由的关系,这一步我们只需要确保同一个网段内能通信即可.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#----在PC0上操作-------------------------</span><br><span class="line">PC0&gt; ping 192.168.1.1</span><br><span class="line">PC0&gt; ping 192.168.1.2</span><br><span class="line">PC0&gt; ping 192.168.1.3</span><br><span class="line">Pinging 192.168.1.3 with 32 bytes of data:</span><br><span class="line">Reply from 192.168.1.3: bytes=32 time=0ms TTL=128</span><br><span class="line"></span><br><span class="line">#----在Route0上操作----------------------</span><br><span class="line">Router0#ping 10.10.10.20</span><br><span class="line"></span><br><span class="line">Type escape sequence to abort.</span><br><span class="line">Sending 5, 100-byte ICMP Echos to 10.10.10.20, timeout is 2 seconds:</span><br><span class="line">!!!!!</span><br><span class="line">Success rate is 100 percent (5/5), round-trip min/avg/max = 1/7/12 ms</span><br></pre></td></tr></table></figure></p>
+<p><strong>配置静态路由:</strong> 接下来我们需要在两台路由器上分别配置路由条目,使用<code>ip route命令</code>配置,如果想要删除路由可使用<code>no ip route命令</code>即可删除指定路由条目.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#----在Router0上操作-------------------------</span><br><span class="line">Router0&gt; enable</span><br><span class="line">Router0# configure terminal</span><br><span class="line"></span><br><span class="line">                           [目的网络]    [目的掩码]         [下一跳地址]</span><br><span class="line">Router0(config)# ip route 192.168.2.0  255.255.255.0      10.10.10.20</span><br><span class="line"></span><br><span class="line">#----在Router1上操作-------------------------</span><br><span class="line">Router1&gt; enable</span><br><span class="line">Router1# configure terminal</span><br><span class="line">Router1(config)# ip route 192.168.1.0 255.255.255.0 10.10.10.10        // 指定返回时的路由</span><br><span class="line"></span><br><span class="line">#----检查配置参数情况-------------------------</span><br><span class="line">Router0# show ip interface brief          // 显示端口ip</span><br><span class="line">Router0# show ip route                    // 检查路由参数</span><br><span class="line">Codes: C - connected, S - static, I - IGRP, R - RIP, M - mobile, B - BGP</span><br><span class="line">       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area</span><br><span class="line">       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2</span><br><span class="line">       E1 - OSPF external type 1, E2 - OSPF external type 2, E - EGP</span><br><span class="line">       i - IS-IS, L1 - IS-IS level-1, L2 - IS-IS level-2, ia - IS-IS inter area</span><br><span class="line">       * - candidate default, U - per-user static route, o - ODR</span><br><span class="line">       P - periodic downloaded static route</span><br><span class="line"></span><br><span class="line">Gateway of last resort is not set</span><br><span class="line">     10.0.0.0/24 is subnetted, 1 subnets</span><br><span class="line">C    10.10.10.0 is directly connected, Serial0/0/0</span><br><span class="line">C    192.168.1.0/24 is directly connected,FastEthernet0/0</span><br><span class="line">S    192.168.2.0/24 [1/0] via 10.10.10.20</span><br></pre></td></tr></table></figure></p>
+<p><strong>最后的测试:</strong> 当配置好路由条目以后,我们在PC0主机上Ping检测PC3的连通性,会发现原来无法连通的两个网段,现在可以正常通信了,也就说明我们的路由配置生效了.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">PC0&gt; ping 192.168.2.2</span><br><span class="line"></span><br><span class="line">Pinging 192.168.2.2 with 32 bytes of data:</span><br><span class="line"></span><br><span class="line">Reply from 192.168.2.2: bytes=32 time=12ms TTL=126</span><br><span class="line"></span><br><span class="line">Ping statistics for 192.168.2.2:</span><br><span class="line">    Packets: Sent = 1, Received = 1, Lost = 0 (0% loss),</span><br><span class="line">Approximate round trip times in milli-seconds:</span><br><span class="line">    Minimum = 12ms, Maximum = 12ms, Average = 12ms</span><br></pre></td></tr></table></figure></p>
+<p>以上的路由配置方法,适用于小型网络环境,在大型网络环境中这种静态路由的配置方式很不适合维护,一旦设备过多,则可能自己都搞不清头绪,所以在生产环境中,我们会使用动态路由的方式来实现路由器的配置,接下来继续学习动态路由的配置方式吧.<br><br></p>
+<h2 id="RIP-动态路由"><a href="#RIP-动态路由" class="headerlink" title="RIP 动态路由"></a>RIP 动态路由</h2><p>动态路由是基于某种协议实现的,常见的路由协议有内<code>内部网关协议(IGP)</code>和<code>边界网关协议(BGP)</code>,其中内部网关协议又分为<code>路由信息协议(RIP)</code>和<code>开放式最短路径优先协议(OSPF)协议</code>.</p>
+<p>其中<code>RIP(路由信息协议)</code>是最先被广泛应用的内部网关路由协议,RIP使用跳数来衡量到达目标地址的距离,跳数是指数据从源地址到达目标地址之间经过的路由器个数.从路由器到直接连接的网络的跳数定义为1,每经过一个路由器则数值会增加1,RIP允许的<code>最大跳数是15跳</code>,超过15跳的网络将无法到达,因此RIP适合用于小型的网络环境中.</p>
+<p>RIP协议默认会<code>每隔30秒</code>就会与其他相连的网络广播自己的路由表,收到广播的路由器会将收到的信息与自己路由表进行比较,判断是否将其中的路由条目加入到自己的路由表中,目前RIP共有3中版本,<code>RIPv1,RIPv2,RIPng</code>,其中RIPng应用于IPv6网络环境中,RIPv1是有类路由协议,RIPv2则是无类路由协议.</p>
+<p><img src="/picture/20190317122102.jpg" alt="NetWork"></p>
+<p><strong>配置参数简介:</strong> 首先我们根据上图的配置要求配置好路由器各种基本参数,下面的参数是具体的地址规划.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[设备名称]     [设备接口]        [IP地址]          [默认网关]</span><br><span class="line"></span><br><span class="line"> Router1     Serial0/0/0    192.168.10.1/24         ---</span><br><span class="line"></span><br><span class="line"> Router2     Serial0/0/0    192.168.10.2/24         ---</span><br><span class="line">             Serial0/0/1    192.168.20.1/24         ---</span><br><span class="line"></span><br><span class="line"> Router3     Serial0/0/0    192.168.20.2/24         ---</span><br><span class="line">             Serial0/0/1    192.168.30.1/24         ---</span><br><span class="line"></span><br><span class="line"> Router4     Serial0/0/0    192.168.30.2/24         ---</span><br></pre></td></tr></table></figure></p>
+<p><strong>配置路由器:</strong> 根据上表的结构配置好路由器的各种参数,主要配置路由器的接口IP地址.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Router&gt;enable</span><br><span class="line">Router#configure terminal</span><br><span class="line"></span><br><span class="line">#----在Router1上操作-------------------------</span><br><span class="line">Router1(config)# interface Serial0/0/0</span><br><span class="line">Router1(config-if)# ip address 192.168.10.1 255.255.255.0</span><br><span class="line">Router1(config-if)# no shutdown</span><br><span class="line"></span><br><span class="line">#----在Router2上操作-------------------------</span><br><span class="line">Router2(config)# interface Serial0/0/0</span><br><span class="line">Router2(config-if)# ip address 192.168.10.2 255.255.255.0</span><br><span class="line">Router1(config-if)# no shutdown</span><br><span class="line">Router2(config)# interface Serial0/0/1</span><br><span class="line">Router2(config-if)# ip address 192.168.20.1 255.255.255.0</span><br><span class="line">Router1(config-if)# no shutdown</span><br><span class="line"></span><br><span class="line">#----在Router3上操作-------------------------</span><br><span class="line">Router3(config)# interface Serial0/0/0</span><br><span class="line">Router3(config-if)# ip address 192.168.20.2 255.255.255.0</span><br><span class="line">Router1(config-if)# no shutdown</span><br><span class="line">Router3(config)# interface Serial0/0/1</span><br><span class="line">Router3(config-if)# ip address 192.168.30.1 255.255.255.0</span><br><span class="line">Router1(config-if)# no shutdown</span><br><span class="line"></span><br><span class="line">#----在Router4上操作-------------------------</span><br><span class="line">Router4(config)#interface Serial0/0/0</span><br><span class="line">Router4(config-if)#ip address 192.168.30.2 255.255.255.0</span><br><span class="line">Router1(config-if)# no shutdown</span><br></pre></td></tr></table></figure></p>
+<p><strong>配置并启用RIP路由:</strong> 在每台路由器上启用并配置好RIP动态路由.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Router&gt;enable</span><br><span class="line">Router#configure terminal</span><br><span class="line">#----在Router1上启用RIP路由协议并配置-------------------</span><br><span class="line">Router1(config)# router rip                   // 启用RIP路由</span><br><span class="line">Router1(config-router)# version 2             // 指定使用RIP版本为RIPv2</span><br><span class="line">Router1(config-router)# network 192.168.10.0  // 声明与Router1直连的网络号</span><br><span class="line">Router1(config-router)# exit</span><br><span class="line"></span><br><span class="line">#----在Router2上启用RIP路由协议并配置-------------------</span><br><span class="line">Router2(config)# router rip</span><br><span class="line">Router2(config-router)# version 2</span><br><span class="line">Router2(config-router)# network 192.168.10.0  // 声明与Router2直连的网络号</span><br><span class="line">Router2(config-router)# network 192.168.20.0  // 声明与Router3直连的网络号</span><br><span class="line">Router2(config-router)# exit</span><br><span class="line"></span><br><span class="line">#----在Router3上启用RIP路由协议并配置-------------------</span><br><span class="line">Router3(config)# router rip</span><br><span class="line">Router3(config-router)# version 2</span><br><span class="line">Router3(config-router)# network 192.168.20.0  // 声明与Router3直连的网络号</span><br><span class="line">Router3(config-router)# network 192.168.30.0  // 声明与Router4直连的网络号</span><br><span class="line">Router3(config-router)# exit</span><br><span class="line"></span><br><span class="line">#----在Router4上启用RIP路由协议并配置-------------------</span><br><span class="line">Router4(config)# router rip</span><br><span class="line">Router4(config-router)# version 2</span><br><span class="line">Router4(config-router)# network 192.168.30.0  // 声明与Router4直连的网络号</span><br><span class="line">Router4(config-router)# exit</span><br></pre></td></tr></table></figure></p>
+<p><strong>检查配置信息:</strong> 配置完成后,在<code>Router1</code>上执行<code>show ip route 命令</code>查看RIP配置结果,如下.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Router1#show ip route</span><br><span class="line">Codes: C - connected, S - static, I - IGRP, R - RIP, M - mobile, B - BGP</span><br><span class="line">       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area</span><br><span class="line">       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2</span><br><span class="line">       E1 - OSPF external type 1, E2 - OSPF external type 2, E - EGP</span><br><span class="line">       i - IS-IS, L1 - IS-IS level-1, L2 - IS-IS level-2, ia - IS-IS inter area</span><br><span class="line">       * - candidate default, U - per-user static route, o - ODR</span><br><span class="line">       P - periodic downloaded static route</span><br><span class="line"></span><br><span class="line">Gateway of last resort is not set</span><br><span class="line"></span><br><span class="line">C    192.168.10.0/24 is directly connected, Serial0/0/0</span><br><span class="line">R    192.168.20.0/24 [120/1] via 192.168.10.2, 00:00:01, Serial0/0/0   // R表示当前是RIP路由</span><br><span class="line">R    192.168.30.0/24 [120/2] via 192.168.10.2, 00:00:01, Serial0/0/0   // 路由条目是RIP自动生成的</span><br></pre></td></tr></table></figure></p>
+<p><strong>测试连通性:</strong> 此时我们在<code>Router1</code>路由器上Ping路由器<code>Router4</code>是可以通信的,说明配置成功了.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Router1#ping 192.168.30.2</span><br><span class="line"></span><br><span class="line">Type escape sequence to abort.</span><br><span class="line">Sending 5, 100-byte ICMP Echos to 192.168.30.2, timeout is 2 seconds:</span><br><span class="line">!!!!!</span><br><span class="line">Success rate is 100 percent (5/5), round-trip min/avg/max = 3/15/27 ms</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="OSPF-动态路由"><a href="#OSPF-动态路由" class="headerlink" title="OSPF 动态路由"></a>OSPF 动态路由</h2><p>在上面的配置试验中我们通过使用<code>RIP协议</code>完成了一个路由器之间的数据通信,但是RIP协议最大仅仅支持15个路由节点,虽然在中小型网络中这些节点足够使用了,但是在一些大型企业中往往需更多的跳数,就是因为这种需求我们的<code>OSPF协议</code>就由此诞生啦.</p>
+<p><code>OSPF(开放式最短路径优先)</code>,该协议是基于链路状态的协议规范,因此也可以称为<code>链路状态协议</code>,和RIP协议相同,OSPF协议<code>同样使用跳数</code>计量路径开销,但是与RIP不同的是,OSPF协议不受物理跳数的限制,其路径开销与网络中的链路开销等相关.</p>
+<p>OSPF协议采用了<code>FPS算法</code>来计算最短路径数,SPF算法将每一个路由作为<code>根(ROOT)</code>,来计算其数据包到达每一个目标路由器之间的距离,每个路由器根据一个<code>统一的数据库LSDB</code>计算出<code>路由域</code>的拓扑结构图,该结构很像是一颗树,所以就叫做最短路径树.</p>
+<blockquote>
+<p><i class="fa fa-plus" aria-hidden="true"></i> OSPF协议的优点</p>
+<blockquote>
+<p>1.OSPF采用了SPF算法,从而可以很好的避免路由器环路的产生.<br>2.OSPF协议虽然也使用跳数作为计量单位,但不受物理跳数的限制.<br>3.当网络链路状态发生变化时,OSPF能够迅速捕捉并应用,收敛快,路由信息流量小.<br>4.OSPF路由协议支持路由认证体系,且还可以定义不同的认证方式,提高了网络安全性.<br>5.OSPF协议提供了较好的负载均衡性,其数据更新比较智能,相应的减小了网络流量的带宽.</p>
+</blockquote>
+</blockquote>
+<p>在配置OSPF路由之前还有一个小知识点需要补充,在下面的配置试验中你会看到例如<code>0.0.0.255</code>这样的网络号,这种网络号被称作<code>通配符掩码</code>,通常情况下通配符掩码可由,<code>255.255.255.255(广播地址)</code>减去当前的<code>255.255.255.0(子网掩码)</code>,来获得,此处小实验的通配符掩码为<code>0.0.0.255 area 0</code>.</p>
+<p>接下来开始步入正题,我们还是<code>使用RIP路由的拓扑结构</code>以<code>及IP地址</code>的配置都相同,但是这里在配置动态路由的时候,我们使用OSPF的方式来配置,过程如下:</p>
+<p><strong>配置路由器:</strong> 首先更具上表的结构配置好路由器的各种参数.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Router&gt;enable</span><br><span class="line">Router#configure terminal</span><br><span class="line"></span><br><span class="line">#----在Router1上操作-------------------------</span><br><span class="line">Router1(config)# interface Serial0/0/0</span><br><span class="line">Router1(config-if)# ip address 192.168.10.1 255.255.255.0</span><br><span class="line">Router1(config-if)# no shutdown</span><br><span class="line"></span><br><span class="line">#----在Router2上操作-------------------------</span><br><span class="line">Router2(config)# interface Serial0/0/0</span><br><span class="line">Router2(config-if)# ip address 192.168.10.2 255.255.255.0</span><br><span class="line">Router1(config-if)# no shutdown</span><br><span class="line">Router2(config)# interface Serial0/0/1</span><br><span class="line">Router2(config-if)# ip address 192.168.20.1 255.255.255.0</span><br><span class="line">Router1(config-if)# no shutdown</span><br><span class="line"></span><br><span class="line">#----在Router3上操作-------------------------</span><br><span class="line">Router3(config)# interface Serial0/0/0</span><br><span class="line">Router3(config-if)# ip address 192.168.20.2 255.255.255.0</span><br><span class="line">Router1(config-if)# no shutdown</span><br><span class="line">Router3(config)# interface Serial0/0/1</span><br><span class="line">Router3(config-if)# ip address 192.168.30.1 255.255.255.0</span><br><span class="line">Router1(config-if)# no shutdown</span><br><span class="line"></span><br><span class="line">#----在Router4上操作-------------------------</span><br><span class="line">Router4(config)# interface Serial0/0/0</span><br><span class="line">Router4(config-if)# ip address 192.168.30.2 255.255.255.0</span><br><span class="line">Router1(config-if)# no shutdown</span><br></pre></td></tr></table></figure></p>
+<p><strong>配置并启用OSPF路由:</strong> 在每台路由器上启用并配置好OSPF动态路由.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Router&gt;enable</span><br><span class="line">Router#configure terminal</span><br><span class="line"></span><br><span class="line">#----在Router1上启用OSPF路由协议并配置-------------------</span><br><span class="line">Router1(config)# router ospf 1                                 // 启用OSPF路由,并设置进程号为1</span><br><span class="line">Router1(config-router)# router-id 1.1.1.1                      // 为Router1配置RID编号</span><br><span class="line">Router1(config-router)# network 192.168.10.0 0.0.0.255 area 0  // 配置路由记录</span><br><span class="line">Router1(config-router)# exit</span><br><span class="line"></span><br><span class="line">#----在Router2上启用OSPF路由协议并配置-------------------</span><br><span class="line">Router2(config)# router ospf 1                                 // 启用OSPF路由,并设置进程号为1</span><br><span class="line">Router2(config-router)# router-id 2.2.2.2                      // 为Router2配置RID编号</span><br><span class="line">Router2(config-router)# network 192.168.10.0 0.0.0.255 area 0  // 配置路由记录</span><br><span class="line">Router2(config-router)# network 192.168.20.0 0.0.0.255 area 0</span><br><span class="line">Router2(config-router)# exit</span><br><span class="line"></span><br><span class="line">#----在Router3上启用OSPF路由协议并配置-------------------</span><br><span class="line">Router3(config)# router ospf 1                                 // 启用OSPF路由,并设置进程号为1</span><br><span class="line">Router3(config-router)# router-id 3.3.3.3                      // 为Router3配置RID编号</span><br><span class="line">Router3(config-router)# network 192.168.20.0 0.0.0.255 area 0</span><br><span class="line">Router3(config-router)# network 192.168.30.0 0.0.0.255 area 0</span><br><span class="line">Router3(config-router)# exit</span><br><span class="line"></span><br><span class="line">#----在Router4上启用OSPF路由协议并配置-------------------</span><br><span class="line">Router3(config)# router ospf 1                                 // 启用OSPF路由,并设置进程号为1</span><br><span class="line">Router3(config-router)# router-id 4.4.4.4                      // 为Router4配置RID编号</span><br><span class="line">Router3(config-router)# network 192.168.30.0 0.0.0.255 area 0</span><br><span class="line">Router3(config-router)# exit</span><br></pre></td></tr></table></figure></p>
+<p><strong>检查配置信息:</strong> 配置完成后,在<code>Router1</code>上执行<code>show ip route 命令</code>查看OSPF配置结果,如下.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Router#show ip route</span><br><span class="line">Codes: C - connected, S - static, I - IGRP, R - RIP, M - mobile, B - BGP</span><br><span class="line">       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area</span><br><span class="line">       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2</span><br><span class="line">       E1 - OSPF external type 1, E2 - OSPF external type 2, E - EGP</span><br><span class="line">       i - IS-IS, L1 - IS-IS level-1, L2 - IS-IS level-2, ia - IS-IS inter area</span><br><span class="line">       * - candidate default, U - per-user static route, o - ODR</span><br><span class="line">       P - periodic downloaded static route</span><br><span class="line"></span><br><span class="line">Gateway of last resort is not set</span><br><span class="line"></span><br><span class="line">C    192.168.10.0/24 is directly connected, Serial0/0/0                    // C表示是本机默认路由</span><br><span class="line">O    192.168.20.0/24 [110/128] via 192.168.10.2, 00:02:25, Serial0/0/0     // O表示当前是OSPF路由</span><br><span class="line">O    192.168.30.0/24 [110/192] via 192.168.10.2, 00:01:55, Serial0/0/0     // 路由条目是OSPF自动生成的</span><br></pre></td></tr></table></figure></p>
+<p><strong>测试连通性:</strong> 此时我们在<code>Router1</code>路由器上Ping路由器<code>Router4</code>是可以通信的,说明配置成功了.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Router1#ping 192.168.30.2</span><br><span class="line"></span><br><span class="line">Type escape sequence to abort.</span><br><span class="line">Sending 5, 100-byte ICMP Echos to 192.168.30.2, timeout is 2 seconds:</span><br><span class="line">!!!!!</span><br><span class="line">Success rate is 100 percent (5/5), round-trip min/avg/max = 3/15/27 ms</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="实战-配置RIP企业环境"><a href="#实战-配置RIP企业环境" class="headerlink" title="实战:配置RIP企业环境"></a>实战:配置RIP企业环境</h2><p>接下来,我们通过使用三层交换机配合路由器,来实现一个跨网段通信的案例,其配置流程是,首先配置三层交换机并划分好VLAN的层次,接着在配置Router0这里不需要配置VLAN,原因是三层交换机与Router0共享VLAN,最后在配置外网口的Router1路由器,其拓扑结构如下图所示:</p>
+<p><img src="/picture/20190319145023.jpg" alt="NetWork"></p>
+<p><strong>配置三层交换:</strong> 首先先来配置三层交换机,创建3个VLAN,并划分成三个VLAN虚拟局域网.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Switch&gt; enable</span><br><span class="line">Switch# configure terminal</span><br><span class="line"></span><br><span class="line">#----配置三层交换的VLAN10并把端口fa0/1加入到VLAN-------------------</span><br><span class="line">Switch(config)# vlan 10                              // 创建VLAN10</span><br><span class="line">Switch(config-vlan)# interface fa0/1                 // 将Fa1俩端口加入到VLAN10</span><br><span class="line">Switch(config-if-range)# switchport mode access</span><br><span class="line">Switch(config-if-range)# switchport access vlan 10   // 把端口加入到VLAN10</span><br><span class="line">Switch(config-if-range)# no shutdown                 // 启用端口</span><br><span class="line">Switch(config-if-range)# exit</span><br><span class="line"></span><br><span class="line">#----配置三层交换的VLAN20并把端口fa0/2加入到VLAN-------------------</span><br><span class="line">Switch(config)# vlan 20</span><br><span class="line">Switch(config-vlan)# interface fa0/2</span><br><span class="line">Switch(config-if-range)# switchport mode access</span><br><span class="line">Switch(config-if-range)# switchport access vlan 20</span><br><span class="line">Switch(config-if-range)# no shutdown</span><br><span class="line">Switch(config-if-range)# exit</span><br><span class="line"></span><br><span class="line">#----配置三层交换的VLAN30并把端口fa0/3加入到VLAN-------------------</span><br><span class="line">Switch(config)# vlan 30</span><br><span class="line">Switch(config-vlan)# interface fa0/3</span><br><span class="line">Switch(config-if)# switchport mode access</span><br><span class="line">Switch(config-if)# switchport access vlan 30</span><br><span class="line">Switch(config-if)# no shutdown</span><br><span class="line">Switch(config-if)# exit</span><br></pre></td></tr></table></figure></p>
+<p><strong>配置三层交换IP地址:</strong> 给上面分配好的三个VLAN虚拟局域网一个IP地址,这里指定为各自的网关地址就好.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Switch&gt; enable</span><br><span class="line">Switch# configure terminal</span><br><span class="line"></span><br><span class="line">#----给三层交换的VLAN10内的主机添加网关-------------------</span><br><span class="line">Switch(config)# interface vlan 10                            // 选择vlan10接口</span><br><span class="line">Switch(config-if)# ip address 192.168.1.1 255.255.255.0      // 配置网关地址</span><br><span class="line">Switch(config-if)# no shutdown                               // 开启端口</span><br><span class="line">Switch(config-if)# exit</span><br><span class="line"></span><br><span class="line">#----给三层交换的VLAN20内的主机添加网关-------------------</span><br><span class="line">Switch(config)# interface vlan 20                            // 选择vlan20接口</span><br><span class="line">Switch(config-if)# ip address 192.168.2.1 255.255.255.0      // 配置网关地址</span><br><span class="line">Switch(config-if)# no shutdown                               // 开启端口</span><br><span class="line">Switch(config-if)# exit</span><br><span class="line"></span><br><span class="line">#----给三层交换的VLAN30内的主机添加网关-------------------</span><br><span class="line">Switch(config)# interface vlan 30                            // 选择vlan30接口</span><br><span class="line">Switch(config-if)# ip address 192.168.3.1 255.255.255.0      // 配置网关地址</span><br><span class="line">Switch(config-if)# no shutdown                               // 开启端口</span><br><span class="line">Switch(config-if)# exit</span><br></pre></td></tr></table></figure></p>
+<p><strong>配置路由器Router0:</strong> 配置好网关后,接着配置路由器Router0,配置接口IP地址,注意在DCE接口需要配置时钟.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Router&gt; enable</span><br><span class="line">Router# configure terminal</span><br><span class="line"></span><br><span class="line">#----配置路由fa0/0端口的IP地址-------------------</span><br><span class="line">Router0(config)# interface fa0/0</span><br><span class="line">Router0(config-if)# ip address 192.168.3.2 255.255.255.0</span><br><span class="line">Router0(config-if)# no shutdown</span><br><span class="line">Router0(config-if)# exit</span><br><span class="line"></span><br><span class="line">#----配置路由fa0/1端口的IP地址-------------------</span><br><span class="line">Router0(config)# interface fa0/1</span><br><span class="line">Router0(config-if)# ip address 192.168.4.1 255.255.255.0</span><br><span class="line">Router0(config-if)# no shutdown</span><br><span class="line">Router0(config-if)# exit</span><br><span class="line"></span><br><span class="line">#----配置路由se0/0/0连接外网端口IP----------------</span><br><span class="line">Router0(config)# interface se0/0/0</span><br><span class="line">Router0(config-if)# ip address 1.1.1.1 255.0.0.0</span><br><span class="line">Router0(config-if)# no shutdown</span><br><span class="line">Router0(config-if)# exit</span><br></pre></td></tr></table></figure></p>
+<p><strong>配置路由器Router1:</strong> 最后配置外网与内网的衔接路由器Router1,配置好外网口IP地址以及内网口地址.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Router&gt; enable</span><br><span class="line">Router# configure terminal</span><br><span class="line"></span><br><span class="line">#----配置路由器1的内网口地址-------------------</span><br><span class="line">Router1(config)# interface se0/0/0</span><br><span class="line">Router1(config-if)# ip address 1.1.1.2 255.0.0.0</span><br><span class="line">Router1(config-if)# no shutdown</span><br><span class="line">Router1(config-if)# exit</span><br><span class="line"></span><br><span class="line">#----配置路由器1的外网口地址-------------------</span><br><span class="line">Router1(config)# interface fa0/0</span><br><span class="line">Router1(config-if)# ip address 10.10.10.10 255.0.0.0</span><br><span class="line">Router1(config-if)# no shutdown</span><br></pre></td></tr></table></figure></p>
+<p><strong>开启三层交换机路由:</strong> 开启三层交换机路由功能,并配置RIP动态路由,指明每个路由器的网段地址.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Switch(config)# ip routing</span><br><span class="line">Switch(config)# router rip</span><br><span class="line"></span><br><span class="line">Switch(config-router)# network 192.168.1.0</span><br><span class="line">Switch(config-router)# network 192.168.2.0</span><br><span class="line">Switch(config-router)# network 192.168.3.0</span><br><span class="line">Switch(config-router)# network 192.168.4.0</span><br></pre></td></tr></table></figure></p>
+<p><strong>配置二层路由器RIP:</strong> 最后还需要分别配置两个路由器并开启其路由功能.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#----配置路由器Router0-------------------</span><br><span class="line">Router0(config)# router rip</span><br><span class="line">Router0(config-router)# network 192.168.3.0</span><br><span class="line">Router0(config-router)# network 192.168.4.0</span><br><span class="line"></span><br><span class="line">#----配置路由器Router1-------------------</span><br><span class="line">Router1(config)# route rip</span><br><span class="line">Router1(config-router)# network 192.168.3.0</span><br><span class="line">Router1(config-router)# network 192.168.4.0</span><br><span class="line">Router1(config-router)# network 192.168.4.0</span><br><span class="line">Router1(config-router)# network 1.1.1.1</span><br></pre></td></tr></table></figure></p>
+<p>以上配置流程就是全部的实验配置过程,在配置完成功能后,我们首先通过使用ping命令来测试内部主机是否能够Ping通,最后的实验结果是,内网主机均可以实现通信,外网主机无法和内网主机通信.<br><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2019/03/15/网络设备配置/思科路由器配置笔记/">思科路由器配置笔记</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2019年03月15日 - 11:03</p>
+  <p><span>最后更新:</span>2019年04月16日 - 14:04</p>
+  <p><span>原始链接:</span><a href="/2019/03/15/网络设备配置/思科路由器配置笔记/" title="思科路由器配置笔记">https://www.mkdirs.com/2019/03/15/网络设备配置/思科路由器配置笔记/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/网络设备配置/" rel="tag"> <i class="fa fa-tag"></i> 网络设备配置</a>
+          
+            <a href="/tags/Cisco/" rel="tag"> <i class="fa fa-tag"></i> Cisco</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/14/网络设备配置/思科生成树与端口聚合/" rel="next" title="思科生成树与端口聚合">
+                <i class="fa fa-chevron-left"></i> 思科生成树与端口聚合
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/21/网络设备配置/思科设备ACL与NAT技术/" rel="prev" title="思科设备ACL与NAT技术">
+                思科设备ACL与NAT技术 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#路由基本配置"><span class="nav-text">路由基本配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置静态路由"><span class="nav-text">配置静态路由</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RIP-动态路由"><span class="nav-text">RIP 动态路由</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OSPF-动态路由"><span class="nav-text">OSPF 动态路由</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实战-配置RIP企业环境"><span class="nav-text">实战:配置RIP企业环境</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

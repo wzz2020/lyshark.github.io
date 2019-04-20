@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="LVS(Linux Virtual Server)即Linux虚拟服务器,是由章文嵩博士主导开发的开源负载均衡项目,目前 LVS 已经被集成到 Linux 内核模块中,该项目在 Linux 内核实现了基于 IP 的数据请求负载均衡调度方案,LVS集群采用IP负载均衡技术和基于内容请求分发技术.调度器具有很好的吞吐率,将请求均衡地转移到不同的服务器上执行,且调度器自动屏蔽掉服务器的故障,从而将一组服">
+<meta name="keywords" content="Linux 服务配置">
+<meta property="og:type" content="article">
+<meta property="og:title" content="构建LVS负载均衡集群">
+<meta property="og:url" content="https://www.mkdirs.com/2018/09/16/Linux 服务配置/构建LVS负载均衡集群/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="LVS(Linux Virtual Server)即Linux虚拟服务器,是由章文嵩博士主导开发的开源负载均衡项目,目前 LVS 已经被集成到 Linux 内核模块中,该项目在 Linux 内核实现了基于 IP 的数据请求负载均衡调度方案,LVS集群采用IP负载均衡技术和基于内容请求分发技术.调度器具有很好的吞吐率,将请求均衡地转移到不同的服务器上执行,且调度器自动屏蔽掉服务器的故障,从而将一组服">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20180916214211.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20180917075643.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20180917081618.jpg">
+<meta property="og:updated_time" content="2019-04-16T12:38:53.149Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="构建LVS负载均衡集群">
+<meta name="twitter:description" content="LVS(Linux Virtual Server)即Linux虚拟服务器,是由章文嵩博士主导开发的开源负载均衡项目,目前 LVS 已经被集成到 Linux 内核模块中,该项目在 Linux 内核实现了基于 IP 的数据请求负载均衡调度方案,LVS集群采用IP负载均衡技术和基于内容请求分发技术.调度器具有很好的吞吐率,将请求均衡地转移到不同的服务器上执行,且调度器自动屏蔽掉服务器的故障,从而将一组服">
+<meta name="twitter:image" content="https://www.mkdirs.com/picture/20180916214211.jpg">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/09/16/Linux 服务配置/构建LVS负载均衡集群/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>构建LVS负载均衡集群 | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/09/16/Linux 服务配置/构建LVS负载均衡集群/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">构建LVS负载均衡集群
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-09-16 21:10:08" itemprop="dateCreated datePublished" datetime="2018-09-16T21:10:08+08:00">2018-09-16</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-16 20:38:53" itemprop="dateModified" datetime="2019-04-16T20:38:53+08:00">2019-04-16</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Linux-服务配置/" itemprop="url" rel="index"><span itemprop="name">Linux 服务配置</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>LVS(Linux Virtual Server)即Linux虚拟服务器,是由章文嵩博士主导开发的开源负载均衡项目,目前 LVS 已经被集成到 Linux 内核模块中,该项目在 Linux 内核实现了基于 IP 的数据请求负载均衡调度方案,LVS集群采用IP负载均衡技术和基于内容请求分发技术.调度器具有很好的吞吐率,将请求均衡地转移到不同的服务器上执行,且调度器自动屏蔽掉服务器的故障,从而将一组服务器构成一个高性能的、高可用的虚拟服务器.整个服务器集群的结构对客户是透明的,而且无需修改客户端和服务器端的程序.为此,在设计时需要考虑系统的透明性、可伸缩性、高可用性和易管理性.</p>
+<a id="more"></a>
+<p><br><br><strong>LVS(Linux Virtual Server) 的作用</strong></p>
+<p>LVS主要用于服务器集群的负载均衡,它工作在网络层,可以实现高性能,高可用的服务器集群技术.它廉价,可把许多低性能的服务器组合在一起形成一个超级服务器.它易用,配置非常简单,且有多种负载均衡的方法.它稳定可靠,即使在集群的服务器中某台服务器无法正常工作,也不影响整体效果.另外可扩展性也非常好.</p>
+<p>LVS自从1998年开始,发展到现在已经是一个比较成熟的技术项目了.可以利用LVS技术实现高可伸缩的、高可用的网络服务,例如WWW服务、Cache服务、DNS服务、FTP服务、MAIL服务、视频/音频点播服务等等,有许多比较著名网站和组织都在使用LVS架设的集群系统.</p>
+<blockquote>
+<p>LVS的体系结构,使用LVS架设的服务器集群系统有三个部分组成：</p>
+<blockquote>
+<p>● 最前端的负载均衡层,用Load Balancer表示<br>● 中间的服务器集群层,用Server Array表示<br>● 最底端的数据共享存储层,用Shared Storage表示</p>
+</blockquote>
+</blockquote>
+<p><strong>LVS(Linux Virtual Server) 负载均衡机制</strong></p>
+<p>LVS是四层负载均衡,也就是说建立在OSI模型的第四层传输层之上,传输层上有我们熟悉的TCP/UDP,LVS支持TCP/UDP的负载均衡.因为LVS是四层负载均衡,因此它相对于其它高层负载均衡的解决办法,比如DNS域名轮流解析、应用层负载的调度、客户端的调度等,它的效率是非常高的.</p>
+<p>Load Balancing负载均衡,可以减轻单台服务器压力,不同节点之间相互独立,不共享任何资源.通过一定算法将客户端的访问请求平分到群集的各个节点上,充分利用每个节点的资源.负载均衡扩展了网络设备和服务器带宽,增加吞吐量,加强网络数据处理能力.</p>
+<p><strong>负载均衡集群分类</strong></p>
+<p>软件实现： LVS RAC MySQLProxy Nginx HaProxy<br>硬件实现： F5 citrix array 深信服 梭子鱼</p>
+<p><strong>负载均衡集群的区别</strong></p>
+<p>1.触发条件不同</p>
+<p>四层负载均衡：工作在传输层,转发数据依靠的是三层的IP地址 和 四层的端口(PORT).<br>七层负载均衡：工作在应用层,转发数据依靠URL或主机名.</p>
+<p>2.实现原理不同</p>
+<p>四层负载均衡：TCP连接建立一次,客户端和RS主机之间.<br>七层负载均衡：TCP连接建立两次,第一次是客户端和负载调度器,第二次是负载调度器和RS主机.</p>
+<p>3.应用场景不同</p>
+<p>四层负载均衡：TCP应用为主或者ERP软件<br>七层负载均衡：以HTTP协议为主,例如apache服务器</p>
+<p>4.安全性不同</p>
+<p>四层负载均衡：转发攻击<br>七层负载均衡：拦截攻击</p>
+<p>IPVS：钩子函数,内核机制,在请求没有到达目的地址之前,捕获并取得优先控制权的函数.<br>IPVSADM：工作在用户空间,负责为ipvs内核框架编写规则,定义谁是集群服务,谁是后端真实的服务器.</p>
+<p><strong>负载调度算法分类</strong></p>
+<table>
+<thead>
+<tr>
+<th>轮询方式</th>
+<th style="text-align:center">解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>rr(轮循)</td>
+<td style="text-align:center">从1开始到n结束</td>
+</tr>
+<tr>
+<td>wrr(加权轮循)</td>
+<td style="text-align:center">按权重比例进行调度,权重越大,负责的请求越多.</td>
+</tr>
+<tr>
+<td>sh(源地址hash)</td>
+<td style="text-align:center">实现会话绑定,保留之前建立的会话信息.将来自于同一个ip地址的请求发送给一个真实服务器.</td>
+</tr>
+<tr>
+<td>dh(目标地址hash)</td>
+<td style="text-align:center">将同一个目标地址的请求,发送给同一个服务器节点.提高缓存命中率.</td>
+</tr>
+<tr>
+<td>LC(最少连接)</td>
+<td style="text-align:center">将新的连接请求分配给当前连接数最少的服务器.公式：活动连接*256+非活动连接.</td>
+</tr>
+<tr>
+<td>WLC(加权最少连接)</td>
+<td style="text-align:center">最少连接的特殊模式.公式：(活动连接*256+非活动连接)/权重</td>
+</tr>
+<tr>
+<td>SED(最短期望延迟)</td>
+<td style="text-align:center">加权最少连接的特殊模式.公式：(活动连接 +1)*256/权重</td>
+</tr>
+<tr>
+<td>NQ(永不排队)</td>
+<td style="text-align:center">sed的特殊模式,当某台真实服务器连接为0时,直接分配不计算.</td>
+</tr>
+<tr>
+<td>LBLC(基于局部性的最少连接)</td>
+<td style="text-align:center">dh的特殊模式既要提高缓存命中率又要考虑连接数量.先根据请求的目标IP地址寻找最近的该目标IP地址所有使用的服务器,如果这台服务器依然可用,并且有能力处理该请求,调度器会尽量选择相同的服务器,否则会继续选择其它可行的服务器.</td>
+</tr>
+<tr>
+<td>LBLCR(带复制的基于局部性的最少连接)</td>
+<td style="text-align:center">LBLCR=LBLC+缓存共享机制</td>
+</tr>
+<tr>
+<td>动态算法</td>
+<td style="text-align:center">既要考虑算法本身,也要考虑服务器状态(原理：通过hash表记录连接状态active/inactive)</td>
+</tr>
+<tr>
+<td>静态算法</td>
+<td style="text-align:center">只考虑算法本身,不考虑服务器状态.</td>
+</tr>
+</tbody>
+</table>
+<p>下面我们将依次配置三种模式的集群方案,并说明原理.<br><br></p>
+<h2 id="LVS-NAT-模式"><a href="#LVS-NAT-模式" class="headerlink" title="LVS-NAT 模式"></a>LVS-NAT 模式</h2><p><strong>NAT 模式简介</strong></p>
+<p>NAT (Network Address Translation）即网络地址转换,其作用是通过数据报头的修改,使位于企业内部的私有IP可以访问外网,以及外部用户可以访问位于公司内部的私有IP主机.LVS-NAT工作模式拓扑结构如下图,所示LVS负载调度器使用两块网卡配置不同的IP地址,eth0,设置为私钥IP与内部网络通过交换设备相互连接, eth1设置为外网IP与外部网络联通.</p>
+<p><img src="/picture/20180916214211.jpg" alt="blockchain"></p>
+<p><strong>原理图解:</strong></p>
+<p>a).客户端将请求交给负载调度器,客户端发出数据包,此时这个数据包的源ip为CIP,目标ip为VIP (集群ip).<br>b).数据包到达负载调度器后,修改数据包的目标ip地址为真实服务器的ip,此时数据包的源ip为CIP,目标ip为RIP.<br>c).将数据包发送给RS,之后RS响应将数据包发回给负载调度器,此时数据包的源ip为RIP,目标ip为CIP.<br>d).负载调度器再转发时,会将源ip地址改为自己的VIP地址,然后再发给客户端,此时数据包的源ip为VIP,目标ip为CIP.</p>
+<p><strong>LVS-NAT 模式特点:</strong></p>
+<p>1.负载调度器和真实服务器,必须位于同一网络.<br>2.真实服务器的网关必须指向DIP.<br>3.负载调度器必须位于客户端和真实服务器之间.<br>4.RIP通常都是私有地址,仅用于各个集群节点通信.<br>5.支持端口映射,可映射为任意地址.<br>6.真实服务器可以使用任意操作系统,负载调度器必须是LINUX系统.<br>7.所有数据报文都要经过负载调度器、压力过大、最多10台RS.</p>
+<p><strong>实验环境IP分配:</strong><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[实验环境]</span><br><span class="line"></span><br><span class="line">[类型]       [网卡]	      [IP地址]		[接入模式]</span><br><span class="line"></span><br><span class="line">LVS-NAT         ens32		192.168.1.12		桥接</span><br><span class="line">                ens32		192.168.20.14		NAT</span><br><span class="line"></span><br><span class="line">Read-Ser1	ens32		192.168.20.15		NAT</span><br><span class="line">Read-Ser2	ens32		192.168.20.16		NAT</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆配置LVS调度器◆"><a href="#◆配置LVS调度器◆" class="headerlink" title="◆配置LVS调度器◆"></a>◆配置LVS调度器◆</h3><p>1.通过YUM仓库快速安装Ipvsadm内核管理工具.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y ipvsadm</span></span><br><span class="line"></span><br><span class="line">Package ipvsadm-1.27-7.el7.x86_64 already installed and latest version</span><br><span class="line">Nothing to <span class="keyword">do</span></span><br></pre></td></tr></table></figure></p>
+<p>2.开启IP转发,让其具有转发数据包的能力.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># echo "1" &gt; /proc/sys/net/ipv4/ip_forward</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "net.ipv4.ip_forward=1" &gt;&gt; /etc/sysctl.conf</span></span><br><span class="line">[root@localhost ~]<span class="comment"># sysctl –p</span></span><br><span class="line">net.ipv4.ip_forward=1</span><br></pre></td></tr></table></figure></p>
+<p>3.配置LVS-NAT调度器,访问本机的80端口自动负载均衡到15-16这两台机器上.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ipvsadm -A -t 192.168.1.12:80 -s rr			#指定网卡1地址</span></span><br><span class="line"><span class="comment">#-------------------------------------------------------------------------------</span></span><br><span class="line"><span class="comment">#[参数说明]</span></span><br><span class="line">		-A		添加规则</span><br><span class="line">		-t		TCP 指定分发器VIP</span><br><span class="line">		-s		指定调度算法</span><br><span class="line">		rr		代表轮询round-robin</span><br><span class="line"><span class="comment">#-------------------------------------------------------------------------------</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ipvsadm -a -t 192.168.1.12:80 -r 192.168.20.15 -m</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ipvsadm -a -t 192.168.1.12:80 -r 192.168.20.16 -m</span></span><br><span class="line"><span class="comment">#-------------------------------------------------------------------------------</span></span><br><span class="line"><span class="comment">#[参数说明]</span></span><br><span class="line">		-a		添加real-server地址</span><br><span class="line">		-r		指定real-server地址</span><br><span class="line">		-m		表示masquerade NAT方式的LVS</span><br><span class="line"><span class="comment">#-------------------------------------------------------------------------------</span></span><br></pre></td></tr></table></figure></p>
+<p>4.查看并保存结果,下面就是我们的配置结果啦.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ipvsadm -L -n                     #查看规则</span></span><br><span class="line"></span><br><span class="line">IP Virtual Server version 1.2.1 (size=4096)</span><br><span class="line">Prot LocalAddress:Port Scheduler Flags</span><br><span class="line">  -&gt; RemoteAddress:Port           Forward Weight ActiveConn InActConn</span><br><span class="line">TCP  192.168.1.12:80 rr</span><br><span class="line">  -&gt; 192.168.20.15:80             Masq    1      0          0         </span><br><span class="line">  -&gt; 192.168.20.16:80             Masq    1      0          0         </span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># /sbin/ipvsadm-save                #保存规则</span></span><br></pre></td></tr></table></figure></p>
+<p>4.配置防火墙SNAT,指定NAT表的POSTROUTING.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">iptables -t nat -A POSTROUTING \          <span class="comment">#指定NAT表的POSTROUTING</span></span><br><span class="line">-s 192.168.1.0/24 \                       <span class="comment">#指定内网的网段</span></span><br><span class="line">-o eno16777728 \                          <span class="comment">#指定外网口网卡名称</span></span><br><span class="line">-j SNAT \                                 <span class="comment">#指定为SNAT</span></span><br><span class="line">--to-source 59.110.167.239                <span class="comment">#指定外网卡的地址</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># iptables -t nat -L    #查看添加的规则</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="◆配置RS节点◆"><a href="#◆配置RS节点◆" class="headerlink" title="◆配置RS节点◆"></a>◆配置RS节点◆</h3><p>提示:RelServer客户端每个节点都应该配置,每个节点都要执行以下操作</p>
+<p>1.安装测试Apache,后端的两台主机都要配置Apache.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y httpd</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "web 1" &gt; /var/www/html/index.html</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl restart httpd</span></span><br></pre></td></tr></table></figure></p>
+<p>2.RelServer节点指定网关,指向主调度器的eth1网口.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># route add default gw 192.168.20.14</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="LVS-DR-模式"><a href="#LVS-DR-模式" class="headerlink" title="LVS-DR 模式"></a>LVS-DR 模式</h2><p><strong>LVS-DR模式简介</strong></p>
+<p>DR模式也叫做直接路由模式,其体系如下图所示,该模式中LVS依然承载数据的入站点请求以及算法的合理选择,不同之处在于dR模式只负责接受请求不负责发送,真正发送请求的是后端的主机节点,这样就在一定程度上缓解了服务器的压力,但是本模式要求调度器与后端的主机必须在一个局域网中.</p>
+<p><img src="/picture/20180917075643.jpg" alt="blockchain"></p>
+<p><strong>原理图解:</strong></p>
+<p>a)客户端发出数据包,源ip是CIP,目标ip是VIP.<br>b)依靠路由把数据发送给负载调度器,负载调度器将数据包的源MAC地址修改为DIP的MAC地址,将目标MAC地址修改为RIP的MAC地址,此时源ip和目标ip均未修改.<br>c)由于DS和RS在同一网络中,所以通过二层来传输,通过路由再将数据包发到RS.<br>d)RS接收数据包,之后通过lo接口传送给eth0向外发出,此时的源ip是VIP,目标ip为CIP.<br>e)最后通过路由的方式发给客户端.</p>
+<p><strong>DR 模式特点:</strong></p>
+<p>1.负载路由器和真实服务器,必须位于同一网络.<br>2.真实服务器的网关必须指向路由器.<br>3.负载调度只处理入站请求.<br>4.RIP可以是私有地址,也可以是公网地址.<br>5.真实服务器可以使用任意操作系统,负载调度器必须是LINUX系统.<br>6.负载调度器压力较小,支持100台左右的RS.</p>
+<p><strong>实验环境IP分配:</strong><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[实验环境]</span><br><span class="line"></span><br><span class="line">[类型]		[网卡]		[IP地址]	[VIP/IO]		[接入模式]</span><br><span class="line"></span><br><span class="line">LVS-DR		ens32	192.168.1.5	192.168.1.10(VIP)	桥接</span><br><span class="line"></span><br><span class="line">Read-Ser1	ens32	192.168.1.13	192.168.1.10(IO)	桥接</span><br><span class="line">Read-Ser2	ens32	192.168.1.14	192.168.1.10(IO)	桥接</span><br><span class="line"></span><br><span class="line"><span class="comment">#提示: 如果是在真实环境中 RealServer 应把网关指向路由器eth1口</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="◆配置LVS调度器◆-1"><a href="#◆配置LVS调度器◆-1" class="headerlink" title="◆配置LVS调度器◆"></a>◆配置LVS调度器◆</h3><p>1.通过YUM仓库快速安装Ipvsadm内核管理工具.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y ipvsadm</span></span><br><span class="line"></span><br><span class="line">Package ipvsadm-1.27-7.el7.x86_64 already installed and latest version</span><br><span class="line">Nothing to <span class="keyword">do</span></span><br></pre></td></tr></table></figure></p>
+<p>2.修改内核参数,防止相同网络地址广播冲突.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># echo "net.ipv4.conf.all.send_redirects = 0" &gt;&gt; /etc/sysctl.conf</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "net.ipv4.conf.ens32.send_redirects = 0" &gt;&gt; /etc/sysctl.conf</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "net.ipv4.conf.default.send_redirects = 0" &gt;&gt; /etc/sysctl.conf</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># sysctl -p                                     #刷新内核参数</span></span><br><span class="line">net.ipv4.conf.all.send_redirects = 0</span><br><span class="line">net.ipv4.conf.ens32.send_redirects = 0</span><br><span class="line">net.ipv4.conf.default.send_redirects = 0</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># modprobe ip_vs &amp;&amp; echo "ok" || echo "error"   #查看内核是否加载</span></span><br><span class="line">ok</span><br></pre></td></tr></table></figure></p>
+<p>3.配置一个网卡子接口,此处我们在<code>ens32</code>接口上配置一个子接口<code>ens32:0</code>,这个子接口也就是<code>VIP</code>的地址,并添加一条路由记录.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ifconfig ens32</span></span><br><span class="line">ens32: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1500</span><br><span class="line">        inet 192.168.1.5  netmask 255.255.255.0  broadcast 192.168.1.255</span><br><span class="line">        inet6 fe80::5fbb:43ab:da3:f589  prefixlen 64  scopeid 0x20&lt;link&gt;</span><br><span class="line">        ether 00:0c:29:1e:14:e2  txqueuelen 1000  (Ethernet)</span><br><span class="line">        RX packets 4597  bytes 5186429 (4.9 MiB)</span><br><span class="line">        RX errors 0  dropped 0  overruns 0  frame 0</span><br><span class="line">        TX packets 1711  bytes 177437 (173.2 KiB)</span><br><span class="line">        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ifconfig ens32:0 192.168.1.10 netmask 255.255.255.0         #在ens32添加子接口,VIP的地址</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ifconfig ens32:0</span></span><br><span class="line">ens32:0: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1500</span><br><span class="line">        inet 192.168.1.10  netmask 255.255.255.0  broadcast 192.168.1.255</span><br><span class="line">        ether 00:0c:29:1e:14:e2  txqueuelen 1000  (Ethernet)</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># route -n</span></span><br><span class="line">Kernel IP routing table</span><br><span class="line">Destination     Gateway         Genmask         Flags Metric Ref    Use Iface</span><br><span class="line">0.0.0.0         192.168.1.1     0.0.0.0         UG    100    0        0 ens32</span><br><span class="line">192.168.1.0     0.0.0.0         255.255.255.0   U     100    0        0 ens32</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># route add -host 192.168.1.10 dev ens32                      #在ens32上添加一条路由记录</span></span><br><span class="line">[root@localhost ~]<span class="comment"># route -n</span></span><br><span class="line">Kernel IP routing table</span><br><span class="line">Destination     Gateway         Genmask         Flags Metric Ref    Use Iface</span><br><span class="line">0.0.0.0         192.168.1.1     0.0.0.0         UG    100    0        0 ens32</span><br><span class="line">192.168.1.0     0.0.0.0         255.255.255.0   U     100    0        0 ens32</span><br><span class="line">192.168.1.10    0.0.0.0         255.255.255.255 UH    0      0        0 ens32</span><br></pre></td></tr></table></figure></p>
+<p>4.接下来配置我们的LVS负载调度器,指定VIP地址和使用轮询算法,并保存永久生效.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ipvsadm -A -t 192.168.1.10:80 -s rr                   #添加虚拟服务指定VIP地址</span></span><br><span class="line"><span class="comment">#---------------------------------------------------------------------------------</span></span><br><span class="line"><span class="comment">#[参数说明]</span></span><br><span class="line">	-A	添加规则</span><br><span class="line">	-t	TCP 指定分发器VIP</span><br><span class="line">	-s	指定调度算法</span><br><span class="line">	rr	代表轮询round-robin</span><br><span class="line"><span class="comment">#---------------------------------------------------------------------------------</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ipvsadm -a -t 192.168.1.10:80 -r 192.168.1.13:80 -g		#针对虚拟服务添加RS节点</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ipvsadm -a -t 192.168.1.10:80 -r 192.168.1.14:80 -g		#针对虚拟服务添加RS节点</span></span><br><span class="line"><span class="comment">#---------------------------------------------------------------------------------</span></span><br><span class="line"><span class="comment">#[参数说明]</span></span><br><span class="line">	-a	添加real-server地址</span><br><span class="line">	-r	指定real-server地址</span><br><span class="line">	-m	以NAT模式分配</span><br><span class="line">	-g	以DR模式分配</span><br><span class="line">	-w	指定权值</span><br><span class="line"><span class="comment">#---------------------------------------------------------------------------------</span></span><br></pre></td></tr></table></figure></p>
+<p>5.检查LVS的轮询配置规则,并保存配置文件,此处记得放行放火墙规则.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ipvsadm -L -n --stats			   #查看VIP和RS是否已经配置成功</span></span><br><span class="line">IP Virtual Server version 1.2.1 (size=4096)</span><br><span class="line">Prot LocalAddress:Port               Conns   InPkts  OutPkts  InBytes OutBytes</span><br><span class="line">  -&gt; RemoteAddress:Port</span><br><span class="line">TCP  192.168.1.10:80                     0        0        0        0        0</span><br><span class="line">  -&gt; 192.168.1.13:80                     0        0        0        0        0</span><br><span class="line">  -&gt; 192.168.1.14:80                     0        0        0        0        0</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># /sbin/ipvsadm-save			    #保存规则</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="◆配置RS节点◆-1"><a href="#◆配置RS节点◆-1" class="headerlink" title="◆配置RS节点◆"></a>◆配置RS节点◆</h3><p>提示:RelServer客户端每个节点都应该配置,每个节点都要执行以下操作<br>如果是图形界面,需要关闭图形管理工具 systemctl stop NetworkManager</p>
+<p>1.首先关闭ARP宣告,和ARP转发,这里有两种方法,临时关闭与永久关闭.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment">#--------------------------------------------------------------------------------</span></span><br><span class="line"><span class="comment">#[临时关闭]</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "1" &gt; /proc/sys/net/ipv4/conf/lo/arp_ignore </span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "2" &gt; /proc/sys/net/ipv4/conf/lo/arp_announce</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "1" &gt; /proc/sys/net/ipv4/conf/all/arp_announce </span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "2" &gt; /proc/sys/net/ipv4/conf/all/arp_ignore</span></span><br><span class="line"><span class="comment">#--------------------------------------------------------------------------------</span></span><br><span class="line"><span class="comment">#--------------------------------------------------------------------------------</span></span><br><span class="line"><span class="comment">#[永久关闭]</span></span><br><span class="line">[root@localhost ~]<span class="comment"># vim /etc/sysctl.conf</span></span><br><span class="line"></span><br><span class="line">net.ipv4.conf.ens32.arp_ignore=1</span><br><span class="line">net.ipv4.conf.ens32.arp_announce=2</span><br><span class="line">net.ipv4.conf.all.arp_ignore=1</span><br><span class="line">net.ipv4.conf.all.arp_announce=2</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># sysctl -p</span></span><br><span class="line"><span class="comment">#--------------------------------------------------------------------------------</span></span><br></pre></td></tr></table></figure></p>
+<p>2.添加本地回环口,并设置24位的掩码,添加本地回环路由记录,这里设置成VIP的地址.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ifconfig lo:0 192.168.1.10 netmask 255.255.255.255      #添加本地回环口,设置24位掩码</span></span><br><span class="line">[root@localhost ~]<span class="comment"># route add -host 192.168.1.10 dev lo                     #添加路由记录</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="LVS-TUN-模式"><a href="#LVS-TUN-模式" class="headerlink" title="LVS-TUN 模式"></a>LVS-TUN 模式</h2><p><strong>LVS-IP-TUN 模式简介</strong></p>
+<p>IP-TUN也叫做IP隧道模式,它的配置不受空间的限制,TUN模式的思路就是将请求与相应数据分离,让调度器仅仅处理数据请求,而让真是服务器返回数据包,但是IP隧道模式由于物理主机不在一起,效率比较低下.</p>
+<p><img src="/picture/20180917081618.jpg" alt="blockchain"></p>
+<p><strong>原理图解:</strong></p>
+<p>a)客户端发送数据包到负载调度器,此时数据包的源ip为CIP,目标ip为VIP.<br>b)负载调度器会在数据包的外面再次封装一层ip数据包,封装源ip为DIP,目标ip为RIP.此时源ip为DIP,目标ip为RIP.<br>c)之后负载调度器将数据包发给RS（因为在外层封装多了一层ip首部,所以可以理解为此时通过隧道传输）,此时源ip为DIP,目标ip为RIP.<br>d)RS接收到报文后发现是自己的IP地址,就将报文接收下来拆除掉最外层的IP后会发现里面还有一层IP首部,而且目标是自己的lo接口VIP,那么此时RS开始处理此请求,处理完成之后通过lo接口送给eth0网卡,然后向外传递.此时的源IP地址为VIP,目标IP为CIP.<br>e)之后将数据包发给客户端.</p>
+<p><strong>IP-TUN隧道 模式特点:</strong></p>
+<p>1.所有真实服务器节点既要有RIP,又要有VIP,并且RIP、必须是公网ip.<br>2.负载调度器和真实服务器必须支持隧道功能.<br>3.负载调度器只处理入站请求.<br>4.真实服务器一定不能使用负载雕塑群做默认网关.<br>5.不支持端口映射.<br>6.可跨互联网搭建集群,对网络环境要求较高.</p>
+<p><strong>实验环境IP分配:</strong><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[实验环境]</span><br><span class="line"></span><br><span class="line">[类型]		[网卡]		[IP地址]	[VIP/Tunl]		[接入模式]</span><br><span class="line"></span><br><span class="line">LVS-IPTUN	eno16777728	200.168.10.1	200.168.10.10(VIP)	外网IP</span><br><span class="line"></span><br><span class="line">Read-Ser1	eno16777728	200.168.10.2	200.168.10.10(Tunl)	外网IP</span><br><span class="line">Read-Ser2	eno16777728	200.168.10.3	200.168.10.10(Tunl)	外网IP</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆配置LVS调度器◆-2"><a href="#◆配置LVS调度器◆-2" class="headerlink" title="◆配置LVS调度器◆"></a>◆配置LVS调度器◆</h3><p>1.通过YUM仓库快速安装Ipvsadm内核管理工具.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y ipvsadm</span></span><br><span class="line"></span><br><span class="line">Package ipvsadm-1.27-7.el7.x86_64 already installed and latest version</span><br><span class="line">Nothing to <span class="keyword">do</span></span><br></pre></td></tr></table></figure></p>
+<p>2.修改内核参数,防止相同网络地址广播冲突.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># echo "net.ipv4.conf.all.send_redirects = 0" &gt;&gt; /etc/sysctl.conf</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "net.ipv4.conf.ens32.send_redirects = 0" &gt;&gt; /etc/sysctl.conf</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "net.ipv4.conf.default.send_redirects = 0" &gt;&gt; /etc/sysctl.conf</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># sysctl -p                                     #刷新内核参数</span></span><br><span class="line">net.ipv4.conf.all.send_redirects = 0</span><br><span class="line">net.ipv4.conf.ens32.send_redirects = 0</span><br><span class="line">net.ipv4.conf.default.send_redirects = 0</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># modprobe ip_vs &amp;&amp; echo "ok" || echo "error"   #查看内核是否加载</span></span><br><span class="line">ok</span><br></pre></td></tr></table></figure></p>
+<p>3.LVS服务器配置虚拟IP,虚拟一个隧道IP,4个255代表它自己一个网段,把网段添加到路由表防止走<code>200.168.10.0</code>网段.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ifconfig tunl0 200.168.10.10 netmask 255.255.255.255 up	  #虚拟一个隧道IP 4个255代表它自己一个网段</span></span><br><span class="line">[root@localhost ~]<span class="comment"># route add -host 200.168.10.10 dev tunl0                   #把网段添加到路由表 防止走 200.168.10.0 网段</span></span><br><span class="line">[root@localhost ~]<span class="comment"># route -n                                                  #查看路由</span></span><br></pre></td></tr></table></figure></p>
+<p>2.设置LVS调度器.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ipvsadm -C</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ipvsadm -A -t 200.168.10.10:80 -s rr</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ipvsadm -a -t 200.168.10.10:80 -r 200.168.10.2 -i</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ipvsadm -a -t 200.168.10.10:80 -r 200.168.10.3 -i</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ipvsadm -L -n --stat</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="◆配置RS节点◆-2"><a href="#◆配置RS节点◆-2" class="headerlink" title="◆配置RS节点◆"></a>◆配置RS节点◆</h3><p>提示:RelServer客户端每个节点都应该配置,每个节点都要执行以下操作</p>
+<p>1.配置网卡子接口.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ifconfig tunl0 200.168.10.10 netmask 255.255.255.255 up</span></span><br><span class="line">[root@localhost ~]<span class="comment"># route add -host 200.168.10.10 dev tunl0</span></span><br></pre></td></tr></table></figure></p>
+<p>2.修改环境变量,写入配置文件开机自动加载.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># echo "1" &gt; /proc/sys/net/ipv4/conf/tunl0/arp_ignore        </span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "2" &gt; /proc/sys/net/ipv4/conf/tunl0/arp_announce</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "1" &gt; /proc/sys/net/ipv4/conf/all/arp_ignore</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "2" &gt; /proc/sys/net/ipv4/conf/all/arp_announce</span></span><br></pre></td></tr></table></figure></p>
+<p>3.访问集群IP,测试隧道效果.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># elinks http://200.168.10.10</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/09/16/Linux 服务配置/构建LVS负载均衡集群/">构建LVS负载均衡集群</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年09月16日 - 21:09</p>
+  <p><span>最后更新:</span>2019年04月16日 - 20:04</p>
+  <p><span>原始链接:</span><a href="/2018/09/16/Linux 服务配置/构建LVS负载均衡集群/" title="构建LVS负载均衡集群">https://www.mkdirs.com/2018/09/16/Linux 服务配置/构建LVS负载均衡集群/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux-服务配置/" rel="tag"> <i class="fa fa-tag"></i> Linux 服务配置</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/09/16/Linux 服务配置/通过DHCP动态管理IP地址/" rel="next" title="通过DHCP动态管理IP地址">
+                <i class="fa fa-chevron-left"></i> 通过DHCP动态管理IP地址
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/09/16/Linux 服务配置/构建Keepalived高可用集群/" rel="prev" title="构建Keepalived高可用集群">
+                构建Keepalived高可用集群 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#LVS-NAT-模式"><span class="nav-text">LVS-NAT 模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆配置LVS调度器◆"><span class="nav-text">◆配置LVS调度器◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆配置RS节点◆"><span class="nav-text">◆配置RS节点◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LVS-DR-模式"><span class="nav-text">LVS-DR 模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆配置LVS调度器◆-1"><span class="nav-text">◆配置LVS调度器◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆配置RS节点◆-1"><span class="nav-text">◆配置RS节点◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LVS-TUN-模式"><span class="nav-text">LVS-TUN 模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆配置LVS调度器◆-2"><span class="nav-text">◆配置LVS调度器◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆配置RS节点◆-2"><span class="nav-text">◆配置RS节点◆</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

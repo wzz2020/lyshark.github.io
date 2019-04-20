@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="路由器(Router),是连接因特网中各局域网、广域网的设备,它会根据信道的情况自动选择和设定路由,以最佳路径,按前后顺序发送信号,路由器工作在网络层,用来跨网段通信,路由器具有判断网络地址和选择IP路径的功能,它能在多网络互联环境中,建立灵活的连接,可用完全不同的数据分组和介质访问方法连接各种子网,路由器只接受源站或其他路由器的信息,属网络层的一种互联设备,因此路由器是互联网中必不可少的网络设备">
+<meta name="keywords" content="网络设备配置,huawei">
+<meta property="og:type" content="article">
+<meta property="og:title" content="华为路由器配置笔记">
+<meta property="og:url" content="https://www.mkdirs.com/2019/04/09/网络设备配置/华为路由器配置笔记/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="路由器(Router),是连接因特网中各局域网、广域网的设备,它会根据信道的情况自动选择和设定路由,以最佳路径,按前后顺序发送信号,路由器工作在网络层,用来跨网段通信,路由器具有判断网络地址和选择IP路径的功能,它能在多网络互联环境中,建立灵活的连接,可用完全不同的数据分组和介质访问方法连接各种子网,路由器只接受源站或其他路由器的信息,属网络层的一种互联设备,因此路由器是互联网中必不可少的网络设备">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20190409121020.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20190409151533.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20190409193556.jpg">
+<meta property="og:updated_time" content="2019-04-16T06:12:44.318Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="华为路由器配置笔记">
+<meta name="twitter:description" content="路由器(Router),是连接因特网中各局域网、广域网的设备,它会根据信道的情况自动选择和设定路由,以最佳路径,按前后顺序发送信号,路由器工作在网络层,用来跨网段通信,路由器具有判断网络地址和选择IP路径的功能,它能在多网络互联环境中,建立灵活的连接,可用完全不同的数据分组和介质访问方法连接各种子网,路由器只接受源站或其他路由器的信息,属网络层的一种互联设备,因此路由器是互联网中必不可少的网络设备">
+<meta name="twitter:image" content="https://www.mkdirs.com/picture/20190409121020.jpg">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2019/04/09/网络设备配置/华为路由器配置笔记/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>华为路由器配置笔记 | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2019/04/09/网络设备配置/华为路由器配置笔记/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">华为路由器配置笔记
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-04-09 09:30:12" itemprop="dateCreated datePublished" datetime="2019-04-09T09:30:12+08:00">2019-04-09</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-16 14:12:44" itemprop="dateModified" datetime="2019-04-16T14:12:44+08:00">2019-04-16</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/网络设备配置/" itemprop="url" rel="index"><span itemprop="name">网络设备配置</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>路由器(Router),是连接因特网中各局域网、广域网的设备,它会根据信道的情况自动选择和设定路由,以最佳路径,按前后顺序发送信号,路由器工作在网络层,用来跨网段通信,路由器具有判断网络地址和选择IP路径的功能,它能在多网络互联环境中,建立灵活的连接,可用完全不同的数据分组和介质访问方法连接各种子网,路由器只接受源站或其他路由器的信息,属网络层的一种互联设备,因此路由器是互联网中必不可少的网络设备之一.</p>
+<a id="more"></a>
+<p>路由器,其最重要的功能就是路由,路由是指路由器接收到数据时选择最佳路径将数据穿过网络传输到目标地址的行为,每个路由器负责自己的本地数据的路由或转发,通过多个路由器依次接力将数据最终传递到目标主机,路由的工作流程包括<code>路由选择</code>和<code>路由转发</code>两个方面.<br><br></p>
+<h2 id="路由器基本配置"><a href="#路由器基本配置" class="headerlink" title="路由器基本配置"></a>路由器基本配置</h2><p>路由器与交换机不同,交换机不需要配置也可以正常工作,但是<code>路由器必须经过配置后才可以正常使用</code>,路由器的登陆方式基本和交换机保持一致,下面将用一个实例实现路由器的基本配置,包括配置路由器的主机名称,密码,控制台端口,WAN接口和LAN接口等,来实现一个基本的路由结构.</p>
+<p>首先我们准备<code>两台路由器(Router)</code>,需要注意的是设备之间的连接所选用的线路类型,一般情况下<code>路由器和PC之间使用交叉线</code>,<code>两台路由器相连接使用串行线</code>,配置成以下拓扑结构即可:</p>
+<p><img src="/picture/20190409121020.jpg" alt="blockchain"></p>
+<p><strong>配置WAN接口:</strong> 路由器通过WAN接口接入到互联网上,而常见的WAN接口都是串行接口用<code>Serial</code>表示,如下将按照上图接口进行配置.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#----在Router1上操作-------------------------</span><br><span class="line">&lt;R1&gt; system-view</span><br><span class="line">[R1] interface Serial 0/0/0                           // 选择外网接口</span><br><span class="line">[R1-Serial0/0/0]</span><br><span class="line">[R1-Serial0/0/0] ip address 10.10.10.10 255.255.255.0 // 配置外网地址</span><br><span class="line"></span><br><span class="line">#----在Router2上操作-------------------------</span><br><span class="line">&lt;R2&gt; system-view</span><br><span class="line">[R2] interface Serial 0/0/0</span><br><span class="line">[R2-Serial0/0/0]</span><br><span class="line">[R2-Serial0/0/0] ip address 10.10.10.20 255.255.255.0</span><br></pre></td></tr></table></figure></p>
+<p><strong>配置LAN接口:</strong> LAN接口用来指定内网通讯的地址,接下来分别对两台路由器做配置.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#----在Router1上操作-------------------------</span><br><span class="line">&lt;R1&gt; system-view</span><br><span class="line">[R1]interface Ethernet 0/0/0</span><br><span class="line">[R1-Ethernet0/0/0]</span><br><span class="line">[R1-Ethernet0/0/0] ip address 192.168.1.1 255.255.255.0</span><br><span class="line"></span><br><span class="line">#----在Router2上操作-------------------------</span><br><span class="line">&lt;R2&gt; system-view</span><br><span class="line">[R2]interface Ethernet 0/0/0</span><br><span class="line">[R2-Ethernet0/0/0]</span><br><span class="line">[R2-Ethernet0/0/0]ip address 192.168.1.1 255.255.255.0</span><br></pre></td></tr></table></figure></p>
+<p><strong>查看路由表:</strong> 最后可以使用<code>display ip routing-table</code>命令,查看路由器的路由信息,确定网络是否正确连接.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[R1] display ip routing-table </span><br><span class="line">Route Flags: R - relay, D - download to fib</span><br><span class="line">------------------------------------------------------------------------------</span><br><span class="line">Destination/Mask    Proto   Pre  Cost      Flags NextHop         Interface</span><br><span class="line"></span><br><span class="line">     10.10.10.0/24  Direct  0    0           D   10.10.10.10     Serial0/0/0</span><br><span class="line">    10.10.10.10/32  Direct  0    0           D   127.0.0.1       Serial0/0/0</span><br><span class="line">    10.10.10.20/32  Direct  0    0           D   10.10.10.20     Serial0/0/0</span><br><span class="line">      127.0.0.0/8   Direct  0    0           D   127.0.0.1       InLoopBack0</span><br><span class="line">      127.0.0.1/32  Direct  0    0           D   127.0.0.1       InLoopBack0</span><br><span class="line">    192.168.1.0/24  Direct  0    0           D   192.168.1.1     Ethernet0/0/0</span><br><span class="line">    192.168.1.1/32  Direct  0    0           D   127.0.0.1       Ethernet0/0/0</span><br></pre></td></tr></table></figure></p>
+<p><strong>查接口信息:</strong> 也可以使用<code>display ip interface brief</code>命令,查看路由器的接口信息.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[R1] display ip interface brief </span><br><span class="line"></span><br><span class="line">Interface                         IP Address/Mask      Physical   Protocol  </span><br><span class="line">Ethernet0/0/0                     192.168.1.1/24       up         up        </span><br><span class="line">Ethernet0/0/1                     unassigned           down       down      </span><br><span class="line">GigabitEthernet0/0/0              unassigned           down       down</span><br><span class="line">NULL0                             unassigned           up         up(s) </span><br><span class="line">Serial0/0/0                       10.10.10.10/24       up         up</span><br><span class="line">Serial0/0/1                       unassigned           down       down</span><br></pre></td></tr></table></figure></p>
+<p><strong>最后测试通信:</strong> 在路由器<code>R1</code>上可以ping通<code>R2</code>,每个主机也可以ping通自己网段的路由器.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[R1] ping 10.10.10.20</span><br><span class="line">  PING 10.10.10.20: 56  data bytes, press CTRL_C to break</span><br><span class="line">    Reply from 10.10.10.20: bytes=56 Sequence=1 ttl=255 time=30 ms</span><br><span class="line">    Reply from 10.10.10.20: bytes=56 Sequence=2 ttl=255 time=40 ms</span><br><span class="line">    Reply from 10.10.10.20: bytes=56 Sequence=3 ttl=255 time=70 ms</span><br><span class="line">    Reply from 10.10.10.20: bytes=56 Sequence=4 ttl=255 time=30 ms</span><br><span class="line">    Reply from 10.10.10.20: bytes=56 Sequence=5 ttl=255 time=30 ms</span><br></pre></td></tr></table></figure></p>
+<p>上述小实验到这里就算配置成功了,但是这里留下了一个疑问,那就是<code>PC0</code>Ping<code>PC1</code>无法通信,这就涉及到<code>路由器没有相应的路由条目</code>的问题,这些问题将在后面小实验中做解释.<br><br></p>
+<h2 id="配置静态路由"><a href="#配置静态路由" class="headerlink" title="配置静态路由"></a>配置静态路由</h2><p>静态路由需要管理员根据实际需求一条条自己手动配置,路由器不会自动生成所需的静态路由,静态路由中包括目标节点或目标网络的IP地址,还可以包括下一跳IP地址,以及在本路由器上使用该静态路由时的数据包出接口等,但是手动配置静态路由需要管理员非常了解网络的拓扑结构才能够完成配置,在网络规模较大时还需要耗费大量的经历和时间去维护,所以并不是所有的网络都适合配置静态路由.</p>
+<blockquote>
+<p><i class="fa fa-plus" aria-hidden="true"></i> 一般情况下以下几种情况可以考虑使用静态路由</p>
+<blockquote>
+<p>1.网络的拓扑结构相对较简单,比如就一台路由器和交换机的情况,可使用静态路由.<br>2.网络保密性要求较高,网络管理员需要控制链路或者控制路由表,则可使用静态路由.<br>3.网络仅通过单个ISP接入Internet,则该ISP就是网络唯一的出口,所以不需要配置静态路由.<br>4.路由资源有限,无法运行路由选择协议,在这种情况下,需要手动配置路由条目来更新路由表数据.</p>
+</blockquote>
+</blockquote>
+<p>接下来以一个实例具体介绍静态路由的配置流程,在思科模拟器中选择3台<code>Router路由器</code>,按照以下网络拓扑结构构建网路,然后为每台路由器配置静态路由,实现不同网络间的数据互通.</p>
+<p><img src="/picture/20190409151533.jpg" alt="blockchain"></p>
+<p><strong>配置路由器:</strong> 根据以上拓扑图配置路由器,通过<code>ip address</code>给路由器的每个接口配置好IP地址.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#----在R1上操作-------------------------</span><br><span class="line">&lt;Huawei&gt; system-view</span><br><span class="line">[Huawei] interface Ethernet 0/0/0</span><br><span class="line">[Huawei-Ethernet0/0/0] ip address 192.168.1.1 255.255.255.0</span><br><span class="line">[Huawei-Ethernet0/0/0] quit</span><br><span class="line">[Huawei] interface Ethernet 0/0/1</span><br><span class="line">[Huawei-Ethernet0/0/1] ip address 10.10.10.1 255.255.255.0</span><br><span class="line">[Huawei-Ethernet0/0/1] quit</span><br><span class="line"></span><br><span class="line">#----在R2上操作-------------------------</span><br><span class="line">&lt;Huawei&gt; system-view</span><br><span class="line">[Huawei] interface Ethernet 0/0/0</span><br><span class="line">[Huawei-Ethernet0/0/0] ip address 10.10.10.2 255.255.255.0</span><br><span class="line">[Huawei-Ethernet0/0/0] quit</span><br><span class="line">[Huawei] interface Ethernet 0/0/1</span><br><span class="line">[Huawei-Ethernet0/0/1] ip address 20.20.20.2 255.255.255.0</span><br><span class="line">[Huawei-Ethernet0/0/1] quit</span><br><span class="line"></span><br><span class="line">#----在R3上操作-------------------------</span><br><span class="line">&lt;Huawei&gt; system-view</span><br><span class="line">[Huawei] interface Ethernet 0/0/0</span><br><span class="line">[Huawei-Ethernet0/0/0] ip address 192.168.2.1 255.255.255.0</span><br><span class="line">[Huawei-Ethernet0/0/0] quit</span><br><span class="line">[Huawei] interface Ethernet 0/0/1</span><br><span class="line">[Huawei-Ethernet0/0/1] ip address 20.20.20.3 255.255.255.0</span><br><span class="line">[Huawei-Ethernet0/0/1] quit</span><br></pre></td></tr></table></figure></p>
+<p><strong>检查配置结果:</strong> 配置完路由器的IP地址后,我们在每个路由器上测试相邻的接口是否可连通.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[R1] ping 10.10.10.2</span><br><span class="line">  PING 10.10.10.2: 56  data bytes, press CTRL_C to break</span><br><span class="line">    Reply from 10.10.10.2: bytes=56 Sequence=1 ttl=255 time=130 ms</span><br><span class="line"></span><br><span class="line">[R2] ping 20.20.20.3</span><br><span class="line">  PING 20.20.20.3: 56  data bytes, press CTRL_C to break</span><br><span class="line">    Reply from 20.20.20.3: bytes=56 Sequence=1 ttl=255 time=110 ms</span><br></pre></td></tr></table></figure></p>
+<p><strong>配置静态路由:</strong> 接下来我们需要在两台路由器上分别配置路由条目,使用<code>ip route-static命令</code>配置,如果想要删除路由可使用<code>undo ip route命令</code>即可删除指定路由条目.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#----在R1上操作-------------------------</span><br><span class="line">&lt;Huawei&gt; system-view</span><br><span class="line">                            [目的网络]   [目的掩码]     [下一跳地址]</span><br><span class="line">[Huawei] ip route-static   192.168.2.0  255.255.255.0   10.10.10.2</span><br><span class="line">[Huawei] display ip routing-table</span><br><span class="line"></span><br><span class="line">#----在R2上操作-------------------------</span><br><span class="line">&lt;Huawei&gt; system-view</span><br><span class="line">[Huawei] ip route-static 192.168.2.0 255.255.255.0 20.20.20.3</span><br><span class="line">[Huawei] ip route-static 192.168.1.0 255.255.255.0 10.10.10.1</span><br><span class="line">[Huawei] display ip routing-table</span><br><span class="line"></span><br><span class="line">#----在R1上操作-------------------------</span><br><span class="line">&lt;Huawei&gt; system-view</span><br><span class="line">[Huawei] ip route-static 192.168.1.0 255.255.255.0 20.20.20.2</span><br><span class="line">[Huawei] display ip routing-table</span><br></pre></td></tr></table></figure></p>
+<p><strong>测试阶段:</strong> 最后在主机<code>PC1</code>上面Ping测试<code>PC2</code>发现数据包可以正常的传递.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">PC1&gt; ping 192.168.2.2 -t</span><br><span class="line"></span><br><span class="line">Ping 192.168.2.2: 32 data bytes, Press Ctrl_C to break</span><br><span class="line">From 192.168.2.2: bytes=32 seq=1 ttl=125 time=125 ms</span><br><span class="line"></span><br><span class="line">--- 192.168.2.2 ping statistics ---</span><br><span class="line">  1 packet(s) transmitted</span><br><span class="line">  1 packet(s) received</span><br><span class="line">  0.00% packet loss</span><br><span class="line">  round-trip min/avg/max = 125/125/125 ms</span><br></pre></td></tr></table></figure></p>
+<p>以上的路由配置方法,适用于小型网络环境,在大型网络环境中这种静态路由的配置方式很不适合维护,一旦设备过多,则可能自己都搞不清头绪,所以在生产环境中,我们会使用动态路由的方式来实现路由器的配置,接下来继续学习动态路由的配置方式吧.<br><br></p>
+<h2 id="RIP-动态路由"><a href="#RIP-动态路由" class="headerlink" title="RIP 动态路由"></a>RIP 动态路由</h2><p>动态路由是基于某种协议实现的,常见的路由协议有内<code>内部网关协议(IGP)</code>和<code>边界网关协议(BGP)</code>,其中内部网关协议又分为<code>路由信息协议(RIP)</code>和<code>开放式最短路径优先协议(OSPF)协议</code>.</p>
+<p>其中<code>RIP(路由信息协议)</code>是最先被广泛应用的内部网关路由协议,RIP使用跳数来衡量到达目标地址的距离,跳数是指数据从源地址到达目标地址之间经过的路由器个数.从路由器到直接连接的网络的跳数定义为1,每经过一个路由器则数值会增加1,RIP允许的<code>最大跳数是15跳</code>,超过15跳的网络将无法到达,因此RIP适合用于小型的网络环境中.</p>
+<p>RIP协议默认会<code>每隔30秒</code>就会与其他相连的网络广播自己的路由表,收到广播的路由器会将收到的信息与自己路由表进行比较,判断是否将其中的路由条目加入到自己的路由表中,目前RIP共有3中版本,<code>RIPv1,RIPv2,RIPng</code>,其中RIPng应用于IPv6网络环境中,RIPv1是有类路由协议,RIPv2则是无类路由协议.</p>
+<p><img src="/picture/20190409193556.jpg" alt="blockchain"></p>
+<p><strong>配置路由器:</strong> 首先根据上图将四台路由器的IP地址配置在相应的接口上.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#----在R1上操作-------------------------</span><br><span class="line">&lt;Huawei&gt; system-view</span><br><span class="line">[Huawei] interface Serial 0/0/0</span><br><span class="line">[Huawei-Serial0/0/0] ip address 192.168.10.1 255.255.255.0</span><br><span class="line">[Huawei-Serial0/0/0] quit</span><br><span class="line"></span><br><span class="line">#----在R2上操作-------------------------</span><br><span class="line">&lt;Huawei&gt; system-view</span><br><span class="line">[Huawei] interface Serial 0/0/0</span><br><span class="line">[Huawei-Serial0/0/0] ip address 192.168.10.2 255.255.255.0</span><br><span class="line">[Huawei-Serial0/0/0] quit</span><br><span class="line">[Huawei] interface Serial 0/0/1</span><br><span class="line">[Huawei-Serial0/0/1] ip address 192.168.20.1 255.255.255.0</span><br><span class="line">[Huawei-Serial0/0/1] quit</span><br><span class="line"></span><br><span class="line">#----在R3上操作-------------------------</span><br><span class="line">&lt;Huawei&gt; system-view</span><br><span class="line">[Huawei] interface Serial 0/0/0</span><br><span class="line">[Huawei-Serial0/0/0] ip address 192.168.20.2 255.255.255.0</span><br><span class="line">[Huawei-Serial0/0/0] quit</span><br><span class="line">[Huawei] interface Serial 0/0/1</span><br><span class="line">[Huawei-Serial0/0/1] ip address 192.168.30.1 255.255.255.0</span><br><span class="line">[Huawei-Serial0/0/1] quit</span><br><span class="line"></span><br><span class="line">#----在R4上操作-------------------------</span><br><span class="line">&lt;Huawei&gt; system-view</span><br><span class="line">[Huawei] interface Serial 0/0/0</span><br><span class="line">[Huawei-Serial0/0/0] ip address 192.168.30.2 255.255.255.0</span><br><span class="line">[Huawei-Serial0/0/0] quit</span><br></pre></td></tr></table></figure></p>
+<p><strong>配置并启用RIP路由:</strong> 接着我们分别在每台路由器上启用并配置好<code>RIP动态路由</code>,并指定直连网络号.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#----在R1上启用RIP路由协议并配置-------------------</span><br><span class="line">&lt;Huawei&gt; system-view</span><br><span class="line">[Huawei] rip 1                         // 启动RIP进程1</span><br><span class="line">[Huawei-rip-1] version 2              // 指定使用RIP版本为RIPv2</span><br><span class="line">[Huawei-rip-1] network 192.168.10.0   // 声明与R1直连的网络号</span><br><span class="line">[Huawei-rip-1] quit</span><br><span class="line"></span><br><span class="line">#----在R2上启用RIP路由协议并配置-------------------</span><br><span class="line">&lt;Huawei&gt; system-view</span><br><span class="line">[Huawei] rip 1                        // 启动RIP进程1</span><br><span class="line">[Huawei-rip-1] version 2              // 指定使用RIP版本为RIPv2</span><br><span class="line">[Huawei-rip-1] network 192.168.10.0   // 声明与R2直连的网络号</span><br><span class="line">[Huawei-rip-1] network 192.168.20.0   // 声明与R3直连的网络号</span><br><span class="line">[Huawei-rip-1] quit</span><br><span class="line"></span><br><span class="line">#----在R3上启用RIP路由协议并配置-------------------</span><br><span class="line">&lt;Huawei&gt; system-view</span><br><span class="line">[Huawei] rip 1                        // 启动RIP进程1</span><br><span class="line">[Huawei-rip-1] version 2              // 指定使用RIP版本为RIPv2</span><br><span class="line">[Huawei-rip-1] network 192.168.20.0   // 声明与R3直连的网络号</span><br><span class="line">[Huawei-rip-1] network 192.168.30.0   // 声明与R4直连的网络号</span><br><span class="line">[Huawei-rip-1] quit</span><br><span class="line"></span><br><span class="line">#----在R4上启用RIP路由协议并配置-------------------</span><br><span class="line">&lt;Huawei&gt; system-view</span><br><span class="line">[Huawei] rip 1                         // 启动RIP进程1</span><br><span class="line">[Huawei-rip-1] version 2              // 指定使用RIP版本为RIPv2</span><br><span class="line">[Huawei-rip-1] network 192.168.30.0   // 声明与R4直连的网络号</span><br><span class="line">[Huawei-rip-1] quit</span><br></pre></td></tr></table></figure></p>
+<p><strong>检查配置信息:</strong> 配置完成后RIP会自动生成路由条目,可执行<code>display ip routing-table</code>查询配置结果.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[Huawei] display ip routing-table</span><br><span class="line"></span><br><span class="line">------------------------------------------------------------------------------</span><br><span class="line">Destination/Mask    Proto   Pre  Cost      Flags NextHop         Interface</span><br><span class="line"></span><br><span class="line">      127.0.0.0/8   Direct  0    0           D   127.0.0.1       InLoopBack0</span><br><span class="line">      127.0.0.1/32  Direct  0    0           D   127.0.0.1       InLoopBack0</span><br><span class="line">   192.168.10.0/24  Direct  0    0           D   192.168.10.2    Serial0/0/0</span><br><span class="line">   192.168.10.1/32  Direct  0    0           D   192.168.10.1    Serial0/0/0</span><br><span class="line">   192.168.10.2/32  Direct  0    0           D   127.0.0.1       Serial0/0/0</span><br><span class="line">   192.168.20.0/24  Direct  0    0           D   192.168.20.1    Serial0/0/1</span><br><span class="line">   192.168.20.1/32  Direct  0    0           D   127.0.0.1       Serial0/0/1</span><br><span class="line">   192.168.20.2/32  Direct  0    0           D   192.168.20.2    Serial0/0/1</span><br><span class="line">   192.168.30.0/24  RIP     100  1           D   192.168.20.2    Serial0/0/1</span><br></pre></td></tr></table></figure></p>
+<p><strong>测试连通性:</strong> 此时我们在<code>R1路由器</code>Ping<code>路由器R4</code>是可以通信的,说明配置成功了.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[R1] ping 192.168.30.2</span><br><span class="line">  PING 192.168.30.2: 56  data bytes, press CTRL_C to break</span><br><span class="line">    Reply from 192.168.30.2: bytes=56 Sequence=1 ttl=253 time=100 ms</span><br><span class="line">    Reply from 192.168.30.2: bytes=56 Sequence=2 ttl=253 time=80 ms</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="OSPF-动态路由"><a href="#OSPF-动态路由" class="headerlink" title="OSPF 动态路由"></a>OSPF 动态路由</h2><p>在上面的配置试验中我们通过使用<code>RIP协议</code>完成了一个路由器之间的数据通信,但是RIP协议最大仅仅支持15个路由节点,虽然在中小型网络中这些节点足够使用了,但是在一些大型企业中往往需更多的跳数,就是因为这种需求我们的<code>OSPF协议</code>就由此诞生啦.</p>
+<p><code>OSPF(开放式最短路径优先)</code>,该协议是基于链路状态的协议规范,因此也可以称为<code>链路状态协议</code>,和RIP协议相同,OSPF协议<code>同样使用跳数</code>计量路径开销,但是与RIP不同的是,OSPF协议不受物理跳数的限制,其路径开销与网络中的链路开销等相关.</p>
+<p>OSPF协议采用了<code>FPS算法</code>来计算最短路径数,SPF算法将每一个路由作为<code>根(ROOT)</code>,来计算其数据包到达每一个目标路由器之间的距离,每个路由器根据一个<code>统一的数据库LSDB</code>计算出<code>路由域</code>的拓扑结构图,该结构很像是一颗树,所以就叫做最短路径树.</p>
+<blockquote>
+<p><i class="fa fa-plus" aria-hidden="true"></i> OSPF协议的优点</p>
+<blockquote>
+<p>1.OSPF采用了SPF算法,从而可以很好的避免路由器环路的产生.<br>2.OSPF协议虽然也使用跳数作为计量单位,但不受物理跳数的限制.<br>3.当网络链路状态发生变化时,OSPF能够迅速捕捉并应用,收敛快,路由信息流量小.<br>4.OSPF路由协议支持路由认证体系,且还可以定义不同的认证方式,提高了网络安全性.<br>5.OSPF协议提供了较好的负载均衡性,其数据更新比较智能,相应的减小了网络流量的带宽.</p>
+</blockquote>
+</blockquote>
+<p>在配置OSPF路由之前还有一个小知识点需要补充,在下面的配置试验中你会看到例如<code>0.0.0.255</code>这样的网络号,这种网络号被称作<code>通配符掩码</code>,通常情况下通配符掩码可由,<code>255.255.255.255(广播地址)</code>减去当前的<code>255.255.255.0(子网掩码)</code>,来获得,此处小实验的通配符掩码为<code>0.0.0.255 area 0</code>.</p>
+<p>接下来开始步入正题,我们还是<code>使用RIP路由的拓扑结构</code>以<code>及IP地址</code>的配置都相同,但是这里在配置动态路由的时候,我们使用OSPF的方式来配置,过程如下:</p>
+<p><strong>配置路由器:</strong> 首先根据上图将四台路由器的IP地址配置在相应的接口上.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#----在R1上操作-------------------------</span><br><span class="line">&lt;Huawei&gt; system-view</span><br><span class="line">[Huawei] interface Serial 0/0/0</span><br><span class="line">[Huawei-Serial0/0/0] ip address 192.168.10.1 255.255.255.0</span><br><span class="line">[Huawei-Serial0/0/0] quit</span><br><span class="line"></span><br><span class="line">#----在R2上操作-------------------------</span><br><span class="line">&lt;Huawei&gt; system-view</span><br><span class="line">[Huawei] interface Serial 0/0/0</span><br><span class="line">[Huawei-Serial0/0/0] ip address 192.168.10.2 255.255.255.0</span><br><span class="line">[Huawei-Serial0/0/0] quit</span><br><span class="line">[Huawei] interface Serial 0/0/1</span><br><span class="line">[Huawei-Serial0/0/1] ip address 192.168.20.1 255.255.255.0</span><br><span class="line">[Huawei-Serial0/0/1] quit</span><br><span class="line"></span><br><span class="line">#----在R3上操作-------------------------</span><br><span class="line">&lt;Huawei&gt; system-view</span><br><span class="line">[Huawei] interface Serial 0/0/0</span><br><span class="line">[Huawei-Serial0/0/0] ip address 192.168.20.2 255.255.255.0</span><br><span class="line">[Huawei-Serial0/0/0] quit</span><br><span class="line">[Huawei] interface Serial 0/0/1</span><br><span class="line">[Huawei-Serial0/0/1] ip address 192.168.30.1 255.255.255.0</span><br><span class="line">[Huawei-Serial0/0/1] quit</span><br><span class="line"></span><br><span class="line">#----在R4上操作-------------------------</span><br><span class="line">&lt;Huawei&gt; system-view</span><br><span class="line">[Huawei] interface Serial 0/0/0</span><br><span class="line">[Huawei-Serial0/0/0] ip address 192.168.30.2 255.255.255.0</span><br><span class="line">[Huawei-Serial0/0/0] quit</span><br></pre></td></tr></table></figure></p>
+<p><strong>配置并启用OSPF路由:</strong> 在每台路由器上启用并配置好OSPF动态路由.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#----在R1上启用OSPF路由协议并配置-------------------</span><br><span class="line">[Huawei] ospf 1                                              // 启用OSPF路由,并设置进程号为1</span><br><span class="line">[Huawei-ospf-1] area 0.0.0.0                                 // 为R1配置RID编号</span><br><span class="line">[Huawei-ospf-1-area-0.0.0.0]</span><br><span class="line">[Huawei-ospf-1-area-0.0.0.0] network 192.168.10.0 0.0.0.255  // 声明与R1直连的网络号</span><br><span class="line">[Huawei-ospf-1-area-0.0.0.0] quit</span><br><span class="line"></span><br><span class="line">#----在R2上启用OSPF路由协议并配置-------------------</span><br><span class="line">[Huawei] ospf 1                                              // 启用OSPF路由,并设置进程号为1</span><br><span class="line">[Huawei-ospf-1] area 0.0.0.0                                 // 为R2-R3配置RID编号</span><br><span class="line">[Huawei-ospf-1-area-0.0.0.0]</span><br><span class="line">[Huawei-ospf-1-area-0.0.0.0] network 192.168.10.0 0.0.0.255  // 声明与R2直连的网络号</span><br><span class="line">[Huawei-ospf-1-area-0.0.0.0] network 192.168.20.0 0.0.0.255  // 声明与R3直连的网络号</span><br><span class="line">[Huawei-ospf-1-area-0.0.0.0] quit</span><br><span class="line"></span><br><span class="line">#----在R3上启用OSPF路由协议并配置-------------------</span><br><span class="line">[Huawei] ospf 1                                              // 启用OSPF路由,并设置进程号为1</span><br><span class="line">[Huawei-ospf-1] area 0.0.0.0                                 // 为R3-R4配置RID编号</span><br><span class="line">[Huawei-ospf-1-area-0.0.0.0]</span><br><span class="line">[Huawei-ospf-1-area-0.0.0.0] network 192.168.20.0 0.0.0.255  // 声明与R3直连的网络号</span><br><span class="line">[Huawei-ospf-1-area-0.0.0.0] network 192.168.30.0 0.0.0.255  // 声明与R4直连的网络号</span><br><span class="line">[Huawei-ospf-1-area-0.0.0.0] quit</span><br><span class="line"></span><br><span class="line">#----在R4上启用OSPF路由协议并配置-------------------</span><br><span class="line">[Huawei] ospf 1                                              // 启用OSPF路由,并设置进程号为1</span><br><span class="line">[Huawei-ospf-1] area 0.0.0.0                                 // 为R1配置RID编号</span><br><span class="line">[Huawei-ospf-1-area-0.0.0.0]</span><br><span class="line">[Huawei-ospf-1-area-0.0.0.0] network 192.168.30.0 0.0.0.255  // 声明与R4直连的网络号</span><br><span class="line">[Huawei-ospf-1-area-0.0.0.0] quit</span><br></pre></td></tr></table></figure></p>
+<p><strong>检查配置信息:</strong> 配置完成后RIP会自动生成路由条目,可执行<code>display ip routing-table</code>查询配置结果.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[Huawei] display ip routing-table </span><br><span class="line"></span><br><span class="line">------------------------------------------------------------------------------</span><br><span class="line">Destination/Mask    Proto   Pre  Cost      Flags NextHop         Interface</span><br><span class="line"></span><br><span class="line">      127.0.0.0/8   Direct  0    0           D   127.0.0.1       InLoopBack0</span><br><span class="line">      127.0.0.1/32  Direct  0    0           D   127.0.0.1       InLoopBack0</span><br><span class="line">   192.168.10.0/24  Direct  0    0           D   192.168.10.2    Serial0/0/0</span><br><span class="line">   192.168.10.1/32  Direct  0    0           D   192.168.10.1    Serial0/0/0</span><br><span class="line">   192.168.10.2/32  Direct  0    0           D   127.0.0.1       Serial0/0/0</span><br><span class="line">   192.168.20.0/24  Direct  0    0           D   192.168.20.1    Serial0/0/1</span><br><span class="line">   192.168.20.1/32  Direct  0    0           D   127.0.0.1       Serial0/0/1</span><br><span class="line">   192.168.20.2/32  Direct  0    0           D   192.168.20.2    Serial0/0/1</span><br><span class="line">   192.168.30.0/24  OSPF    10   3124        D   192.168.20.2    Serial0/0/1</span><br></pre></td></tr></table></figure></p>
+<p><strong>测试连通性:</strong> 此时我们在<code>R1路由器</code>Ping<code>路由器R4</code>是可以通信的,说明配置成功了.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[R1] ping 192.168.30.2</span><br><span class="line">  PING 192.168.30.2: 56  data bytes, press CTRL_C to break</span><br><span class="line">    Reply from 192.168.30.2: bytes=56 Sequence=1 ttl=253 time=100 ms</span><br><span class="line">    Reply from 192.168.30.2: bytes=56 Sequence=2 ttl=253 time=80 ms</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2019/04/09/网络设备配置/华为路由器配置笔记/">华为路由器配置笔记</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2019年04月09日 - 09:04</p>
+  <p><span>最后更新:</span>2019年04月16日 - 14:04</p>
+  <p><span>原始链接:</span><a href="/2019/04/09/网络设备配置/华为路由器配置笔记/" title="华为路由器配置笔记">https://www.mkdirs.com/2019/04/09/网络设备配置/华为路由器配置笔记/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/网络设备配置/" rel="tag"> <i class="fa fa-tag"></i> 网络设备配置</a>
+          
+            <a href="/tags/huawei/" rel="tag"> <i class="fa fa-tag"></i> huawei</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/06/网络设备配置/华为生成树与端口聚合/" rel="next" title="华为生成树与端口聚合">
+                <i class="fa fa-chevron-left"></i> 华为生成树与端口聚合
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/10/网络设备配置/华为设备ACL与NAT技术/" rel="prev" title="华为设备ACL与NAT技术">
+                华为设备ACL与NAT技术 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#路由器基本配置"><span class="nav-text">路由器基本配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置静态路由"><span class="nav-text">配置静态路由</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RIP-动态路由"><span class="nav-text">RIP 动态路由</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OSPF-动态路由"><span class="nav-text">OSPF 动态路由</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Python 的创始人为吉多·范罗苏姆(Guido van Rossum).1989年的圣诞节期间,吉多·范罗苏姆为了在阿姆斯特丹打发时间,决心开发一个新的脚本解释程序,作为ABC语言的一种继承.Python是纯粹的自由软件,源代码和解释器CPython遵循 GPL(GNU General Public License)协议.关于python的哲学：python崇尚:”优雅”、”明确”、”简单”,">
+<meta name="keywords" content="Python">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python 流程控制与循环体(3)">
+<meta property="og:url" content="https://www.mkdirs.com/2019/01/09/Python/Python-流程控制与循环体-3/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="Python 的创始人为吉多·范罗苏姆(Guido van Rossum).1989年的圣诞节期间,吉多·范罗苏姆为了在阿姆斯特丹打发时间,决心开发一个新的脚本解释程序,作为ABC语言的一种继承.Python是纯粹的自由软件,源代码和解释器CPython遵循 GPL(GNU General Public License)协议.关于python的哲学：python崇尚:”优雅”、”明确”、”简单”,">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-01-19T13:37:12.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Python 流程控制与循环体(3)">
+<meta name="twitter:description" content="Python 的创始人为吉多·范罗苏姆(Guido van Rossum).1989年的圣诞节期间,吉多·范罗苏姆为了在阿姆斯特丹打发时间,决心开发一个新的脚本解释程序,作为ABC语言的一种继承.Python是纯粹的自由软件,源代码和解释器CPython遵循 GPL(GNU General Public License)协议.关于python的哲学：python崇尚:”优雅”、”明确”、”简单”,">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2019/01/09/Python/Python-流程控制与循环体-3/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Python 流程控制与循环体(3) | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2019/01/09/Python/Python-流程控制与循环体-3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Python 流程控制与循环体(3)
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-01-09 09:18:36" itemprop="dateCreated datePublished" datetime="2019-01-09T09:18:36+08:00">2019-01-09</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-01-19 21:37:12" itemprop="dateModified" datetime="2019-01-19T21:37:12+08:00">2019-01-19</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Python/" itemprop="url" rel="index"><span itemprop="name">Python</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Python 的创始人为吉多·范罗苏姆(Guido van Rossum).1989年的圣诞节期间,吉多·范罗苏姆为了在阿姆斯特丹打发时间,决心开发一个新的脚本解释程序,作为ABC语言的一种继承.Python是纯粹的自由软件,源代码和解释器CPython遵循 GPL(GNU General Public License)协议.关于python的哲学：python崇尚:”优雅”、”明确”、”简单”,Python是用最简单最优雅最明确的方法来解决问题.</p>
+<a id="more"></a>
+<p><br></p>
+<h2 id="IF-条件判断语句"><a href="#IF-条件判断语句" class="headerlink" title="IF 条件判断语句"></a>IF 条件判断语句</h2><p><strong>单分支结构:</strong> 单分支结构的判断是最简单的一种形式,如果满足条件则执行,否则跳过IF语句.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"></span><br><span class="line">num = <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> num == <span class="number">0</span>:</span><br><span class="line">    print(<span class="string">"数值确实等于零！"</span>)</span><br></pre></td></tr></table></figure></p>
+<p><strong>双分支结构:</strong> 双分支用来判断两种不同的情况,比如要么为真要么为假.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"></span><br><span class="line">num=<span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> num == <span class="number">0</span>:</span><br><span class="line">    print(<span class="string">"数值确实等于零！"</span>)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    print(<span class="string">"你在逗我吗，这不是零，皮一下很开心！"</span>)</span><br></pre></td></tr></table></figure></p>
+<p><strong>多分支结构:</strong> 多分枝结构用来判断大多数情况,其给予每个结果一个返回值.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"></span><br><span class="line">score = <span class="number">88.8</span></span><br><span class="line">level = int(score % <span class="number">10</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> level &gt;= <span class="number">10</span>:</span><br><span class="line">    print(<span class="string">'Level A+'</span>)</span><br><span class="line"><span class="keyword">elif</span> level == <span class="number">9</span>:</span><br><span class="line">    print(<span class="string">'Level A'</span>)</span><br><span class="line"><span class="keyword">elif</span> level == <span class="number">8</span>:</span><br><span class="line">    print(<span class="string">'Level B'</span>)</span><br><span class="line"><span class="keyword">elif</span> level == <span class="number">7</span>:</span><br><span class="line">    print(<span class="string">'Level C'</span>)</span><br><span class="line"><span class="keyword">elif</span> level == <span class="number">6</span>:</span><br><span class="line">    print(<span class="string">'Level D'</span>)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    print(<span class="string">'Level E'</span>)</span><br></pre></td></tr></table></figure></p>
+<p><strong>模拟登陆(1):</strong> 模拟用户登录小实验,输入密码必须不显示.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> getpass</span><br><span class="line"></span><br><span class="line">name=input(<span class="string">"输入用户名："</span>)</span><br><span class="line">pwd=getpass.getpass(<span class="string">"请输入密码："</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> name == <span class="string">"lyshark"</span> <span class="keyword">and</span> pwd==<span class="string">"123123"</span>:</span><br><span class="line">    print(<span class="string">"欢迎,lyshark，登陆！"</span>)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    print(<span class="string">"用户名或密码错误！"</span>)</span><br></pre></td></tr></table></figure></p>
+<p><strong>猜数字游戏(2):</strong> 猜数字小游戏,输入参数返回指定结果.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"></span><br><span class="line">my_num = <span class="number">38</span></span><br><span class="line">user_input = int(input(<span class="string">"输入一个数字:"</span>))</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> user_input == my_num:</span><br><span class="line">    print(<span class="string">"你猜对了!"</span>)</span><br><span class="line"><span class="keyword">elif</span> user_input &lt; my_num:</span><br><span class="line">    print(<span class="string">"猜小了!"</span>)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    print(<span class="string">"猜大了!"</span>)</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="WHILE-循环语句"><a href="#WHILE-循环语句" class="headerlink" title="WHILE 循环语句"></a>WHILE 循环语句</h2><p><strong>死循环:</strong> 演示一个死循环的小例子.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line">count = <span class="number">0</span></span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">    print(<span class="string">"这是一个死循环..."</span>,count)</span><br><span class="line">    count +=<span class="number">1</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>循环打印:</strong> 循环打印0-9这几个数字,且结果不要换行,在一行中输出.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line">count = <span class="number">0</span></span><br><span class="line"><span class="keyword">while</span> count &lt;= <span class="number">9</span>:</span><br><span class="line">    print(count, end=<span class="string">' '</span>)</span><br><span class="line">    count += <span class="number">1</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>中断循环:</strong> 演示一个while循环被中断的情况.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line">count = <span class="number">0</span></span><br><span class="line"><span class="keyword">while</span> count &lt;=<span class="number">9</span>:</span><br><span class="line">    print(count, end=<span class="string">' '</span>)</span><br><span class="line">    <span class="keyword">if</span> count == <span class="number">5</span>:</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line">    count += <span class="number">1</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    print(<span class="string">'end'</span>)</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例1:</strong> 打印指定字符串,循环打印其中的每一个元素,并每次递减.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line">url=<span class="string">"www.baidu.com"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> url:</span><br><span class="line">    print(url)</span><br><span class="line">    url=url[<span class="number">1</span>:]</span><br><span class="line"></span><br><span class="line"><span class="comment">#--输出结果-------------------------</span></span><br><span class="line">www.baidu.com</span><br><span class="line">ww.baidu.com</span><br><span class="line">w.baidu.com</span><br><span class="line">.baidu.com</span><br><span class="line">baidu.com</span><br><span class="line">aidu.com</span><br><span class="line">idu.com</span><br><span class="line">du.com</span><br><span class="line">u.com</span><br><span class="line">.com</span><br><span class="line">com</span><br><span class="line">om</span><br><span class="line">m</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例2:</strong> 循环打印一些数据,这里打印<code>0-9</code>并每次递增.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line">x=<span class="number">0</span>;y=<span class="number">10</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> x&lt;y:</span><br><span class="line">    print(x)</span><br><span class="line">    x+=<span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#--输出结果-------------------------</span></span><br><span class="line"><span class="number">0</span></span><br><span class="line"><span class="number">1</span></span><br><span class="line"><span class="number">2</span></span><br><span class="line"><span class="number">3</span></span><br><span class="line"><span class="number">4</span></span><br><span class="line"><span class="number">5</span></span><br><span class="line"><span class="number">6</span></span><br><span class="line"><span class="number">7</span></span><br><span class="line"><span class="number">8</span></span><br><span class="line"><span class="number">9</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>实例3:</strong> 打印一个字符串,循环打印,打印完成后输出<code>game over</code>.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line">url=<span class="string">"www.baidu.com"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> url:</span><br><span class="line">    print(url)</span><br><span class="line">    url=url[:<span class="number">-1</span>]</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    print(<span class="string">"game over"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#--输出结果-------------------------</span></span><br><span class="line">www.baidu.com</span><br><span class="line">www.baidu.co</span><br><span class="line">www.baidu.c</span><br><span class="line">www.baidu.</span><br><span class="line">www.baidu</span><br><span class="line">www.baid</span><br><span class="line">www.bai</span><br><span class="line">www.ba</span><br><span class="line">www.b</span><br><span class="line">www.</span><br><span class="line">www</span><br><span class="line">ww</span><br><span class="line">w</span><br><span class="line">game over</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例4:</strong> 逐一显示指定列表中的所有元素,这里有三种方法.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>list=[<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>count =<span class="number">0</span></span><br><span class="line">&gt;&gt;&gt;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">while</span> list:</span><br><span class="line"><span class="meta">... </span>    print(list[<span class="number">0</span>])</span><br><span class="line"><span class="meta">... </span>    list.pop(<span class="number">0</span>)</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>list=[<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">while</span> list:</span><br><span class="line"><span class="meta">... </span>    print(list[<span class="number">-1</span>])</span><br><span class="line"><span class="meta">... </span>    list.pop()</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>list=[<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">while</span> count &lt; len(list):</span><br><span class="line"><span class="meta">... </span>    print(list[count])</span><br><span class="line"><span class="meta">... </span>    count+=<span class="number">1</span></span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例5:</strong> 求100以内所有偶数之和,使用嵌套判断.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>num=<span class="number">0</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>sum=<span class="number">0</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">while</span> num &lt;=<span class="number">100</span>:</span><br><span class="line"><span class="meta">... </span>    <span class="keyword">if</span> num %<span class="number">2</span> ==<span class="number">0</span>:</span><br><span class="line"><span class="meta">... </span>            sum=sum+num</span><br><span class="line"><span class="meta">... </span>    <span class="keyword">else</span>:</span><br><span class="line"><span class="meta">... </span>            <span class="keyword">pass</span></span><br><span class="line"><span class="meta">... </span> num=num+<span class="number">1</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>实例6:</strong> 逐一显示指定字典的所有键,并于显示结束后说明总键数.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>d1 = &#123;<span class="string">'x'</span>:<span class="number">1</span>,<span class="string">'y'</span>:<span class="number">23</span>,<span class="string">'z'</span>:<span class="number">78</span>&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>keylists = d1.keys()</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">while</span> keylists:</span><br><span class="line">        print(keylists[<span class="number">0</span>])</span><br><span class="line">        keylists.pop[<span class="number">0</span>]</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        print(len(d1))</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例7:</strong> 创建一个包含了100以内所有奇数的列表.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>l1 = []</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>x = <span class="number">1</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">while</span> x &lt; <span class="number">100</span>:</span><br><span class="line">        l1.append(x)</span><br><span class="line">        x += <span class="number">2</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>实例8:</strong> 列表<code>l1 = [0,1,2,3,4,5,6]</code>,列表<code>l2 = [&#39;Sun&#39;,&#39;Mon&#39;,&#39;Tue&#39;,&#39;Wed&#39;,&#39;Thu&#39;,&#39;Fri&#39;,&#39;Sat&#39;]</code>,以第一个列表中的元素为键,以第二个列表中的元素为值生成新字典<code>d1</code>.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>l1 = [<span class="number">0</span>,<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>l2 = [<span class="string">'Sun'</span>,<span class="string">'Mon'</span>,<span class="string">'Tue'</span>,<span class="string">'Wed'</span>,<span class="string">'Thu'</span>,<span class="string">'Fri'</span>,<span class="string">'Sat'</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d1 = &#123;&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>count = <span class="number">0</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">if</span> len(l1) == len(l2):</span><br><span class="line">    <span class="keyword">while</span> count &lt; len(l1):</span><br><span class="line">        d1[l1[count]] = l2[count]</span><br><span class="line">        count += <span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(d1)</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例9:</strong> 循环并打印相关文字,当到达100次的时候退出.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">count = <span class="number">0</span></span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">    print(<span class="string">"hello lyshark:"</span>,count)</span><br><span class="line">    count +=<span class="number">1</span></span><br><span class="line">    <span class="keyword">if</span> count == <span class="number">100</span>:</span><br><span class="line">        print(<span class="string">"break"</span>)</span><br><span class="line">        <span class="keyword">break</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>实例10:</strong> 模拟登陆小程序,程序启动要求输入密码,并判断如果次数小于3次则登陆成功,否则禁止登陆.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line"><span class="keyword">import</span> getpass</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line">name = <span class="string">"lyshark"</span></span><br><span class="line">pwd = <span class="string">"123123"</span></span><br><span class="line">count = <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">    <span class="keyword">if</span> count &lt; <span class="number">3</span>:</span><br><span class="line">        print(<span class="string">"请输入用户名和密码:"</span>)</span><br><span class="line">        username = input(<span class="string">"用户名:"</span>)</span><br><span class="line">        password = getpass.getpass(<span class="string">"密码:"</span>)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> username == name <span class="keyword">and</span> password == pwd:</span><br><span class="line">            print(<span class="string">"恭喜你登陆成功！"</span>)</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            print(<span class="string">"登陆失败！用户名或者密码错误"</span>)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        print(<span class="string">"你已经输错3次,正在退出...."</span>)</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line"></span><br><span class="line">    count += <span class="number">1</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="FOR-循环遍历语句"><a href="#FOR-循环遍历语句" class="headerlink" title="FOR 循环遍历语句"></a>FOR 循环遍历语句</h2><p><strong>列表遍历:</strong> 通过使用for循环打印一个list列表中的元素.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line">names = [<span class="string">"tom"</span>,<span class="string">"admin"</span>,<span class="string">"lyshark"</span>,<span class="string">"jack"</span>]</span><br><span class="line"><span class="keyword">for</span> x <span class="keyword">in</span> names:</span><br><span class="line">    print(x)</span><br></pre></td></tr></table></figure></p>
+<p><strong>列表迭代:</strong> 对于一个序列来说,也可以通过索引进行迭代.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line">names = [<span class="string">"tom"</span>,<span class="string">"admin"</span>,<span class="string">"lyshark"</span>,<span class="string">"jack"</span>]</span><br><span class="line"><span class="keyword">for</span> x <span class="keyword">in</span> range(len(names)):</span><br><span class="line">    print(names[x])</span><br></pre></td></tr></table></figure></p>
+<p><strong>打印序列:</strong> 通过for循环,遍历并打印一个序列.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line">T = [(<span class="number">1</span>,<span class="number">2</span>),(<span class="number">3</span>,<span class="number">4</span>),(<span class="number">5</span>,<span class="number">6</span>),(<span class="number">7</span>,<span class="number">8</span>)]</span><br><span class="line"><span class="keyword">for</span> (a,b) <span class="keyword">in</span> T:</span><br><span class="line">    print(a,b)</span><br></pre></td></tr></table></figure></p>
+<p><strong>循环遍历:</strong> 遍历0-9范围内的所有数字,并通过循环控制语句打印出其中的奇数.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10</span>):</span><br><span class="line">    <span class="keyword">if</span> i % <span class="number">2</span> == <span class="number">0</span>:</span><br><span class="line">        <span class="keyword">continue</span></span><br><span class="line">    print(i, end=<span class="string">' '</span>)</span><br></pre></td></tr></table></figure></p>
+<p><strong>循环遍历:</strong> 通过循环控制语句打印一个列表中的前3个元素.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line">names = [<span class="string">'Tom'</span>, <span class="string">'Peter'</span>, <span class="string">'Jerry'</span>, <span class="string">'Jack'</span>, <span class="string">'Lilly'</span>]</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(len(names)):</span><br><span class="line">    <span class="keyword">if</span> i &gt;= <span class="number">3</span>:</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line">    print(names[i])</span><br></pre></td></tr></table></figure></p>
+<p><strong>循环遍历:</strong> 通过for循环打印99乘法表.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> j <span class="keyword">in</span> range(<span class="number">1</span>, <span class="number">10</span>):</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, j+<span class="number">1</span>):</span><br><span class="line">        print(<span class="string">'%d*%d=%d'</span> % (i, j, i*j), end=<span class="string">'\t'</span>)</span><br><span class="line">        i += <span class="number">1</span></span><br><span class="line">    print()</span><br><span class="line">    j += <span class="number">1</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>range()函数:</strong> 通过使用range函数,每隔一定的个数元素挑选一个元素.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>string=<span class="string">"hello world my name lyshark"</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">0</span>,len(string),<span class="number">2</span>):</span><br><span class="line"><span class="meta">... </span>    print(string[i])</span><br></pre></td></tr></table></figure></p>
+<p><strong>range()函数:</strong> 通过range遍历,修改列表元素,在原来元素的基础上修改元素.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>list=[<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">for</span> i <span class="keyword">in</span> range(len(list)):</span><br><span class="line"><span class="meta">... </span>    list[i]+=<span class="number">1</span></span><br><span class="line">...</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>list</span><br><span class="line">[<span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>]</span><br></pre></td></tr></table></figure></p>
+<p><strong>zip()函数:</strong> zip函数常用于动态的构造字典.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>L1 = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>L2 = [<span class="string">'a'</span>,<span class="string">'b'</span>,<span class="string">'c'</span>,<span class="string">'d'</span>,<span class="string">'e'</span>,]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>zip(L1,L2)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>keys = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>vaules = [<span class="string">'Sun'</span>,<span class="string">'Mon'</span>,<span class="string">'Tue'</span>,<span class="string">'Wed'</span>,<span class="string">'Thu'</span>,<span class="string">'Fri'</span>,<span class="string">'Sat'</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>D = &#123;&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">for</span> (k,v) <span class="keyword">in</span> zip(keys,values)</span><br><span class="line">       D[k] = v</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>D</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例1:</strong> 逐一分开显示指定字典d1中的所有元素,也就是字典遍历打印.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>d1 = &#123;<span class="string">'x'</span>:<span class="number">123</span>,<span class="string">'y'</span>:<span class="number">321</span>,<span class="string">'z'</span>:<span class="number">734</span>&#125;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">for</span> (k,v) <span class="keyword">in</span> d1.items():</span><br><span class="line">    print(k,v)</span><br><span class="line">    </span><br><span class="line">y <span class="number">321</span></span><br><span class="line">x <span class="number">123</span></span><br><span class="line">z <span class="number">734</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>实例2:</strong> 逐一显示列表中<code>l1=[&#39;Sun&#39;,&#39;Mon&#39;,&#39;Tue&#39;,&#39;Wed&#39;,&#39;Thu&#39;,&#39;Fri&#39;,&#39;Sat&#39;]</code>中索引为奇数的元素.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>l1=[<span class="string">'Sun'</span>,<span class="string">'Mon'</span>,<span class="string">'Tue'</span>,<span class="string">'Wed'</span>,<span class="string">'Thu'</span>,<span class="string">'Fri'</span>,<span class="string">'Sat'</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>,len(l1),<span class="number">2</span>):</span><br><span class="line">    print(l1[i])</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例3:</strong> 将属于列表<code>l1=[&#39;Sun&#39;,&#39;Mon&#39;,&#39;Tue&#39;,&#39;Wed&#39;,&#39;Thu&#39;,&#39;Fri&#39;,&#39;Sat&#39;]</code>,但不属于列表<code>l2=[&#39;Sun&#39;,&#39;Mon&#39;,&#39;Tue&#39;,&#39;Thu&#39;,&#39;Sat&#39;]</code>的所有元素定义为一个新列表<code>l3</code>,并加入到其中.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>l1=[<span class="string">'Sun'</span>,<span class="string">'Mon'</span>,<span class="string">'Tue'</span>,<span class="string">'Wed'</span>,<span class="string">'Thu'</span>,<span class="string">'Fri'</span>,<span class="string">'Sat'</span>] </span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>l2=[<span class="string">'Sun'</span>,<span class="string">'Mon'</span>,<span class="string">'Tue'</span>,<span class="string">'Thu'</span>,<span class="string">'Sat'</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>l3 = []</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">for</span> i <span class="keyword">in</span> l1:</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>    <span class="keyword">if</span> i <span class="keyword">not</span> <span class="keyword">in</span> l2:</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>        l3.append(i)</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例4:</strong> 将属于列表<code>namelist=[&#39;stu1&#39;,&#39;stu2&#39;,&#39;stu3&#39;,&#39;stu4&#39;,&#39;stu5&#39;,&#39;stu6&#39;,&#39;stu7&#39;]</code>,删除列表<code>removelist=[&#39;stu3&#39;,&#39;stu7&#39;,&#39;stu9&#39;]</code>,请将属于removelist列表中的每个元素从namelist中移除(属于removelist,但不属于namelist的忽略即可).<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>namelist=[<span class="string">'stu1'</span>,<span class="string">'stu2'</span>,<span class="string">'stu3'</span>,<span class="string">'stu4'</span>,<span class="string">'stu5'</span>,<span class="string">'stu6'</span>,<span class="string">'stu7'</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>removelist=[<span class="string">'stu3'</span>,<span class="string">'stu7'</span>,<span class="string">'stu9'</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">for</span> i <span class="keyword">in</span> removelist:</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>    <span class="keyword">if</span> i <span class="keyword">in</span> namelist:</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>        namelist.remove(i)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(namelist)</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例5:</strong> 给指定的一个列表加编号,使用enumerate加编号.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>temp=[<span class="string">"手机"</span>,<span class="string">"电脑"</span>,<span class="string">"玩具"</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">for</span> (x,y) <span class="keyword">in</span> enumerate(temp):</span><br><span class="line">    print(x,y)</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"><span class="number">0</span> 手机</span><br><span class="line"><span class="number">1</span> 电脑</span><br><span class="line"><span class="number">2</span> 玩具</span><br></pre></td></tr></table></figure></p>
+<p><strong>小总结:</strong> 实现让用户不断的猜年龄,但只给最多3次机会,再猜不对就退出程序.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line"></span><br><span class="line">age = <span class="number">22</span></span><br><span class="line">count = <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10</span>):</span><br><span class="line">    <span class="keyword">if</span> count &lt; <span class="number">3</span>:</span><br><span class="line">        a = int(input(<span class="string">"请输入一个猜测的数:"</span>))</span><br><span class="line">        <span class="keyword">if</span> a == age:</span><br><span class="line">            print(<span class="string">"恭喜你,答对了"</span>)</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        <span class="keyword">elif</span> a &gt; age:</span><br><span class="line">            print(<span class="string">"你猜的数字大了"</span>)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            print(<span class="string">"你猜的数字小了"</span>)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        b = input(<span class="string">"这都猜不对,你继续玩吗？(yes or not):"</span>)</span><br><span class="line">        <span class="keyword">if</span> b == <span class="string">'yes'</span>:</span><br><span class="line">            count = <span class="number">0</span></span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            print(<span class="string">"Bye!下次再玩"</span>)</span><br><span class="line"></span><br><span class="line">    count += <span class="number">1</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="跳过执行与跳出语句"><a href="#跳过执行与跳出语句" class="headerlink" title="跳过执行与跳出语句"></a>跳过执行与跳出语句</h2><p><strong>pass语句:</strong> pass是为了保持程序结构的完整性,该语句不做任何事情,一般用做占位语句.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">for</span> ch <span class="keyword">in</span> <span class="string">"LyShark"</span>:</span><br><span class="line"><span class="meta">... </span>    <span class="keyword">if</span> ch == <span class="string">"h"</span>:</span><br><span class="line"><span class="meta">... </span>            <span class="keyword">pass</span></span><br><span class="line"><span class="meta">... </span>            print(<span class="string">"这里执行了pass语句"</span>)</span><br><span class="line"><span class="meta">... </span>    print(<span class="string">"字符:"</span>,ch)</span><br><span class="line">...</span><br><span class="line"><span class="comment">#--输出结果-------------------------</span></span><br><span class="line">字符: L</span><br><span class="line">字符: y</span><br><span class="line">字符: S</span><br><span class="line">这里执行了<span class="keyword">pass</span>语句</span><br><span class="line">字符: h</span><br><span class="line">字符: a</span><br><span class="line">字符: r</span><br><span class="line">字符: k</span><br></pre></td></tr></table></figure></p>
+<p><strong>break语句:</strong> break语句用来终止循环语句,即使循环没有结束任然要执行.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">for</span> ch <span class="keyword">in</span> <span class="string">"LyShark"</span>:</span><br><span class="line"><span class="meta">... </span>    <span class="keyword">if</span> ch == <span class="string">"a"</span>:</span><br><span class="line"><span class="meta">... </span>            <span class="keyword">break</span></span><br><span class="line"><span class="meta">... </span>    print(<span class="string">"字符:"</span>,ch)</span><br><span class="line">...</span><br><span class="line"><span class="comment">#--输出结果-------------------------</span></span><br><span class="line">字符: L</span><br><span class="line">字符: y</span><br><span class="line">字符: S</span><br><span class="line">字符: h</span><br></pre></td></tr></table></figure></p>
+<p><strong>continue语句:</strong> 该语句语句用来告诉Python跳过当前循环的剩余语句,然后继续进行下一轮循环.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">for</span> ch <span class="keyword">in</span> <span class="string">"LyShark"</span>:</span><br><span class="line"><span class="meta">... </span>    <span class="keyword">if</span> ch == <span class="string">"a"</span>:</span><br><span class="line"><span class="meta">... </span>            <span class="keyword">continue</span></span><br><span class="line"><span class="meta">... </span>    print(<span class="string">"字符:"</span>,ch)</span><br><span class="line">...</span><br><span class="line"><span class="comment">#--输出结果-------------------------</span></span><br><span class="line">字符: L</span><br><span class="line">字符: y</span><br><span class="line">字符: S</span><br><span class="line">字符: h</span><br><span class="line">字符: r</span><br><span class="line">字符: k</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="本章小总结-课后练习"><a href="#本章小总结-课后练习" class="headerlink" title="本章小总结(课后练习)"></a>本章小总结(课后练习)</h2><p><strong>实现元素分类:</strong> 有如下值集合<code>[11,22,33,44,55,66,77,88,99]</code>,将所有大于66的值保存至字典的第一个key中,将小于66的值保存至第二个key的值中,即：<code>{&#39;k1&#39;: 大于66的所有值,&#39;k2&#39;: 小于66的所有值}</code>,代码如下:<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">list= [<span class="number">11</span>,<span class="number">22</span>,<span class="number">33</span>,<span class="number">44</span>,<span class="number">55</span>,<span class="number">66</span>,<span class="number">77</span>,<span class="number">88</span>,<span class="number">99</span>]</span><br><span class="line">bignum=[]</span><br><span class="line">smallnum=[]</span><br><span class="line">dir=&#123;&#125;</span><br><span class="line"><span class="keyword">for</span> num <span class="keyword">in</span> list:</span><br><span class="line">    <span class="keyword">if</span> num&gt;<span class="number">66</span>:</span><br><span class="line">        bignum.append(num)</span><br><span class="line">    <span class="keyword">if</span> num&lt;<span class="number">66</span>:</span><br><span class="line">        smallnum.append(num)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line">dir[<span class="string">'k1'</span>]=bignum</span><br><span class="line">dir[<span class="string">'k2'</span>]=smallnum</span><br><span class="line">print(dir)</span><br></pre></td></tr></table></figure></p>
+<p><strong>实现元素查找:</strong> 查找元素,移动空格,并查找以a或A开头,并且以c结尾的所有元素.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">li = [<span class="string">"alec"</span>, <span class="string">" aric"</span>, <span class="string">"Alex"</span>, <span class="string">"Tony"</span>, <span class="string">"rain"</span>]</span><br><span class="line">tu = (<span class="string">"alec"</span>, <span class="string">" aric"</span>, <span class="string">"Alex"</span>, <span class="string">"Tony"</span>, <span class="string">"rain"</span>)</span><br><span class="line">dic = &#123;<span class="string">'k1'</span>: <span class="string">"alex"</span>, <span class="string">'k2'</span>: <span class="string">' aric'</span>,  <span class="string">"k3"</span>: <span class="string">"Alex"</span>, <span class="string">"k4"</span>: <span class="string">"Tony"</span>&#125;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> li:</span><br><span class="line">    <span class="keyword">if</span> i.strip().capitalize().startswith(<span class="string">'A'</span>) <span class="keyword">and</span> i.strip().endswith(<span class="string">'c'</span>):</span><br><span class="line">        print(i)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> tu:</span><br><span class="line">    <span class="keyword">if</span> i.strip().capitalize().startswith(<span class="string">'A'</span>) <span class="keyword">and</span> i.strip().endswith(<span class="string">'c'</span>):</span><br><span class="line">        print(i)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> dic.values():</span><br><span class="line">    <span class="keyword">if</span> i.strip().capitalize().startswith(<span class="string">'A'</span>) <span class="keyword">and</span> i.strip().endswith(<span class="string">'c'</span>):</span><br><span class="line">        <span class="keyword">print</span> (i)</span><br></pre></td></tr></table></figure></p>
+<p><strong>实现商品输出:</strong> 输出商品列表,用户输入序号,显示用户选中的商品.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment">#方法一</span></span><br><span class="line">l1=[<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>]</span><br><span class="line">l2=[<span class="string">"手机"</span>, <span class="string">"电脑"</span>, <span class="string">'鼠标垫'</span>, <span class="string">'游艇'</span>]</span><br><span class="line">d=dict(zip(l1,l2))</span><br><span class="line">print(d)</span><br><span class="line">num=input(<span class="string">"请输入商品编号："</span>)</span><br><span class="line">print(<span class="string">"你选择的商品为 %s"</span> %d[int(num)])</span><br><span class="line"> </span><br><span class="line"><span class="comment">#方法二</span></span><br><span class="line">li = [<span class="string">"手机"</span>, <span class="string">"电脑"</span>, <span class="string">'鼠标垫'</span>, <span class="string">'游艇'</span>]</span><br><span class="line"><span class="keyword">for</span> k, i <span class="keyword">in</span> enumerate(li):</span><br><span class="line">    print(k,i)</span><br><span class="line">k=input(<span class="string">"请输入商品编号："</span>)</span><br><span class="line">print(<span class="string">"你选择的商品为 %s"</span> % li[int(k)])</span><br></pre></td></tr></table></figure></p>
+<p><strong>实现命令行:</strong> 实现一个简单的命令行小工具框架,可自行添加扩展功能.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> platform</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">help</span><span class="params">()</span>:</span></span><br><span class="line">    print(<span class="string">"By:LyShark www.mkdirs.com"</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">clear</span><span class="params">()</span>:</span></span><br><span class="line">    temp=platform.system()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(temp == <span class="string">"Windows"</span>):</span><br><span class="line">        os.system(<span class="string">"cls"</span>)</span><br><span class="line">    <span class="keyword">elif</span>(temp == <span class="string">"Linux"</span>):</span><br><span class="line">        os.system(<span class="string">"clear"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            shell=str(input(<span class="string">"[Shell] # "</span>))</span><br><span class="line">            <span class="keyword">if</span>(shell == <span class="string">""</span>):</span><br><span class="line">                <span class="keyword">continue</span></span><br><span class="line">            <span class="keyword">elif</span>(shell == <span class="string">"exit"</span>):</span><br><span class="line">                exit()</span><br><span class="line">            <span class="keyword">elif</span>(shell == <span class="string">"help"</span>):</span><br><span class="line">                help()</span><br><span class="line">            <span class="keyword">elif</span>(shell == <span class="string">"clear"</span>):</span><br><span class="line">                clear()</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                print(<span class="string">"未知命令行"</span>)</span><br><span class="line">        <span class="keyword">except</span> Exception:</span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 程序的开头,模拟C语言写法.</span></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure></p>
+<p><strong>实现三级菜单:</strong> 实现用户交互,显示省市县三级联动的选择.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">dic = &#123;</span><br><span class="line">    <span class="string">"河北"</span>: &#123;</span><br><span class="line">        <span class="string">"石家庄"</span>: [<span class="string">"鹿泉"</span>, <span class="string">"藁城"</span>, <span class="string">"元氏"</span>],</span><br><span class="line">        <span class="string">"邯郸"</span>: [<span class="string">"永年"</span>, <span class="string">"涉县"</span>, <span class="string">"磁县"</span>],</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="string">"湖南"</span>: &#123;</span><br><span class="line">        <span class="string">"长沙"</span>:[<span class="string">'a'</span>,<span class="string">'b'</span>,<span class="string">'c'</span>],</span><br><span class="line">        <span class="string">"株洲"</span>:[<span class="string">'d'</span>,<span class="string">'e'</span>,<span class="string">'f'</span>]</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="string">"湖北"</span>: &#123;</span><br><span class="line">        <span class="string">"武汉"</span>:[<span class="string">'g'</span>,<span class="string">'h'</span>,<span class="string">'i'</span>],</span><br><span class="line">        <span class="string">"黄石"</span>:[<span class="string">'j'</span>,<span class="string">'k'</span>,<span class="string">'l'</span>]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">for</span> k <span class="keyword">in</span> dic.keys():</span><br><span class="line">    print(k)</span><br><span class="line">flag=<span class="literal">True</span></span><br><span class="line"><span class="keyword">while</span> flag:</span><br><span class="line">    n=input(<span class="string">"请输入你所在省："</span>)</span><br><span class="line">    <span class="keyword">for</span> k <span class="keyword">in</span> dic.keys():</span><br><span class="line">        <span class="keyword">if</span> n <span class="keyword">in</span> dic.keys():</span><br><span class="line">            <span class="keyword">if</span> k == n:</span><br><span class="line">                <span class="keyword">for</span> i <span class="keyword">in</span> dic[n].keys():</span><br><span class="line">                    print(i)</span><br><span class="line">                w = input(<span class="string">"请输入你所在的城市："</span>)</span><br><span class="line">                <span class="keyword">for</span> i <span class="keyword">in</span> dic[n].keys():</span><br><span class="line">                    <span class="keyword">if</span> w <span class="keyword">in</span> dic[n].keys():</span><br><span class="line">                        <span class="keyword">if</span> i == w:</span><br><span class="line">                            <span class="keyword">for</span> k <span class="keyword">in</span> dic[n][w]:</span><br><span class="line">                                print(k)</span><br><span class="line">                            s=input(<span class="string">"请输入你所在的县："</span>)</span><br><span class="line">                            <span class="keyword">for</span> j <span class="keyword">in</span> dic[n][w]:</span><br><span class="line">                                <span class="keyword">if</span> s <span class="keyword">in</span> dic[n][w]:</span><br><span class="line">                                    <span class="keyword">if</span> j==s:</span><br><span class="line">                                        print(<span class="string">"你所在的位置是：%s省%s市%s县"</span> % (n,w,s))</span><br><span class="line">                                        flag = <span class="literal">False</span></span><br><span class="line">                                        <span class="keyword">break</span></span><br><span class="line">                                <span class="keyword">else</span>:</span><br><span class="line">                                    print(<span class="string">'不存在，请重新输入'</span>)</span><br><span class="line">                                    <span class="keyword">break</span></span><br><span class="line">                    <span class="keyword">else</span>:</span><br><span class="line">                        print(<span class="string">'不存在，请重新输入'</span>)</span><br><span class="line">                        <span class="keyword">break</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            print(<span class="string">'不存在，请重新输入'</span>)</span><br><span class="line">            <span class="keyword">break</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>实现一个购物车:</strong> 实现一个购物车小程序,并符合以下要求.</p>
+<blockquote>
+<p>1.要求用户输入总资产,例如：20000<br>2.显示商品列表,让用户根据序号选择商品,加入购物车<br>3.购买,如果商品总额大于总资产,提示账户余额不足,否则购买成功</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">product = [</span><br><span class="line">    (<span class="string">"iphone"</span>,<span class="number">5800</span>),</span><br><span class="line">    (<span class="string">"watch"</span>,<span class="number">380</span>),</span><br><span class="line">    (<span class="string">"bike"</span>,<span class="number">800</span>),</span><br><span class="line">    (<span class="string">"book"</span>,<span class="number">120</span>),</span><br><span class="line">    (<span class="string">"computer"</span>,<span class="number">4000</span>)</span><br><span class="line">]</span><br><span class="line"> </span><br><span class="line">shopping_car = []</span><br><span class="line"> </span><br><span class="line">salary = input(<span class="string">"请输入你的金钱: "</span>)</span><br><span class="line"><span class="keyword">if</span> salary.isdigit():</span><br><span class="line">    salary = int(salary)</span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> enumerate(product):</span><br><span class="line">            print(i)</span><br><span class="line"> </span><br><span class="line">        user_choice = input(<span class="string">"&gt;&gt;&gt;或者q:"</span>)</span><br><span class="line"> </span><br><span class="line">        <span class="keyword">if</span> user_choice.isdigit():</span><br><span class="line">            user_choice = int(user_choice)</span><br><span class="line">            <span class="keyword">if</span> user_choice &gt;= <span class="number">0</span> <span class="keyword">and</span> user_choice &lt; len(product):</span><br><span class="line">                p_item = product[user_choice]</span><br><span class="line">                <span class="keyword">if</span> salary &gt;= p_item[<span class="number">1</span>]:</span><br><span class="line">                    shopping_car.append(p_item[<span class="number">0</span>])</span><br><span class="line">                    salary -= p_item[<span class="number">1</span>]</span><br><span class="line">                    print(<span class="string">"你购买了\033[32m%s\033[0m,你的余额剩余\033[31m%s\033[0m"</span> % (p_item[<span class="number">0</span>], salary))</span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    print(<span class="string">"\033[31m你的余额不足\033[0m"</span>)</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                print(<span class="string">"你输入的项目[%s]不存在,请重新输入"</span> % user_choice)</span><br><span class="line">        <span class="keyword">elif</span> user_choice == <span class="string">'q'</span>:</span><br><span class="line">            print(<span class="string">"你购买了这些商品:"</span>.center(<span class="number">30</span>,<span class="string">"-"</span>))</span><br><span class="line">            <span class="keyword">for</span> i <span class="keyword">in</span> shopping_car:</span><br><span class="line">                print(<span class="string">"\033[32m%s\033[0m"</span> %i)</span><br><span class="line">            print(<span class="string">"\033[31m余额%s\033[0m"</span> %salary)</span><br><span class="line">            exit()</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            print(<span class="string">"你输入的[%s]不存在"</span> % user_choice)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    print(<span class="string">"你输入的金额不正确！请重新输入金额！"</span>)</span><br></pre></td></tr></table></figure>
+<p><br></p>
+<h2 id="实例小总结-提高技巧"><a href="#实例小总结-提高技巧" class="headerlink" title="实例小总结(提高技巧)"></a>实例小总结(提高技巧)</h2><p><strong>题目(1):</strong> 有四个数字：1、2、3、4,能组成多少个互不相同且无重复数字的三位数?各是多少?</p>
+<p>程序分析:可填在百位、十位、个位的数字都是1、2、3、4,组成所有的排列后再去掉不满足条件的排列.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>,<span class="number">5</span>):</span><br><span class="line"><span class="meta">... </span>    <span class="keyword">for</span> j <span class="keyword">in</span> range(<span class="number">1</span>,<span class="number">5</span>):</span><br><span class="line"><span class="meta">... </span>            <span class="keyword">for</span> k <span class="keyword">in</span> range(<span class="number">1</span>,<span class="number">5</span>):</span><br><span class="line"><span class="meta">... </span>                    <span class="keyword">if</span>(i!=k) <span class="keyword">and</span> (i!=j) <span class="keyword">and</span>(j!=k):</span><br><span class="line"><span class="meta">... </span>                            print(i,j,k)</span><br><span class="line">...</span><br><span class="line"><span class="comment">#--输出结果-------------------------</span></span><br><span class="line"><span class="number">1</span> <span class="number">2</span> <span class="number">3</span></span><br><span class="line"><span class="number">1</span> <span class="number">2</span> <span class="number">4</span></span><br><span class="line"><span class="number">1</span> <span class="number">3</span> <span class="number">2</span></span><br><span class="line"><span class="number">1</span> <span class="number">3</span> <span class="number">4</span></span><br><span class="line"><span class="number">1</span> <span class="number">4</span> <span class="number">2</span></span><br><span class="line"><span class="number">1</span> <span class="number">4</span> <span class="number">3</span></span><br><span class="line"><span class="number">2</span> <span class="number">1</span> <span class="number">3</span></span><br><span class="line"><span class="number">2</span> <span class="number">1</span> <span class="number">4</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>题目(2):</strong> 输入某年某月某日,程序自动判断这一天是这一年的第几天?</p>
+<p>程序分析:以10月1日为例,应该先把前9个月的加起来,然后再加上1天即本年的第几天,特殊情况,闰年且输入月份大于2时需考虑多加一天.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># -*- coding: UTF-8 -*-</span></span><br><span class="line"> </span><br><span class="line">year = int(input(<span class="string">'year:\n'</span>))</span><br><span class="line">month = int(input(<span class="string">'month:\n'</span>))</span><br><span class="line">day = int(input(<span class="string">'day:\n'</span>))</span><br><span class="line"> </span><br><span class="line">months = (<span class="number">0</span>,<span class="number">31</span>,<span class="number">59</span>,<span class="number">90</span>,<span class="number">120</span>,<span class="number">151</span>,<span class="number">181</span>,<span class="number">212</span>,<span class="number">243</span>,<span class="number">273</span>,<span class="number">304</span>,<span class="number">334</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> <span class="number">0</span> &lt; month &lt;= <span class="number">12</span>:</span><br><span class="line">    sum = months[month - <span class="number">1</span>]</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    <span class="keyword">print</span> (<span class="string">'data error'</span>)</span><br><span class="line">sum += day</span><br><span class="line">leap = <span class="number">0</span></span><br><span class="line"><span class="keyword">if</span> (year % <span class="number">400</span> == <span class="number">0</span>) <span class="keyword">or</span> ((year % <span class="number">4</span> == <span class="number">0</span>) <span class="keyword">and</span> (year % <span class="number">100</span> != <span class="number">0</span>)):</span><br><span class="line">    leap = <span class="number">1</span></span><br><span class="line"><span class="keyword">if</span> (leap == <span class="number">1</span>) <span class="keyword">and</span> (month &gt; <span class="number">2</span>):</span><br><span class="line">    sum += <span class="number">1</span></span><br><span class="line"><span class="keyword">print</span> (<span class="string">'it is the %dth day.'</span> % sum)</span><br><span class="line"><span class="comment">#--输出结果-------------------------</span></span><br><span class="line">year:</span><br><span class="line"><span class="number">2018</span></span><br><span class="line">month:</span><br><span class="line"><span class="number">10</span></span><br><span class="line">day:</span><br><span class="line"><span class="number">1</span></span><br><span class="line">it <span class="keyword">is</span> the <span class="number">274</span>th day.</span><br></pre></td></tr></table></figure></p>
+<p><strong>题目(3):</strong> 斐波那契数列,又称黄金分割数列,指的是这样一个数列：0、1、1、2、3、5、8、13、21、34、….在数学上,费波那契数列是以递归的方法来定义.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">F0 = <span class="number">0</span>    (n=<span class="number">0</span>)</span><br><span class="line">F1 = <span class="number">1</span>    (n=<span class="number">1</span>)</span><br><span class="line">Fn = F[n-1]+ F[n-2](n=&gt;2)</span><br><span class="line"></span><br><span class="line"><span class="comment"># -*- coding: UTF-8 -*-</span></span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">fib</span><span class="params">(n)</span>:</span></span><br><span class="line">    a,b = <span class="number">1</span>,<span class="number">1</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(n<span class="number">-1</span>):</span><br><span class="line">        a,b = b,a+b</span><br><span class="line">    <span class="keyword">return</span> a</span><br><span class="line"> </span><br><span class="line"><span class="comment"># 输出了第10个斐波那契数列</span></span><br><span class="line"><span class="keyword">print</span> (fib(<span class="number">10</span>))</span><br></pre></td></tr></table></figure></p>
+<p><strong>题目(4):</strong> 输出<code>9*9</code>乘法口诀表,分行与列考虑,共9行9列,i控制行,j控制列.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> x <span class="keyword">in</span> range(<span class="number">1</span>,<span class="number">10</span>):</span><br><span class="line">        print()</span><br><span class="line">        <span class="keyword">for</span> y <span class="keyword">in</span> range(<span class="number">1</span>,x+<span class="number">1</span>):</span><br><span class="line">                print(<span class="string">"%d*%d=%d "</span>%(y,x,x*y),end=<span class="string">""</span>)</span><br></pre></td></tr></table></figure></p>
+<p><strong>题目(5):</strong> 写一个字符串遍历查找工具,代码如下.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"></span><br><span class="line">ls=<span class="string">"Type help() for interactive help, or help(object) for help about object"</span></span><br><span class="line"></span><br><span class="line">find=<span class="string">"help"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> x <span class="keyword">in</span> range(len(ls)):</span><br><span class="line">        temp=len(find)</span><br><span class="line">        <span class="keyword">if</span> str(ls[x:x+temp]) == str(find):</span><br><span class="line">                print(ls[x:x+temp],x)</span><br><span class="line">                <span class="keyword">break</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>题目(6):</strong> 通过使用time模块中的sleep函数,让程序每隔1秒执行一次循环.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">dic=&#123;<span class="number">1</span>:<span class="string">"admin"</span>,<span class="number">2</span>:<span class="string">"guest"</span>&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> key,value <span class="keyword">in</span> dict.items(dic):</span><br><span class="line">        print(key,value)</span><br><span class="line">        time.sleep(<span class="number">1</span>)</span><br></pre></td></tr></table></figure></p>
+<p><strong>题目(7):</strong> 通过使用time模块,对指定的时间格式进行一定的格式化操作.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">print(time.strftime(<span class="string">"%Y-%m-%d %H:%M:%S"</span>,time.localtime(time.time())))   <span class="comment">#2019-01-18 15:16:28</span></span><br><span class="line">time.sleep(<span class="number">2</span>)</span><br><span class="line">print(time.strftime(<span class="string">"%Y-%m-%d %H:%M:%S"</span>,time.localtime(time.time())))</span><br></pre></td></tr></table></figure></p>
+<p><strong>题目(8):</strong> 有一对兔子,从出生后第3个月起每个月都生一对兔子,小兔子长到第三个月后每个月又生一对兔子,假如兔子都不死,问每个月的兔子总数为多少?</p>
+<p>程序分析：兔子的规律为数列 1,1,2,3,5,8,13,21….<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line">f1 = <span class="number">1</span></span><br><span class="line">f2 = <span class="number">1</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>,<span class="number">22</span>):</span><br><span class="line">    print(<span class="string">'%12ld %12ld'</span>%(f1,f2))</span><br><span class="line">    <span class="keyword">if</span> (i % <span class="number">3</span>) == <span class="number">0</span>:</span><br><span class="line">        print(<span class="string">""</span>)</span><br><span class="line">    f1 = f1 + f2</span><br><span class="line">    f2 = f1 + f2</span><br></pre></td></tr></table></figure></p>
+<p><strong>题目(9):</strong> 判断101-200之间有多少个素数,并输出所有素数.</p>
+<p>程序分析:判断素数的方法,用一个数分别去除2,如果能被整除,则表明此数不是素数,反之是素数.　<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">from</span> math <span class="keyword">import</span> sqrt</span><br><span class="line"><span class="keyword">from</span> sys <span class="keyword">import</span> stdout</span><br><span class="line"></span><br><span class="line">h=<span class="number">0</span></span><br><span class="line">leap=<span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> m <span class="keyword">in</span> range(<span class="number">101</span>,<span class="number">201</span>):</span><br><span class="line">    k = int(sqrt(m + <span class="number">1</span>))</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">2</span>,k + <span class="number">1</span>):</span><br><span class="line">        <span class="keyword">if</span> m % i == <span class="number">0</span>:</span><br><span class="line">            leap = <span class="number">0</span></span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">    <span class="keyword">if</span> leap == <span class="number">1</span>:</span><br><span class="line">        print(<span class="string">"%-4d"</span>%m)</span><br><span class="line">        h += <span class="number">1</span></span><br><span class="line">        <span class="keyword">if</span> h % <span class="number">10</span> == <span class="number">0</span>:</span><br><span class="line">            print(<span class="string">""</span>)</span><br><span class="line">    leap = <span class="number">1</span></span><br><span class="line">print(<span class="string">'The total is %d'</span> %h)</span><br></pre></td></tr></table></figure></p>
+<p><strong>题目(10):</strong> 输入一行字符,分别统计出其中英文字母、空格、数字和其它字符的个数.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> string</span><br><span class="line"></span><br><span class="line">strs=input(<span class="string">"请输入一个字符串:"</span>)</span><br><span class="line"></span><br><span class="line">letters=<span class="number">0</span></span><br><span class="line">space=<span class="number">0</span></span><br><span class="line">digit=<span class="number">0</span></span><br><span class="line">others=<span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> x <span class="keyword">in</span> range(len(strs)):</span><br><span class="line">        ch=strs[x]</span><br><span class="line">        <span class="keyword">if</span> ch.isalpha():</span><br><span class="line">                letters+=<span class="number">1</span></span><br><span class="line">        <span class="keyword">elif</span> ch.isspace():</span><br><span class="line">                space+=<span class="number">1</span></span><br><span class="line">        <span class="keyword">elif</span> ch.isdigit():</span><br><span class="line">                digit+=<span class="number">1</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">                others+=<span class="number">1</span></span><br><span class="line"></span><br><span class="line">print(<span class="string">"char=%d,space=%d,digit=%d,others=%d"</span>%(letters,space,digit,others))</span><br></pre></td></tr></table></figure></p>
+<p><strong>题目(11):</strong> 读取<code>db</code>配置文件,并按照文件中的账号密码判断是否允许登陆.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">login</span><span class="params">(x,y)</span>:</span></span><br><span class="line">    fp=open(<span class="string">"db"</span>,<span class="string">"r"</span>,encoding=<span class="string">"utf-8"</span>)</span><br><span class="line">    data=fp.readline().split(<span class="string">":"</span>)</span><br><span class="line">    count=len(open(<span class="string">"db"</span>,<span class="string">"r"</span>).readlines())</span><br><span class="line"></span><br><span class="line">    username=data[<span class="number">0</span>]</span><br><span class="line">    password=data[<span class="number">1</span>]</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">3</span>):</span><br><span class="line">        <span class="keyword">if</span> x==username.strip() <span class="keyword">and</span> y==password.strip():</span><br><span class="line">            print(<span class="string">"登陆成功"</span>)</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            data=fp.readline().split(<span class="string">":"</span>)</span><br><span class="line">            username=data[<span class="number">0</span>]</span><br><span class="line">            password=data[<span class="number">1</span>]</span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line">    fp.close()</span><br><span class="line"></span><br><span class="line">login(<span class="string">"admin"</span>,<span class="string">"admin"</span>)</span><br><span class="line">login(<span class="string">"lyshark"</span>,<span class="string">"lyshark"</span>)</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2019/01/09/Python/Python-流程控制与循环体-3/">Python 流程控制与循环体(3)</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2019年01月09日 - 09:01</p>
+  <p><span>最后更新:</span>2019年01月19日 - 21:01</p>
+  <p><span>原始链接:</span><a href="/2019/01/09/Python/Python-流程控制与循环体-3/" title="Python 流程控制与循环体(3)">https://www.mkdirs.com/2019/01/09/Python/Python-流程控制与循环体-3/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Python/" rel="tag"> <i class="fa fa-tag"></i> Python</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/01/07/Python/Python-运算符与数据类型-2/" rel="next" title="Python 运算符与数据类型(2)">
+                <i class="fa fa-chevron-left"></i> Python 运算符与数据类型(2)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/01/18/Python/Python-变量作用域与函数-4/" rel="prev" title="Python 变量作用域与函数(4)">
+                Python 变量作用域与函数(4) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#IF-条件判断语句"><span class="nav-text">IF 条件判断语句</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#WHILE-循环语句"><span class="nav-text">WHILE 循环语句</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#FOR-循环遍历语句"><span class="nav-text">FOR 循环遍历语句</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#跳过执行与跳出语句"><span class="nav-text">跳过执行与跳出语句</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#本章小总结-课后练习"><span class="nav-text">本章小总结(课后练习)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实例小总结-提高技巧"><span class="nav-text">实例小总结(提高技巧)</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

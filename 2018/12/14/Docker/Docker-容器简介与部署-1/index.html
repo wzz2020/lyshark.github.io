@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Docker是基于Go语言实现的开源容器项目,Docker让开发者可以打包他们的应用以及依赖包到一个可移植的容器中,然后发布到任何流行的 Linux 机器上,也可以实现虚拟化.容器是完全使用沙箱机制,相互之间不会有任何接口,Docker诞生于2013年年初,最初发起者是dotCloud公司.Docker自开源后受到广泛的关注和讨论,目前已有多个相关项目(包括Docker三剑客、Kubernetes">
+<meta name="keywords" content="Docker">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Docker 容器简介与部署(1)">
+<meta property="og:url" content="https://www.mkdirs.com/2018/12/14/Docker/Docker-容器简介与部署-1/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="Docker是基于Go语言实现的开源容器项目,Docker让开发者可以打包他们的应用以及依赖包到一个可移植的容器中,然后发布到任何流行的 Linux 机器上,也可以实现虚拟化.容器是完全使用沙箱机制,相互之间不会有任何接口,Docker诞生于2013年年初,最初发起者是dotCloud公司.Docker自开源后受到广泛的关注和讨论,目前已有多个相关项目(包括Docker三剑客、Kubernetes">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-12-15T07:08:46.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Docker 容器简介与部署(1)">
+<meta name="twitter:description" content="Docker是基于Go语言实现的开源容器项目,Docker让开发者可以打包他们的应用以及依赖包到一个可移植的容器中,然后发布到任何流行的 Linux 机器上,也可以实现虚拟化.容器是完全使用沙箱机制,相互之间不会有任何接口,Docker诞生于2013年年初,最初发起者是dotCloud公司.Docker自开源后受到广泛的关注和讨论,目前已有多个相关项目(包括Docker三剑客、Kubernetes">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/12/14/Docker/Docker-容器简介与部署-1/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Docker 容器简介与部署(1) | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/12/14/Docker/Docker-容器简介与部署-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Docker 容器简介与部署(1)
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-14 14:58:39" itemprop="dateCreated datePublished" datetime="2018-12-14T14:58:39+08:00">2018-12-14</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-12-15 15:08:46" itemprop="dateModified" datetime="2018-12-15T15:08:46+08:00">2018-12-15</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Docker/" itemprop="url" rel="index"><span itemprop="name">Docker</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Docker是基于Go语言实现的开源容器项目,Docker让开发者可以打包他们的应用以及依赖包到一个可移植的容器中,然后发布到任何流行的 Linux 机器上,也可以实现虚拟化.容器是完全使用沙箱机制,相互之间不会有任何接口,Docker诞生于2013年年初,最初发起者是dotCloud公司.Docker自开源后受到广泛的关注和讨论,目前已有多个相关项目(包括Docker三剑客、Kubernetes等),逐渐形成了围绕Docker容器的生态体系,由于Docker在业界造成的影响力实在太大,dotCloud公司后来也直接改名为Docker Inc,并专注于Docker相关技术和产品的开发.</p>
+<a id="more"></a>
+<p><br></p>
+<h2 id="关于Docker容器技术"><a href="#关于Docker容器技术" class="headerlink" title="关于Docker容器技术"></a>关于Docker容器技术</h2><p><strong>Docker容器简介</strong></p>
+<p>Docker的构想是要实现 “Build,Ship and Run Any App,Anywhere” ,即通过对应用的封装(Packaging)、分发(Distribution)、部署(Deployment)、运行(Runtime)生命周期进行管理,达到应用组件 “一次封装,到处运行” 的目的.这里的应用组件,既可以是一个Web应用、一个编译环境,也可以是一套数据库平台服务,甚至是一个操作系统或集群.基于Linux平台上的多项开源技术,Docker提供了高效、敏捷和轻量级的容器方案,并支持部署到本地环境和多种主流云平台.可以说,Docker首次为应用的开发、运行和部署提供了”一站式”的实用解决方案,而且Docker的源代码是开源的,并已加入了Linux基金会,遵循Apache2.0协议,全部开源代码均在<code>https://github.com/docker/</code>上进行维护.</p>
+<p>跟大部分新兴技术的诞生一样,Docker也并非”从石头缝里蹦出来的”,而是站在前人的肩膀上,其中最重要的就是Linux容器(LinuxContainers LXC)技术,LXC可以提供轻量级的虚拟化,以便隔离进程和资源,而且不需要提供指令解释机制以及全虚拟化的其他复杂性.相当于C++中的NameSpace.容器有效地将由单个操作系统管理的资源划分到孤立的组中,以更好地在孤立的组之间平衡有冲突的资源使用需求,LXC在资源管理方面依赖于Linux内核的cgroups子系统,cgroups子系统是Linux内核提供的一个基于进程组的资源管理的框架,可以为特定的进程组限定可以使用的资源.LXC在隔离控制方面依赖于Linux内核的namespace特性,具体而言就是在clone时加入相应的flag.</p>
+<p><strong>Docker与Linux系统</strong></p>
+<p>在LXC的基础上,Docker进一步优化了容器的使用体验,首先Docker提供了各种容器管理工具(如分发、版本、移植等)让用户无需关注底层的操作,可以更简单明了地管理和使用容器.其次Docker通过引入分层文件系统构建和高效的镜像机制,降低了迁移难度,极大地提升了用户体验.用户操作Docker容器就像操作应用自身一样简单,早期的Docker代码实现是直接基于LXC的,自0.9版本开始Docker开发了libcontainer项目,作为更广泛的容器驱动实现,从而替换掉了LXC的实现.目前Docker还积极推动成立了runC标准项目,试图让容器支持不再局限于Linux操作系统,而是更安全、更具扩展性.</p>
+<p>简单来说,其实我们可以把Docker容器理解为一种轻量级的沙盒(sandbox),每个容器内运行着一个应用,不同的容器相互隔离,容器之间也可以通过网络互相通信.容器的创建和停止都十分快速,几乎跟创建和终止原生应用一致.另外,容器自身对系统资源的额外需求也十分有限,远远低于传统虚拟机.很多时候,甚至直接把容器当作应用本身也没有任何问<br>题.</p>
+<p><strong>Docker虚拟化的好处</strong></p>
+<p>Docker项目的发起人和Docker公司CTO Solomon Hykes曾认为,Docker在正确的地点、正确的时间顺应了正确的趋势——如何正确地构建应用.在云时代,开发者创建的应用必须要能很方便地在网络上传播,也就是说应用必须脱离底层物理硬件的限制.同时必须是”任何时间、任何地点”可获取的,因此,开发者需要一种新型的创建分布式应用程序的方式,快速分发和部署,这正是Docker所能够提供的最大优势,</p>
+<p>Docker还可以快速迁移数据,通过容器来打包应用,解耦应用和运行平台.意味着迁移的时候,只需要在新的服务器上启动需要的容器就可以了,无论新旧服务器是否是同一类型的平台.这无疑将节约大量的宝贵时间,并降低部署过程出现问题的风险.</p>
+<p><strong>Go语言与Docker</strong></p>
+<p>相比Go语言与其它语言的对比,国内外很多技术媒体都有列举,在Docker领域Go语言相比其它语言的优势在于.</p>
+<blockquote>
+<p>● 相对于C/C++开发难度低,支持向前兼容,运维维护成本小.<br>● 相对于python生成的是静态文件,有效的避免的低级错误,并且性能高一个等级.<br>● 并发性好,内存占用低,属于编译型.<br>● 部署简单,毕竟生成的静态文件,有glibc的地方就能运行.</p>
+</blockquote>
+<p>一门语言当然也有自己的缺点,比如内存回收延迟久,图片处理库有bug,对包版本要求严格等一些问题,但是瑕不掩瑜,一个开发成本极其简单,性能优良,部署简单的语言与Docker简直就是天作之合.</p>
+<p><strong>Docker的引擎简介</strong></p>
+<p>Docker的是基于Linux自带的(Linux Containers,LXC)技术,在LXC上Docker进行了近一步封装.正因为如此,Docker只能在Linux环境下运行,当然前段时间docker终于支持OSX和Windows了,虽然还是体验尝鲜版,但更加方便开发者去开发了.</p>
+<p><strong>Docker的原理</strong></p>
+<p>其实前面讲了这么多,Docker的原理已经不言而喻,这里用IBM的解释就是:</p>
+<p>容器有效的将单个操作系统管理的资源划分到孤立的组中,以便更好的在孤立的组之间平衡有冲突的资源使用需求.与虚拟化相比,这样既不需要指令级模拟,也不需要即时编译.容器可以在核心CPU本地运行指令,而不需要任何专门的解释机制.此外,也避免了准虚拟化(paravirtualization)和系统调用替换中的复杂性.</p>
+<p>简而言之就是,Docker是一个盒子,一个盒子装一个玩具,无论你丢在哪里,你给他通电(glibc)他就能运行.你的玩具大就用大盒子,小玩具就用小盒子.</p>
+<p>两个应用之间的环境是环境是完全隔离的,建立通信机制来互相调用.容器的创建和停止都十分快速(秒级),容器自身对资源的需求十分有限,远比虚拟机本身占用的资源少.<br><br></p>
+<h2 id="Docker容器Yum安装"><a href="#Docker容器Yum安装" class="headerlink" title="Docker容器Yum安装"></a>Docker容器Yum安装</h2><p>1.配置YUM源,此处我们使用阿里源,并安装EPEL源,和Docker相应的依赖.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># rm -fr /etc/yum.repos.d/*</span></span><br><span class="line">[root@localhost ~]<span class="comment"># wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo</span></span><br><span class="line">[root@localhost ~]<span class="comment"># yum makecache</span></span><br><span class="line">[root@localhost ~]<span class="comment"># yum -y install epel-release</span></span><br><span class="line">[root@localhost ~]<span class="comment"># yum install -y yum-utils device-mapper-persistent-data lvm2</span></span><br></pre></td></tr></table></figure></p>
+<p>2.下载Docker源,并开始配置一些安装属性列表.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo</span></span><br><span class="line">[root@localhost ~]<span class="comment"># yum-config-manager --enable docker-ce-edge</span></span><br><span class="line">[root@localhost ~]<span class="comment"># yum-config-manager --enable docker-ce-test</span></span><br><span class="line">[root@localhost ~]<span class="comment"># yum-config-manager --disable docker-ce-edge</span></span><br></pre></td></tr></table></figure></p>
+<p>3.开始安装Docker,并设置开机自启动.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y docker-ce</span></span><br><span class="line">[root@localhost ~]<span class="comment"># yum list docker-ce --showduplicates | sort -r</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl start docker</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl enable docker</span></span><br><span class="line">[root@localhost ~]<span class="comment"># docker run hello-world</span></span><br></pre></td></tr></table></figure></p>
+<p>4.接着配置好阿里云Docker加速器地址.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/docker/daemon.json</span></span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line"> <span class="string">"registry-mirrors"</span>: [<span class="string">"https://h8o9al0n.mirror.aliyuncs.com"</span>]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl daemon-reload</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl restart docker</span></span><br><span class="line">[root@localhost ~]<span class="comment"># docker version</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="Docker容器编译安装"><a href="#Docker容器编译安装" class="headerlink" title="Docker容器编译安装"></a>Docker容器编译安装</h2><p>1.通过Yum仓库安装Docker,因为docker的源码需要在容器中运行,因此必须要有docker存在.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># rm -fr /etc/yum.repos.d/*</span></span><br><span class="line">[root@localhost ~]<span class="comment"># wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo</span></span><br><span class="line">[root@localhost ~]<span class="comment"># yum makecache</span></span><br><span class="line">[root@localhost ~]<span class="comment"># yum -y install epel-release</span></span><br><span class="line">[root@localhost ~]<span class="comment"># yum install -y git docker docker-client docker-common</span></span><br><span class="line"></span><br><span class="line">Package 2:docker-1.13.1-88.git07f3374.el7.centos.x86_64 already installed and latest version</span><br><span class="line">Package 2:docker-client-1.13.1-88.git07f3374.el7.centos.x86_64 already installed and latest version</span><br><span class="line">Package 2:docker-common-1.13.1-88.git07f3374.el7.centos.x86_64 already installed and latest version</span><br><span class="line">Nothing to <span class="keyword">do</span></span><br></pre></td></tr></table></figure></p>
+<p>2.使用Git工具下载最新版的Docker源代码,并在源码的根目录执行make build,这一步会调用Makefile中的build分支代码:<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># git clone https://github.com/docker/docker.git</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make build</span></span><br><span class="line"></span><br><span class="line">build: bundles init-go-pkg-cache docker build <span class="variable">$&#123;BUILD_APT_MIRROR&#125;</span> <span class="variable">$&#123;DOCKER_BUILD_ARGS&#125;</span> -t <span class="string">"<span class="variable">$(DOCKER_IMAGE)</span>"</span> -f <span class="string">"<span class="variable">$(DOCKERFILE)</span>"</span></span><br></pre></td></tr></table></figure></p>
+<p>这一步会使用docker创建一个临时的容器,并在容器中基于DOCKERFILE创建image</p>
+<p>3.执行make binary,这会调用Makefile中的binary分支代码:<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># make binary</span></span><br><span class="line"></span><br><span class="line">binary: build <span class="comment">## build the linux binaries $(DOCKER_RUN_DOCKER) hack/make.sh binary </span></span><br><span class="line"></span><br><span class="line"><span class="comment">#这一步是在上一步创建的image中创建容器并在容器中运行hack/make.sh</span></span><br><span class="line">在hack/make.sh 中会调用/hack/make/binary,</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">#在hack/make/binary中会调用/hack/make/binary-client 和binary-daemon,这两个脚本会分别调用同目录下的.binary文件,在.binary文件中会执行go build 语句实现源码的最终的编译:</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">go build / -o <span class="string">"<span class="variable">$DEST</span>/<span class="variable">$BINARY_FULLNAME</span>"</span> / <span class="string">"<span class="variable">$&#123;BUILDFLAGS[@]&#125;</span>"</span> / -ldflags <span class="string">" <span class="variable">$LDFLAGS</span> <span class="variable">$LDFLAGS_STATIC_DOCKER</span> "</span> / <span class="variable">$GO_PACKAGE</span> </span><br><span class="line"><span class="comment">#我们可以追踪GO_PACKAGE,发现它就是/docker/cmd/docker/docker.go和/docker/cmd/dockerd/docker.go两个文件,也就是docker源码的两个入口文件。</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/12/14/Docker/Docker-容器简介与部署-1/">Docker 容器简介与部署(1)</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年12月14日 - 14:12</p>
+  <p><span>最后更新:</span>2018年12月15日 - 15:12</p>
+  <p><span>原始链接:</span><a href="/2018/12/14/Docker/Docker-容器简介与部署-1/" title="Docker 容器简介与部署(1)">https://www.mkdirs.com/2018/12/14/Docker/Docker-容器简介与部署-1/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Docker/" rel="tag"> <i class="fa fa-tag"></i> Docker</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/11/Zabbix/Zabbix-监控常见数据库服务-6/" rel="next" title="Zabbix 监控常见数据库服务(6)">
+                <i class="fa fa-chevron-left"></i> Zabbix 监控常见数据库服务(6)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/14/Docker/Docker-镜像与容器管理-2/" rel="prev" title="Docker 镜像与容器管理(2)">
+                Docker 镜像与容器管理(2) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#关于Docker容器技术"><span class="nav-text">关于Docker容器技术</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker容器Yum安装"><span class="nav-text">Docker容器Yum安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker容器编译安装"><span class="nav-text">Docker容器编译安装</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

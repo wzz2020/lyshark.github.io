@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="JavaScript 一种直译式脚本语言,是一种动态类型、弱类型、基于原型的语言,内置支持类型,它的解释器被称为JavaScript引擎,是浏览器的一部分,并且是被广泛用于客户端的脚本语言,JavaScript最早是在HTML网页上使用,它是属于网络的脚本语言,现在已经被广泛用于Web应用开发,常用来为网页添加各式各样的动态功能,为用户提供更流畅美观的浏览效果,通常JavaScript脚本是通过嵌">
+<meta name="keywords" content="Web 前端">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Web前端开发JavaScript基础(3)">
+<meta property="og:url" content="https://www.mkdirs.com/2019/02/20/Web 前端/Web前端开发JavaScript基础-3/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="JavaScript 一种直译式脚本语言,是一种动态类型、弱类型、基于原型的语言,内置支持类型,它的解释器被称为JavaScript引擎,是浏览器的一部分,并且是被广泛用于客户端的脚本语言,JavaScript最早是在HTML网页上使用,它是属于网络的脚本语言,现在已经被广泛用于Web应用开发,常用来为网页添加各式各样的动态功能,为用户提供更流畅美观的浏览效果,通常JavaScript脚本是通过嵌">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-04-16T06:06:07.508Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Web前端开发JavaScript基础(3)">
+<meta name="twitter:description" content="JavaScript 一种直译式脚本语言,是一种动态类型、弱类型、基于原型的语言,内置支持类型,它的解释器被称为JavaScript引擎,是浏览器的一部分,并且是被广泛用于客户端的脚本语言,JavaScript最早是在HTML网页上使用,它是属于网络的脚本语言,现在已经被广泛用于Web应用开发,常用来为网页添加各式各样的动态功能,为用户提供更流畅美观的浏览效果,通常JavaScript脚本是通过嵌">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2019/02/20/Web 前端/Web前端开发JavaScript基础-3/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Web前端开发JavaScript基础(3) | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2019/02/20/Web 前端/Web前端开发JavaScript基础-3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Web前端开发JavaScript基础(3)
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-02-20 15:42:37" itemprop="dateCreated datePublished" datetime="2019-02-20T15:42:37+08:00">2019-02-20</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-16 14:06:07" itemprop="dateModified" datetime="2019-04-16T14:06:07+08:00">2019-04-16</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Web-前端/" itemprop="url" rel="index"><span itemprop="name">Web 前端</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>JavaScript 一种直译式脚本语言,是一种动态类型、弱类型、基于原型的语言,内置支持类型,它的解释器被称为JavaScript引擎,是浏览器的一部分,并且是被广泛用于客户端的脚本语言,JavaScript最早是在HTML网页上使用,它是属于网络的脚本语言,现在已经被广泛用于Web应用开发,常用来为网页添加各式各样的动态功能,为用户提供更流畅美观的浏览效果,通常JavaScript脚本是通过嵌入在HTML中来实现自身的功能的,现在随着node.js引擎的出现,使得JavaScript逐步成为了一种全栈开发语言了.</p>
+<a id="more"></a>
+<p><br></p>
+<h2 id="JavaScript-代码引入"><a href="#JavaScript-代码引入" class="headerlink" title="JavaScript 代码引入"></a>JavaScript 代码引入</h2><p>JS通常有两种引入方式,理论上引入命令在body和head中都可以,但是推荐放在body代码块底部,因为Html代码是从上到下执行,如果Head中的js代码耗时严重,就会导致用户长时间无法看到页面,如果放置在body代码块底部,那么即使js代码耗时严重,也不会影响用户看到页面效果,只是js实现特效慢而已,规范化我们就直接将JS代码统统放在body的最底部.</p>
+<p><strong>引入方式(1):</strong> 第一种引入方式就是在body标签的区域内直接使用<code>&lt;script&gt;&lt;/script&gt;</code>方式来引用代码.<br><figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">"text/javascript"</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="javascript">        alert(<span class="string">"hello lyshark"</span>)</span></span><br><span class="line"><span class="undefined">    </span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>引入方式(2):</strong> 这是第二种引入方式,也就是在需要使用的地方直接引入一个外部js文件,通常写在<code>&lt;head&gt;</code>标签里.<br><figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"test.js"</span> <span class="attr">type</span>=<span class="string">"text/javascript"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"/js/test.js"</span> <span class="attr">type</span>=<span class="string">"text/javascript"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"//cnd.mkdirs.com/test.js"</span> <span class="attr">type</span>=<span class="string">"text/javascript"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="JavaScript-定义变量"><a href="#JavaScript-定义变量" class="headerlink" title="JavaScript 定义变量"></a>JavaScript 定义变量</h2><p>变量是程序设计语言里最重要、最基本的概念,与强类型语言不同的是 JavaScript 是弱类型语言,同一个变量可以一会存储数值,一会存储字符串,变量声明有两种方式,即显式声明和隐式声明,根据变量定义的范围不同,变量有全局变量和局部变量之分,直接定义的变量是全局变量,全局变量可以被所有的脚本访问,在函数里定义的变量称为局部变量,局部变量只在函数内有效.如果全局变量和局部变量使用相同的变量名,则局部变量将覆盖全局变量.</p>
+<p><strong>定义局部变量:</strong> 如下函数内局部变量必须以var开头,如果在函数内未使用var,系统默认也是定义局部变量.<br><figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">"text/javascript"</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="javascript">        <span class="function"><span class="keyword">function</span> <span class="title">func</span>(<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">            names = <span class="string">"lyshark"</span>;     <span class="comment">//函数内部默认转成局部变量</span></span></span><br><span class="line"><span class="javascript">            <span class="keyword">var</span> age = <span class="number">21</span>;         <span class="comment">//定义局部变量标准写法</span></span></span><br><span class="line"><span class="javascript">            gender = <span class="string">"Man"</span>;       <span class="comment">//默认局部变量</span></span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="javascript">            alert(<span class="string">"姓名:"</span> + names);</span></span><br><span class="line"><span class="javascript">            alert(<span class="string">"年龄:"</span> + age);</span></span><br><span class="line"><span class="javascript">            alert(<span class="string">"性别:"</span> + gender);</span></span><br><span class="line"><span class="undefined">        &#125;</span></span><br><span class="line"><span class="javascript">        func()                   <span class="comment">//调用函数,不掉用则不执行</span></span></span><br><span class="line"><span class="undefined">    </span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>定义全局变量:</strong> 如果我们想要定义全局变量,只需要在函数体外部定义,解释器默认将外部变量当成全局变量.<br><figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">"text/javascript"</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="javascript">        <span class="keyword">var</span> func_names = <span class="string">"lyshark"</span>     <span class="comment">//定义全局变量</span></span></span><br><span class="line"><span class="javascript">            func_novar = <span class="string">"hello"</span>       <span class="comment">//定义全局变量</span></span></span><br><span class="line"><span class="javascript">        <span class="function"><span class="keyword">function</span> <span class="title">func</span>(<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">            alert(<span class="string">"打印全局变量:"</span> + func_names)</span></span><br><span class="line"><span class="javascript">            alert(<span class="string">"打印全局变量:"</span> + func_novar)</span></span><br><span class="line"><span class="undefined">        &#125;</span></span><br><span class="line"><span class="javascript">        func()                   <span class="comment">//调用函数,不掉用则不执行</span></span></span><br><span class="line"><span class="undefined">    </span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="JavaScript-数据类型"><a href="#JavaScript-数据类型" class="headerlink" title="JavaScript 数据类型"></a>JavaScript 数据类型</h2><p>JavaScript 是弱类型脚本语言,声明变量时无需指定变量的数据类型, JavaScript 变量的数据类型是解释时动态决定的,但 JavaScript 的值保存在了内容中,也是有数据类型的 JavaScript 的基本数据类型有以下5种:</p>
+<blockquote>
+<p>● 数值类型: 数值类型包含整数和浮点数<br>● 布尔类型: 布尔类型包括True和False<br>● 数组类型: 数组是一系列数据的集合<br>● 字符串类型: 字符串类型必须以双引号引起来<br>● undefined: 用来确定一个已经创建但没有初始值的变量<br>● null: 用于表明某个变量的值为空</p>
+</blockquote>
+<h3 id="◆数值类型◆"><a href="#◆数值类型◆" class="headerlink" title="◆数值类型◆"></a>◆数值类型◆</h3><p>与强类型语言,如C,JAVA,C++不同 JavaScript 的数值类型不仅包括所有的整型变量,也包括所有的浮点型变量, JavaScript 语言中的数值都以 IEEE754一1985 双精度浮点数格式保存. JavaScript 中的数值形式非常丰富,完全支持用科学计数法表示.</p>
+<p><strong>整数变量:</strong> 使用显式方式声明三个变量,<code>num1=1024</code>,<code>num2=5E2</code>,<code>num3=1.23e-3</code>.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="keyword">var</span> num1 = <span class="number">1024</span>;</span><br><span class="line">        <span class="keyword">var</span> num2 = <span class="number">0x1A</span>;</span><br><span class="line">        <span class="keyword">var</span> num3 = <span class="number">10</span>;</span><br><span class="line">        <span class="keyword">var</span> num4 = <span class="number">20</span>;</span><br><span class="line"></span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"两个数相加:"</span> + (num3 + num4 ))</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>浮点数变量:</strong> 分别声明四个浮点数变量,其中表示方式可以有以下四种形式.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="keyword">var</span> num1 = <span class="number">3.5659</span>;</span><br><span class="line">        <span class="keyword">var</span> num2 = <span class="number">-8.1E12</span>;</span><br><span class="line">        <span class="keyword">var</span> num3 = <span class="number">.1e12</span>;</span><br><span class="line">        <span class="keyword">var</span> num4 = <span class="number">32E-12</span>;</span><br><span class="line"></span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"输出一个浮点数:"</span> + num2)</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>特殊的数值:</strong> 除了上面的数值表示类型外,JS默认定义了一些常量用来表示更多的类型值.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"表示无穷大的特殊值:"</span> + <span class="literal">Infinity</span>)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"特殊的非数字值:"</span> + <span class="literal">NaN</span>)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"表示最大值:"</span> + <span class="built_in">Number</span>.MAX_VALUE)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"表示最小值:"</span> + <span class="built_in">Number</span>.MIN_VALUE)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"特殊的非数字值:"</span> + <span class="built_in">Number</span>.NaN)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"表示正无穷大的特殊值:"</span> + <span class="built_in">Number</span>.POSITIVE_INFINITY)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"表示负无穷大的特殊值:"</span> + <span class="built_in">Number</span>.NEGATIVE_INFINITY)</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>数字转换:</strong> <code>parseInt(..)</code>方法,可以实现将一个字符串转换成整数,如果不成功则返回NaN.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        str = <span class="string">"1024"</span>;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="keyword">typeof</span> str)    <span class="comment">//输出字符串格式</span></span><br><span class="line">        num = <span class="built_in">parseInt</span>(str)        <span class="comment">//将字符串转成数值,赋值给num</span></span><br><span class="line">        <span class="built_in">console</span>.log(num)           <span class="comment">//打印这个数值</span></span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>转浮点数转换:</strong> <code>parseFloat(..)</code>方法,可以实现将一个字符串转换成浮点数,如果不成功则返回NaN.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        str = <span class="string">"1024"</span>;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="keyword">typeof</span> str)    <span class="comment">//输出字符串格式</span></span><br><span class="line">        num = <span class="built_in">parseFloat</span>(str)      <span class="comment">//将字符串转成浮点数,赋值给num</span></span><br><span class="line">        <span class="built_in">console</span>.log(num)           <span class="comment">//打印这个数值</span></span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>常用数值函数:</strong> 这里举三个例子,分别代表判断有限值,保留小数点,和保留小数点后几位.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="keyword">var</span> num1 = <span class="number">1024</span>;</span><br><span class="line">        <span class="keyword">var</span> num2 = <span class="number">3.16159</span>;</span><br><span class="line">        <span class="keyword">var</span> num3 = <span class="number">100</span>;</span><br><span class="line"></span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"判断是否为有限值: "</span> + <span class="built_in">isFinite</span>(num1) + <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"指定要保留的小数点位数: "</span> + num2.toFixed(<span class="number">2</span>) + <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"保留小数点后2位: "</span> + num3.toFixed(<span class="number">2</span>))</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆字符串型◆"><a href="#◆字符串型◆" class="headerlink" title="◆字符串型◆"></a>◆字符串型◆</h3><p>字符串是 JavaScript 中最常用的数据类型,几乎每个程序都会用到字符串,字符串是由字符组成的数组,但在 JavaScript 中字符串是不可变的,可以访问字符串任意位置的文本,但是JavaScript并未提供修改已知字符串内容的方法,JS中有丰富的对字符串的操作函数,常用的包括连接,查找替换,大小写转换等操作,如下是常用的操作格式:<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">obj.length                           获取字符串长度</span><br><span class="line">obj.toString()                       将数组转换成字串</span><br><span class="line">obj.trim()                           移除字符串中空白</span><br><span class="line">obj.trimLeft()                       移除字符串中左边空白</span><br><span class="line">obj.trimRight()                      移除字符串中右边空白</span><br><span class="line">obj.charAt(n)                        返回字符串中的第n个字符</span><br><span class="line">obj.concat(value, ...)               两个或者多个字符串拼接</span><br><span class="line"></span><br><span class="line">obj.indexOf(substring,start)         返回指定字符串在字符串中首次出现的位置</span><br><span class="line">obj.lastIndexOf(substring,start)     返回该元素在字符串中最后一次出现的位置</span><br><span class="line">obj.substring(<span class="keyword">from</span>,to)               提取字符串中介于两个指定下标之间的字符</span><br><span class="line"></span><br><span class="line">obj.slice(start,end)                 从已有字符串数组中返回选定的元素,切片</span><br><span class="line">obj.split(delimiter,limit)           用于把一个字符串分割成字符串数组,分割</span><br><span class="line">obj.toLowerCase()                    将小写字符串转换成大写</span><br><span class="line">obj.toUpperCase()                    将大写字符串转换成小写</span><br><span class="line"></span><br><span class="line">obj.search(regexp)                   从头开始匹配,返回匹配成功的第一个字符串位置,g无效</span><br><span class="line">obj.match(regexp)                    全局搜索,如果正则中有g表示找到全部,否则只找到第一个</span><br><span class="line">obj.replace(regexp,replacement)      正则替换,正则中有g则替换所有,否则只替换第一个匹配项</span><br><span class="line">                                     $数字：匹配的第n个组内容</span><br><span class="line">                                     $&amp;：当前匹配的内容</span><br><span class="line">                                     $<span class="string">`：位于匹配子串左侧的文本</span></span><br><span class="line"><span class="string">                                     $'：位于匹配子串右侧的文本</span></span><br><span class="line"><span class="string">                                     $$：直接量$符号</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>统计字串长度:</strong> 使用<code>length</code>方法获取字符串的长度,并返回,可以直接返回,也可以赋值给变量.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="keyword">var</span> string = <span class="string">" hello lyshark 欢迎来到中国!"</span>;</span><br><span class="line">        <span class="keyword">var</span> num = string.length;</span><br><span class="line">        </span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"统计字符串长度: "</span> + string.length + <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"另一种统计长度的方法: "</span> + num)</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>移除字串空格:</strong> 通过使用<code>trim()</code>移除字符串两边空格,<code>trimLeft(),trimRight()</code>可以分别移除左边和右边空格.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="keyword">var</span> obj = <span class="string">"    lyshark     "</span>;</span><br><span class="line">        </span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"统计字符串大小: "</span> + obj.length + <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"去除两边的空格: "</span> + obj.trim() + <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"统计字符串大小: "</span> + obj.length + <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>字符串拼接:</strong> 使用<code>concat(,)</code>将两个或者多个字符串拼接在一起形成一个新的字符串.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="keyword">var</span> string1 = <span class="string">"hello "</span>;</span><br><span class="line">        <span class="keyword">var</span> string2 = <span class="string">"lyshark"</span>;</span><br><span class="line">        <span class="keyword">var</span> string3 = <span class="string">"welcome"</span>;</span><br><span class="line">        </span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"拼接一个字串: "</span> + string1.concat(string2) + <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"拼接多个字串: "</span> + string1.concat(string2,string3) + <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>字符串提取:</strong> 使用<code>indexOf</code>定位首次出现的位置,<code>lastIndexOf</code>定位最后出现的位置,<code>substring</code>实现提取任意字符串.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="keyword">var</span> str = <span class="string">"Hello World!"</span>;</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"Hello 首次出现的位置: "</span> + str.indexOf(<span class="string">"Hello"</span>) +  <span class="string">"&lt;br/&gt;"</span>)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"World 首次出现的位置: "</span> + str.indexOf(<span class="string">"World"</span>) +  <span class="string">"&lt;br/&gt;"</span>)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"如果没有出现过默认-1: "</span> + str.indexOf(<span class="string">"world"</span>))</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br><span class="line"></span><br><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="keyword">var</span> str = <span class="string">"Hello World! Hello lyshark!"</span>;</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"Hello 最后出现的位置: "</span> + str.lastIndexOf(<span class="string">"Hello"</span>) +  <span class="string">"&lt;br/&gt;"</span>)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"World 最后出现的位置: "</span> + str.lastIndexOf(<span class="string">"World"</span>) +  <span class="string">"&lt;br/&gt;"</span>)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"如果没有出现过默认-1: "</span> + str.lastIndexOf(<span class="string">"world"</span>))</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br><span class="line"></span><br><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="keyword">var</span> str = <span class="string">"Hello World!"</span>;</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"从0偏移取数据,向后取5个: "</span> + str.substring(<span class="number">0</span>,<span class="number">5</span>) +  <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"从0偏移取数据,向后取11个: "</span> + str.substring(<span class="number">0</span>,<span class="number">11</span>) + <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"从3偏移取数据,向后取7个: "</span> + str.substring(<span class="number">3</span>,<span class="number">7</span>))</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>切片与分割:</strong> 通过使用<code>slice()</code>方法切割数组,<code>split()</code>方法用来切割字符串转换成数组.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="keyword">var</span> array = <span class="keyword">new</span> <span class="built_in">Array</span>(<span class="number">5</span>)</span><br><span class="line">        array[<span class="number">0</span>] = <span class="string">"LyShark"</span>;</span><br><span class="line">        array[<span class="number">1</span>] = <span class="string">"Admin"</span>;</span><br><span class="line">        array[<span class="number">2</span>] = <span class="string">"John"</span>;</span><br><span class="line">        array[<span class="number">3</span>] = <span class="string">"Adrew"</span>;</span><br><span class="line"></span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"返回整个数组: "</span> + array +  <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"返回[1]-[2]元素: "</span> + array.slice(<span class="number">1</span>,<span class="number">3</span>) +  <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br><span class="line"></span><br><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="keyword">var</span> str = <span class="string">"hello world my names lyshark !"</span>;</span><br><span class="line">        <span class="keyword">var</span> test = <span class="string">"a:b:c:d:e:f:g:h"</span></span><br><span class="line"></span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"以空格作为分隔符分割字串: "</span> + str.split(<span class="string">" "</span>) +  <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"将每个字母单独变成一个数组: "</span> + str.split(<span class="string">""</span>) +  <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"以空格分隔,只分割前三个单词: "</span> + str.split(<span class="string">" "</span>,<span class="number">3</span>) +  <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"以冒号作为分隔符,分割元素: "</span> + test.split(<span class="string">":"</span>))</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>字符串查找:</strong> 查找字符串并返回所在位置,<code>search() 和 match()</code>方法作用基本一致,查找时支持正则匹配.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="keyword">var</span> string = <span class="string">"hello world my names lyshark my world !"</span>;</span><br><span class="line"></span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"精确查找字符串: "</span> + string.search(<span class="string">"lyshark"</span>) +  <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"精确检索字符串: "</span> + string.search(<span class="regexp">/my/</span>) +  <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"忽略大小写检索: "</span> + string.search(<span class="regexp">/world/i</span>) +  <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br><span class="line"></span><br><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="keyword">var</span> string = <span class="string">"hello world my names lyshark my world  123 456 !"</span>;</span><br><span class="line"></span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"精确查找字符串: "</span> + string.match(<span class="string">"lyshark"</span>) +  <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"全局匹配\d数字: "</span> + string.match(<span class="regexp">/\d+/g</span>) +  <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>字符串替换:</strong> 查找并替换字符串,可以使用<code>replace()</code>方法,该方法也支持正则表达式.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="keyword">var</span> string = <span class="string">"hello world welcome to mkdirs.com hello lyshark HELLO mkdirs!"</span>;</span><br><span class="line"></span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"查找welcome替换成xxxx: "</span> + string.replace(<span class="regexp">/welcome/</span>,<span class="string">"xxxx"</span>) +  <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"全局查找替换hello并替换: "</span> + string.replace(<span class="regexp">/hello/g</span>,<span class="string">"oooo"</span>) +  <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"匹配替换并区分大小写: "</span> + string.replace(<span class="regexp">/HELLO/</span>,<span class="string">"gggg"</span>) +  <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆数组类型◆"><a href="#◆数组类型◆" class="headerlink" title="◆数组类型◆"></a>◆数组类型◆</h3><p>任何编程语言中都存在数组,数组是一系列变量的集合,与其他强类型语言不同的是 JavaScript 中的数组元素的类型可以不相同,这也是动态语言的好处 JavaScript 语言本身只支持一维数组,但是也可以将两个一维数组合起来变成一个二维数组使用,首先看一下常用的数组操作方法:<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">obj.length                           获取数组的大小</span><br><span class="line">obj.push(ele)                        给数组尾部追加元素</span><br><span class="line">obj.pop()                            从尾部获取一个元素</span><br><span class="line">obj.unshift(ele)                     在数组头部插入元素</span><br><span class="line">obj.shift(ele)                       在数组头部移除元素</span><br><span class="line"></span><br><span class="line">obj.slice()                          数组元素的切片</span><br><span class="line">obj.concat(val,..)                   多个数组相连接</span><br><span class="line">obj.join(sep)                        将数组连接起来变成字符串</span><br><span class="line">obj.sort()                           对数组元素进行排序</span><br><span class="line">obj.reverse()                        反转数组中的元素</span><br><span class="line"></span><br><span class="line">obj.splice(n,<span class="number">0</span>,val)                  在数组指定位置插入元素</span><br><span class="line">obj.splice(n,<span class="number">1</span>,val)                  在数组指定位置替换元素</span><br><span class="line">obj.splice(n,<span class="number">1</span>)                      在数组指定位置删除元素</span><br></pre></td></tr></table></figure></p>
+<p><strong>定义一维数组:</strong> 以下案例定义了3个数组,并且分别给数组赋值,然后打印结果.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="keyword">var</span> array = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>];         <span class="comment">//创建数组,并有5个元素</span></span><br><span class="line">        <span class="keyword">var</span> array1 = [];                <span class="comment">//创建空数组</span></span><br><span class="line">        <span class="keyword">var</span> array2 = <span class="keyword">new</span> <span class="built_in">Array</span>()        <span class="comment">//同样创建空数组</span></span><br><span class="line">        array1[<span class="number">0</span>] = <span class="string">"hello"</span>;</span><br><span class="line">        array1[<span class="number">2</span>] = <span class="string">"world"</span>;</span><br><span class="line">        array2[<span class="number">0</span>] = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"数组array大小: "</span> + array.length + <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"数组array1大小: "</span> + array1.length + <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"数组array2大小: "</span> + array2.length)</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>定义二维数组:</strong> 以下案例定义了3个数组,并且分别给数组赋值,然后通过循环语句打印数组值.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="keyword">var</span> value = [[<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>],[<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>],[<span class="number">7</span>,<span class="number">8</span>,<span class="number">9</span>,<span class="number">10</span>]];                          <span class="comment">//创建二维数组</span></span><br><span class="line"></span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"数组value大小: "</span> + value.length + <span class="string">"&lt;br&gt;"</span>)          <span class="comment">//打印数组大小</span></span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"数组value[2]大小: "</span> + value[<span class="number">2</span>].length + <span class="string">"&lt;br&gt;"</span>)    <span class="comment">//打印数组大小</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">var</span> i=<span class="number">0</span>;i&lt;<span class="number">3</span>;i++)           <span class="comment">//循环输出数组元素</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">for</span>(j <span class="keyword">in</span> value[i])        <span class="comment">//输出每个数组元素的值</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="built_in">document</span>.write(<span class="string">" "</span> + value[i][j]);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="built_in">document</span>.write(<span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>插入修改与删除:</strong> 通过使用<code>splice()</code>方法,实现对元素的插入,增加,修改,删除.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="keyword">var</span> array = <span class="keyword">new</span> <span class="built_in">Array</span>(<span class="number">5</span>)</span><br><span class="line">        array[<span class="number">0</span>] = <span class="string">"admin"</span>;</span><br><span class="line">        array[<span class="number">1</span>] = <span class="string">"guest"</span>;</span><br><span class="line">        array[<span class="number">2</span>] = <span class="string">"lyshark"</span>;</span><br><span class="line">        array[<span class="number">3</span>] = <span class="string">"wall"</span>;</span><br><span class="line">        </span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"当前列表: "</span> + array + <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">        array.splice(<span class="number">2</span>,<span class="number">1</span>,<span class="string">"替换成我"</span>)                    <span class="comment">//把第2个元素提换,替换1次</span></span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"替换列表: "</span> + array + <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">        array.splice(<span class="number">5</span>,<span class="number">1</span>,<span class="string">"插入元素"</span>)                   <span class="comment">//在第5个位置上插入新元素</span></span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"插入列表: "</span> + array + <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">        array.splice(<span class="number">1</span>,<span class="number">3</span>,<span class="string">"删除元素"</span>)                   <span class="comment">//删除第2个位置以后2个元素</span></span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"删除列表: "</span> + array + <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>PUSH/POP操作元素:</strong> 通过该命令可实现在数组结尾追加新元素,也可从结尾删除元素.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="keyword">var</span> list = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>];</span><br><span class="line"></span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"数组元素: "</span> + list + <span class="string">"  总大小:"</span> + list.length + <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">        list.push(<span class="number">6</span>)</span><br><span class="line">        list.push(<span class="number">7</span>)     <span class="comment">//在结尾添加新元素</span></span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"数组元素: "</span> + list + <span class="string">"  总大小:"</span> + list.length + <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">        list.pop()</span><br><span class="line">        list.pop()     <span class="comment">//在结尾删除元素</span></span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"数组元素: "</span> + list + <span class="string">"  总大小:"</span> + list.length + <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>Shift/Unshift:</strong> 该命令可以实现在数组元素的头部添加元素,或者是删除头部的元素.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="keyword">var</span> list = [<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>];</span><br><span class="line"></span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"数组元素: "</span> + list + <span class="string">"  总大小:"</span> + list.length + <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">        list.unshift(<span class="number">3</span>)</span><br><span class="line">        list.unshift(<span class="number">2</span>)</span><br><span class="line">        list.unshift(<span class="number">1</span>)     <span class="comment">//在开头添加元素</span></span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"数组元素: "</span> + list + <span class="string">"  总大小:"</span> + list.length + <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">        list.shift()</span><br><span class="line">        list.shift()       <span class="comment">//从开头删除一个元素</span></span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"数组元素: "</span> + list + <span class="string">"  总大小:"</span> + list.length + <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>切片与连接:</strong> 使用<code>slice()</code>方法实现数组的切片,<code>concat()</code>实现数组连接,<code>join()</code>数组转成字符串.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt; ----------------------------[数组切片]---------------------------- &gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="keyword">var</span> array = <span class="keyword">new</span> <span class="built_in">Array</span>()</span><br><span class="line">        array[<span class="number">0</span>] = <span class="string">"admin"</span>;</span><br><span class="line">        array[<span class="number">1</span>] = <span class="string">"lyshark"</span>;</span><br><span class="line">        array[<span class="number">2</span>] = <span class="string">"Thomas"</span>;</span><br><span class="line">        array[<span class="number">3</span>] = <span class="string">"John"</span>;</span><br><span class="line">        array[<span class="number">4</span>] = <span class="string">"George"</span>;</span><br><span class="line"></span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"数组切片(从1号索引开始显示元素): "</span> + array.slice(<span class="number">1</span>) + <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"数组切片(从3号索引开始显示元素): "</span> + array.slice(<span class="number">3</span>) + <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"数组切片(只显示1-2号元素切片): "</span> + array.slice(<span class="number">1</span>,<span class="number">3</span>) + <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br><span class="line">&lt; ----------------------------[数组连接]---------------------------- &gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="keyword">var</span> array = <span class="keyword">new</span> <span class="built_in">Array</span>();</span><br><span class="line">        <span class="keyword">var</span> a = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>];</span><br><span class="line">        <span class="keyword">var</span> b = [<span class="number">7</span>,<span class="number">8</span>,<span class="number">9</span>,<span class="number">10</span>];</span><br><span class="line"></span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"将数组连接: "</span> + array.concat(a,b) + <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"直接连接并打印: "</span> + a.concat(b) + <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br><span class="line">&lt; ----------------------------[数组转换]---------------------------- &gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="keyword">var</span> array = <span class="keyword">new</span> <span class="built_in">Array</span>(<span class="number">3</span>);</span><br><span class="line">        array[<span class="number">0</span>] = <span class="string">"admin"</span>;</span><br><span class="line">        array[<span class="number">1</span>] = <span class="string">"guest"</span>;</span><br><span class="line">        array[<span class="number">2</span>] = <span class="string">"lyshark"</span>;</span><br><span class="line"></span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"直接连接成字符串: "</span> + array.join() + <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"连接成字符串并添加一个分隔符: "</span> + array.join(<span class="string">"*"</span>) + <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>数组元素排序:</strong> 使用<code>sort()</code>方法实现数组的正向排列,<code>reverse()</code>则实现数组的反向排列.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="keyword">var</span> array = [<span class="number">12</span>,<span class="number">65</span>,<span class="number">77</span>,<span class="number">89</span>,<span class="number">32</span>,<span class="number">-19</span>,<span class="number">54</span>,<span class="number">33</span>,<span class="number">78</span>]</span><br><span class="line"></span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"未排序前: "</span> + array + <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"正向排序: "</span> + array.sort() + <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"反向排序: "</span> + array.reverse() + <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆布尔类型◆"><a href="#◆布尔类型◆" class="headerlink" title="◆布尔类型◆"></a>◆布尔类型◆</h3><p>在前面的案例中我们看了数值类型和字符串类型,该类型数据都有无穷大的数值,但是布尔行数据类型只有两个取值,通常情况下布尔类型直接表示方式有两个,<code>True/False</code>这两个表示方式,分别代表真和假,它主要用于描述一种状态或者标志,通常用来比较所得到的结果.</p>
+<p><strong>相等于不相等:</strong> 使用<code>==</code>双等于号判断两数字是否相等,使用<code>!=</code>不等于号判断两数字是否不相等.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        num1 = <span class="number">1</span>;</span><br><span class="line">        num2 = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">if</span>(num1 == num2)&#123;</span><br><span class="line">            <span class="built_in">document</span>.write(<span class="string">"两数相等..."</span>)</span><br><span class="line">        &#125;<span class="keyword">else</span> <span class="keyword">if</span>(num1 != num2)&#123;</span><br><span class="line">            <span class="built_in">document</span>.write(<span class="string">"两数不相等..."</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>与运算与或运算:</strong> 使用<code>||</code>或运算符实现或运算,使用<code>&amp;&amp;</code>与运算符实现与运算.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        num1 = <span class="string">"true"</span>;</span><br><span class="line">        num2 = <span class="string">"false"</span>;</span><br><span class="line">        num3 = <span class="string">"ok"</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(num1 == num2 || num2 == num2)&#123;</span><br><span class="line">            <span class="built_in">document</span>.write(<span class="string">"或运算的比较结果..."</span>)</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(num1 == num1 &amp;&amp; num2 == num2)&#123;</span><br><span class="line">            <span class="built_in">document</span>.write(<span class="string">"与运算的比较结果..."</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆类型转换◆"><a href="#◆类型转换◆" class="headerlink" title="◆类型转换◆"></a>◆类型转换◆</h3><p>JS是一种松散类型的程序设计语言,并没有严格地规定变最的数据类型,己经定义数据类型的变量可以在表达式中自动转换数据类型,或通过相应的方法来转换数据类型,自动类型转换有一定的规则,如果按照 JS的类型转换规则,没有转换或者转换的类型不对,就需要通过相应的方法来进行转换.</p>
+<p><strong>基本类型转换:</strong> 基本类型转换<code>String:将字数字转成字符串</code>,<code>Number:将其他类型转为整数</code>,<code>Boolean:其他类型转成布尔类型</code>.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"其他类型转换为字符串: "</span> + <span class="built_in">String</span>(<span class="number">1024</span>) + <span class="string">"&lt;br&gt;"</span>);</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"其他类型转换为数值:"</span> + <span class="built_in">Number</span>(<span class="string">"hello"</span>) + <span class="string">"&lt;br&gt;"</span>);</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"其他类型转换为布尔:"</span> + <span class="built_in">Boolean</span>(<span class="number">1</span>) + <span class="string">"&lt;br&gt;"</span>);</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>字符串转成整数:</strong> 字符串之间的数据转换,与进制转换实例.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"将a转换成整数: "</span> + <span class="built_in">parseInt</span>(<span class="string">"a"</span>) + <span class="string">"&lt;br&gt;"</span>);</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"将a转换成8进制,整数: "</span> + <span class="built_in">parseInt</span>(<span class="string">"a"</span>,<span class="number">8</span>) + <span class="string">"&lt;br&gt;"</span>);</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"将a转换成2进制,整数: "</span> + <span class="built_in">parseInt</span>(<span class="string">"a"</span>,<span class="number">2</span>) + <span class="string">"&lt;br&gt;"</span>);</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"将a转换成浮点数: "</span> + <span class="built_in">parseFloat</span>(<span class="string">"a"</span>) + <span class="string">"&lt;br&gt;"</span>);</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>eval()计算:</strong> EVAL用于计算字符串表达式或语句的值.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="keyword">var</span> num = <span class="number">10</span>;</span><br><span class="line">        <span class="keyword">var</span> str = <span class="string">"1024"</span>;</span><br><span class="line"></span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"eval连接字符串: "</span> + <span class="built_in">eval</span>(str+num) + <span class="string">"&lt;br&gt;"</span>);</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="JavaScript-流程控制"><a href="#JavaScript-流程控制" class="headerlink" title="JavaScript 流程控制"></a>JavaScript 流程控制</h2><p>所谓流程就是程序代码所执行的顺序,在任何一种语言中,程序控制流程是必须的,他能够是整个程序减少混乱,使之顺利的按照一定得方式执行工作,在 JavaScript 中常用的程序流程有三种,顺序结构,选择结构,和循环结构,下面将依次演示他们的使用技巧.</p>
+<p><strong>if-else:</strong> 判断<code>if(num1&gt;num2)</code>如果条件满足则执行,否则判断<code>if(num2&gt;num3)</code>,满足执行否则执行<code>else</code>里面的代码.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="keyword">var</span> num1 = <span class="number">100</span>;</span><br><span class="line">        <span class="keyword">var</span> num2 = <span class="number">200</span>;</span><br><span class="line">        <span class="keyword">var</span> num3 = <span class="number">10</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(num1 &gt; num2)&#123;</span><br><span class="line">            <span class="keyword">var</span> temp = num1 - num2;</span><br><span class="line">            <span class="built_in">document</span>.write(<span class="string">"num1 大于 num2"</span> + <span class="string">"     比num2多出:"</span> + temp)</span><br><span class="line">        &#125;<span class="keyword">else</span> <span class="keyword">if</span>(num2 &gt; num3)&#123;</span><br><span class="line">            <span class="keyword">var</span> temp = num2 - num3</span><br><span class="line">            <span class="built_in">document</span>.write(<span class="string">"num2 大于 num3"</span> + <span class="string">"     比num2多出:"</span> + temp)</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            <span class="built_in">document</span>.write(<span class="string">"没有合适的结果.."</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>switch:</strong> switch通常用于选择结构,以下代码用户输入一个数值,进入选择结构根据输入数值执行相应代码片段.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="keyword">var</span> temp;</span><br><span class="line">        temp = prompt(<span class="string">"请选择输入(1,2,*):"</span>,<span class="string">""</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">switch</span>(temp)&#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">"1"</span>:</span><br><span class="line">                <span class="built_in">document</span>.write(<span class="string">"你选择了1号"</span>);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">"2"</span>:</span><br><span class="line">                <span class="built_in">document</span>.write(<span class="string">"你选择了2号"</span>);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">default</span>:</span><br><span class="line">                <span class="built_in">document</span>.write(<span class="string">"你选择了其他选项"</span>);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>while:</strong> 循环执行结构,while会一直循环下去,直到满足<code>(num &lt;=100)</code>的条件则跳出循环,语句语法结构如下.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="keyword">var</span> num = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">var</span> sum = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span>(num &lt;=<span class="number">100</span>)&#123;</span><br><span class="line">            sum = sum +num;</span><br><span class="line">            num = num +<span class="number">1</span>;</span><br><span class="line">            <span class="built_in">document</span>.write(<span class="string">"当前循环:  "</span>+ num + <span class="string">"  当前累加: "</span> + sum);</span><br><span class="line">            <span class="built_in">document</span>.write(<span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"从1+100...结果是:"</span> + sum)</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>for:</strong> 以下案例,通过for循环遍历<code>names</code>列表,每次循环<code>i++</code>递增,直到满足<code>(i&lt;names.length)</code>则退出循环.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="keyword">var</span> names = [<span class="string">"admin"</span>,<span class="string">"guest"</span>,<span class="string">"lyshark"</span>,<span class="string">"alex"</span>]</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">var</span> i=<span class="number">0</span>;i&lt;names.length;i++)&#123;</span><br><span class="line">            <span class="built_in">document</span>.write(<span class="string">"当前位置: "</span>+ i +<span class="string">"元素值: "</span> + names[i])</span><br><span class="line">            <span class="built_in">document</span>.write(<span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>for in:</strong> 这是一种类似python的语法格式,使用效果和python中的循环语句并无差异.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="keyword">var</span> names = [<span class="string">"admin"</span>,<span class="string">"guest"</span>,<span class="string">"lyshark"</span>,<span class="string">"alex"</span>]</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">var</span> index <span class="keyword">in</span> names)&#123;</span><br><span class="line">            <span class="built_in">document</span>.write(<span class="string">"当前位置: "</span>+ index +<span class="string">"元素值: "</span> + names[index])</span><br><span class="line">            <span class="built_in">document</span>.write(<span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>try..catch:</strong> 异常处理,当try里面代码出现问题的时候自动执行catch抛出异常,最后无论是否异常都会执行finally.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// 这段代码从上往下运行,其中任何一个语句抛出异常该代码块就结束运行</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">catch</span>(e)&#123;</span><br><span class="line">             <span class="comment">// 如果try代码块中抛出了异常,catch代码块中的代码就会被执行</span></span><br><span class="line">             <span class="comment">// e是一个局部变量，用来指向Error对象或者其他抛出的对象</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">finally</span>&#123;</span><br><span class="line">            <span class="comment">// 无论try中代码是否有异常抛出(甚至是try代码块中有return语句),finally代码块中始终会被执行</span></span><br><span class="line">        &#125;</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="JavaScript-关于函数"><a href="#JavaScript-关于函数" class="headerlink" title="JavaScript 关于函数"></a>JavaScript 关于函数</h2><p>函数为编程者提供了在整个程序中重复使用一个单元结构的能力,在这个单元中封装了完成指定任务或者功能的程序代码,为了使用函数,需要知道如何定义函数,如何将变量传递给函数,以及如何返问函数计算出的结果,另外 JavaScript 以其灵活性的特点,我们可以将一些开发环境中常用到的模块进行封装,然后再使用时直接调用即可,节约了开发周期.</p>
+<h3 id="◆函数的定义◆"><a href="#◆函数的定义◆" class="headerlink" title="◆函数的定义◆"></a>◆函数的定义◆</h3><p>JavaScript 中函数基本上可以分为三类,普通函数,匿名函数,自执行函数,此外需要注意的是对于 JavaScript中 函数参数,实际参数的个数可能小于形式参数的个数,函数内的特殊值arguments中封装了所有实际参数.</p>
+<p><strong>普通无参函数:</strong> 以下代码,通过使用关键字<code>function</code>声明了<code>func()</code>无参数的函数.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">function</span> <span class="title">func</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">            <span class="built_in">document</span>.write(<span class="string">"这个无参数函数被执行了..."</span> + <span class="string">"&lt;br&gt;"</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="string">"ok"</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">var</span> ret = func()    <span class="comment">//调用函数,并将返回值赋值给ret变量</span></span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"函数的返回值是: "</span> + ret);</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>普通有参函数:</strong> 以下代码,通过使用关键字<code>function</code>声明了<code>func()</code>有参数的函数,其中形式参数有<code>name,age,sex</code>.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">function</span> <span class="title">func</span>(<span class="params">name,age,sex</span>)</span>&#123;</span><br><span class="line">            <span class="built_in">document</span>.write(<span class="string">"姓名: "</span> + name + <span class="string">"年龄:"</span> + age + <span class="string">"性别: "</span> + sex + <span class="string">"&lt;br&gt;"</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">var</span> ret = func(<span class="string">"lyshark"</span>,<span class="string">"22"</span>,<span class="string">"Man"</span>)     <span class="comment">//调用函数</span></span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"函数的返回值是: "</span> + ret);</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>传递数组地址:</strong> 我们不仅仅可以传递单个的参数,还可以将一个预定义好的数组传递到函数体内部.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="function"><span class="keyword">function</span> <span class="title">show</span>(<span class="params">temp</span>)</span></span><br><span class="line"><span class="function">        </span>&#123;</span><br><span class="line">            <span class="keyword">for</span>(i <span class="keyword">in</span> temp)</span><br><span class="line">                <span class="built_in">document</span>.write(temp[i] + <span class="string">"  "</span>);</span><br><span class="line">            <span class="built_in">document</span>.write(<span class="string">"&lt;br&gt;"</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">var</span> array = <span class="keyword">new</span> <span class="built_in">Array</span>(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>,<span class="number">9</span>,<span class="number">10</span>);</span><br><span class="line">        show(array)  <span class="comment">//传递一个数组到函数体,并执行</span></span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>定义匿名函数:</strong> 匿名函数,就是没有名字的函数,需要我们手动进行调用,一般情况不会使用.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="keyword">var</span> func = <span class="function"><span class="keyword">function</span>(<span class="params">x,y</span>)</span>&#123;</span><br><span class="line">            <span class="built_in">document</span>.write(<span class="string">"参数1= "</span> + x + <span class="string">"参数2= "</span> + y);</span><br><span class="line">        &#125;</span><br><span class="line">        func(<span class="number">10</span>,<span class="number">20</span>)      <span class="comment">//调用匿名函数</span></span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>自执行函数:</strong> 自执行函数,也就是说无论我们是否调用它,它都会被执行,适合做初始化工作.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        (<span class="function"><span class="keyword">function</span>(<span class="params">name,url</span>)</span>&#123;</span><br><span class="line">            <span class="built_in">document</span>.write(<span class="string">"姓名: "</span> + name + <span class="string">"URL: "</span> + url);</span><br><span class="line">        &#125;)(<span class="string">"lyshark"</span>,<span class="string">"mkdirs.com"</span>)</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>arguments:</strong> 使用特殊对象arguments,开发者无需明确指出参数名,就能访问数据的内部元素.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="function"><span class="keyword">function</span> <span class="title">func</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">            <span class="built_in">document</span>.write(<span class="string">"当前参数长度: "</span> + <span class="built_in">arguments</span>.length + <span class="string">"&lt;br&gt;"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        func(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>);</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆嵌套与递归◆"><a href="#◆嵌套与递归◆" class="headerlink" title="◆嵌套与递归◆"></a>◆嵌套与递归◆</h3><p>函数嵌套与递归式很多编程语言的通用属性,同样的 JavaScript 虽然是脚本语言,但是也支持嵌套和递归函数的实现,函数嵌套是语言特性,递归调用是逻辑思想,这两者有关但并不互斥,一个递归过程可以包含函数嵌套,同样一个递归函数也可当做是自身嵌套函数,一般情况下不会使用这些特性.</p>
+<p><strong>函数的嵌套:</strong> 函数的嵌套是指在函数体的内部再次嵌套一层函数体,并依次返回执行结果,就是嵌套函数.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="function"><span class="keyword">function</span> <span class="title">ext_func</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">            <span class="function"><span class="keyword">function</span> <span class="title">func</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">                <span class="built_in">document</span>.write(<span class="string">"内部函数执行结果...."</span> + <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">                <span class="keyword">return</span> <span class="number">1024</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            ret = func()</span><br><span class="line">            <span class="keyword">return</span> ret</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        ret = ext_func()</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"内部函数返回值: "</span> + ret)</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>函数的递归:</strong> 函数的递归是指函数不停地调用自身,直到满足一定得条件才会自动的跳出循环体.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="function"><span class="keyword">function</span> <span class="title">func</span>(<span class="params">temp</span>)</span>&#123;</span><br><span class="line">            <span class="keyword">if</span>(temp == <span class="number">1</span>)&#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">            &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                <span class="keyword">return</span> func(temp<span class="number">-1</span>)+<span class="number">2</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        ret = func(<span class="number">5</span>)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"内部函数返回值: "</span> + ret)</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>函数的闭包:</strong> 通常情况下,我们想调用一个函数内部的嵌套方法,我们可以使用闭包的形式来实现.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="function"><span class="keyword">function</span> <span class="title">func1</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">            <span class="keyword">var</span> array = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>];</span><br><span class="line">            <span class="function"><span class="keyword">function</span> <span class="title">func2</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> array;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> func2;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        temp = func1()                    <span class="comment">//调用语句返回函数func2对象</span></span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"函数返回对象: "</span> + temp + <span class="string">"&lt;br&gt;"</span>);</span><br><span class="line">        ret = temp()                      <span class="comment">//调用这个对象,最终得到结果</span></span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"最终返回值: "</span> + ret);</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆常用内置函数◆"><a href="#◆常用内置函数◆" class="headerlink" title="◆常用内置函数◆"></a>◆常用内置函数◆</h3><p>除了可以在 JavaScript 中自己定义函数以外 JavaScript 自身也提供了一些内部函数,也称为内部方法,程序可以直接调用这些函数来完成某些功能,下面是 JavaScript 中的一些内部函数的介绍.</p>
+<p><strong>encodeURI:</strong> 返回一个对URI字符串编码后的结果,URI表示的范围比URL要大.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="keyword">var</span> urlstr = <span class="built_in">encodeURI</span>(<span class="string">"http://www.mkdirs.com/index.html country=中国"</span>)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"URI中的转义字符: "</span> + urlstr + <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">var</span> urlstr = <span class="built_in">encodeURIComponent</span>(<span class="string">"http://www.mkdirs.com/index.html country=中国"</span>)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"转义URI组件中的字符: "</span> + urlstr)</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>decodeURI:</strong> 对一个编码后的URI字符串进行解释,翻译成一个正常格式.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="keyword">var</span> urlstr = <span class="built_in">decodeURI</span>(<span class="string">"http://www.mkdirs.com/index.html%20country=%E4%B8%AD%E5%9B%BD"</span>)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"URI翻译: "</span> + urlstr + <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">var</span> urlstr = <span class="built_in">decodeURIComponent</span>(<span class="string">"%2Findex.html%20country%3D%E4%B8%AD%E5%9B%BD"</span>)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"URI组件翻译: "</span> + urlstr)</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>字符串转换:</strong> 使用<code>escape()</code>方法对字符串进行转义处理,<code>unescape()</code>则负责将代码解码.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        <span class="keyword">var</span> encode = <span class="built_in">escape</span>(<span class="string">"中国"</span>)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"字符串转换: "</span> + encode + <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">        <span class="keyword">var</span> decode = <span class="built_in">unescape</span>(<span class="string">"%u4E2D%u56FD"</span>)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"字符串解码: "</span> + decode)</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>JSON序列化:</strong> 使用JSON方法将数组序列化存储,方便数据传输.<br><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        array = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>]</span><br><span class="line">        ret = <span class="built_in">JSON</span>.stringify(array)    <span class="comment">//序列化,将其他类型转换成字符串</span></span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"序列化后的类型: "</span> + <span class="keyword">typeof</span>(ret) + <span class="string">"&lt;br&gt;"</span>)</span><br><span class="line">        <span class="built_in">document</span>.write(<span class="string">"反序列化,加载结果: "</span> + <span class="built_in">JSON</span>.parse(ret))</span><br><span class="line">    &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2019/02/20/Web 前端/Web前端开发JavaScript基础-3/">Web前端开发JavaScript基础(3)</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2019年02月20日 - 15:02</p>
+  <p><span>最后更新:</span>2019年04月16日 - 14:04</p>
+  <p><span>原始链接:</span><a href="/2019/02/20/Web 前端/Web前端开发JavaScript基础-3/" title="Web前端开发JavaScript基础(3)">https://www.mkdirs.com/2019/02/20/Web 前端/Web前端开发JavaScript基础-3/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Web-前端/" rel="tag"> <i class="fa fa-tag"></i> Web 前端</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/02/14/Web 前端/Web前端开发CSS基础-2/" rel="next" title="Web前端开发CSS基础(2)">
+                <i class="fa fa-chevron-left"></i> Web前端开发CSS基础(2)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/02/21/Web 前端/Web前端开发JavaScript提高-4/" rel="prev" title="Web前端开发JavaScript提高(4)">
+                Web前端开发JavaScript提高(4) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#JavaScript-代码引入"><span class="nav-text">JavaScript 代码引入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JavaScript-定义变量"><span class="nav-text">JavaScript 定义变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JavaScript-数据类型"><span class="nav-text">JavaScript 数据类型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆数值类型◆"><span class="nav-text">◆数值类型◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆字符串型◆"><span class="nav-text">◆字符串型◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆数组类型◆"><span class="nav-text">◆数组类型◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆布尔类型◆"><span class="nav-text">◆布尔类型◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆类型转换◆"><span class="nav-text">◆类型转换◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JavaScript-流程控制"><span class="nav-text">JavaScript 流程控制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JavaScript-关于函数"><span class="nav-text">JavaScript 关于函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆函数的定义◆"><span class="nav-text">◆函数的定义◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆嵌套与递归◆"><span class="nav-text">◆嵌套与递归◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆常用内置函数◆"><span class="nav-text">◆常用内置函数◆</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="FTP 是File Transfer Protocol(文件传输协议)的英文简称,而中文简称为”文传协议”.用于Internet上的控制文件的双向传输,使用FTP来传输时,其实是具有一定程度的『危险性』,因为数据在因特网上面是完全没有受到保护的『明文』传输方式,VSFTP是一个基于GPL发布的类Unix系统上使用的FTP服务器软件,它的全称是Very Secure FTP,从名称定义上基本可以看出">
+<meta name="keywords" content="Linux 服务配置">
+<meta property="og:type" content="article">
+<meta property="og:title" content="配置VSFTP文件服务器">
+<meta property="og:url" content="https://www.mkdirs.com/2018/09/16/Linux 服务配置/配置VSFTP文件服务器/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="FTP 是File Transfer Protocol(文件传输协议)的英文简称,而中文简称为”文传协议”.用于Internet上的控制文件的双向传输,使用FTP来传输时,其实是具有一定程度的『危险性』,因为数据在因特网上面是完全没有受到保护的『明文』传输方式,VSFTP是一个基于GPL发布的类Unix系统上使用的FTP服务器软件,它的全称是Very Secure FTP,从名称定义上基本可以看出">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20180917103113.jpg">
+<meta property="og:updated_time" content="2019-04-16T12:39:05.305Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="配置VSFTP文件服务器">
+<meta name="twitter:description" content="FTP 是File Transfer Protocol(文件传输协议)的英文简称,而中文简称为”文传协议”.用于Internet上的控制文件的双向传输,使用FTP来传输时,其实是具有一定程度的『危险性』,因为数据在因特网上面是完全没有受到保护的『明文』传输方式,VSFTP是一个基于GPL发布的类Unix系统上使用的FTP服务器软件,它的全称是Very Secure FTP,从名称定义上基本可以看出">
+<meta name="twitter:image" content="https://www.mkdirs.com/picture/20180917103113.jpg">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/09/16/Linux 服务配置/配置VSFTP文件服务器/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>配置VSFTP文件服务器 | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/09/16/Linux 服务配置/配置VSFTP文件服务器/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">配置VSFTP文件服务器
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-09-16 23:10:08" itemprop="dateCreated datePublished" datetime="2018-09-16T23:10:08+08:00">2018-09-16</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-16 20:39:05" itemprop="dateModified" datetime="2019-04-16T20:39:05+08:00">2019-04-16</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Linux-服务配置/" itemprop="url" rel="index"><span itemprop="name">Linux 服务配置</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>FTP 是File Transfer Protocol(文件传输协议)的英文简称,而中文简称为”文传协议”.用于Internet上的控制文件的双向传输,使用FTP来传输时,其实是具有一定程度的『危险性』,因为数据在因特网上面是完全没有受到保护的『明文』传输方式,VSFTP是一个基于GPL发布的类Unix系统上使用的FTP服务器软件,它的全称是Very Secure FTP,从名称定义上基本可以看出,这是为了解决ftp传输安全性问题的.</p>
+<a id="more"></a>
+<p><strong>VSFTP的特点:</strong></p>
+<p>1.vsftp程序的运行者一般是普通用户,降低了相对应进程的权限,提高了安全性.<br>2.任何需要执行较高权限的指令都需要上层程序许可.<br>3.ftp所需要使用的绝大多数命令都被整合到了vsftp中,基本不需要系统额外提供命令.<br>4.拥有chroot功能,可以改变用户的根目录,限制用户只能在自己的家目录.</p>
+<p><strong>VSFTP的连接类型:</strong></p>
+<p>控制连接（持续连接）-&gt; TCP21（命令信道）-&gt; 用户收发FTP命令<br>数据连接（按需连接）-&gt; TCP20（数据信道）-&gt; 用于上传下载数据</p>
+<p><strong>VSFTP的工作模式:</strong></p>
+<p><img src="/picture/20180917103113.jpg" alt="blockchain"></p>
+<p><strong>主动模式与被动模式注意事项</strong></p>
+<p>1.很多防火墙在设置的时候都是不允许接受外部发起的连接,所以许多位于防火墙后或内网的FTP服务器不支持PASV模式,因为客户端无法穿过防火墙打开FTP服务器的高位端口.<br>2.而许多内网的客户端不能用PORT模式登陆FTP服务器，因为从服务器的TCP20无法和内部网络的客户端建立一个新的连接，造成无法工作.</p>
+<p><strong>VSFTP的传输模式:</strong></p>
+<blockquote>
+<p>ASCII传输方式</p>
+<blockquote>
+<p>1.假定用户正在拷贝的文件包含的简单ASCII码文本,如果在远程机器上运行的不是UNIX,当文件传输时ftp通常会自动地调整文件的内容以便于把文件解释成另外那台计算机存储文本文件的格式.<br>2.但是常常有这样的情况,用户正在传输的文件包含的不是文本文件,它们可能是程序,数据库,字处理文件或者压缩文件.在拷贝任何非文本文件之前,用binary命令告诉ftp逐字拷贝</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>二进制传输模式(Binary模式)</p>
+<blockquote>
+<p>1.在二进制传输中,保存文件的位序,以便原始和拷贝的是逐位对应的.即使目的地机器上包含位序列的文件是没意义的.例如QQ.exe以二进制方式传送可执行文件到Linux系统,在对方系统上,此文件不能执行.</p>
+</blockquote>
+</blockquote>
+<p>以上就是全部的常用内容啦,基本上面试也就问这些东西.<br><br></p>
+<h2 id="配置匿名FTP服务器"><a href="#配置匿名FTP服务器" class="headerlink" title="配置匿名FTP服务器"></a>配置匿名FTP服务器</h2><p>作用：任意用户,输入FTP服务器IP都可以访问,只需输入用户名ftp即可访问.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[匿名配置常用参数]</span><br><span class="line"></span><br><span class="line">	anonymous_enable=YES		<span class="comment">#启用匿名访问</span></span><br><span class="line">	anon_umask=022			<span class="comment">#匿名用户所上传文件的权限掩码</span></span><br><span class="line">	anon_root=/var/ftp		<span class="comment">#匿名用户的FTP根目录</span></span><br><span class="line">	anon_upload_enable=YES		<span class="comment">#允许上传文件</span></span><br><span class="line">	anon_mkdir_write_enable=YES	<span class="comment">#允许创建目录</span></span><br><span class="line">	anon_other_write_enable=YES	<span class="comment">#开放其他写入权</span></span><br><span class="line">	anon_max_rate=0			<span class="comment">#限制最大传输速率</span></span><br></pre></td></tr></table></figure>
+<p>1.安装VSFTP服务器.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y vsftpd</span></span><br></pre></td></tr></table></figure></p>
+<p>2.修改VSFTP主配置文件,覆盖写入以下内容,并去掉#号注释即可.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/vsftpd/vsftpd.conf</span></span><br><span class="line"></span><br><span class="line">pasv_enable=YES							<span class="comment">#开启被动模式</span></span><br><span class="line">pasv_min_port=10000						<span class="comment">#被动模式最小端口</span></span><br><span class="line">pasv_max_port=15000						<span class="comment">#被动模式最大端口</span></span><br><span class="line"></span><br><span class="line">anonymous_enable=YES						<span class="comment">#允许匿名用户访问</span></span><br><span class="line">anon_upload_enable=YES						<span class="comment">#允许匿名用户上传</span></span><br><span class="line">anon_mkdir_write_enable=YES					<span class="comment">#允许匿名用户建立目录</span></span><br><span class="line">anon_other_write_enable=YES					<span class="comment">#开放其他人写入权限</span></span><br><span class="line">anon_umask=022							<span class="comment">#设置匿名用户umask</span></span><br><span class="line">anon_root=/ghost						<span class="comment">#匿名用户ftp根目录</span></span><br><span class="line"></span><br><span class="line">local_enable=YES						<span class="comment">#允许本地用户登录</span></span><br><span class="line">write_enable=YES						<span class="comment">#允许本地用户上传</span></span><br><span class="line">local_umask=022							<span class="comment">#本地用户上传umask值</span></span><br><span class="line">xferlog_enable=YES						<span class="comment">#激活记录日志</span></span><br><span class="line">connect_from_port_20=YES					<span class="comment">#主动模式传输接口</span></span><br><span class="line">xferlog_std_format=YES						<span class="comment">#使用标准ftp日志的格式</span></span><br><span class="line"></span><br><span class="line">listen=YES							<span class="comment">#允许被侦听</span></span><br><span class="line">pam_service_name=vsftpd						<span class="comment">#ftp采用pam默认用户名密码验证</span></span><br><span class="line">userlist_enable=YES						<span class="comment">#用户登陆限制</span></span><br><span class="line">tcp_wrappers=YES						<span class="comment">#网络访问限制机制</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">#[打开vim,输入正则 去掉警号：%s/#.*$//g 去掉空格：%s/\s//g]</span></span><br></pre></td></tr></table></figure></p>
+<p>3.启动FTP服务,并设置开机自动启动.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># systemctl start vsftpd</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl enable vsftpd</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="配置本地用户FTP服务器"><a href="#配置本地用户FTP服务器" class="headerlink" title="配置本地用户FTP服务器"></a>配置本地用户FTP服务器</h2><p>作用：只有正确输入用户名和密码才能访问数据.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[本地配置常用参数]</span><br><span class="line"></span><br><span class="line">	local_enable=YES				<span class="comment">#是否启用本地系统用户</span></span><br><span class="line">	local_umask=022					<span class="comment">#本地用户所上传文件的权限掩码</span></span><br><span class="line">	local_root=/var/ftp				<span class="comment">#设置本地用户的FTP根目录</span></span><br><span class="line">	chroot_local_user=YES				<span class="comment">#是否将用户禁锢在主目录</span></span><br><span class="line">	local_max_rate=0				<span class="comment">#限制最大传输速率</span></span><br><span class="line">	ftpd_banner=Welcome to blah FTP service		<span class="comment">#用户登录时显示的欢迎信息</span></span><br><span class="line">	banner_file=/目录				<span class="comment">#弹出一个说明，可以做哪些操作</span></span><br><span class="line">	userlist_enable=YES &amp;userlist_deny=YES 	<span class="comment">#禁止/etc/vsftpd/user_list文件中出现的用户名登录FTP</span></span><br><span class="line">	userlist_enable=YES &amp; userlist_deny=NO 	<span class="comment">#仅允许/etc/vsftpd/user_list文件中出现的用户名登录FTP</span></span><br></pre></td></tr></table></figure>
+<p>1.安装VSFTP服务器.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y vsftpd</span></span><br></pre></td></tr></table></figure></p>
+<p>2.修改VSFTP主配置文件,覆盖写入以下内容,并去掉#号注释即可.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/vsftpd/vsftpd.conf</span></span><br><span class="line"></span><br><span class="line">pasv_enable=YES							<span class="comment">#开启被动模式</span></span><br><span class="line">pasv_min_port=10000						<span class="comment">#被动模式最小端口</span></span><br><span class="line">pasv_max_port=15000						<span class="comment">#被动模式最大端口</span></span><br><span class="line"></span><br><span class="line">anonymous_enable=NO						<span class="comment">#允许匿名用户登陆</span></span><br><span class="line">chroot_local_user=YES						<span class="comment">#把用户禁锢在家目录</span></span><br><span class="line">local_enable=YES						<span class="comment">#本地用户允许登陆</span></span><br><span class="line">local_root=/ghost						<span class="comment">#指定本地用户的ftp根目录</span></span><br><span class="line">write_enable=YES						<span class="comment">#允许本地用户上传</span></span><br><span class="line">local_umask=022							<span class="comment">#本地用户上传umask值</span></span><br><span class="line">xferlog_enable=YES						<span class="comment">#激活记录日志</span></span><br><span class="line">xferlog_std_format=YES						<span class="comment">#使用标准ftp日志的格式</span></span><br><span class="line"></span><br><span class="line">listen=YES							<span class="comment">#允许被侦听</span></span><br><span class="line">pam_service_name=vsftpd						<span class="comment">#ftp采用pam默认用户名密码验证</span></span><br><span class="line">userlist_enable=YES						<span class="comment">#用户登陆限制</span></span><br><span class="line">tcp_wrappers=YES						<span class="comment">#网络访问限制机制</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#[打开vim,输入正则 去掉警号：%s/#.*$//g 去掉空格：%s/\s//g]</span></span><br></pre></td></tr></table></figure></p>
+<p>3.创建用户并指定其家目录,创建用于存储数据的目录.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># useradd -s /sbin/nologin -d /ghost/lyshark  lyshark</span></span><br><span class="line">[root@localhost ~]<span class="comment"># passwd  lyshark</span></span><br></pre></td></tr></table></figure></p>
+<p>4.启动FTP服务,并设置开机自动启动.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># systemctl start vsftpd</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl enable vsftpd</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="配置匿名与本地混合FTP"><a href="#配置匿名与本地混合FTP" class="headerlink" title="配置匿名与本地混合FTP"></a>配置匿名与本地混合FTP</h2><p>作用：匿名用户可以查看共享数据,登陆后有自己的存储池.</p>
+<p>1.安装VSFTP服务器<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y vsftpd</span></span><br></pre></td></tr></table></figure></p>
+<p>2.修改VSFTP主配置文件,覆盖写入以下内容,并去掉#号注释即可.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/vsftpd/vsftpd.conf</span></span><br><span class="line"></span><br><span class="line">pasv_enable=YES							<span class="comment">#开启被动模式</span></span><br><span class="line">pasv_min_port=10000						<span class="comment">#被动模式最小端口</span></span><br><span class="line">pasv_max_port=15000						<span class="comment">#被动模式最大端口</span></span><br><span class="line">anonymous_enable=YES						<span class="comment">#允许匿名用户登陆</span></span><br><span class="line">anon_umask=022							<span class="comment">#设置匿名用户umask</span></span><br><span class="line">anon_root=/var/ftp						<span class="comment">#匿名用户ftp根目录</span></span><br><span class="line">anon_upload_enable=YES						<span class="comment">#允许匿名用户上传</span></span><br><span class="line">anon_mkdir_write_enable=YES					<span class="comment">#允许匿名用户建立目录</span></span><br><span class="line">anon_other_write_enable=YES					<span class="comment">#开放其他人写入权限</span></span><br><span class="line">anon_max_rate=0							<span class="comment">#限制最大传输速率</span></span><br><span class="line"></span><br><span class="line">local_enable=YES						<span class="comment">#允许本地用户登录</span></span><br><span class="line">local_root=/ghost						<span class="comment">#指定本地用户的ftp根目录</span></span><br><span class="line">chroot_local_user=YES						<span class="comment">#把用户禁锢在家目录</span></span><br><span class="line">write_enable=YES						<span class="comment">#允许本地用户上传</span></span><br><span class="line">local_umask=022							<span class="comment">#本地用户上传umask值</span></span><br><span class="line">xferlog_enable=YES						<span class="comment">#激活记录日志</span></span><br><span class="line">xferlog_std_format=YES						<span class="comment">#使用标准ftp日志的格式</span></span><br><span class="line">listen=YES							<span class="comment">#允许被侦听</span></span><br><span class="line">pam_service_name=vsftpd						<span class="comment">#ftp采用pam默认用户名密码验证</span></span><br><span class="line">userlist_enable=YES						<span class="comment">#用户登陆限制</span></span><br><span class="line">tcp_wrappers=YES						<span class="comment">#网络访问限制机制</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#[打开vim,输入正则 去掉警号：%s/#.*$//g 去掉空格：%s/\s//g]</span></span><br></pre></td></tr></table></figure></p>
+<p>3.创建用户并指定其家目录,创建用于存储数据的目录.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># useradd -s /sbin/nologin -d /ghost/lyshark  lyshark</span></span><br><span class="line">[root@localhost ~]<span class="comment"># passwd  lyshark</span></span><br></pre></td></tr></table></figure></p>
+<p>4.启动FTP服务,并设置开机自动启动.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># systemctl start vsftpd</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl enable vsftpd</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="配置虚拟用户FTP服务器"><a href="#配置虚拟用户FTP服务器" class="headerlink" title="配置虚拟用户FTP服务器"></a>配置虚拟用户FTP服务器</h2><p>作用：有时候创建本地用户过多,严重影响系统效率,所有我们要使用虚拟用户模式.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[虚拟配置常用参数]</span><br><span class="line"></span><br><span class="line">	anon_world_readable_only=NO 		<span class="comment">#允许查看和上传下载文件</span></span><br><span class="line">	anon_upload_enable=YES			<span class="comment">#允许上传文件</span></span><br><span class="line">	anon_world_readable_only=NO		<span class="comment">#允许查看和上传下载文件</span></span><br><span class="line">	anon_mkdir_write_enable=YES		<span class="comment">#允许创建目录</span></span><br><span class="line">	anon_world_readable_only=NO		<span class="comment">#允许查看和上传下载文件</span></span><br><span class="line">	anon_other_write_enable=YES		<span class="comment">#允许重名和删除文件</span></span><br></pre></td></tr></table></figure>
+<p>1.安装相应软件包,libdb-utls是数据库包.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">写入相应账号以及密码yum install -y libdb-utils</span><br><span class="line">写入相应账号以及密码yum install -y vsftpd</span><br></pre></td></tr></table></figure></p>
+<p>2.配置vlogin文件,vlogin文件名称可自定义,写入相应账号以及密码.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/vsftpd/vlogin</span></span><br><span class="line"></span><br><span class="line">Lyshark			<span class="comment">#奇数行写账号</span></span><br><span class="line">123456			<span class="comment">#偶数行写密码</span></span><br></pre></td></tr></table></figure></p>
+<p>3.将写好的文件加密,并转换成vlogin.db数据库文件<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># db_load -T -t hash -f /etc/vsftpd/vlogin /etc/vsftpd/vlogin.db</span></span><br></pre></td></tr></table></figure></p>
+<p>4.设置数据库文件的权限,保证安全.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># chmod 600 /etc/vsftpd/&#123;vlogin,vlogin.db&#125;</span></span><br></pre></td></tr></table></figure></p>
+<p>5.覆盖编辑PAM文件,写入以下内容.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/pam.d/vsftpd.pam</span></span><br><span class="line"></span><br><span class="line">auth required /lib64/security/pam_userdb.so db=/etc/vsftpd/vlogin</span><br><span class="line">account required /lib64/security/pam_userdb.so db=/etc/vsftpd/vlogin</span><br></pre></td></tr></table></figure></p>
+<p>6.创建一个映射账号virtual,所有的登陆请求都是virtual.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># useradd -s /sbin/nologin -d /home/ftp virtual</span></span><br></pre></td></tr></table></figure></p>
+<p>7.修改VSFTP主配置文件,覆盖写入以下内容,并去掉#号注释即可.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/vsftpd/vsftpd.conf</span></span><br><span class="line"></span><br><span class="line">pasv_enable=YES							<span class="comment">#开启被动模式</span></span><br><span class="line">pasv_min_port=10000						<span class="comment">#被动模式最小端口</span></span><br><span class="line">pasv_max_port=15000						<span class="comment">#被动模式最大端口</span></span><br><span class="line"></span><br><span class="line">anonymous_enable=NO						<span class="comment">#允许匿名用户访问</span></span><br><span class="line">local_enable=YES						<span class="comment">#允许本地用户登录</span></span><br><span class="line">write_enable=YES						<span class="comment">#允许本地用户上传</span></span><br><span class="line">anon_upload_enable=YES						<span class="comment">#允许匿名用户上传</span></span><br><span class="line">anon_mkdir_write_enable=NO					<span class="comment">#允许匿名用户建立目录</span></span><br><span class="line">anon_other_write_enable=NO					<span class="comment">#开放其他人写入权限</span></span><br><span class="line">chroot_local_user=YES						<span class="comment">#把用户禁锢在家目录</span></span><br><span class="line">guest_enable=YES						<span class="comment">#启动来宾用户</span></span><br><span class="line">guest_username=virtual						<span class="comment">#来宾默认使用的用户</span></span><br><span class="line">listen=YES							<span class="comment">#允许被侦听</span></span><br><span class="line">listen_port=21							<span class="comment">#侦听21端口</span></span><br><span class="line">pam_service_name=vsftpd.pam					<span class="comment">#ftp采用pam默认用户名密码验证</span></span><br><span class="line">user_config_dir=/etc/vsftpd_user_conf				<span class="comment">#指定虚拟用户配置文件保存位置</span></span><br><span class="line">user_sub_token=<span class="variable">$USER</span>						<span class="comment">#映射用户变量</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#[打开vim,输入正则 去掉警号：%s/#.*$//g 去掉空格：%s/\s//g]</span></span><br></pre></td></tr></table></figure></p>
+<p>8.创建对应文件(用于保存权限文件).<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mkdir /etc/vsftpd_user_conf</span></span><br><span class="line">[root@localhost ~]<span class="comment"># mkdir -p /home/ftp/lyshark</span></span><br></pre></td></tr></table></figure></p>
+<p>9.编辑文件给指定用户分配权限,用匿名用户权限分配.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/vsftpd_user_conf/lyshark</span></span><br><span class="line"></span><br><span class="line">local_root=/home/ftp/<span class="variable">$USER</span></span><br><span class="line">anon_upload_enable=YES</span><br><span class="line">anon_mkdir_write_enable=YES</span><br><span class="line">anon_other_write_enable=YES</span><br><span class="line">chroot_local_user=YES</span><br><span class="line"></span><br><span class="line"><span class="comment">#	allow_writeable_chroot=YES	  	#可在公共目录下创建文件</span></span><br></pre></td></tr></table></figure></p>
+<p>10.启动FTP服务,并设置开机自动启动.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># systemctl start vsftpd</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl enable vsftpd</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="OpenSSL-VSFTP加密传输"><a href="#OpenSSL-VSFTP加密传输" class="headerlink" title="OpenSSL+VSFTP加密传输"></a>OpenSSL+VSFTP加密传输</h2><p>1.查看是否安装OpenSSL包.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># rpm -q openssl</span></span><br></pre></td></tr></table></figure></p>
+<p>2.生成SSL加密密钥对.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># openssl req -new -x509 -nodes -out vsftpd.pem -keyout vsftpd.pem</span></span><br><span class="line"></span><br><span class="line">[参数说明]</span><br><span class="line">		req 		<span class="comment">#标注格式</span></span><br><span class="line">		-new 		<span class="comment">#创建一个新的证书</span></span><br><span class="line">		-x509		<span class="comment">#证书内容格式</span></span><br><span class="line">		-nodes 		<span class="comment">#不使用密码</span></span><br><span class="line">		-out		<span class="comment">#生成文件名</span></span><br><span class="line">		-keyout		<span class="comment">#生成的秘钥文件名</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#创建时依次填写：国家、省份、城市、组织、部门、个人或主机名、邮箱</span></span><br></pre></td></tr></table></figure></p>
+<p>3.把生成的证书放入特定目录下，并给予最低权限,保证安全.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cp -a vsftpd.pem /etc/ssl/certs/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># chmod 500 /etc/ssl/certs/</span></span><br></pre></td></tr></table></figure></p>
+<p>4.在VSFTP主配置中文件加入以下参数.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># vim /etc/vsftpd/vsftpd.conf</span></span><br><span class="line"></span><br><span class="line">ssl_enable=YES							<span class="comment">#启用ssl认证</span></span><br><span class="line">ssl_tlsv1=YES</span><br><span class="line">ssl_sslv2=YES							<span class="comment">#开启tlsv1、sslv2、sslv3都支持</span></span><br><span class="line">ssl_sslv3=YES</span><br><span class="line">allow_anon_ssl=YES						<span class="comment">#允许匿名用户</span></span><br><span class="line">force_anon_logins_ssl=YES</span><br><span class="line">force_anon_data_ssl=YES						<span class="comment">#匿名登录和传输时强制使用ssl</span></span><br><span class="line">force_local_logins_ssl=YES</span><br><span class="line">force_local_data_ssl=YES					<span class="comment">#本地登录和传输时强制使用ssl</span></span><br><span class="line">rsa_cert_file=/etc/ssl/certs/vsftpd.pem				<span class="comment">#证书文件所在目录</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#[打开vim,输入正则 去掉警号：%s/#.*$//g 去掉空格：%s/\s//g]</span></span><br></pre></td></tr></table></figure></p>
+<p>5.启动FTP服务,并设置开机自动启动.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># systemctl start vsftpd</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl enable vsftpd</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/09/16/Linux 服务配置/配置VSFTP文件服务器/">配置VSFTP文件服务器</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年09月16日 - 23:09</p>
+  <p><span>最后更新:</span>2019年04月16日 - 20:04</p>
+  <p><span>原始链接:</span><a href="/2018/09/16/Linux 服务配置/配置VSFTP文件服务器/" title="配置VSFTP文件服务器">https://www.mkdirs.com/2018/09/16/Linux 服务配置/配置VSFTP文件服务器/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux-服务配置/" rel="tag"> <i class="fa fa-tag"></i> Linux 服务配置</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/09/16/Linux 服务配置/构建Keepalived高可用集群/" rel="next" title="构建Keepalived高可用集群">
+                <i class="fa fa-chevron-left"></i> 构建Keepalived高可用集群
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/09/16/Linux 服务配置/使用Samba实现文件共享/" rel="prev" title="使用Samba实现文件共享">
+                使用Samba实现文件共享 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#配置匿名FTP服务器"><span class="nav-text">配置匿名FTP服务器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置本地用户FTP服务器"><span class="nav-text">配置本地用户FTP服务器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置匿名与本地混合FTP"><span class="nav-text">配置匿名与本地混合FTP</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置虚拟用户FTP服务器"><span class="nav-text">配置虚拟用户FTP服务器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OpenSSL-VSFTP加密传输"><span class="nav-text">OpenSSL+VSFTP加密传输</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

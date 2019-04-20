@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Apache是世界使用排名第一的Web服务器软件,它可以运行在几乎所有广泛使用的计算机平台上,由于其跨平台和安全性被广泛使用,是最流行的Web服务器端软件之一.它快速、可靠并且可通过简单的API扩充,将Perl/Python等解释器编译到服务器中.同时Apache音译为阿帕奇,是北美印第安人的一个部落,叫阿帕奇族,在美国的西南部.也是一个基金会的名称、一种武装直升机等等. 下面的内容是在编译状态下">
+<meta name="keywords" content="Linux 服务配置">
+<meta property="og:type" content="article">
+<meta property="og:title" content="编译Apache服务部署静态网站">
+<meta property="og:url" content="https://www.mkdirs.com/2018/11/11/Linux 服务配置/编译Apache服务部署静态网站/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="Apache是世界使用排名第一的Web服务器软件,它可以运行在几乎所有广泛使用的计算机平台上,由于其跨平台和安全性被广泛使用,是最流行的Web服务器端软件之一.它快速、可靠并且可通过简单的API扩充,将Perl/Python等解释器编译到服务器中.同时Apache音译为阿帕奇,是北美印第安人的一个部落,叫阿帕奇族,在美国的西南部.也是一个基金会的名称、一种武装直升机等等. 下面的内容是在编译状态下">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-04-16T12:38:22.082Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="编译Apache服务部署静态网站">
+<meta name="twitter:description" content="Apache是世界使用排名第一的Web服务器软件,它可以运行在几乎所有广泛使用的计算机平台上,由于其跨平台和安全性被广泛使用,是最流行的Web服务器端软件之一.它快速、可靠并且可通过简单的API扩充,将Perl/Python等解释器编译到服务器中.同时Apache音译为阿帕奇,是北美印第安人的一个部落,叫阿帕奇族,在美国的西南部.也是一个基金会的名称、一种武装直升机等等. 下面的内容是在编译状态下">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/11/11/Linux 服务配置/编译Apache服务部署静态网站/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>编译Apache服务部署静态网站 | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/11/11/Linux 服务配置/编译Apache服务部署静态网站/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">编译Apache服务部署静态网站
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-11-11 13:29:10" itemprop="dateCreated datePublished" datetime="2018-11-11T13:29:10+08:00">2018-11-11</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-16 20:38:22" itemprop="dateModified" datetime="2019-04-16T20:38:22+08:00">2019-04-16</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Linux-服务配置/" itemprop="url" rel="index"><span itemprop="name">Linux 服务配置</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Apache是世界使用排名第一的Web服务器软件,它可以运行在几乎所有广泛使用的计算机平台上,由于其跨平台和安全性被广泛使用,是最流行的Web服务器端软件之一.它快速、可靠并且可通过简单的API扩充,将Perl/Python等解释器编译到服务器中.同时Apache音译为阿帕奇,是北美印第安人的一个部落,叫阿帕奇族,在美国的西南部.也是一个基金会的名称、一种武装直升机等等.</p>
+<p>下面的内容是在编译状态下,实现身份认证,实现个人主页,实现虚拟主机,实现http到https认证,实现SSL加密等常用配置,且无错误版.</p>
+<a id="more"></a>
+<p><br></p>
+<h2 id="编译安装Apache"><a href="#编译安装Apache" class="headerlink" title="编译安装Apache"></a>编译安装Apache</h2><p>1.配置Yum仓库,安装Apache所依赖的包文件,以及编译器.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo</span></span><br><span class="line">[root@localhost ~]<span class="comment"># yum -y install epel-release</span></span><br><span class="line">[root@localhost ~]<span class="comment"># yum install -y gcc openssl openssl-devel zlib zlib-devel pcre pcre-devel expat-devel libxml2-devel</span></span><br></pre></td></tr></table></figure></p>
+<p>2.安装Apr-1.6.3,主要为上层的应用程序提供一个可以跨越多操作系统平台使用的底层支持接口库.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># wget http://www-eu.apache.org/dist//apr/apr-1.6.3.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># tar -xzvf apr-1.6.3.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd apr-1.6.3/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># CC="gcc -m64" ./configure --prefix=/usr/local/apr</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ./configure --prefix=/usr/local/apr</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make &amp;&amp; make install</span></span><br></pre></td></tr></table></figure></p>
+<p>3.安装Apr-util-1.6.1,是包含了一些常用的开发组件,这些组件与apache的关系更加密切一些,比如存储段和存储段组,加密等.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># wget http://www-eu.apache.org/dist//apr/apr-util-1.6.1.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># tar -xzvf apr-util-1.6.1.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd apr-util-1.6.1/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ./configure --prefix=/usr/local/apr-util --with-apr=/usr/local/apr</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make &amp;&amp; make install</span></span><br></pre></td></tr></table></figure></p>
+<p>4.安装Apache-2.4.33<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># wget http://www-eu.apache.org/dist//httpd/httpd-2.4.33.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># tar -xzvf httpd-2.4.33.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd httpd-2.4.33/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ./configure --prefix=/usr/local/apache2 \</span></span><br><span class="line">--<span class="built_in">enable</span>-rewrite \</span><br><span class="line">--<span class="built_in">enable</span>-so \</span><br><span class="line">--<span class="built_in">enable</span>-headers \</span><br><span class="line">--<span class="built_in">enable</span>-expires \</span><br><span class="line">--with-mpm=worker \</span><br><span class="line">--<span class="built_in">enable</span>-modules=most \</span><br><span class="line">--<span class="built_in">enable</span>-deflate \</span><br><span class="line">--<span class="built_in">enable</span>-ssl \</span><br><span class="line">--with-apr=/usr/<span class="built_in">local</span>/apr \</span><br><span class="line">--with-apr-util=/usr/<span class="built_in">local</span>/apr-util \</span><br><span class="line">--with-pcre=/usr/<span class="built_in">local</span>/pcre</span><br><span class="line">[root@localhost ~]<span class="comment"># make &amp;&amp; make install</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="配置Apache访问控制"><a href="#配置Apache访问控制" class="headerlink" title="配置Apache访问控制"></a>配置Apache访问控制</h2><p>Apache可以基于原主机名,原IP地址,或原主机上的浏览器特征,对网站上的资源进行访问控制,它通过Allow指令允许某个主机访问服务器上的网站资源,通过Deny指令实现禁止访问,还可以给指定的页面添加密码认证.</p>
+<h3 id="◆基于用户名密码的认证◆"><a href="#◆基于用户名密码的认证◆" class="headerlink" title="◆基于用户名密码的认证◆"></a>◆基于用户名密码的认证◆</h3><p>作用：当我们打开指定网页时,会提示需要输入密码才能访问,这就是密码认证技术.</p>
+<p>1.编辑Apache主配置文件,在相应的区域中加入以下标★语句.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /usr/local/apache2/conf/httpd.conf</span></span><br><span class="line"></span><br><span class="line">235     <span class="comment"># AllowOverride controls what directives may be placed in .htaccess files.</span></span><br><span class="line">236     <span class="comment"># It can be "All", "None", or any combination of the keywords:</span></span><br><span class="line">237     <span class="comment">#   AllowOverride FileInfo AuthConfig Limit</span></span><br><span class="line">238     <span class="comment">#</span></span><br><span class="line">★      AllowOverride all        <span class="comment">#修改为 AllowOverride all</span></span><br><span class="line">240     <span class="comment">#AllowOverride 表示是否去找.htacess文件作为配置文件</span></span><br><span class="line">241     <span class="comment">#</span></span><br><span class="line">242     <span class="comment"># Controls who can get stuff from this server.</span></span><br></pre></td></tr></table></figure></p>
+<p>2.在要添加认证的网页文件下创建 .htaccess 文件,并覆盖写入以下内容.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /usr/local/apache2/htdocs/.htaccess</span></span><br><span class="line"></span><br><span class="line">authname  <span class="string">"welcome to admin"</span>                                            <span class="comment">#欢迎提示信息</span></span><br><span class="line">authtype basic                                                          <span class="comment">#认证类型</span></span><br><span class="line">authuserfile /usr/<span class="built_in">local</span>/apache2/htdocs/login.psd                        <span class="comment">#认证文件存放位置</span></span><br><span class="line">require valid-user                                                      <span class="comment">#除认证用户其他用户不允许登陆</span></span><br></pre></td></tr></table></figure></p>
+<p>3.借助Apache的工具生成密码文件,此处的用户名密码就是访问网页时的号码.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># /usr/local/apache2/bin/htpasswd  -c  /usr/local/apache2/htdocs/login.psd   LyShark	#创建认证用户(覆盖)</span></span><br><span class="line">[root@localhost ~]<span class="comment"># /usr/local/apache2/bin/htpasswd  -m  /usr/local/apache2/htdocs/login.psd   LyShark	#写入认证用户(追加)</span></span><br></pre></td></tr></table></figure></p>
+<p>4.重启Apache服务,并访问页面测试即可.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># /usr/local/apache2/bin/apachectl restart</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="◆基于IP地址的身份认证◆"><a href="#◆基于IP地址的身份认证◆" class="headerlink" title="◆基于IP地址的身份认证◆"></a>◆基于IP地址的身份认证◆</h3><p>作用：当我们打开指定网页时,会判断您的IP地址是允许访问还是拒绝访问,这就是基于IP的认证技术</p>
+<p><strong>◆允许个别IP地址访问网页,拒绝所有◆</strong></p>
+<p>1.编辑Apache主配置文件,在相应的区域中加入以下标★语句，在<directory>嵌套里写入以下内容<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /usr/local/apache2/conf/httpd.conf</span></span><br><span class="line"></span><br><span class="line">234     <span class="comment">#</span></span><br><span class="line">235     <span class="comment"># AllowOverride controls what directives may be placed in .htaccess files.</span></span><br><span class="line">236     <span class="comment"># It can be "All", "None", or any combination of the keywords:</span></span><br><span class="line">237     <span class="comment">#   AllowOverride FileInfo AuthConfig Limit</span></span><br><span class="line">238     <span class="comment">#</span></span><br><span class="line">239     AllowOverride None</span><br><span class="line">240 </span><br><span class="line">★ &lt;requireall&gt;</span><br><span class="line">★         require all granted</span><br><span class="line">★         require ip 192.168.1.10                                         	<span class="comment">#允许访问的IP地址</span></span><br><span class="line">★ &lt;/requireall&gt;</span><br><span class="line">245 </span><br><span class="line">246     <span class="comment">#</span></span><br><span class="line">247     <span class="comment"># Controls who can get stuff from this server.</span></span><br><span class="line">248     <span class="comment">#</span></span><br><span class="line">249     <span class="comment">#Require all granted							#注释掉</span></span><br><span class="line">250 &lt;/Directory&gt;</span><br></pre></td></tr></table></figure></directory></p>
+<p>2.重启Apache服务<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># /usr/local/apache2/bin/apachectl restart</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>◆拒绝个别IP地址访问网页,允许所有◆</strong></p>
+<p>1.编辑Apache主配置文件,在相应的区域中加入以下标★语句，在<directory>嵌套里写入以下内容<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /usr/local/apache2/conf/httpd.conf</span></span><br><span class="line"></span><br><span class="line">235     <span class="comment"># AllowOverride controls what directives may be placed in .htaccess files.</span></span><br><span class="line">236     <span class="comment"># It can be "All", "None", or any combination of the keywords:</span></span><br><span class="line">237     <span class="comment">#   AllowOverride FileInfo AuthConfig Limit</span></span><br><span class="line">238     <span class="comment">#</span></span><br><span class="line">239     AllowOverride None</span><br><span class="line">240 &lt;requireall&gt;</span><br><span class="line">241         require all granted</span><br><span class="line">242         require not ip 192.168.1.10                                       	<span class="comment">#拒绝访问的IP地址</span></span><br><span class="line">243 &lt;/requireall&gt;</span><br><span class="line">244     <span class="comment">#</span></span><br><span class="line">245     <span class="comment"># Controls who can get stuff from this server.</span></span><br><span class="line">246     <span class="comment">#</span></span><br><span class="line">247     <span class="comment">#Require all granted							#注释掉</span></span><br><span class="line">248 &lt;/Directory&gt;</span><br></pre></td></tr></table></figure></directory></p>
+<p>2.重启Apache服务<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># /usr/local/apache2/bin/apachectl restart</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="配置Apache目录别名"><a href="#配置Apache目录别名" class="headerlink" title="配置Apache目录别名"></a>配置Apache目录别名</h2><p>有时候一个网页目录过深,每次输入地址过长,此时我们可以使用别名的方式来减小目录深度.</p>
+<p>1.编辑Apache主配置文件,在配置文件行尾,追加写入以下标★语句<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim  /usr/local/apache2/conf/httpd.conf</span></span><br><span class="line"></span><br><span class="line">496 <span class="comment"># Note: The following must must be present to support</span></span><br><span class="line">497 <span class="comment">#       starting without SSL on platforms with no /dev/random equivalent</span></span><br><span class="line">498 <span class="comment">#       but a statically compiled-in mod_ssl.</span></span><br><span class="line">499 <span class="comment">#</span></span><br><span class="line">500 &lt;IfModule ssl_module&gt;</span><br><span class="line">501 SSLRandomSeed startup <span class="built_in">builtin</span></span><br><span class="line">502 SSLRandomSeed connect <span class="built_in">builtin</span></span><br><span class="line">503 &lt;/IfModule&gt;</span><br><span class="line">504 </span><br><span class="line">★ <span class="built_in">alias</span> <span class="string">"/lyshark"</span> <span class="string">"/usr/local/apache2/htdocs/a/b/c/d"</span>				<span class="comment">#地址简化</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#以上语句的含义：将访问路径由 http://IP地址/a/b/c/d 简化为 http://IP地址/lyshark</span></span><br></pre></td></tr></table></figure></p>
+<p>2.重启Apache服务<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># /usr/local/apache2/bin/apachectl restart</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="配置Apache虚拟主机"><a href="#配置Apache虚拟主机" class="headerlink" title="配置Apache虚拟主机"></a>配置Apache虚拟主机</h2><p>利用虚拟主机功能,可以把一台处于运行状态的物理服务器分割成多个,虚拟服务器,出于各种考虑目前各种企业都在使用虚拟主机功能,Apache虚拟主机功能,是服务器基于用户的请求的不同Ip地址,主机域名或端口号,实现提供多个网站同时为外部提供访问服务的技术,用户取得的资源不同最后取得的页面也会不同.</p>
+<h3 id="◆基于IP的虚拟主机◆"><a href="#◆基于IP的虚拟主机◆" class="headerlink" title="◆基于IP的虚拟主机◆"></a>◆基于IP的虚拟主机◆</h3><p>如果一台服务器有多个IP地址,而且每个IP地址与服务器上部署的每个网站对应,这样当用户请求访问不同的IP时,会访问到不同网站的页面资源,而且每个网站都有一个独立的IP地址,以下实验将实现在一台服务器上配置多个IP,搭建多个网站,每个网站使用一个IP地址.</p>
+<p>1.在eno16777728上配置一个网卡子接口<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost]<span class="comment"># ifconfig eno16777728:0 192.168.1.13  netmask 255.255.255.0</span></span><br><span class="line"></span><br><span class="line">[root@localhost]<span class="comment"># ifconfig</span></span><br><span class="line"></span><br><span class="line">eno16777728: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1500</span><br><span class="line">        inet 192.168.1.12  netmask 255.255.255.0  broadcast 192.168.1.255</span><br><span class="line">        inet6 fe80::20c:29ff:fe1e:14e2  prefixlen 64  scopeid 0x20&lt;link&gt;</span><br><span class="line">        ether 00:0c:29:1e:14:e2  txqueuelen 1000  (Ethernet)</span><br><span class="line">        RX packets 40292  bytes 4129804 (3.9 MiB)</span><br><span class="line">        RX errors 0  dropped 0  overruns 0  frame 0</span><br><span class="line">        TX packets 8962  bytes 1557264 (1.4 MiB)</span><br><span class="line">        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0</span><br><span class="line"></span><br><span class="line">eno16777728:0: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1500</span><br><span class="line">        inet 192.168.1.13  netmask 255.255.255.0  broadcast 192.168.1.255</span><br><span class="line">        ether 00:0c:29:1e:14:e2  txqueuelen 1000  (Ethernet)</span><br></pre></td></tr></table></figure></p>
+<p>2.编辑主配置文件,开启虚拟主机选项(取消注释),在相应的区域中取消以下标★注释<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /usr/local/apache2/conf/httpd.conf</span></span><br><span class="line"></span><br><span class="line">475 </span><br><span class="line">476 <span class="comment"># Virtual hosts</span></span><br><span class="line">★  Include conf/extra/httpd-vhosts.conf				<span class="comment">#取消本行注释,开启虚拟主机模块</span></span><br><span class="line">478 </span><br><span class="line">479 <span class="comment"># Local access to the Apache HTTP Server Manual</span></span><br></pre></td></tr></table></figure></p>
+<p>3.修改虚拟主机配置文件添加虚拟主机,在相应的区域中修改以下标★语句<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /usr/local/apache2/conf/extra/httpd-vhosts.conf</span></span><br><span class="line"></span><br><span class="line">18 <span class="comment"># VirtualHost example:</span></span><br><span class="line">19 <span class="comment"># Almost any Apache directive may go into a VirtualHost container.</span></span><br><span class="line">20 <span class="comment"># The first VirtualHost section is used for all requests that do not</span></span><br><span class="line">21 <span class="comment"># match a ServerName or ServerAlias in any &lt;VirtualHost&gt; block.</span></span><br><span class="line">22 <span class="comment">#</span></span><br><span class="line">★ &lt;VirtualHost 192.168.1.12:80&gt;</span><br><span class="line">24     ServerAdmin webmaster@dummy-host.example.com</span><br><span class="line">★     DocumentRoot <span class="string">"/usr/local/apache2/htdocs/vhost1"</span></span><br><span class="line">26     ServerName dummy-host.example.com</span><br><span class="line">27     ServerAlias www.dummy-host.example.com</span><br><span class="line">28     ErrorLog <span class="string">"logs/dummy-host.example.com-error_log"</span></span><br><span class="line">29     CustomLog <span class="string">"logs/dummy-host.example.com-access_log"</span> common</span><br><span class="line">30 &lt;/VirtualHost&gt;</span><br><span class="line">31 </span><br><span class="line">★ &lt;VirtualHost 192.168.1.13:80&gt;</span><br><span class="line">33     ServerAdmin webmaster@dummy-host2.example.com</span><br><span class="line">★     DocumentRoot <span class="string">"/usr/local/apache2/htdocs/vhost2"</span></span><br><span class="line">35     ServerName dummy-host2.example.com</span><br><span class="line">36     ErrorLog <span class="string">"logs/dummy-host2.example.com-error_log"</span></span><br><span class="line">37     CustomLog <span class="string">"logs/dummy-host2.example.com-access_log"</span> common</span><br><span class="line">38 &lt;/VirtualHost&gt;</span><br></pre></td></tr></table></figure></p>
+<p>4.分别创建 vhost1 和 vhost2 目录,并放入两个index.html文件<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mkdir /usr/local/apache2/htdocs/vhost1</span></span><br><span class="line">[root@localhost ~]<span class="comment"># mkdir /usr/local/apache2/htdocs/vhost2</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "vhost1 test page" &gt; /usr/local/apache2/htdocs/vhost1/index.html</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "vhost2 test page" &gt; /usr/local/apache2/htdocs/vhost2/index.html</span></span><br></pre></td></tr></table></figure></p>
+<p>5.重启Apache服务,测试效果,两个IP分别对应两个网站主页<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># /usr/local/apache2/bin/apachectl restart</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="◆基于端口的虚拟主机◆"><a href="#◆基于端口的虚拟主机◆" class="headerlink" title="◆基于端口的虚拟主机◆"></a>◆基于端口的虚拟主机◆</h3><p>基于端口的虚拟主机,可以让用户通过端口号,来访问服务器上的资源,在使用Apache配置虚拟网站时,基于端口的配置方式最为复杂,以下实验将实现在一台服务器上配置多个端口,搭建多个网站,每个网站使用一个端口.</p>
+<p>1.编辑主配置文件,开启虚拟主机选项(取消注释),在相应的区域中取消以下标★注释<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /usr/local/apache2/conf/httpd.conf</span></span><br><span class="line"></span><br><span class="line">475 </span><br><span class="line">476 <span class="comment"># Virtual hosts</span></span><br><span class="line">★  Include conf/extra/httpd-vhosts.conf				<span class="comment">#取消本行注释,开启虚拟主机模块</span></span><br><span class="line">478 </span><br><span class="line">479 <span class="comment"># Local access to the Apache HTTP Server Manual</span></span><br></pre></td></tr></table></figure></p>
+<p>2.修改虚拟主机配置文件添加虚拟主机,在相应的区域中修改以下标★语句<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /usr/local/apache2/conf/extra/httpd-vhosts.conf</span></span><br><span class="line"></span><br><span class="line">18 <span class="comment"># VirtualHost example:</span></span><br><span class="line">19 <span class="comment"># Almost any Apache directive may go into a VirtualHost container.</span></span><br><span class="line">20 <span class="comment"># The first VirtualHost section is used for all requests that do not</span></span><br><span class="line">21 <span class="comment"># match a ServerName or ServerAlias in any &lt;VirtualHost&gt; block.</span></span><br><span class="line">22 <span class="comment">#</span></span><br><span class="line">★ &lt;VirtualHost 192.168.1.12:80&gt;</span><br><span class="line">24     ServerAdmin webmaster@dummy-host.example.com</span><br><span class="line">★     DocumentRoot <span class="string">"/usr/local/apache2/htdocs/vhost1"</span></span><br><span class="line">26     ServerName dummy-host.example.com</span><br><span class="line">27     ServerAlias www.dummy-host.example.com</span><br><span class="line">28     ErrorLog <span class="string">"logs/dummy-host.example.com-error_log"</span></span><br><span class="line">29     CustomLog <span class="string">"logs/dummy-host.example.com-access_log"</span> common</span><br><span class="line">30 &lt;/VirtualHost&gt;</span><br><span class="line">31 </span><br><span class="line">★ &lt;VirtualHost 192.168.1.12:8080&gt;</span><br><span class="line">33     ServerAdmin webmaster@dummy-host2.example.com</span><br><span class="line">★     DocumentRoot <span class="string">"/usr/local/apache2/htdocs/vhost2"</span></span><br><span class="line">35     ServerName dummy-host2.example.com</span><br><span class="line">36     ErrorLog <span class="string">"logs/dummy-host2.example.com-error_log"</span></span><br><span class="line">37     CustomLog <span class="string">"logs/dummy-host2.example.com-access_log"</span> common</span><br><span class="line">38 &lt;/VirtualHost&gt;</span><br></pre></td></tr></table></figure></p>
+<p>3.修改Apache主配置文件,添加两个端口监听<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /usr/local/apache2/conf/httpd.conf</span></span><br><span class="line"></span><br><span class="line"> 48 <span class="comment"># Change this to Listen on specific IP addresses as shown below to </span></span><br><span class="line"> 49 <span class="comment"># prevent Apache from glomming onto all bound IP addresses.</span></span><br><span class="line"> 50 <span class="comment">#</span></span><br><span class="line"> 51 <span class="comment">#Listen 12.34.56.78:80</span></span><br><span class="line">★ Listen 80</span><br><span class="line">★ Listen 8080</span><br></pre></td></tr></table></figure></p>
+<p>4.分别创建 vhost1 和 vhost2 目录,并放入两个index.html文件<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mkdir /usr/local/apache2/htdocs/vhost1</span></span><br><span class="line">[root@localhost ~]<span class="comment"># mkdir /usr/local/apache2/htdocs/vhost2</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "vhost1 test page" &gt; /usr/local/apache2/htdocs/vhost1/index.html</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "vhost2 test page" &gt; /usr/local/apache2/htdocs/vhost2/index.html</span></span><br></pre></td></tr></table></figure></p>
+<p>5.重启Apache服务,测试效果,两个端口分别对应两个网站主页<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># usr/local/apache2/bin/apachectl restart</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="◆基于域名的虚拟主机◆"><a href="#◆基于域名的虚拟主机◆" class="headerlink" title="◆基于域名的虚拟主机◆"></a>◆基于域名的虚拟主机◆</h3><p>当服务器无法为每一个网站分配一个独立的IP的时候,可以尝试让Apache自动识别用户请求的域名,从而根据不同的域名请求来传输不同的内容,这里我们为了验证实验要手动搭建一个DNS解析,以下实验将实现在一台服务器上多个域名,搭建多个网站,每个网站使用一个域名.</p>
+<p>1.首先搭建DNS域名解析,模拟vhost1.com与vhost2.com两个网站域名.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y bind bind-chroot</span></span><br><span class="line">Loaded plugins: product-id, search-disabled-repos, subscription-manager</span><br><span class="line">This system is not registered with an entitlement server. You can use subscription-manager.</span><br><span class="line">Package 32:<span class="built_in">bind</span>-9.9.4-61.el7.x86_64 already installed and latest version</span><br><span class="line">Package 32:<span class="built_in">bind</span>-chroot-9.9.4-61.el7.x86_64 already installed and latest version</span><br><span class="line">Nothing to <span class="keyword">do</span></span><br></pre></td></tr></table></figure></p>
+<p>2.配置DNS解析,这里我们简单配置即可,有关DNS详细例子请查看其他相关文章.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/named.conf</span></span><br><span class="line"></span><br><span class="line"> 12 options &#123;</span><br><span class="line"> 13         listen-on port 53 &#123; any; &#125;;</span><br><span class="line"> 14         listen-on-v6 port 53 &#123; ::1; &#125;;</span><br><span class="line"> 15         directory       <span class="string">"/var/named"</span>;</span><br><span class="line"> 16         dump-file       <span class="string">"/var/named/data/cache_dump.db"</span>;</span><br><span class="line"> 17         statistics-file <span class="string">"/var/named/data/named_stats.txt"</span>;</span><br><span class="line"> 18         memstatistics-file <span class="string">"/var/named/data/named_mem_stats.txt"</span>;</span><br><span class="line"> 19         allow-query     &#123; any; &#125;;</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># vim /etc/named.rfc1912.zones</span></span><br><span class="line"></span><br><span class="line"> 43 zone <span class="string">"vhost1.com"</span> IN &#123;</span><br><span class="line"> 44         <span class="built_in">type</span> master;</span><br><span class="line"> 45         file <span class="string">"vhost1.com.zone"</span>;</span><br><span class="line"> 46         allow-update &#123; none; &#125;;</span><br><span class="line"> 47 &#125;;</span><br><span class="line"> 48 zone <span class="string">"vhost2.com"</span> IN &#123;</span><br><span class="line"> 49         <span class="built_in">type</span> master;</span><br><span class="line"> 50         file <span class="string">"vhost2.com.zone"</span>;</span><br><span class="line"> 51         allow-update &#123; none; &#125;;</span><br><span class="line"> 52 &#125;;</span><br></pre></td></tr></table></figure></p>
+<p>3.拷贝配置文件,并修改成以下模样,并重启Bind<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cp -a /var/named/named.localhost /var/named/vhost1.com.zone</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cp -a /var/named/named.localhost /var/named/vhost2.com.zone</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># vim /var/named/vhost1.com.zone</span></span><br><span class="line"><span class="variable">$TTL</span> 1D</span><br><span class="line">@       IN SOA  dns.vhost1.com. rname.invalid. (</span><br><span class="line">                                        0       ; serial</span><br><span class="line">                                        1D      ; refresh</span><br><span class="line">                                        1H      ; retry</span><br><span class="line">                                        1W      ; expire</span><br><span class="line">                                        3H )    ; minimum</span><br><span class="line">        NS      dns.vhost1.com.</span><br><span class="line">dns     A       127.0.0.1</span><br><span class="line">www     A       192.168.1.10</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># vim /var/named/vhost2.com.zone</span></span><br><span class="line"><span class="variable">$TTL</span> 1D</span><br><span class="line">@       IN SOA  dns.vhost2.com. rname.invalid. (</span><br><span class="line">                                        0       ; serial</span><br><span class="line">                                        1D      ; refresh</span><br><span class="line">                                        1H      ; retry</span><br><span class="line">                                        1W      ; expire</span><br><span class="line">                                        3H )    ; minimum</span><br><span class="line">        NS      dns.vhost2.com.</span><br><span class="line">dns     A       127.0.0.1</span><br><span class="line">www     A       192.168.1.10</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl restart named</span></span><br></pre></td></tr></table></figure></p>
+<p>4.编辑Apache主配置文件,开启虚拟主机选项(取消注释),在相应的区域中取消以下标★注释<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /usr/local/apache2/conf/httpd.conf</span></span><br><span class="line"></span><br><span class="line">475 </span><br><span class="line">476 <span class="comment"># Virtual hosts</span></span><br><span class="line">★  Include conf/extra/httpd-vhosts.conf				<span class="comment">#取消本行注释,开启虚拟主机模块</span></span><br><span class="line">478 </span><br><span class="line">479 <span class="comment"># Local access to the Apache HTTP Server Manual</span></span><br></pre></td></tr></table></figure></p>
+<p>5.修改虚拟主机配置文件添加虚拟主机,在相应的区域中修改以下标★语句<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /usr/local/apache2/conf/extra/httpd-vhosts.conf</span></span><br><span class="line"></span><br><span class="line">18 <span class="comment"># VirtualHost example:</span></span><br><span class="line">19 <span class="comment"># Almost any Apache directive may go into a VirtualHost container.</span></span><br><span class="line">20 <span class="comment"># The first VirtualHost section is used for all requests that do not</span></span><br><span class="line">21 <span class="comment"># match a ServerName or ServerAlias in any &lt;VirtualHost&gt; block.</span></span><br><span class="line">22 <span class="comment">#</span></span><br><span class="line">23 &lt;VirtualHost *:80&gt;</span><br><span class="line">24     ServerAdmin webmaster@dummy-host.example.com</span><br><span class="line">★     DocumentRoot <span class="string">"/usr/local/apache2/htdocs/vhost1"</span></span><br><span class="line">★     ServerName www.vhost1.com					<span class="comment">#vhost1.com解析到vhost1目录下</span></span><br><span class="line">27     ServerAlias www.dummy-host.example.com</span><br><span class="line">28     ErrorLog <span class="string">"logs/dummy-host.example.com-error_log"</span></span><br><span class="line">29     CustomLog <span class="string">"logs/dummy-host.example.com-access_log"</span> common</span><br><span class="line">30 &lt;/VirtualHost&gt;</span><br><span class="line">31 </span><br><span class="line">32 &lt;VirtualHost *:80&gt;</span><br><span class="line">33     ServerAdmin webmaster@dummy-host2.example.com</span><br><span class="line">★     DocumentRoot <span class="string">"/usr/local/apache2/htdocs/vhost2"</span></span><br><span class="line">★     ServerName www.vhost2.com					<span class="comment">#vhost2.com解析到vhost2目录下</span></span><br><span class="line">36     ErrorLog <span class="string">"logs/dummy-host2.example.com-error_log"</span></span><br><span class="line">37     CustomLog <span class="string">"logs/dummy-host2.example.com-access_log"</span> common</span><br><span class="line">38 &lt;/VirtualHost&gt;</span><br></pre></td></tr></table></figure></p>
+<p>6.分别创建 vhost1 和 vhost2 目录,并放入两个index.html文件<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mkdir /usr/local/apache2/htdocs/vhost1</span></span><br><span class="line">[root@localhost ~]<span class="comment"># mkdir /usr/local/apache2/htdocs/vhost2</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "vhost1 test page" &gt; /usr/local/apache2/htdocs/vhost1/index.html</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "vhost2 test page" &gt; /usr/local/apache2/htdocs/vhost2/index.html</span></span><br></pre></td></tr></table></figure></p>
+<p>7.重启Apache服务,测试效果,两个域名分别对应两个网站主页<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># /usr/local/apache2/bin/apachectl restart</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="配置Apache个人主页"><a href="#配置Apache个人主页" class="headerlink" title="配置Apache个人主页"></a>配置Apache个人主页</h2><p>如果想为每个系统独立的用户建立一个网站,通常情况先是基于虚拟主机的功能来部署多个网站,但是这样工作量实在太大,还好Apache为我们提供了个人主页功能,以下实验将实现给予不同的用户一个单独的网页空间,实现每个人可以有自己的空间,类似QQ空间.</p>
+<p>1.编辑主配置文件,开启个人主页选项(取消注释),在相应的区域中取消以下标★注释.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /usr/local/apache2/conf/httpd.conf</span></span><br><span class="line"></span><br><span class="line">149 <span class="comment">#LoadModule speling_module modules/mod_speling.so</span></span><br><span class="line">★  LoadModule userdir_module modules/mod_userdir.so			<span class="comment">#取消注释(约在150行)</span></span><br><span class="line">151 LoadModule alias_module modules/mod_alias.so</span><br><span class="line">.....</span><br><span class="line">470 <span class="comment"># User home directories</span></span><br><span class="line">★  Include conf/extra/httpd-userdir.conf				<span class="comment">#取消注释(约在471行)</span></span><br><span class="line">472 </span><br><span class="line">473 <span class="comment"># Real-time info on requests and configuration</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># cat /usr/local/apache2/conf/extra/httpd-userdir.conf</span></span><br></pre></td></tr></table></figure></p>
+<p>2.创建用户并设置密码.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># useradd lyshark</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "123123" |passwd --stdin lyshark</span></span><br><span class="line">Changing password <span class="keyword">for</span> user lyshark.</span><br><span class="line">passwd: all authentication tokens updated successfully.</span><br></pre></td></tr></table></figure></p>
+<p>3.进入lyshark用户家目录,创建相应文件,并赋予权限.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mkdir -p /home/lyshark/public_html					#在用户家目录创建public_html</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "this is lyshark web" &gt; /home/lyshark/public_html/index.html	#创建测试页</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># chmod 755 /home/lyshark/public_html/index.html			#赋予执行权限</span></span><br><span class="line">[root@localhost ~]<span class="comment"># chmod 755 /home/lyshark						#赋予执行权限</span></span><br></pre></td></tr></table></figure></p>
+<p>4.重启Apache服务,并进入浏览器输入以下格式进行验证.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># /usr/local/apache2/bin/apachectl restart</span></span><br><span class="line">[root@localhost ~]<span class="comment"># elinks http://127.0.0.1/~lyshark</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="启用Apache地址跳转"><a href="#启用Apache地址跳转" class="headerlink" title="启用Apache地址跳转"></a>启用Apache地址跳转</h2><p>在有些以后我们需要跳转一些页面,比如说今天搞活动我们要把以前的页面替换掉让其暂时跳转到活动页面上来,恰巧Apache提供这样的域名跳转的配置服务,下面实验将实现当用户访问 vhost1.com 时会自动跳转到 vhost2.com 网站上来.</p>
+<p>1.首先搭建DNS域名解析,模拟vhost1.com与vhost2.com两个网站域名.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y bind bind-chroot</span></span><br><span class="line">Loaded plugins: product-id, search-disabled-repos, subscription-manager</span><br><span class="line">This system is not registered with an entitlement server. You can use subscription-manager.</span><br><span class="line">Package 32:<span class="built_in">bind</span>-9.9.4-61.el7.x86_64 already installed and latest version</span><br><span class="line">Package 32:<span class="built_in">bind</span>-chroot-9.9.4-61.el7.x86_64 already installed and latest version</span><br><span class="line">Nothing to <span class="keyword">do</span></span><br></pre></td></tr></table></figure></p>
+<p>2.配置DNS解析,这里我们简单配置即可,有关DNS详细例子请查看其他相关文章.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/named.conf</span></span><br><span class="line"></span><br><span class="line"> 12 options &#123;</span><br><span class="line"> 13         listen-on port 53 &#123; any; &#125;;</span><br><span class="line"> 14         listen-on-v6 port 53 &#123; ::1; &#125;;</span><br><span class="line"> 15         directory       <span class="string">"/var/named"</span>;</span><br><span class="line"> 16         dump-file       <span class="string">"/var/named/data/cache_dump.db"</span>;</span><br><span class="line"> 17         statistics-file <span class="string">"/var/named/data/named_stats.txt"</span>;</span><br><span class="line"> 18         memstatistics-file <span class="string">"/var/named/data/named_mem_stats.txt"</span>;</span><br><span class="line"> 19         allow-query     &#123; any; &#125;;</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># vim /etc/named.rfc1912.zones</span></span><br><span class="line"></span><br><span class="line"> 43 zone <span class="string">"vhost1.com"</span> IN &#123;</span><br><span class="line"> 44         <span class="built_in">type</span> master;</span><br><span class="line"> 45         file <span class="string">"vhost1.com.zone"</span>;</span><br><span class="line"> 46         allow-update &#123; none; &#125;;</span><br><span class="line"> 47 &#125;;</span><br><span class="line"> 48 zone <span class="string">"vhost2.com"</span> IN &#123;</span><br><span class="line"> 49         <span class="built_in">type</span> master;</span><br><span class="line"> 50         file <span class="string">"vhost2.com.zone"</span>;</span><br><span class="line"> 51         allow-update &#123; none; &#125;;</span><br><span class="line"> 52 &#125;;</span><br></pre></td></tr></table></figure></p>
+<p>3.拷贝配置文件,并修改成以下模样,并重启Bind<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cp -a /var/named/named.localhost /var/named/vhost1.com.zone</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cp -a /var/named/named.localhost /var/named/vhost2.com.zone</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># vim /var/named/vhost1.com.zone</span></span><br><span class="line"><span class="variable">$TTL</span> 1D</span><br><span class="line">@       IN SOA  dns.vhost1.com. rname.invalid. (</span><br><span class="line">                                        0       ; serial</span><br><span class="line">                                        1D      ; refresh</span><br><span class="line">                                        1H      ; retry</span><br><span class="line">                                        1W      ; expire</span><br><span class="line">                                        3H )    ; minimum</span><br><span class="line">        NS      dns.vhost1.com.</span><br><span class="line">dns     A       127.0.0.1</span><br><span class="line">www     A       192.168.1.10</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># vim /var/named/vhost2.com.zone</span></span><br><span class="line"><span class="variable">$TTL</span> 1D</span><br><span class="line">@       IN SOA  dns.vhost2.com. rname.invalid. (</span><br><span class="line">                                        0       ; serial</span><br><span class="line">                                        1D      ; refresh</span><br><span class="line">                                        1H      ; retry</span><br><span class="line">                                        1W      ; expire</span><br><span class="line">                                        3H )    ; minimum</span><br><span class="line">        NS      dns.vhost2.com.</span><br><span class="line">dns     A       127.0.0.1</span><br><span class="line">www     A       192.168.1.10</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl restart named</span></span><br></pre></td></tr></table></figure></p>
+<p>4.编辑主配置文件开启相应功能(取消注释)<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /usr/local/apache2/conf/httpd.conf</span></span><br><span class="line"></span><br><span class="line">145 LoadModule vhost_alias_module modules/mod_vhost_alias.so		<span class="comment">#开启虚拟主机(约在145行)</span></span><br><span class="line">152 LoadModule rewrite_module modules/mod_rewrite.so	 		<span class="comment">#开启网页重写(约在152行)</span></span><br><span class="line">.....</span><br><span class="line">476 <span class="comment"># Virtual hosts</span></span><br><span class="line">477 Include conf/extra/httpd-vhosts.conf				<span class="comment">#开启虚拟主机(约在477行)</span></span><br></pre></td></tr></table></figure></p>
+<p>5.改写虚拟主机配置文件,在相应的区域中取消以下标★注释<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /usr/local/apache2/conf/extra/httpd-vhosts.conf</span></span><br><span class="line"></span><br><span class="line">18 <span class="comment"># VirtualHost example:</span></span><br><span class="line">19 <span class="comment"># Almost any Apache directive may go into a VirtualHost container.</span></span><br><span class="line">20 <span class="comment"># The first VirtualHost section is used for all requests that do not</span></span><br><span class="line">21 <span class="comment"># match a ServerName or ServerAlias in any &lt;VirtualHost&gt; block.</span></span><br><span class="line">22 <span class="comment">#</span></span><br><span class="line">23 &lt;VirtualHost *:80&gt;</span><br><span class="line">★     DocumentRoot <span class="string">"/usr/local/apache2/htdocs/vhost1"</span>			<span class="comment">#vhost1网页存放位置</span></span><br><span class="line">★     ServerName www.vhost1.com						<span class="comment">#域名vhost1.com</span></span><br><span class="line">26 &lt;/VirtualHost&gt;</span><br><span class="line">27 </span><br><span class="line">★ &lt;Directory <span class="string">"/usr/local/apache2/htdocs/vhost1"</span>&gt;			<span class="comment">#vhost1页面的路径</span></span><br><span class="line">★ Options indexes followsymlinks</span><br><span class="line">★ Allowoverride all</span><br><span class="line">★ Require all granted</span><br><span class="line">★ &lt;/Directory&gt;</span><br><span class="line">33 </span><br><span class="line">34 &lt;VirtualHost *:80&gt;</span><br><span class="line">★     DocumentRoot <span class="string">"/usr/local/apache2/htdocs/vhost2"</span>			<span class="comment">#vhost2网页存放位置</span></span><br><span class="line">★     ServerName www.vhost2.com						<span class="comment">#域名vhost2.com</span></span><br><span class="line">37 &lt;/VirtualHost&gt;</span><br></pre></td></tr></table></figure></p>
+<p>6.分别创建网页文件存储位置,和测试页<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mkdir -p /usr/local/apache2/htdocs/vhost1</span></span><br><span class="line">[root@localhost ~]<span class="comment"># mkdir -p /usr/local/apache2/htdocs/vhost2</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "vhost1 server" &gt; /usr/local/apache2/htdocs/vhost1/index.html</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "vhost2 server" &gt; /usr/local/apache2/htdocs/vhost2/index.html</span></span><br></pre></td></tr></table></figure></p>
+<p>7.在要跳转的网页目录下创建 .htaccess 文件 (本例中应在vhost1目录下创建),覆盖写入以下内容即可<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /usr/local/apache2/htdocs/vhost1/.htaccess</span></span><br><span class="line"></span><br><span class="line">rewriteengine on							<span class="comment">#开启跳转功能</span></span><br><span class="line">rewritecond %&#123;HTTP_HOST&#125; www.vhost1.com					<span class="comment">#将www.vhost1.com</span></span><br><span class="line">rewriterule .* http://www.vhost2.com					<span class="comment">#跳转到www.vhost2.com</span></span><br></pre></td></tr></table></figure></p>
+<p>8.重启Apache服务,重新加载配置,现在访问 vhost1.com 会跳转到 vhost2.com 目录下<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># /usr/local/apache2/bin/apachectl restart</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="启用https-SSL加密传输"><a href="#启用https-SSL加密传输" class="headerlink" title="启用https SSL加密传输"></a>启用https SSL加密传输</h2><p>在生产环境中,我们需要让我们的网站更加的安全,多数情况下我们会开启https的加密认证,来保证数据传输的安全性,下面实验将实现启动SSL证书,也就是https认证,端口为443.</p>
+<p>1.建立服务器私钥,过程中需要输入密码<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># openssl genrsa -des3 -out server.key 1024</span></span><br><span class="line"></span><br><span class="line">----------------------------------------------------------------------------</span><br><span class="line">注释：</span><br><span class="line">		Genrsa –des3					<span class="comment">#加密类型</span></span><br><span class="line">		-out	server.key				<span class="comment">#输出文件</span></span><br><span class="line">		-1024						<span class="comment">#加密长度</span></span><br><span class="line">----------------------------------------------------------------------------</span><br></pre></td></tr></table></figure></p>
+<p>2.建立证书,生成的csr文件交给CA签名后形成服务端自己的证书<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># openssl req -new -key server.key -out server.csr</span></span><br><span class="line"></span><br><span class="line">----------------------------------------------------------------------------</span><br><span class="line">注释：</span><br><span class="line">		req -new 				<span class="comment">#新建证书</span></span><br><span class="line">		-key server.key				<span class="comment">#私钥文件</span></span><br><span class="line">		-out server.csr				<span class="comment">#输出文件</span></span><br><span class="line"></span><br><span class="line">注：依次输入：国家 省 市 组织 机构 全称 EMAIL 是否要改变密码 是否改名称</span><br><span class="line">----------------------------------------------------------------------------</span><br></pre></td></tr></table></figure></p>
+<p>3.转化成证书,这一步由证书CA机构来做的,这里只是实验.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># openssl x509 -req -days 365 -sha256 -in server.csr -signkey server.key -out servernew.crt</span></span><br></pre></td></tr></table></figure></p>
+<p>4.配置服务器让其支持https<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cp -a servernew.crt /usr/local/apache2/conf/server.crt			#将证书复制到conf目录下</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cp -a server.key /usr/local/apache2/conf/server.key			#私钥也要放入conf目录下</span></span><br></pre></td></tr></table></figure></p>
+<p>5.编辑主配置文件开启相应功能(取消注释)<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /usr/local/apache2/conf/httpd.conf</span></span><br><span class="line"></span><br><span class="line">133 LoadModule ssl_module modules/mod_ssl.so		<span class="comment">#开启ssl功能(约在133行)</span></span><br><span class="line"></span><br><span class="line">493 <span class="comment"># Secure (SSL/TLS) connections</span></span><br><span class="line">494 Include conf/extra/httpd-ssl.conf			<span class="comment">#开启ssl模板,搜索SSLRandomSeed(约在494行)</span></span><br></pre></td></tr></table></figure></p>
+<p>6.配置SSL模板文件<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /usr/local/apache2/conf/extra/httpd-ssl.conf</span></span><br><span class="line"></span><br><span class="line">88 <span class="comment">#   Inter-Process Session Cache:</span></span><br><span class="line">89 <span class="comment">#   Configure the SSL Session Cache: First the mechanism </span></span><br><span class="line">90 <span class="comment">#   to use and second the expiring timeout (in seconds).</span></span><br><span class="line">91 <span class="comment">#SSLSessionCache         "dbm:/usr/local/apache2/logs/ssl_scache"		#注释掉</span></span><br><span class="line">92 <span class="comment">#SSLSessionCache        "shmcb:/usr/local/apache2/logs/ssl_scache(512000)"	#注释掉</span></span><br><span class="line">93 <span class="comment">#SSLSessionCacheTimeout  300							#注释掉</span></span><br></pre></td></tr></table></figure></p>
+<p>7.重启Apache服务,输入密码<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># /usr/local/apache2/bin/apachectl restart</span></span><br></pre></td></tr></table></figure></p>
+<p>8.访问网站,这里注意要加上443端口,否则无法访问<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># https://127.0.0.1:443/index.html</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/11/11/Linux 服务配置/编译Apache服务部署静态网站/">编译Apache服务部署静态网站</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年11月11日 - 13:11</p>
+  <p><span>最后更新:</span>2019年04月16日 - 20:04</p>
+  <p><span>原始链接:</span><a href="/2018/11/11/Linux 服务配置/编译Apache服务部署静态网站/" title="编译Apache服务部署静态网站">https://www.mkdirs.com/2018/11/11/Linux 服务配置/编译Apache服务部署静态网站/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux-服务配置/" rel="tag"> <i class="fa fa-tag"></i> Linux 服务配置</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/08/Linux 服务配置/编译LAMP部署动态网站环境/" rel="next" title="编译LAMP部署动态网站环境">
+                <i class="fa fa-chevron-left"></i> 编译LAMP部署动态网站环境
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/11/11/Linux 服务配置/编译Nginx服务部署静态网站/" rel="prev" title="编译Nginx服务部署静态网站">
+                编译Nginx服务部署静态网站 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#编译安装Apache"><span class="nav-text">编译安装Apache</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置Apache访问控制"><span class="nav-text">配置Apache访问控制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆基于用户名密码的认证◆"><span class="nav-text">◆基于用户名密码的认证◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆基于IP地址的身份认证◆"><span class="nav-text">◆基于IP地址的身份认证◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置Apache目录别名"><span class="nav-text">配置Apache目录别名</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置Apache虚拟主机"><span class="nav-text">配置Apache虚拟主机</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆基于IP的虚拟主机◆"><span class="nav-text">◆基于IP的虚拟主机◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆基于端口的虚拟主机◆"><span class="nav-text">◆基于端口的虚拟主机◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆基于域名的虚拟主机◆"><span class="nav-text">◆基于域名的虚拟主机◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置Apache个人主页"><span class="nav-text">配置Apache个人主页</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#启用Apache地址跳转"><span class="nav-text">启用Apache地址跳转</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#启用https-SSL加密传输"><span class="nav-text">启用https SSL加密传输</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

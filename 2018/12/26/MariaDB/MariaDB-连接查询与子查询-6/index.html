@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="MariaDB数据库管理系统是MySQL的一个分支,主要由开源社区在维护,采用GPL授权许可MariaDB的目的是完全兼容MySQL,包括API和命令行,MySQL由于现在闭源了,而能轻松成为MySQL的代替品.在存储引擎方面,使用XtraDB来代替MySQL的InnoDB,MariaDB由MySQL的创始人Michael Widenius主导开发,他早前曾以10亿美元的价格,将自己创建的公司My">
+<meta name="keywords" content="MariaDB">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MariaDB 连接查询与子查询(6)">
+<meta property="og:url" content="https://www.mkdirs.com/2018/12/26/MariaDB/MariaDB-连接查询与子查询-6/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="MariaDB数据库管理系统是MySQL的一个分支,主要由开源社区在维护,采用GPL授权许可MariaDB的目的是完全兼容MySQL,包括API和命令行,MySQL由于现在闭源了,而能轻松成为MySQL的代替品.在存储引擎方面,使用XtraDB来代替MySQL的InnoDB,MariaDB由MySQL的创始人Michael Widenius主导开发,他早前曾以10亿美元的价格,将自己创建的公司My">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-12-27T01:41:58.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MariaDB 连接查询与子查询(6)">
+<meta name="twitter:description" content="MariaDB数据库管理系统是MySQL的一个分支,主要由开源社区在维护,采用GPL授权许可MariaDB的目的是完全兼容MySQL,包括API和命令行,MySQL由于现在闭源了,而能轻松成为MySQL的代替品.在存储引擎方面,使用XtraDB来代替MySQL的InnoDB,MariaDB由MySQL的创始人Michael Widenius主导开发,他早前曾以10亿美元的价格,将自己创建的公司My">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/12/26/MariaDB/MariaDB-连接查询与子查询-6/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>MariaDB 连接查询与子查询(6) | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/12/26/MariaDB/MariaDB-连接查询与子查询-6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">MariaDB 连接查询与子查询(6)
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-26 09:02:34" itemprop="dateCreated datePublished" datetime="2018-12-26T09:02:34+08:00">2018-12-26</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-12-27 09:41:58" itemprop="dateModified" datetime="2018-12-27T09:41:58+08:00">2018-12-27</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/MariaDB/" itemprop="url" rel="index"><span itemprop="name">MariaDB</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>MariaDB数据库管理系统是MySQL的一个分支,主要由开源社区在维护,采用GPL授权许可MariaDB的目的是完全兼容MySQL,包括API和命令行,MySQL由于现在闭源了,而能轻松成为MySQL的代替品.在存储引擎方面,使用XtraDB来代替MySQL的InnoDB,MariaDB由MySQL的创始人Michael Widenius主导开发,他早前曾以10亿美元的价格,将自己创建的公司MySQL AB卖给了SUN,此后,随着SUN被甲骨文收购MySQL的所有权也落入Oracle的手中.MariaDB名称来自MichaelWidenius的女儿Maria的名字.</p>
+<a id="more"></a>
+<p><br></p>
+<h2 id="MariaDB-连接查询"><a href="#MariaDB-连接查询" class="headerlink" title="MariaDB 连接查询"></a>MariaDB 连接查询</h2><p>连接是关系数据库模型的主要特点,连接查询是关系数据库中最主要的查询,主要包括内连接、外连接等.通过连接运算符可以实现多个表查询,在关系数据库管理系统中,表建立时各数据之间的关系不必确定,常把一个实体的所有信息存放在一个表中.当查询数据时,通过连接操作查询出存放在多个表中的不同实体的信息.当两个或多个表中存在相同意义的字段时,便可以通过这些字段对不同的表进行连接查询.</p>
+<h3 id="◆内连接查询◆"><a href="#◆内连接查询◆" class="headerlink" title="◆内连接查询◆"></a>◆内连接查询◆</h3><p>内连接(INNER JOIN)使用比较运算符进行表间(某些列)数据的比较操作,并列出这些表中与连接条件相匹配的数据行,组合成新记录,也就是说,在内连接查询中,只有满足条件的记录才能出现在结果关系中.</p>
+<p>为了演示效果的需要,首先穿件一个<code>suppliers</code>表,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; create table suppliers</span><br><span class="line">    -&gt; (</span><br><span class="line">    -&gt; s_id int not null auto_increment,</span><br><span class="line">    -&gt; s_name char(50) not null,</span><br><span class="line">    -&gt; s_city char(50) null,</span><br><span class="line">    -&gt; s_zip char(10) null,</span><br><span class="line">    -&gt; s_call char(50) not null,</span><br><span class="line">    -&gt; primary key(s_id)</span><br><span class="line">    -&gt; );</span><br><span class="line">Query OK, 0 rows affected (0.09 sec)</span><br></pre></td></tr></table></figure></p>
+<p>需要插入演示的数据,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> suppliers(s_id,s_name,s_city,s_zip,s_call) <span class="keyword">values</span>(<span class="number">101</span>,<span class="string">'FastFruit.'</span>,<span class="string">'TianJin'</span>,<span class="string">'30000'</span>,<span class="string">'4521'</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> suppliers(s_id,s_name,s_city,s_zip,s_call) <span class="keyword">values</span>(<span class="number">102</span>,<span class="string">'LT Supplies'</span>,<span class="string">'ShangHai'</span>,<span class="string">'554780'</span>,<span class="string">'3268'</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> suppliers(s_id,s_name,s_city,s_zip,s_call) <span class="keyword">values</span>(<span class="number">103</span>,<span class="string">'ACME LyShark'</span>,<span class="string">'Chongqing'</span>,<span class="string">'447581'</span>,<span class="string">'9985'</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> suppliers(s_id,s_name,s_city,s_zip,s_call) <span class="keyword">values</span>(<span class="number">104</span>,<span class="string">'FNK INCS'</span>,<span class="string">'XiZang'</span>,<span class="string">'3526'</span>,<span class="string">'4475'</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> suppliers(s_id,s_name,s_city,s_zip,s_call) <span class="keyword">values</span>(<span class="number">105</span>,<span class="string">'GOOD SET'</span>,<span class="string">'ZhongSHan'</span>,<span class="string">'4478511'</span>,<span class="string">'6666'</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> suppliers(s_id,s_name,s_city,s_zip,s_call) <span class="keyword">values</span>(<span class="number">106</span>,<span class="string">'JUST Eat Ours'</span>,<span class="string">'TaiYuang'</span>,<span class="string">'33325469'</span>,<span class="string">'5555'</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> suppliers(s_id,s_name,s_city,s_zip,s_call) <span class="keyword">values</span>(<span class="number">107</span>,<span class="string">'docker INC'</span>,<span class="string">'ZhengZhou'</span>,<span class="string">'1124574'</span>,<span class="string">'4851'</span>);</span><br></pre></td></tr></table></figure></p>
+<p><strong>内连接实例:</strong> 在<code>lyshark表</code>和<code>suppliers表</code>之间使用内连接查询.</p>
+<p>1.在查询之前先来看一下表结构吧.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; desc lyshark;</span><br><span class="line">+<span class="comment">-------+--------------+------+-----+---------+-------+</span></span><br><span class="line">| Field | Type         | Null | Key | Default | Extra |</span><br><span class="line">+<span class="comment">-------+--------------+------+-----+---------+-------+</span></span><br><span class="line">| Uid   | char(10)     | NO   | PRI | NULL    |       |</span><br><span class="line">| Gid   | int(11)      | NO   |     | NULL    |       |</span><br><span class="line">| Name  | char(255)    | NO   |     | NULL    |       |</span><br><span class="line">| Price | decimal(8,2) | NO   |     | NULL    |       |</span><br><span class="line">+<span class="comment">-------+--------------+------+-----+---------+-------+</span></span><br><span class="line">4 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; <span class="keyword">desc</span> suppliers;</span><br><span class="line">+<span class="comment">--------+----------+------+-----+---------+----------------+</span></span><br><span class="line">| Field  | Type     | Null | Key | Default | Extra          |</span><br><span class="line">+<span class="comment">--------+----------+------+-----+---------+----------------+</span></span><br><span class="line">| s_id   | int(11)  | NO   | PRI | NULL    | auto_increment |</span><br><span class="line">| s_name | char(50) | NO   |     | NULL    |                |</span><br><span class="line">| s_city | char(50) | YES  |     | NULL    |                |</span><br><span class="line">| s_zip  | char(10) | YES  |     | NULL    |                |</span><br><span class="line">| s_call | char(50) | NO   |     | NULL    |                |</span><br><span class="line">+<span class="comment">--------+----------+------+-----+---------+----------------+</span></span><br><span class="line">5 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>由上面的查询结果可看到,<code>lyshark表</code>和<code>suppliers</code>表中都有相同数据类型的字段<code>ID</code>,两个表通过<code>Gid与s_id</code>字段建立联系.</p>
+<p>2.接下来从<code>lyshark表</code>查询<code>Name,Price字段</code>,从<code>suppliers表</code>查询<code>s_id,s_name字段</code>,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select suppliers.s_id,s_name,Name,Price</span><br><span class="line">    -&gt; from lyshark,suppliers</span><br><span class="line">    -&gt; where lyshark.Gid = suppliers.s_id;</span><br><span class="line"></span><br><span class="line">+<span class="comment">------+---------------+------------+-------+</span></span><br><span class="line">| s_id | s_name        | Name       | Price |</span><br><span class="line">+<span class="comment">------+---------------+------------+-------+</span></span><br><span class="line">|  101 | FastFruit.    | apple      |  5.20 |</span><br><span class="line">|  103 | ACME LyShark  | apricot    |  2.20 |</span><br><span class="line">|  101 | FastFruit.    | blackberry | 10.20 |</span><br><span class="line">|  104 | FNK INCS      | berry      |  7.60 |</span><br><span class="line">|  107 | docker INC    | xxxx       |  3.60 |</span><br><span class="line">|  102 | LT Supplies   | orange     | 11.20 |</span><br><span class="line">|  105 | GOOD <span class="keyword">SET</span>      | melon      |  <span class="number">8.20</span> |</span><br><span class="line">|  <span class="number">101</span> | FastFruit.    | cherry     |  <span class="number">3.20</span> |</span><br><span class="line">|  <span class="number">104</span> | FNK INCS      | lemon      |  <span class="number">6.40</span> |</span><br><span class="line">|  <span class="number">106</span> | JUST Eat Ours | mango      | <span class="number">15.70</span> |</span><br><span class="line">|  <span class="number">105</span> | GOOD <span class="keyword">SET</span>      | xbabay     |  <span class="number">2.60</span> |</span><br><span class="line">|  <span class="number">105</span> | GOOD <span class="keyword">SET</span>      | xxtt       | <span class="number">11.60</span> |</span><br><span class="line">|  <span class="number">103</span> | ACME LyShark  | coconut    |  <span class="number">9.20</span> |</span><br><span class="line">|  <span class="number">102</span> | LT Supplies   | bannana    | <span class="number">10.30</span> |</span><br><span class="line">|  <span class="number">102</span> | LT Supplies   | grape      |  <span class="number">5.30</span> |</span><br><span class="line">|  <span class="number">107</span> | docker INC    | xbababa    |  <span class="number">3.60</span> |</span><br><span class="line">+<span class="comment">------+---------------+------------+-------+</span></span><br><span class="line"><span class="number">16</span> <span class="keyword">rows</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.01</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>在这里,<code>SELECT语句</code>与前面所介绍的一个最大的差别是,SELECT后面指定的列分别属于两个不同的表,<code>(Name,Price)在表 lyshark中</code>,而另外两个字段<code>在表 suppliers</code>中,同时FROM子句列出了两个表<code>lyshark 和 suppliers</code>.WHERE 子句在这里作为过滤条件,指明只有两个表中的<code>s_id</code>字段值相等的时候才符合连接查询的条件.从返回的结果可以看到,显示的记录是由两个表中不同列值组成的新记录.</p>
+<p><strong>内连接(INNER JOIN)实例:</strong> 在<code>lyshark表</code>和<code>suppliers表</code>之间,使用<code>INNER JOIN</code>语法进行内连接查询,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select suppliers.s_id,s_name,Name,Price</span><br><span class="line">    -&gt; from lyshark INNER JOIN suppliers</span><br><span class="line">    -&gt; ON lyshark.Gid=suppliers.s_id;</span><br><span class="line">+<span class="comment">------+---------------+------------+-------+</span></span><br><span class="line">| s_id | s_name        | Name       | Price |</span><br><span class="line">+<span class="comment">------+---------------+------------+-------+</span></span><br><span class="line">|  101 | FastFruit.    | apple      |  5.20 |</span><br><span class="line">|  103 | ACME LyShark  | apricot    |  2.20 |</span><br><span class="line">|  101 | FastFruit.    | blackberry | 10.20 |</span><br><span class="line">|  104 | FNK INCS      | berry      |  7.60 |</span><br><span class="line">|  107 | docker INC    | xxxx       |  3.60 |</span><br><span class="line">|  102 | LT Supplies   | orange     | 11.20 |</span><br><span class="line">|  105 | GOOD <span class="keyword">SET</span>      | melon      |  <span class="number">8.20</span> |</span><br><span class="line">|  <span class="number">101</span> | FastFruit.    | cherry     |  <span class="number">3.20</span> |</span><br><span class="line">|  <span class="number">104</span> | FNK INCS      | lemon      |  <span class="number">6.40</span> |</span><br><span class="line">|  <span class="number">106</span> | JUST Eat Ours | mango      | <span class="number">15.70</span> |</span><br><span class="line">|  <span class="number">105</span> | GOOD <span class="keyword">SET</span>      | xbabay     |  <span class="number">2.60</span> |</span><br><span class="line">|  <span class="number">105</span> | GOOD <span class="keyword">SET</span>      | xxtt       | <span class="number">11.60</span> |</span><br><span class="line">|  <span class="number">103</span> | ACME LyShark  | coconut    |  <span class="number">9.20</span> |</span><br><span class="line">|  <span class="number">102</span> | LT Supplies   | bannana    | <span class="number">10.30</span> |</span><br><span class="line">|  <span class="number">102</span> | LT Supplies   | grape      |  <span class="number">5.30</span> |</span><br><span class="line">|  <span class="number">107</span> | docker INC    | xbababa    |  <span class="number">3.60</span> |</span><br><span class="line">+<span class="comment">------+---------------+------------+-------+</span></span><br><span class="line"><span class="number">16</span> <span class="keyword">rows</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.01</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>本案例和上面的查询结果是一样的,在这里两表之间的关系通过<code>INNER JOIN</code>指定,使用这种语法的时候连接的条件使用<code>ON</code>子句,ON和WHERE后面指定的条件相同.</p>
+<p><strong>自连接实例:</strong> 查询供应商<code>Uid=&#39;a1&#39;</code>的水果的种类,SQL语句如下:</p>
+<p>如果在一个连接查询中,涉及的两个表都是同一张表,这种查询称为<code>自连接查询</code>,自连接是一种特殊的内连接,它是指相互连接的表在物理上为同一张表,但可以在逻辑上分为两张表.</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select f1.Uid,f1.Name</span><br><span class="line">    -&gt; from lyshark AS f1,lyshark AS f2 </span><br><span class="line">    -&gt; where f1.Gid = f2.Gid and f2.Uid='a1';</span><br><span class="line">+<span class="comment">-----+------------+</span></span><br><span class="line">| Uid | Name       |</span><br><span class="line">+<span class="comment">-----+------------+</span></span><br><span class="line">| a1  | apple      |</span><br><span class="line">| b1  | blackberry |</span><br><span class="line">| c0  | cherry     |</span><br><span class="line">+<span class="comment">-----+------------+</span></span><br><span class="line">3 rows in <span class="keyword">set</span> (<span class="number">0.01</span> sec)</span><br></pre></td></tr></table></figure>
+<p>此处查询的两个表是相同的表,为了防止产生二义性,对表使用了别名,<code>lyshark</code>表第1次出现的别名为fl,第2次出现的别名为f2,使用SELECT语句返回列时明确指出返回以n为前缀的列的全名,WHERE连接两个表,并按照第2个表的<code>Gid</code>对数据进行过滤,返回所需数据.</p>
+<h3 id="◆外连接查询◆"><a href="#◆外连接查询◆" class="headerlink" title="◆外连接查询◆"></a>◆外连接查询◆</h3><p>外连接查询将查询多个表中相关联的行,内连接时,返回查询结果集合中的仅是符合查询条件和连接条件的行.但有时候需要包含没有关联的行中数据,即返回查询结果集合中的不仅包含符合连接条件的行,而且还包括<code>左表(左外连接或左连接)</code>,<code>右表(右外连接或右连接)</code>,或<code>两个连接表(全外连接)</code>中的所有数据行,外连接分为左外连接右外连接:</p>
+<blockquote>
+<p>● LEFT JOIN(左连接):返回包括左表中的所有记录和右表中连接字段相等的记录.<br>● RIGHT JOIN(右连接):返回包括右表中的所有记录和左表中连接字段相等的记录.</p>
+</blockquote>
+<p>接着下面先来创建两个测试表<code>orders和customers</code>,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; create table orders</span><br><span class="line">    -&gt; (</span><br><span class="line">    -&gt; o_num int not null auto_increment,</span><br><span class="line">    -&gt; o_date datetime not null,</span><br><span class="line">    -&gt; c_id int not null,</span><br><span class="line">    -&gt; primary key(o_num)</span><br><span class="line">    -&gt; );</span><br><span class="line">Query OK, 0 rows affected (0.02 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; create table customers (c_id int not null );</span><br><span class="line">Query OK, 0 rows affected (0.01 sec)</span><br></pre></td></tr></table></figure></p>
+<p>接着插入需要演示的数据,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> orders(o_num,o_date,c_id) <span class="keyword">VALUES</span>(<span class="number">30001</span>,<span class="string">'2018-09-01'</span>,<span class="number">10001</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> orders(o_num,o_date,c_id) <span class="keyword">VALUES</span>(<span class="number">30002</span>,<span class="string">'2018-09-02'</span>,<span class="number">10003</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> orders(o_num,o_date,c_id) <span class="keyword">VALUES</span>(<span class="number">30003</span>,<span class="string">'2018-09-03'</span>,<span class="number">10004</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> orders(o_num,o_date,c_id) <span class="keyword">VALUES</span>(<span class="number">30004</span>,<span class="string">'2018-09-04'</span>,<span class="number">10005</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> orders(o_num,o_date,c_id) <span class="keyword">VALUES</span>(<span class="number">30005</span>,<span class="string">'2018-09-05'</span>,<span class="number">10001</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> customers(c_id) <span class="keyword">VALUES</span>(<span class="number">10001</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> customers(c_id) <span class="keyword">VALUES</span>(<span class="number">10002</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> customers(c_id) <span class="keyword">VALUES</span>(<span class="number">10003</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> customers(c_id) <span class="keyword">VALUES</span>(<span class="number">10004</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> customers(c_id) <span class="keyword">VALUES</span>(<span class="number">10005</span>);</span><br></pre></td></tr></table></figure></p>
+<p><strong>左连接(lEFT JOIN)</strong></p>
+<p>左连接的结果包括<code>LEFT OUTER</code>子句中指定的左表的所有行,而不仅仅是连接列所匹配的行,如果左表的某行在右表中没有匹配行,则在相关联的结果中,右表的所有选择列表列均为空值.</p>
+<p>如下:在<code>customers表</code>和<code>orders表</code>中,查询所有客户,包括没有订单的客户,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select customers.c_id,orders.o_num</span><br><span class="line">    -&gt; from customers LEFT OUTER JOIN orders</span><br><span class="line">    -&gt; ON customers.c_id=orders.c_id;</span><br><span class="line">+<span class="comment">-------+-------+</span></span><br><span class="line">| c_id  | o_num |</span><br><span class="line">+<span class="comment">-------+-------+</span></span><br><span class="line">| 10001 | 30001 |</span><br><span class="line">| 10003 | 30002 |</span><br><span class="line">| 10004 | 30003 |</span><br><span class="line">| 10005 | 30004 |</span><br><span class="line">| 10001 | 30005 |</span><br><span class="line">| 10002 |  NULL |</span><br><span class="line">+<span class="comment">-------+-------+</span></span><br><span class="line">6 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>结果显示了6条记录,编号10002的用户并没有达成交易,所有该条记录只取出了<code>ordes</code>表中相应的值,而从<code>customers</code>表中取出的值为空值<code>NULL</code>.</p>
+<p><strong>右连接(RIGHT JOIN)</strong></p>
+<p>右连接是左连接的反向连接,将返回右表的所有行,如果右表的某行在作表中没有匹配行,作表将返回空值.<br><strong>实例:</strong> 在<code>customers</code>表和<code>orders</code>表中,查询所有订单,包括没有客户的订单,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select customers.c_id,orders.o_num</span><br><span class="line">    -&gt; from customers RIGHT OUTER JOIN orders</span><br><span class="line">    -&gt; ON customers.c_id=orders.c_id;</span><br><span class="line">+<span class="comment">-------+-------+</span></span><br><span class="line">| c_id  | o_num |</span><br><span class="line">+<span class="comment">-------+-------+</span></span><br><span class="line">| 10001 | 30001 |</span><br><span class="line">| 10001 | 30005 |</span><br><span class="line">| 10003 | 30002 |</span><br><span class="line">| 10004 | 30003 |</span><br><span class="line">| NULL  | 30004 |</span><br><span class="line">+<span class="comment">-------+-------+</span></span><br><span class="line">5 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>结果显示6条记录,30004订单客户取消了订单,对应的<code>customers表</code>中并没有该客户的信息,所以该条记录只取出了<code>orders表</code>中相应的值,而从<code>customers表</code>中取出的值为空值NULL.</p>
+<h3 id="◆复合连接查询◆"><a href="#◆复合连接查询◆" class="headerlink" title="◆复合连接查询◆"></a>◆复合连接查询◆</h3><p>复合条件连接查询是在连接查询的过程中,通过添加过滤条件,限制查询的结果,使查询结果更精确.<br><strong>实例:</strong> 在<code>lyshark</code>表和<code>suppliers</code>表之间,使用<code>INNER JOIN</code>语法进行内连接查询,并对查询结果排序,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select suppliers.s_id,s_name,Name,Price</span><br><span class="line">    -&gt; from lyshark INNER JOIN suppliers</span><br><span class="line">    -&gt; ON lyshark.Gid = suppliers.s_id</span><br><span class="line">    -&gt; ORDER BY lyshark.Gid;</span><br><span class="line">+<span class="comment">------+---------------+------------+-------+</span></span><br><span class="line">| s_id | s_name        | Name       | Price |</span><br><span class="line">+<span class="comment">------+---------------+------------+-------+</span></span><br><span class="line">|  101 | FastFruit.    | apple      |  5.20 |</span><br><span class="line">|  101 | FastFruit.    | blackberry | 10.20 |</span><br><span class="line">|  101 | FastFruit.    | cherry     |  3.20 |</span><br><span class="line">|  102 | LT Supplies   | grape      |  5.30 |</span><br><span class="line">|  102 | LT Supplies   | bannana    | 10.30 |</span><br><span class="line">|  102 | LT Supplies   | orange     | 11.20 |</span><br><span class="line">|  103 | ACME LyShark  | apricot    |  2.20 |</span><br><span class="line">|  103 | ACME LyShark  | coconut    |  9.20 |</span><br><span class="line">|  104 | FNK INCS      | lemon      |  6.40 |</span><br><span class="line">|  104 | FNK INCS      | berry      |  7.60 |</span><br><span class="line">|  105 | GOOD <span class="keyword">SET</span>      | xbabay     |  <span class="number">2.60</span> |</span><br><span class="line">|  <span class="number">105</span> | GOOD <span class="keyword">SET</span>      | xxtt       | <span class="number">11.60</span> |</span><br><span class="line">|  <span class="number">105</span> | GOOD <span class="keyword">SET</span>      | melon      |  <span class="number">8.20</span> |</span><br><span class="line">|  <span class="number">106</span> | JUST Eat Ours | mango      | <span class="number">15.70</span> |</span><br><span class="line">|  <span class="number">107</span> | docker INC    | xxxx       |  <span class="number">3.60</span> |</span><br><span class="line">|  <span class="number">107</span> | docker INC    | xbababa    |  <span class="number">3.60</span> |</span><br><span class="line">+<span class="comment">------+---------------+------------+-------+</span></span><br><span class="line"><span class="number">16</span> <span class="keyword">rows</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="MariaDB-子查询"><a href="#MariaDB-子查询" class="headerlink" title="MariaDB 子查询"></a>MariaDB 子查询</h2><p>子查询指一个查询语句嵌套在另一个查询语句内部的查询,在SELECT子句中先计算子查询,子查询结果作为外层另一个查询的过滤条件,查询可以基于一个表或者多个表.<br>一般的子查询中常用的操作符有<code>ANY(SOME),ALL,IN,EXISTS</code>.子查询可以添加到<code>SELECT、UPDATE和DELETE</code> 语句中,而且可以进行多层嵌套.子查询中也可以使用比较运算符,如<code>&lt;,&lt;=,&gt;,&gt;=,!=</code>等.</p>
+<h3 id="◆IN-子查询◆"><a href="#◆IN-子查询◆" class="headerlink" title="◆IN 子查询◆"></a>◆IN 子查询◆</h3><p>IN关键字进行子查询时,内层查询语句仅仅返回一个数据列,这个数据列里的值将提供给外层查询语句进行比较操作.</p>
+<p><strong>IN查询1:</strong> 查询<code>lyshark表</code>中的<code>Uid=&#39;a1&#39;</code>的GId号,并以Gid作为查询条件查询<code>suppliers表</code>中<code>s_id字段</code>的<code>s_city</code>字段的数值.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select Gid from lyshark where Uid='a1';</span><br><span class="line">+<span class="comment">-----+</span></span><br><span class="line">| Gid |</span><br><span class="line">+<span class="comment">-----+</span></span><br><span class="line">| 101 |</span><br><span class="line">+<span class="comment">-----+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; <span class="keyword">select</span> * <span class="keyword">from</span> suppliers;</span><br><span class="line">+<span class="comment">------+---------------+-----------+----------+--------+</span></span><br><span class="line">| s_id | s_name        | s_city    | s_zip    | s_call |</span><br><span class="line">+<span class="comment">------+---------------+-----------+----------+--------+</span></span><br><span class="line">|  101 | FastFruit.    | TianJin   | 30000    | 4521   |</span><br><span class="line">|  102 | LT Supplies   | ShangHai  | 554780   | 3268   |</span><br><span class="line">|  103 | ACME LyShark  | Chongqing | 447581   | 9985   |</span><br><span class="line">|  104 | FNK INCS      | XiZang    | 3526     | 4475   |</span><br><span class="line">|  105 | GOOD <span class="keyword">SET</span>      | ZhongSHan | <span class="number">4478511</span>  | <span class="number">6666</span>   |</span><br><span class="line">|  <span class="number">106</span> | JUST Eat Ours | TaiYuang  | <span class="number">33325469</span> | <span class="number">5555</span>   |</span><br><span class="line">|  <span class="number">107</span> | docker INC    | ZhengZhou | <span class="number">1124574</span>  | <span class="number">4851</span>   |</span><br><span class="line">+<span class="comment">------+---------------+-----------+----------+--------+</span></span><br><span class="line"><span class="number">7</span> <span class="keyword">rows</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; <span class="keyword">select</span> s_city <span class="keyword">from</span> suppliers <span class="keyword">where</span> s_id <span class="keyword">IN</span></span><br><span class="line">    -&gt; (<span class="keyword">select</span> Gid <span class="keyword">from</span> lyshark <span class="keyword">where</span> Uid=<span class="string">'a1'</span>);</span><br><span class="line">+<span class="comment">---------+</span></span><br><span class="line">| s_city  |</span><br><span class="line">+<span class="comment">---------+</span></span><br><span class="line">| TianJin |</span><br><span class="line">+<span class="comment">---------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.02</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>IN查询2:</strong> 查询<code>lyshark表</code>中,Gid字段是<code>(101和105)编号</code>的内容.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select Gid,Name from lyshark where Gid IN(101,105);</span><br><span class="line">+<span class="comment">-----+------------+</span></span><br><span class="line">| Gid | Name       |</span><br><span class="line">+<span class="comment">-----+------------+</span></span><br><span class="line">| 101 | apple      |</span><br><span class="line">| 101 | blackberry |</span><br><span class="line">| 105 | melon      |</span><br><span class="line">| 101 | cherry     |</span><br><span class="line">| 105 | xbabay     |</span><br><span class="line">| 105 | xxtt       |</span><br><span class="line">+<span class="comment">-----+------------+</span></span><br><span class="line">6 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>NOT IN查询:</strong> 这个查询结果正好和上面的例子相反.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select Gid,Name from lyshark where Gid NOT IN(101,105,102);</span><br><span class="line">+<span class="comment">-----+----------+</span></span><br><span class="line">| Gid | Name     |</span><br><span class="line">+<span class="comment">-----+----------+</span></span><br><span class="line">| 103 | apricot  |</span><br><span class="line">| 104 | berry    |</span><br><span class="line">| 107 | xxxx     |</span><br><span class="line">| 104 | lemon    |</span><br><span class="line">| 999 | lysharks |</span><br><span class="line">| 106 | mango    |</span><br><span class="line">| 103 | coconut  |</span><br><span class="line">| 107 | xbababa  |</span><br><span class="line">+<span class="comment">-----+----------+</span></span><br><span class="line">8 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆ANY-子查询◆"><a href="#◆ANY-子查询◆" class="headerlink" title="◆ANY 子查询◆"></a>◆ANY 子查询◆</h3><p>ANY和SOME关键字是同义词,表示满足其中任意一个条件,他们允许创建一个表达式对子查询的返回值进行比较,只要满足内层子查询中任何一个比较条件,就返回一个结果作为外层查询的条件.</p>
+<p>为了进行下面的实验,先来创建一下SQL语句表格:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; create table tab1(num1 int not null);</span><br><span class="line">Query OK, 0 rows affected (0.02 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; create table tab2(num2 int not null);</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> tab1 <span class="keyword">VALUES</span>(<span class="number">1</span>),(<span class="number">5</span>),(<span class="number">13</span>),(<span class="number">27</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> tab2 <span class="keyword">VALUES</span>(<span class="number">6</span>),(<span class="number">14</span>),(<span class="number">11</span>),(<span class="number">20</span>);</span><br></pre></td></tr></table></figure></p>
+<p><strong>ANY 实例:</strong> 返回<code>tab2</code>表的所有num2列,然后将<code>tab1</code>中的num1的值与之进行比较,只要大于num2的任何1个值,即为符合查询结果.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select num1 from tab1 where num1 &gt; ANY(select num2 from tab2);</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">| num1 |</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">|   13 |</span><br><span class="line">|   27 |</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">2 rows in <span class="keyword">set</span> (<span class="number">0.01</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>在子查询中,返回的是tab2的所有num2列结果(6,14,11,20),然后将tab1中的num1列的值与之进行比较,只要大于num2列的任意一个数即为符合条件的结果.</p>
+<h3 id="◆ALL-子查询◆"><a href="#◆ALL-子查询◆" class="headerlink" title="◆ALL 子查询◆"></a>◆ALL 子查询◆</h3><p>ALL关键字与ANY不同,使用ALL时需要同时满足所有内层查询的条件,ALL关键字接在一个比较操作符的后面,表示与子查询返回的所有值比较为TRUE,则返回TRUE.</p>
+<p><strong>ALL实例:</strong> 返回<code>tab2</code>表中比<code>tab2</code>表num2列所有值都打的值,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select num1 from tab1 where num1 &gt; ALL(select num2 from tab2);</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">| num1 |</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">|   27 |</span><br><span class="line">+<span class="comment">------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.02</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>以上,大于所有num2列的num1值只有27,则返回27.</p>
+<h3 id="◆EXISTS-子查询◆"><a href="#◆EXISTS-子查询◆" class="headerlink" title="◆EXISTS 子查询◆"></a>◆EXISTS 子查询◆</h3><p>EXISTS关键字后面的参数是一个任意的子查询,系统对子查询进行运算以判断它是否返回行,如果至少返回一行,那么EXISTS的结果为<code>true</code>,此时外层查询语句将进行查询.如果子查询没有返回任何行,那么EXISTS返回的结果是<code>false</code>,此时外层语句将不进行查询.</p>
+<p><strong>EXISTS 实例1:</strong> 查询<code>lyshark</code>表中所有记录,查询<code>suppliers</code>表中是否存在<code>s_id=107</code>的记录,如果存在,则查询<code>lyshark</code>表中的记录,否则不查询,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select * from lyshark</span><br><span class="line">    -&gt; where EXISTS</span><br><span class="line">    -&gt; (select s_name from suppliers where s_id=107);</span><br><span class="line">+<span class="comment">---------+-----+------------+--------+</span></span><br><span class="line">| Uid     | Gid | Name       | Price  |</span><br><span class="line">+<span class="comment">---------+-----+------------+--------+</span></span><br><span class="line">| a1      | 101 | apple      |   5.20 |</span><br><span class="line">| a2      | 103 | apricot    |   2.20 |</span><br><span class="line">| b1      | 101 | blackberry |  10.20 |</span><br><span class="line">| b2      | 104 | berry      |   7.60 |</span><br><span class="line">| b5      | 107 | xxxx       |   3.60 |</span><br><span class="line">| bs1     | 102 | orange     |  11.20 |</span><br><span class="line">| bs2     | 105 | melon      |   8.20 |</span><br><span class="line">| c0      | 101 | cherry     |   3.20 |</span><br><span class="line">| l2      | 104 | lemon      |   6.40 |</span><br><span class="line">| lyshark | 999 | lysharks   | 999.00 |</span><br><span class="line">| m1      | 106 | mango      |  15.70 |</span><br><span class="line">| m2      | 105 | xbabay     |   2.60 |</span><br><span class="line">| m3      | 105 | xxtt       |  11.60 |</span><br><span class="line">| o2      | 103 | coconut    |   9.20 |</span><br><span class="line">| t1      | 102 | bannana    |  10.30 |</span><br><span class="line">| t2      | 102 | grape      |   5.30 |</span><br><span class="line">| t4      | 107 | xbababa    |   3.60 |</span><br><span class="line">+<span class="comment">---------+-----+------------+--------+</span></span><br><span class="line">17 rows in <span class="keyword">set</span> (<span class="number">0.01</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>由结果可以看到,内层查询结果表明<code>suppliers</code>表中存在<code>s_id =107</code>表达式返回<code>true</code>,外层查询语句接收<code>true</code> 之后对表<code>lyshark</code>进行查询,并返回所有的记录.</p>
+<p><strong>EXISTS 实例2:</strong> 查询<code>suppliers</code>表中是否存在<code>s_id=107</code>的字段,如果存在,则查询<code>lyshark</code>表中的<code>Price</code>大于10.02的记录,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select * from lyshark</span><br><span class="line">    -&gt; where Price &gt;10.02 AND EXISTS</span><br><span class="line">    -&gt; (select s_name from suppliers where s_id=107);</span><br><span class="line">+<span class="comment">---------+-----+------------+--------+</span></span><br><span class="line">| Uid     | Gid | Name       | Price  |</span><br><span class="line">+<span class="comment">---------+-----+------------+--------+</span></span><br><span class="line">| b1      | 101 | blackberry |  10.20 |</span><br><span class="line">| bs1     | 102 | orange     |  11.20 |</span><br><span class="line">| lyshark | 999 | lysharks   | 999.00 |</span><br><span class="line">| m1      | 106 | mango      |  15.70 |</span><br><span class="line">| m3      | 105 | xxtt       |  11.60 |</span><br><span class="line">| t1      | 102 | bannana    |  10.30 |</span><br><span class="line">+<span class="comment">---------+-----+------------+--------+</span></span><br><span class="line">6 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>NOT EXISTS 实例:</strong> 查询<code>suppliers</code>表中是否存在<code>s_id=107</code>的供应商,如果不存在则查询<code>lyshark</code>表中的记录,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select * from lyshark</span><br><span class="line">    -&gt; where NOT EXISTS</span><br><span class="line">    -&gt; (select s_name from suppliers where s_id=107);</span><br><span class="line">Empty <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>如上:查询语句<code>select s_name from suppliers where s_id=107</code>返回false,则不再执行外层的查询工作.</p>
+<h3 id="◆比较运算符子查询◆"><a href="#◆比较运算符子查询◆" class="headerlink" title="◆比较运算符子查询◆"></a>◆比较运算符子查询◆</h3><p>在前面介绍的带ANY,ALL关键字的子查询时使用了<code>&gt;</code>比较运算符,子查询时还可以使用其他的比较运算符,如<code>&lt;,&lt;=,&gt;,&gt;=,=,!=</code>等.</p>
+<p><strong>实例1:</strong> 使用<code>&gt;=</code>号,过滤出<code>lyshark</code>表中,<code>Gid&gt;=101</code>的字段并显示其<code>Gid,Name</code>字段内容.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select Gid,Name from lyshark</span><br><span class="line">    -&gt; where Gid &gt;=101;</span><br><span class="line">+<span class="comment">-----+------------+</span></span><br><span class="line">| Gid | Name       |</span><br><span class="line">+<span class="comment">-----+------------+</span></span><br><span class="line">| 101 | apple      |</span><br><span class="line">| 103 | apricot    |</span><br><span class="line">| 101 | blackberry |</span><br><span class="line">| 104 | berry      |</span><br><span class="line">| 107 | xxxx       |</span><br><span class="line">| 102 | orange     |</span><br><span class="line">| 105 | melon      |</span><br><span class="line">| 101 | cherry     |</span><br><span class="line">| 104 | lemon      |</span><br><span class="line">| 999 | lysharks   |</span><br><span class="line">| 106 | mango      |</span><br><span class="line">| 105 | xbabay     |</span><br><span class="line">| 105 | xxtt       |</span><br><span class="line">| 103 | coconut    |</span><br><span class="line">| 102 | bannana    |</span><br><span class="line">| 102 | grape      |</span><br><span class="line">| 107 | xbababa    |</span><br><span class="line">+<span class="comment">-----+------------+</span></span><br><span class="line">17 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例2:</strong> 使用<code>&lt;&gt;不等于</code>,查询指定字段,通过别名查询,其中嵌套子查询语句.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select Gid,Name from lyshark</span><br><span class="line">    -&gt; where Gid &lt;&gt;</span><br><span class="line">    -&gt; (select Gid from lyshark AS ly where ly.Name='apple');</span><br><span class="line">+<span class="comment">-----+----------+</span></span><br><span class="line">| Gid | Name     |</span><br><span class="line">+<span class="comment">-----+----------+</span></span><br><span class="line">| 103 | apricot  |</span><br><span class="line">| 104 | berry    |</span><br><span class="line">| 107 | xxxx     |</span><br><span class="line">| 102 | orange   |</span><br><span class="line">| 105 | melon    |</span><br><span class="line">| 104 | lemon    |</span><br><span class="line">| 999 | lysharks |</span><br><span class="line">| 106 | mango    |</span><br><span class="line">| 105 | xbabay   |</span><br><span class="line">| 105 | xxtt     |</span><br><span class="line">| 103 | coconut  |</span><br><span class="line">| 102 | bannana  |</span><br><span class="line">| 102 | grape    |</span><br><span class="line">| 107 | xbababa  |</span><br><span class="line">+<span class="comment">-----+----------+</span></span><br><span class="line">14 rows in <span class="keyword">set</span> (<span class="number">0.01</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="MariaDB-其他查询"><a href="#MariaDB-其他查询" class="headerlink" title="MariaDB 其他查询"></a>MariaDB 其他查询</h2><h3 id="◆合并查询结果◆"><a href="#◆合并查询结果◆" class="headerlink" title="◆合并查询结果◆"></a>◆合并查询结果◆</h3><p>利用<code>UNION</code>关键字,可以给出多条<code>SELECT</code>语句,并将它们的结果组合成单个结果集.合并时,两个表对应的列数和数据类型必须相同.各个SELECT语句之间使用<code>UNION</code>或<code>UNION ALL</code>关键字分隔.<code>UNION</code>不使用关键字<code>ALL</code>,执行的时候删除重复的记录,所有返回的行都是唯一的.使用关键字<code>ALL</code>的作用是不删除重复行也不对结果进行自动排序.基本语法格式如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">column</span>,....FROM table1</span><br><span class="line"><span class="keyword">UNION</span> [<span class="keyword">ALL</span>]</span><br><span class="line"><span class="keyword">SELECT</span> <span class="keyword">column</span>,....FROM table2</span><br></pre></td></tr></table></figure></p>
+<p><strong>合并并删除重复行:</strong> 查询所有价格小于<code>9.0</code>的水果的信息,且查询<code>Gid=101和103</code>所有水果信息,使用<code>UNION</code>连接自动删除重复的行,查询结果,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select Gid,Name,Price from lyshark</span><br><span class="line">    -&gt; where Price &lt; 9.0</span><br><span class="line">    -&gt; UNION</span><br><span class="line">    -&gt; select Gid,Name,Price from lyshark</span><br><span class="line">    -&gt; where Gid IN(101.103);</span><br><span class="line">+<span class="comment">-----+---------+-------+</span></span><br><span class="line">| Gid | Name    | Price |</span><br><span class="line">+<span class="comment">-----+---------+-------+</span></span><br><span class="line">| 101 | apple   |  5.20 |</span><br><span class="line">| 103 | apricot |  2.20 |</span><br><span class="line">| 104 | berry   |  7.60 |</span><br><span class="line">| 107 | xxxx    |  3.60 |</span><br><span class="line">| 105 | melon   |  8.20 |</span><br><span class="line">| 101 | cherry  |  3.20 |</span><br><span class="line">| 104 | lemon   |  6.40 |</span><br><span class="line">| 105 | xbabay  |  2.60 |</span><br><span class="line">| 102 | grape   |  5.30 |</span><br><span class="line">| 107 | xbababa |  3.60 |</span><br><span class="line">+<span class="comment">-----+---------+-------+</span></span><br><span class="line">10 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>如上所示:使用<code>UNION</code>将两条SELECT语句分开,执行完毕后把输出结果组合成单个的结果集,并删除重复的记录.</p>
+<p><strong>合并但不删除重复行:</strong> 查询所有价格小于<code>9.0</code>的水果的信息,且查询<code>Gid=101和103</code>所有水果信息,使用<code>UNION ALL</code>连接,不要删除重复的行,查询结果,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select Gid,Name,Price from lyshark</span><br><span class="line">    -&gt; where Price &lt; 9.0</span><br><span class="line">    -&gt; UNION ALL</span><br><span class="line">    -&gt; select Gid,Name,Price from lyshark</span><br><span class="line">    -&gt; where Gid IN(101,103);</span><br><span class="line">+<span class="comment">-----+------------+-------+</span></span><br><span class="line">| Gid | Name       | Price |</span><br><span class="line">+<span class="comment">-----+------------+-------+</span></span><br><span class="line">| 101 | apple      |  5.20 |</span><br><span class="line">| 103 | apricot    |  2.20 |</span><br><span class="line">| 104 | berry      |  7.60 |</span><br><span class="line">| 107 | xxxx       |  3.60 |</span><br><span class="line">| 105 | melon      |  8.20 |</span><br><span class="line">| 101 | cherry     |  3.20 |</span><br><span class="line">| 104 | lemon      |  6.40 |</span><br><span class="line">| 105 | xbabay     |  2.60 |</span><br><span class="line">| 102 | grape      |  5.30 |</span><br><span class="line">| 107 | xbababa    |  3.60 |</span><br><span class="line">| 101 | apple      |  5.20 |</span><br><span class="line">| 103 | apricot    |  2.20 |</span><br><span class="line">| 101 | blackberry | 10.20 |</span><br><span class="line">| 101 | cherry     |  3.20 |</span><br><span class="line">| 103 | coconut    |  9.20 |</span><br><span class="line">+<span class="comment">-----+------------+-------+</span></span><br><span class="line">15 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>上面的查询结果可以看出<code>UNION ALL</code>只会合并数据,但不会去除重复行.</p>
+<h3 id="◆为表和字段取别名◆"><a href="#◆为表和字段取别名◆" class="headerlink" title="◆为表和字段取别名◆"></a>◆为表和字段取别名◆</h3><p>在前面介绍分组查询、聚合函数查询和嵌套子查询,你可以看到有的地方使用了<code>AS</code>关键字为查询结果中的某一列指定一个特定的名字,在内连接查询时,则对相同的表<code>lyshark</code>分别指定两个不同的名字,这里可以为字段或者表取一个别名,在查询时,使用别名替代其指定内容,下面即将主要了解一下如何给字段和表创建别名以及如何使用别名吧.</p>
+<p><strong>为表取别名:</strong></p>
+<p>当表名称很长或者执行一些特殊查询时,为了方便操作或者需要多次使用相同的表时,可以为表指定别名,用这个别名替代表原来的名称,为表取别名SQL基本语法如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">表名称 [AS] 表别名</span><br></pre></td></tr></table></figure></p>
+<p>1.给<code>orders</code>表取别名<code>o</code>,查询<code>30001</code>订单的下单日期,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select * from orders AS o where o.o_num=30001;</span><br><span class="line"></span><br><span class="line">+<span class="comment">-------+---------------------+-------+</span></span><br><span class="line">| o_num | o_date              | c_id  |</span><br><span class="line">+<span class="comment">-------+---------------------+-------+</span></span><br><span class="line">| 30001 | 2018-09-01 00:00:00 | 10001 |</span><br><span class="line">+<span class="comment">-------+---------------------+-------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.35</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>2.为<code>customers</code>和<code>orders</code>表分别取别名,并进行连接查询,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select c.c_id,o.o_num</span><br><span class="line">    -&gt; from customers AS c LEFT OUTER JOIN orders AS o</span><br><span class="line">    -&gt; ON c.c_id=o.c_id;</span><br><span class="line">+<span class="comment">-------+-------+</span></span><br><span class="line">| c_id  | o_num |</span><br><span class="line">+<span class="comment">-------+-------+</span></span><br><span class="line">| 10001 | 30001 |</span><br><span class="line">| 10003 | 30002 |</span><br><span class="line">| 10004 | 30003 |</span><br><span class="line">| 10005 | 30004 |</span><br><span class="line">| 10001 | 30005 |</span><br><span class="line">| 10002 |  NULL |</span><br><span class="line">+<span class="comment">-------+-------+</span></span><br><span class="line">6 rows in <span class="keyword">set</span> (<span class="number">0.01</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>由上面的查询结果可看到,MariaDB可同时为多个表取别名,且表名可以放在不同的位置,如<code>where子句,select列表,on子句,以及order by 子句</code>.</p>
+<p>在前面还介绍了自连接查询,在连接两个表都是同一个表时,也可以使用别名机制,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select f1.Gid,f1.Name</span><br><span class="line">    -&gt; from lyshark AS f1,lyshark AS f2</span><br><span class="line">    -&gt; where f1.Gid=f2.Gid AND f2.Gid=101;</span><br><span class="line">+<span class="comment">-----+------------+</span></span><br><span class="line">| Gid | Name       |</span><br><span class="line">+<span class="comment">-----+------------+</span></span><br><span class="line">| 101 | apple      |</span><br><span class="line">| 101 | blackberry |</span><br><span class="line">| 101 | cherry     |</span><br><span class="line">| 101 | apple      |</span><br><span class="line">| 101 | blackberry |</span><br><span class="line">| 101 | cherry     |</span><br><span class="line">| 101 | apple      |</span><br><span class="line">| 101 | blackberry |</span><br><span class="line">| 101 | cherry     |</span><br><span class="line">+<span class="comment">-----+------------+</span></span><br><span class="line">9 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>为字段取别名:</strong></p>
+<p>当我们使用<code>SELECT语句</code>显示查询结果时,MySQL会显示每个SELECT后面指定的输出列,在有些情况下,显示的列的名称会很长或者名称不够改观,MySQL可以指定列别名,替换字段或表达式.为字段取别名的基本语法格式为:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">列名称 [AS] 列别名</span><br></pre></td></tr></table></figure></p>
+<p>1.查询<code>lyshark</code>表,为<code>Name</code>字段取别名<code>file_Name</code>,<code>Price</code>取别名<code>file_Price</code>,为<code>lyshark</code>表取别名为<code>f1</code>,并查询表中<code>Price &lt; 8</code>的水果名称,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [lyshark]&gt; select f1.Name AS file_name,f1.Price AS file_price</span><br><span class="line">    -&gt; from lyshark AS f1</span><br><span class="line">    -&gt; where f1.Price &lt; 8;</span><br><span class="line">+<span class="comment">-----------+------------+</span></span><br><span class="line">| file_name | file_price |</span><br><span class="line">+<span class="comment">-----------+------------+</span></span><br><span class="line">| apple     |       5.20 |</span><br><span class="line">| apricot   |       2.20 |</span><br><span class="line">| berry     |       7.60 |</span><br><span class="line">| xxxx      |       3.60 |</span><br><span class="line">| cherry    |       3.20 |</span><br><span class="line">| lemon     |       6.40 |</span><br><span class="line">| xbabay    |       2.60 |</span><br><span class="line">| grape     |       5.30 |</span><br><span class="line">| xbababa   |       3.60 |</span><br><span class="line">+<span class="comment">-----------+------------+</span></span><br><span class="line">9 rows in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/12/26/MariaDB/MariaDB-连接查询与子查询-6/">MariaDB 连接查询与子查询(6)</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年12月26日 - 09:12</p>
+  <p><span>最后更新:</span>2018年12月27日 - 09:12</p>
+  <p><span>原始链接:</span><a href="/2018/12/26/MariaDB/MariaDB-连接查询与子查询-6/" title="MariaDB 连接查询与子查询(6)">https://www.mkdirs.com/2018/12/26/MariaDB/MariaDB-连接查询与子查询-6/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/MariaDB/" rel="tag"> <i class="fa fa-tag"></i> MariaDB</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/25/MariaDB/MariaDB-单表查询与聚合-5/" rel="next" title="MariaDB 单表查询与聚合(5)">
+                <i class="fa fa-chevron-left"></i> MariaDB 单表查询与聚合(5)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/27/MariaDB/MariaDB-使用正则匹配查询-7/" rel="prev" title="MariaDB 使用正则匹配查询(7)">
+                MariaDB 使用正则匹配查询(7) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#MariaDB-连接查询"><span class="nav-text">MariaDB 连接查询</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆内连接查询◆"><span class="nav-text">◆内连接查询◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆外连接查询◆"><span class="nav-text">◆外连接查询◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆复合连接查询◆"><span class="nav-text">◆复合连接查询◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MariaDB-子查询"><span class="nav-text">MariaDB 子查询</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆IN-子查询◆"><span class="nav-text">◆IN 子查询◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆ANY-子查询◆"><span class="nav-text">◆ANY 子查询◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆ALL-子查询◆"><span class="nav-text">◆ALL 子查询◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆EXISTS-子查询◆"><span class="nav-text">◆EXISTS 子查询◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆比较运算符子查询◆"><span class="nav-text">◆比较运算符子查询◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MariaDB-其他查询"><span class="nav-text">MariaDB 其他查询</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆合并查询结果◆"><span class="nav-text">◆合并查询结果◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆为表和字段取别名◆"><span class="nav-text">◆为表和字段取别名◆</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

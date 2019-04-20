@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Flask 是一个基于Python开发并且依赖jinja2模板和Werkzeug WSGI服务的一个微型框架,对于Werkzeug本质是Socket服务端,其用于接收http请求并对请求进行预处理,然后触发Flask框架,开发人员基于Flask框架提供的功能对请求进行相应的处理,并返回给用户,如果要返回给用户复杂的内容时,需要借助jinja2模板来将模板和数据进行渲染,将渲染后的字符串返回给用户浏">
+<meta name="keywords" content="Web 前端">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Web开发框架之Flask入门(6)">
+<meta property="og:url" content="https://www.mkdirs.com/2019/02/28/Web 前端/Web开发框架之Flask入门-6/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="Flask 是一个基于Python开发并且依赖jinja2模板和Werkzeug WSGI服务的一个微型框架,对于Werkzeug本质是Socket服务端,其用于接收http请求并对请求进行预处理,然后触发Flask框架,开发人员基于Flask框架提供的功能对请求进行相应的处理,并返回给用户,如果要返回给用户复杂的内容时,需要借助jinja2模板来将模板和数据进行渲染,将渲染后的字符串返回给用户浏">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-04-16T06:06:24.637Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Web开发框架之Flask入门(6)">
+<meta name="twitter:description" content="Flask 是一个基于Python开发并且依赖jinja2模板和Werkzeug WSGI服务的一个微型框架,对于Werkzeug本质是Socket服务端,其用于接收http请求并对请求进行预处理,然后触发Flask框架,开发人员基于Flask框架提供的功能对请求进行相应的处理,并返回给用户,如果要返回给用户复杂的内容时,需要借助jinja2模板来将模板和数据进行渲染,将渲染后的字符串返回给用户浏">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2019/02/28/Web 前端/Web开发框架之Flask入门-6/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Web开发框架之Flask入门(6) | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2019/02/28/Web 前端/Web开发框架之Flask入门-6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Web开发框架之Flask入门(6)
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-02-28 18:19:45" itemprop="dateCreated datePublished" datetime="2019-02-28T18:19:45+08:00">2019-02-28</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-16 14:06:24" itemprop="dateModified" datetime="2019-04-16T14:06:24+08:00">2019-04-16</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Web-前端/" itemprop="url" rel="index"><span itemprop="name">Web 前端</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Flask 是一个基于Python开发并且依赖jinja2模板和Werkzeug WSGI服务的一个微型框架,对于Werkzeug本质是Socket服务端,其用于接收http请求并对请求进行预处理,然后触发Flask框架,开发人员基于Flask框架提供的功能对请求进行相应的处理,并返回给用户,如果要返回给用户复杂的内容时,需要借助jinja2模板来将模板和数据进行渲染,将渲染后的字符串返回给用户浏览器,本文将收集一些常用的开发小例子方便开发速查.</p>
+<a id="more"></a>
+<p><br></p>
+<h2 id="Web-框架的本质"><a href="#Web-框架的本质" class="headerlink" title="Web 框架的本质"></a>Web 框架的本质</h2><p><strong>实现简单HTTP:</strong> 众所周知,对于所有的Web应用,本质上其实就是一个socket服务端,用户的浏览器其实就是一个socket客户端,其下面就是简单实现的HTTP服务器.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">handle_request</span><span class="params">(client)</span>:</span></span><br><span class="line">    buf = client.recv(<span class="number">1024</span>)</span><br><span class="line">    client.send(bytes(<span class="string">"HTTP/1.1 200 OK\r\n\r\n"</span>,<span class="string">"UTF-8"</span>))</span><br><span class="line">    client.send(bytes(<span class="string">"&lt;b&gt;Hello lyshark&lt;/b&gt;"</span>,<span class="string">"UTF-8"</span>))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)</span><br><span class="line">    sock.bind((<span class="string">"localhost"</span>,<span class="number">80</span>))</span><br><span class="line">    sock.listen(<span class="number">5</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        connection, address = sock.accept()</span><br><span class="line">        handle_request(connection)</span><br><span class="line">        connection.close()</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure></p>
+<p><strong>python wsgi接口</strong> WSGI是一种规范,它定义了使用python编写的web app与web server之间接口格式,实现web app与web server间的解耦,python标准库提供的独立WSGI服务器称为wsgiref<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> wsgiref.simple_server <span class="keyword">import</span> make_server</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">RunServer</span><span class="params">(environ,start_response)</span>:</span></span><br><span class="line">    start_response(<span class="string">"200 OK"</span>,[(<span class="string">"Content-Type"</span>,<span class="string">"text/html"</span>)])</span><br><span class="line">    print(environ[<span class="string">'PATH_INFO'</span>])</span><br><span class="line">    <span class="keyword">return</span> [<span class="string">b"&lt;h1&gt;Hello lyshark&lt;/h1&gt;"</span>]</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    httpd = make_server(<span class="string">"localhost"</span>,<span class="number">80</span>,RunServer)</span><br><span class="line">    print(<span class="string">"Serving HTTP on port 80..."</span>)</span><br><span class="line">    httpd.serve_forever()</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="Flask-表单操作"><a href="#Flask-表单操作" class="headerlink" title="Flask 表单操作"></a>Flask 表单操作</h2><h3 id="◆CheckBox-复选框◆"><a href="#◆CheckBox-复选框◆" class="headerlink" title="◆CheckBox 复选框◆"></a>◆CheckBox 复选框◆</h3><p><strong>HTML</strong> index.html<br><figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">form</span> <span class="attr">action</span>=<span class="string">"/"</span> <span class="attr">method</span>=<span class="string">"post"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"MyDiv"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">label</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"checkbox"</span> <span class="attr">name</span>=<span class="string">"s_option"</span> <span class="attr">value</span>=<span class="string">"basketball"</span> &gt;</span> 篮球</span><br><span class="line">            <span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">label</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"checkbox"</span> <span class="attr">name</span>=<span class="string">"s_option"</span> <span class="attr">value</span>=<span class="string">"football"</span> &gt;</span> 足球</span><br><span class="line">            <span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">label</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"checkbox"</span> <span class="attr">name</span>=<span class="string">"s_option"</span> <span class="attr">value</span>=<span class="string">"badminton"</span> &gt;</span> 羽毛球</span><br><span class="line">            <span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"submit"</span> <span class="attr">value</span>=<span class="string">"发送"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>后台</strong> app.py<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask,render_template,request</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route("/",methods=['POST','GET'])</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">if</span> request.method == <span class="string">"POST"</span>:</span><br><span class="line">        data = request.values.getlist(<span class="string">"s_option"</span>)</span><br><span class="line">        print(<span class="string">"您的选择内容是: %s"</span> %data)</span><br><span class="line">    <span class="keyword">return</span> render_template(<span class="string">"index.html"</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    app.run()</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆Select-选择框◆"><a href="#◆Select-选择框◆" class="headerlink" title="◆Select 选择框◆"></a>◆Select 选择框◆</h3><p><strong>HTML</strong> index.html<br><figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">form</span> <span class="attr">action</span>=<span class="string">"/"</span> <span class="attr">method</span>=<span class="string">"post"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">select</span> <span class="attr">name</span>=<span class="string">"MySelect"</span>&gt;</span></span><br><span class="line">                 <span class="tag">&lt;<span class="name">option</span> <span class="attr">selected</span>=<span class="string">"selected"</span>&gt;</span>--请选择厂家--<span class="tag">&lt;/<span class="name">option</span>&gt;</span></span><br><span class="line">                 <span class="tag">&lt;<span class="name">option</span> &gt;</span>惠普<span class="tag">&lt;/<span class="name">option</span>&gt;</span></span><br><span class="line">                 <span class="tag">&lt;<span class="name">option</span> &gt;</span>华为<span class="tag">&lt;/<span class="name">option</span>&gt;</span></span><br><span class="line">                 <span class="tag">&lt;<span class="name">option</span> &gt;</span>戴尔<span class="tag">&lt;/<span class="name">option</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"submit"</span> <span class="attr">value</span>=<span class="string">"发送"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>后台</strong> app.py<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask,render_template,request</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route("/",methods=['POST','GET'])</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">if</span> request.method == <span class="string">"POST"</span>:</span><br><span class="line">        data = request.values.get(<span class="string">"MySelect"</span>)</span><br><span class="line">        print(<span class="string">"您的选择内容是: %s"</span> %data)</span><br><span class="line">    <span class="keyword">return</span> render_template(<span class="string">"index.html"</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    app.run()</span><br></pre></td></tr></table></figure></p>
+<h3 id="Ajax-发送数据◆"><a href="#Ajax-发送数据◆" class="headerlink" title="Ajax 发送数据◆"></a>Ajax 发送数据◆</h3><p>HTML页面发送数据,后端接收并返回数据</p>
+<p><strong>HTML</strong> index.html<br><figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"button"</span> <span class="attr">class</span>=<span class="string">"MyButton"</span> <span class="attr">value</span>=<span class="string">"发送数据"</span> <span class="attr">onclick</span>=<span class="string">"SendAjax()"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"/static/jquery.js"</span> <span class="attr">type</span>=<span class="string">"text/javascript"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">"text/javascript"</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="javascript">        <span class="function"><span class="keyword">function</span> <span class="title">SendAjax</span>(<span class="params"></span>)</span>&#123;</span></span><br><span class="line"><span class="javascript">            $.ajax(&#123;</span></span><br><span class="line"><span class="javascript">                url:<span class="string">"/dataFromAjax"</span>,</span></span><br><span class="line"><span class="javascript">                contentType: <span class="string">"POST"</span>,</span></span><br><span class="line"><span class="javascript">                data:&#123;<span class="string">"MyData"</span>: <span class="string">"hello lyshark"</span>&#125;,</span></span><br><span class="line"><span class="javascript">                success:<span class="function"><span class="keyword">function</span>(<span class="params">data</span>)</span>&#123;</span></span><br><span class="line"><span class="javascript">                    alert(<span class="string">"返回数据:"</span> + data);</span></span><br><span class="line"><span class="undefined">                &#125;,</span></span><br><span class="line"><span class="javascript">                error:<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span></span><br><span class="line"><span class="javascript">                    alert(<span class="string">"执行失败了..."</span>)</span></span><br><span class="line"><span class="undefined">                &#125;</span></span><br><span class="line"><span class="undefined">            &#125;);</span></span><br><span class="line"><span class="undefined">        &#125;</span></span><br><span class="line"><span class="undefined">    </span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>后台</strong> app.py<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask,render_template,request</span><br><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> jsonify</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route("/")</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">return</span> render_template(<span class="string">"index.html"</span>)</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route("/dataFromAjax")</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">recv</span><span class="params">()</span>:</span></span><br><span class="line">    data = request.args.get(<span class="string">"MyData"</span>)</span><br><span class="line">    print(<span class="string">"收到客户端数据: %s"</span>%data)</span><br><span class="line">    <span class="keyword">return</span> <span class="string">"通信成功..."</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    app.run()</span><br></pre></td></tr></table></figure></p>
+<h3 id="Ajax-获取数据◆"><a href="#Ajax-获取数据◆" class="headerlink" title="Ajax 获取数据◆"></a>Ajax 获取数据◆</h3><p>后端发送JSON数据,HTML页面接收数据并显示出来.</p>
+<p><strong>HTML</strong> index.html<br><figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"button"</span> <span class="attr">class</span>=<span class="string">"MyButton"</span> <span class="attr">value</span>=<span class="string">"接收数据"</span> <span class="attr">onclick</span>=<span class="string">"GetAjax()"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"/static/jquery.js"</span> <span class="attr">type</span>=<span class="string">"text/javascript"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">"text/javascript"</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="javascript">        <span class="function"><span class="keyword">function</span> <span class="title">GetAjax</span>(<span class="params"></span>)</span>&#123;</span></span><br><span class="line"><span class="javascript">            $.ajax(&#123;</span></span><br><span class="line"><span class="javascript">                url:<span class="string">"/dataFromAjax"</span>,</span></span><br><span class="line"><span class="javascript">                contentType: <span class="string">"GET"</span>,</span></span><br><span class="line"><span class="javascript">                success:<span class="function"><span class="keyword">function</span>(<span class="params">data</span>)</span>&#123;</span></span><br><span class="line"><span class="javascript">                    alert(<span class="string">"姓名: "</span> + data.name + <span class="string">"年龄: "</span> + data.age);</span></span><br><span class="line"><span class="undefined">                &#125;,</span></span><br><span class="line"><span class="javascript">                error:<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span></span><br><span class="line"><span class="javascript">                    alert(<span class="string">"执行失败了..."</span>)</span></span><br><span class="line"><span class="undefined">                &#125;</span></span><br><span class="line"><span class="undefined">            &#125;);</span></span><br><span class="line"><span class="undefined">        &#125;</span></span><br><span class="line"><span class="undefined">    </span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>后台</strong> app.py<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask,render_template,request</span><br><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> jsonify</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route("/")</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">return</span> render_template(<span class="string">"index.html"</span>)</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route("/dataFromAjax",methods=["GET","POST"])</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">set</span><span class="params">()</span>:</span></span><br><span class="line">    data = &#123;<span class="string">"name"</span>:<span class="string">"lyshark"</span>,<span class="string">"age"</span>:<span class="string">"23"</span>&#125;</span><br><span class="line">    <span class="keyword">return</span> jsonify(data)</span><br><span class="line"></span><br><span class="line">	<span class="comment"># info = dict()    //另一种组装发送数据的方法</span></span><br><span class="line">	<span class="comment"># info['name'] = "lyshark"</span></span><br><span class="line">	<span class="comment"># info['age'] = 22</span></span><br><span class="line">	<span class="comment"># return jsonify(info)</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    app.run()</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="Flask-过滤器"><a href="#Flask-过滤器" class="headerlink" title="Flask 过滤器"></a>Flask 过滤器</h2><p><strong>字符串操作:</strong><br><figure class="highlight html"><table><tr><td class="code"><pre><span class="line">&#123;# 当变量未定义时，显示默认字符串，可以缩写为d #&#125;</span><br><span class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>&#123;&#123; name | default('No name', true) &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"> </span><br><span class="line">&#123;# 单词首字母大写 #&#125;</span><br><span class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>&#123;&#123; 'hello' | capitalize &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"> </span><br><span class="line">&#123;# 单词全小写 #&#125;</span><br><span class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>&#123;&#123; 'XML' | lower &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"> </span><br><span class="line">&#123;# 去除字符串前后的空白字符 #&#125;</span><br><span class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>&#123;&#123; '  hello  ' | trim &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"> </span><br><span class="line">&#123;# 字符串反转，返回"olleh" #&#125;</span><br><span class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>&#123;&#123; 'hello' | reverse &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"> </span><br><span class="line">&#123;# 格式化输出，返回"Number is 2" #&#125;</span><br><span class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>&#123;&#123; '%s is %d' | format("Number", 2) &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"> </span><br><span class="line">&#123;# 关闭HTML自动转义 #&#125;</span><br><span class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>&#123;&#123; '<span class="tag">&lt;<span class="name">em</span>&gt;</span>name<span class="tag">&lt;/<span class="name">em</span>&gt;</span>' | safe &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"> </span><br><span class="line">&#123;% autoescape false %&#125;</span><br><span class="line">&#123;# HTML转义，即使autoescape关了也转义，可以缩写为e #&#125;</span><br><span class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>&#123;&#123; '<span class="tag">&lt;<span class="name">em</span>&gt;</span>name<span class="tag">&lt;/<span class="name">em</span>&gt;</span>' | escape &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">&#123;% endautoescape %&#125;</span><br><span class="line">#用管道的形式，如果avatar（后端传过来的变量）的值不存在，则用default的值</span><br><span class="line">&#123;&#123; avatar|default('xxx') &#125;&#125;　　　　</span><br><span class="line">#这里的意思为获取avatar的长度，avatar为后端传过来的变量，可以是列表，也可以是字典</span><br><span class="line">&#123;&#123; avatar|length &#125;&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>数值操作:</strong><br><figure class="highlight html"><table><tr><td class="code"><pre><span class="line">&#123;# 四舍五入取整，返回13.0 #&#125;</span><br><span class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>&#123;&#123; 12.8888 | round &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"></span><br><span class="line">&#123;# 向下截取到小数点后2位，返回12.88 #&#125;</span><br><span class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>&#123;&#123; 12.8888 | round(2, 'floor') &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"></span><br><span class="line">&#123;# 绝对值，返回12 #&#125;</span><br><span class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>&#123;&#123; -12 | abs &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>列表操作:</strong><br><figure class="highlight html"><table><tr><td class="code"><pre><span class="line">&#123;# 取第一个元素 #&#125;</span><br><span class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>&#123;&#123; [1,2,3,4,5] | first &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"> </span><br><span class="line">&#123;# 取最后一个元素 #&#125;</span><br><span class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>&#123;&#123; [1,2,3,4,5] | last &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"> </span><br><span class="line">&#123;# 返回列表长度，可以写为count #&#125;</span><br><span class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>&#123;&#123; [1,2,3,4,5] | length &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"> </span><br><span class="line">&#123;# 列表求和 #&#125;</span><br><span class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>&#123;&#123; [1,2,3,4,5] | sum &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"> </span><br><span class="line">&#123;# 列表排序，默认为升序 #&#125;</span><br><span class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>&#123;&#123; [3,2,1,5,4] | sort &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"> </span><br><span class="line">&#123;# 合并为字符串，返回"1 | 2 | 3 | 4 | 5" #&#125;</span><br><span class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>&#123;&#123; [1,2,3,4,5] | join(' | ') &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"> </span><br><span class="line">&#123;# 列表中所有元素都全大写。这里可以用upper,lower，但capitalize无效 #&#125;</span><br><span class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>&#123;&#123; ['tom','bob','ada'] | upper &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>字典列表操作:</strong><br><figure class="highlight html"><table><tr><td class="code"><pre><span class="line">&#123;% set users=[&#123;'name':'Tom','gender':'M','age':20&#125;,</span><br><span class="line">              &#123;'name':'John','gender':'M','age':18&#125;,</span><br><span class="line">              &#123;'name':'Mary','gender':'F','age':24&#125;,</span><br><span class="line">              &#123;'name':'Bob','gender':'M','age':31&#125;,</span><br><span class="line">              &#123;'name':'Lisa','gender':'F','age':19&#125;]</span><br><span class="line">%&#125;</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">&#123;# 按指定字段排序，这里设reverse为true使其按降序排 #&#125;</span><br><span class="line"><span class="tag">&lt;<span class="name">ul</span>&gt;</span></span><br><span class="line">&#123;% for user in users | sort(attribute='age', reverse=true) %&#125;</span><br><span class="line">     <span class="tag">&lt;<span class="name">li</span>&gt;</span>&#123;&#123; user.name &#125;&#125;, &#123;&#123; user.age &#125;&#125;<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">&#123;% endfor %&#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">ul</span>&gt;</span></span><br><span class="line"> </span><br><span class="line">&#123;# 列表分组，每组是一个子列表，组名就是分组项的值 #&#125;</span><br><span class="line"><span class="tag">&lt;<span class="name">ul</span>&gt;</span></span><br><span class="line">&#123;% for group in users|groupby('gender') %&#125;</span><br><span class="line">    <span class="tag">&lt;<span class="name">li</span>&gt;</span>&#123;&#123; group.grouper &#125;&#125;<span class="tag">&lt;<span class="name">ul</span>&gt;</span></span><br><span class="line">    &#123;% for user in group.list %&#125;</span><br><span class="line">        <span class="tag">&lt;<span class="name">li</span>&gt;</span>&#123;&#123; user.name &#125;&#125;<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">    &#123;% endfor %&#125;<span class="tag">&lt;/<span class="name">ul</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">&#123;% endfor %&#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">ul</span>&gt;</span></span><br><span class="line"> </span><br><span class="line">&#123;# 取字典中的某一项组成列表，再将其连接起来 #&#125;</span><br><span class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>&#123;&#123; users | map(attribute='name') | join(', ') &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>内置过滤器:</strong> tojson配合js使用,注意这里要避免HTML自动转义,所以加上safe过滤器<br><figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">"text/javascript"</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="javascript"><span class="keyword">var</span> users = &#123;&#123; users | tojson | safe &#125;&#125;;</span></span><br><span class="line"><span class="javascript"><span class="built_in">console</span>.log(users[<span class="number">0</span>].name);</span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>自定义过滤器:</strong> 自定义过滤器其实就是一个函数,自己写即可<br><figure class="highlight html"><table><tr><td class="code"><pre><span class="line">def mylen(arg):#实现一个可以求长度的函数</span><br><span class="line">    return len(arg)</span><br><span class="line"></span><br><span class="line"># 该函数实现给定一个区间返回区间的内容</span><br><span class="line">def interval(test_str, start, end):#过滤器中传递多个参数，第一个参数为被过滤的内容，第二第三个参数需要自己传入</span><br><span class="line">    return test_str[int(start):int(end)]</span><br><span class="line"></span><br><span class="line">env = app.jinja_env</span><br><span class="line">env.filters['mylen'] = mylen　　　　　　#注册自定义过滤器</span><br><span class="line">env.filters['interval'] = interval　　 #注册自定义过滤器</span><br><span class="line"></span><br><span class="line">@app.route("/") </span><br><span class="line">def index(): </span><br><span class="line">　　test_str = "hello" </span><br><span class="line">　　return render_template("index.html", test_str=test_str)</span><br><span class="line">#--------------------------------------------------------------------</span><br><span class="line">jinja2模板</span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">h1</span>&gt;</span>len: &#123;&#123;test_str|mylen&#125;&#125;<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">h1</span>&gt;</span>interval: &#123;&#123;test_str|interval(0,2)&#125;&#125;<span class="tag">&lt;/<span class="name">h1</span>&gt;</span>　　　　#test_str作为参数传到interval函数里</span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="Flask-应用实例"><a href="#Flask-应用实例" class="headerlink" title="Flask 应用实例"></a>Flask 应用实例</h2><h3 id="◆URL传递参数◆"><a href="#◆URL传递参数◆" class="headerlink" title="◆URL传递参数◆"></a>◆URL传递参数◆</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask,render_template,request</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route("/post/&lt;id&gt;")                       #参数需要放在"&lt;&gt;"中,并且要与函数中传入的参数同名</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">post</span><span class="params">(id)</span>:</span>                                  <span class="comment">#加入参数,函数名称要与上面的路由名称相同</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">"请求的参数是 %s"</span> %id</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route("/user=&lt;name&gt; password=&lt;pasd&gt;")     #可同时传递多个参数</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">post1</span><span class="params">(name,pasd)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">"用户名: %s 密码: %s"</span> %(name,pasd)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    app.run(host=<span class="string">"0.0.0.0"</span>,port=<span class="string">"80"</span>,debug=<span class="literal">True</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="◆URL反向解析◆"><a href="#◆URL反向解析◆" class="headerlink" title="◆URL反向解析◆"></a>◆URL反向解析◆</h3><p>反转url主要用于模版和页面的重定向（从视图函数到url的转换）<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask,render_template,request</span><br><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> url_for</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route("/")</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span><span class="params">()</span>:</span></span><br><span class="line">    print(url_for(<span class="string">"post"</span>,id=<span class="string">"lyshark"</span>))</span><br><span class="line">    <span class="keyword">return</span> <span class="string">"/"</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route("/post/&lt;id&gt;")</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">post</span><span class="params">(id)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">"&lt;h1&gt; hello %s &lt;/h1&gt;"</span> %id</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    app.run(host=<span class="string">"0.0.0.0"</span>,port=<span class="string">"80"</span>,debug=<span class="literal">True</span>)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆URL地址跳转◆"><a href="#◆URL地址跳转◆" class="headerlink" title="◆URL地址跳转◆"></a>◆URL地址跳转◆</h3><p>url跳转（重定向）及url反转功能应用<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask,render_template,request</span><br><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> url_for,redirect</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route("/")</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">"&lt;b&gt; 这是首页 &lt;/b&gt;"</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route("/quest/&lt;is_login&gt;")</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">quest</span><span class="params">(is_login)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> is_login == <span class="string">"1"</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"&lt;b&gt; 登陆成功...&lt;/b&gt;"</span>          <span class="comment">#1为登陆成功,其他为失败,失败则跳转到登陆函数(下面的login)</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> redirect(url_for(<span class="string">"login"</span>))    <span class="comment">#失败,跳转到登陆函数（界面）</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route("/login/")</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">login</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">"&lt;b&gt; 请登陆... &lt;/b&gt;"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    app.run(host=<span class="string">"0.0.0.0"</span>,port=<span class="string">"80"</span>,debug=<span class="literal">True</span>)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆静态文件引入◆"><a href="#◆静态文件引入◆" class="headerlink" title="◆静态文件引入◆"></a>◆静态文件引入◆</h3><figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">"stylesheet"</span> <span class="attr">href</span>=<span class="string">"&#123;&#123; url_for('static',filename='css/index.css') &#125;&#125;"</span>&gt;</span>     // 加载、static目录下的css目录下的index.css文件</span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"&#123;&#123; url_for('static',filename='js/index.js') &#125;&#125;"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span>              // 加载js文件</span><br><span class="line"><span class="tag">&lt;<span class="name">img</span>  <span class="attr">src</span>=<span class="string">"&#123;&#123; url_for('static',filename='images/aa.jpg') &#125;&#125;"</span>&gt;</span>                       // 加载后台图片</span><br><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"&#123;&#123; url_for('login') &#125;&#125;"</span>&gt;</span>登陆<span class="tag">&lt;/<span class="name">a</span>&gt;</span>　　　　                                    // 点击登陆从index跳转到login页面</span><br></pre></td></tr></table></figure>
+<h3 id="◆简单的参数传递◆"><a href="#◆简单的参数传递◆" class="headerlink" title="◆简单的参数传递◆"></a>◆简单的参数传递◆</h3><p><strong>HTML</strong> index.html<br><figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span>第一个flask页面<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span>姓名：&#123;&#123; username &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span>height：&#123;&#123; height &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>后台</strong> app.py<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask,url_for,redirect,render_template</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route("/")</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span><span class="params">()</span>:</span></span><br><span class="line">    info = &#123;</span><br><span class="line">        <span class="string">"username"</span>:<span class="string">"lyshark"</span>,</span><br><span class="line">        <span class="string">"gender"</span>:<span class="string">"man"</span>,</span><br><span class="line">        <span class="string">"height"</span>:<span class="string">"165"</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">#如果有多个参数,可以将所有的参数放到字典中,然后以**kwargs的方式传递进去,info为上面定义的字典</span></span><br><span class="line">    <span class="comment">#这里直接写模版文件名称,如果在模版文件在temlate/html目录下,则这里需要写'html/index.html'</span></span><br><span class="line">    <span class="keyword">return</span> render_template(<span class="string">"index.html"</span>,**info)  </span><br><span class="line"></span><br><span class="line">    <span class="comment">#渲染模版,传参数,如果参数较少,可以直接写关键字参数及值,如下:</span></span><br><span class="line">　　<span class="comment">#return render_template('index.html',username='name',gender="man",height="178")</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    app.run(host=<span class="string">"0.0.0.0"</span>,port=<span class="string">"80"</span>,debug=<span class="literal">True</span>)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆复杂的参数传递◆"><a href="#◆复杂的参数传递◆" class="headerlink" title="◆复杂的参数传递◆"></a>◆复杂的参数传递◆</h3><p><strong>HTML</strong> index.html<br><figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span>第一个flask页面<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span>姓名：&#123;&#123; username &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span>height：&#123;&#123; height &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">hr</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span>&#123;&#123; person.name &#125;&#125;---&#123;&#123; person.age &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span>　　//此处对应上面py中定义的Person类</span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span>&#123;&#123; city.bj &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span>　　　　　　　　　　　　　　 //第一种取值方式</span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span>&#123;&#123; city['tj'] &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span>                       //第二种取值方式</span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>后台</strong> app.py<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask,url_for,redirect,render_template</span><br><span class="line"> </span><br><span class="line">app = Flask(__name__)</span><br><span class="line"> </span><br><span class="line"><span class="meta">@app.route('/')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Person</span><span class="params">(object)</span>:</span></span><br><span class="line">        name=<span class="string">'tttt'</span></span><br><span class="line">        age=<span class="number">18</span></span><br><span class="line"> </span><br><span class="line">    p = Person()</span><br><span class="line">    info = &#123;</span><br><span class="line">        <span class="string">'username'</span> :<span class="string">'name'</span>,</span><br><span class="line">        <span class="string">'gender'</span>:<span class="string">"man"</span>,</span><br><span class="line">        <span class="string">'height'</span> : <span class="string">"178"</span>,</span><br><span class="line">        <span class="string">'person'</span>:p,</span><br><span class="line">        <span class="string">'city'</span>:&#123;</span><br><span class="line">            <span class="string">'bj'</span>:<span class="string">"bj"</span>,</span><br><span class="line">            <span class="string">'tj'</span>:<span class="string">'tj'</span></span><br><span class="line">        &#125;</span><br><span class="line"> </span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> render_template(<span class="string">'index.html'</span>,**info)</span><br><span class="line">    <span class="comment">#return render_template('index.html',username='name',gender="man",height="178")</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    app.run(debug=<span class="literal">True</span>)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆自定义错误页◆"><a href="#◆自定义错误页◆" class="headerlink" title="◆自定义错误页◆"></a>◆自定义错误页◆</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">@app.errorhandler(404)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">page_noe_found</span><span class="params">(error)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> render_template(<span class="string">'home/404.html'</span>),<span class="number">404</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@app.errorhandler(500)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">page_noe_found</span><span class="params">(error)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> render_template(<span class="string">'home/500.html'</span>),<span class="number">500</span></span><br></pre></td></tr></table></figure>
+<h3 id="◆IF语句的使用◆"><a href="#◆IF语句的使用◆" class="headerlink" title="◆IF语句的使用◆"></a>◆IF语句的使用◆</h3><p><strong>HTML:</strong> index.html<br><figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    &#123;% if users and users.age &gt;10 %&#125;　　　　　　　　#这里的users为py文件里传递的user字典，users.age为py文件user字典里的age</span><br><span class="line">        <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"#"</span>&gt;</span>&#123;&#123; users.aa &#125;&#125;<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"#"</span>&gt;</span>&#123;&#123;  users.bbb&#125;&#125;<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">    &#123;% else %&#125;</span><br><span class="line">        <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"#"</span>&gt;</span>登陆<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"#"</span>&gt;</span>注册<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">    &#123;% endif %&#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>后台:</strong> app.py<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask,url_for,redirect,render_template</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route('/&lt;is_login&gt;')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span><span class="params">(is_login)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> is_login == <span class="string">"1"</span>:　　　　　　　　<span class="comment">#模拟1为登陆成功</span></span><br><span class="line">        user = &#123;</span><br><span class="line">            <span class="string">"aa"</span>:<span class="string">"test"</span>,</span><br><span class="line">            <span class="string">'bbb'</span>:<span class="string">'注销'</span>,</span><br><span class="line">            <span class="string">'age'</span>:<span class="string">"11"</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> render_template(<span class="string">'index.html'</span>,users=user)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> render_template(<span class="string">'index.html'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    app.run(debug=<span class="literal">True</span>)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆FOR语句的使用◆"><a href="#◆FOR语句的使用◆" class="headerlink" title="◆FOR语句的使用◆"></a>◆FOR语句的使用◆</h3><p><strong>HTML:</strong> index.html<br><figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    &#123;% for k,v in user.items() %&#125;　　　　　　　　#for语句</span><br><span class="line">        <span class="tag">&lt;<span class="name">p</span>&gt;</span>&#123;&#123; k &#125;&#125;----&#123;&#123; v &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">    &#123;% endfor %&#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>后台:</strong> app.py<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask,url_for,redirect,render_template</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route('/')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span><span class="params">()</span>:</span></span><br><span class="line">    users = &#123;</span><br><span class="line">        <span class="string">'username'</span>:<span class="string">'tsdf'</span>,</span><br><span class="line">        <span class="string">'age'</span>:<span class="number">11</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> render_template(<span class="string">'index.html'</span>,user=users)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    app.run(debug=<span class="literal">True</span>)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆钩子函数的使用◆"><a href="#◆钩子函数的使用◆" class="headerlink" title="◆钩子函数的使用◆"></a>◆钩子函数的使用◆</h3><p>before_request函数,就是一个装饰器,他可以把需要设置为钩子函数的代码放到视图函数执行之前执行.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask,url_for,redirect,render_template,request</span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route('/')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">print</span> (<span class="string">'index'</span>)</span><br><span class="line">    <span class="keyword">return</span> <span class="string">'index'</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@app.before_request</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">mybefore_request</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">print</span> (<span class="string">'before_request'</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    app.run(debug=<span class="literal">True</span>)</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="Flask-实战例子"><a href="#Flask-实战例子" class="headerlink" title="Flask 实战例子"></a>Flask 实战例子</h2><h3 id="◆实现登陆验证◆"><a href="#◆实现登陆验证◆" class="headerlink" title="◆实现登陆验证◆"></a>◆实现登陆验证◆</h3><p><strong>HTML:</strong> index.html<br><figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">form</span> <span class="attr">action</span>=<span class="string">"/"</span> <span class="attr">method</span>=<span class="string">"post"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">placeholder</span>=<span class="string">"用户名"</span> <span class="attr">name</span>=<span class="string">"username"</span> /&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"password"</span> <span class="attr">placeholder</span>=<span class="string">"密码"</span> <span class="attr">name</span>=<span class="string">"password"</span> /&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"submit"</span> <span class="attr">value</span>=<span class="string">"发送"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">p</span>&gt;</span>用户名: &#123;&#123; user &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">p</span>&gt;</span>密码: &#123;&#123; pasd &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>后台:</strong> app.py<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask,render_template,request</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route("/",methods=['POST','GET'])</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">if</span> request.method == <span class="string">"POST"</span>:</span><br><span class="line">        username = request.form.get(<span class="string">"username"</span>)</span><br><span class="line">        password =request.form.get(<span class="string">"password"</span>)</span><br><span class="line">        print(<span class="string">"收到用户名: %s ---&gt;收到密码: %s"</span> %(username,password))</span><br><span class="line">        <span class="keyword">return</span> render_template(<span class="string">"index.html"</span>,user=username,pasd=password)      <span class="comment">#可以指定返回的数据</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">elif</span> request.method == <span class="string">"GET"</span>:</span><br><span class="line">        <span class="keyword">return</span> render_template(<span class="string">"index.html"</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    app.run()</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆实现文件上传◆"><a href="#◆实现文件上传◆" class="headerlink" title="◆实现文件上传◆"></a>◆实现文件上传◆</h3><p><strong>HTML:</strong> upload.html<br><figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">form</span> <span class="attr">action</span>=<span class="string">"/upload"</span> <span class="attr">enctype</span>=<span class="string">"multipart/form-data"</span> <span class="attr">method</span>=<span class="string">"post"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"file"</span> <span class="attr">name</span>=<span class="string">"file"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"submit"</span> <span class="attr">value</span>=<span class="string">"上传文件"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span> <span class="attr">style</span>=<span class="string">"color: green"</span>&gt;</span> 上传状态: &#123;&#123; file_flage &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>后台:</strong> app.py<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask,render_template,request</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route("/upload",methods=['POST','GET'])</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">upload</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">if</span> request.method == <span class="string">"GET"</span>:</span><br><span class="line">        <span class="keyword">return</span> render_template(<span class="string">"upload.html"</span>)</span><br><span class="line">    <span class="keyword">elif</span> request.method == <span class="string">"POST"</span>:</span><br><span class="line">        files = request.files[<span class="string">"file"</span>]                <span class="comment">#获取到返回文件的名称</span></span><br><span class="line">        print(<span class="string">"上传文件详细名称: %s"</span> %files)</span><br><span class="line">        print(<span class="string">"上传文件简略名称: %s"</span> %files.filename)</span><br><span class="line">        files.save(files.filename)                   <span class="comment">#上传文件到当前目录,这里可以做更多判断</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> render_template(<span class="string">"upload.html"</span>,file_flage=<span class="string">"上传文件完成..."</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    app.run()</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆实现Cookie◆"><a href="#◆实现Cookie◆" class="headerlink" title="◆实现Cookie◆"></a>◆实现Cookie◆</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask,render_template,request</span><br><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> make_response</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route("/set")</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">set_cookie</span><span class="params">()</span>:</span></span><br><span class="line">    cook = make_response(<span class="string">"设置cookie完成..."</span>)</span><br><span class="line">    cook.set_cookie(<span class="string">"Name"</span>,<span class="string">"lyshark"</span>,max_age=<span class="number">3600</span>)</span><br><span class="line">    <span class="keyword">return</span> cook</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route("/get")</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_cookie</span><span class="params">()</span>:</span></span><br><span class="line">    cook = request.cookies.get(<span class="string">"Name"</span>)</span><br><span class="line">    <span class="keyword">return</span> <span class="string">"cookie 设置用户=%s"</span> %cook</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route('/del')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">del_cookie</span><span class="params">()</span>:</span></span><br><span class="line">    cook=make_response(<span class="string">"删除cookie完成..."</span>)</span><br><span class="line">    cook.delete_cookie(<span class="string">'Name'</span>)</span><br><span class="line">    <span class="keyword">return</span> cook</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    app.run()</span><br></pre></td></tr></table></figure>
+<h3 id="◆实现Session◆"><a href="#◆实现Session◆" class="headerlink" title="◆实现Session◆"></a>◆实现Session◆</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask,render_template,request</span><br><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> session,url_for,escape,redirect</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route('/')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span><span class="params">()</span>:</span>                               <span class="comment">#自动验证session</span></span><br><span class="line">    <span class="keyword">if</span> <span class="string">'username'</span> <span class="keyword">in</span> session:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">'用户 %s 已经登陆成功...'</span> % escape(session[<span class="string">'username'</span>])</span><br><span class="line">    <span class="keyword">return</span> <span class="string">'您还没有登陆呢...'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route('/login', methods=['GET', 'POST'])</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">login</span><span class="params">()</span>:</span>                                 <span class="comment">#登陆session</span></span><br><span class="line">    <span class="keyword">if</span> request.method == <span class="string">'POST'</span>:</span><br><span class="line">        session[<span class="string">'username'</span>] = request.form[<span class="string">'username'</span>]</span><br><span class="line">        <span class="keyword">return</span> redirect(url_for(<span class="string">'index'</span>))</span><br><span class="line">    <span class="keyword">return</span> <span class="string">'''</span></span><br><span class="line"><span class="string">        &lt;form action="" method="post"&gt;</span></span><br><span class="line"><span class="string">            &lt;p&gt;&lt;input type=text name=username&gt;</span></span><br><span class="line"><span class="string">            &lt;p&gt;&lt;input type=submit value=登陆&gt;</span></span><br><span class="line"><span class="string">        &lt;/form&gt;</span></span><br><span class="line"><span class="string">    '''</span></span><br><span class="line"><span class="meta">@app.route('/get')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get</span><span class="params">()</span>:</span>                                   <span class="comment">#获取session</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">"用户: %s"</span> %session.get(<span class="string">'username'</span>)</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route('/logout')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">logout</span><span class="params">()</span>:</span>                                <span class="comment">#注销session</span></span><br><span class="line">    session.pop(<span class="string">'username'</span>, <span class="literal">None</span>)</span><br><span class="line">    <span class="comment"># session.clear() 　　　　　　　　　      #清空session里的所有数据</span></span><br><span class="line">    <span class="keyword">return</span> redirect(url_for(<span class="string">'index'</span>))</span><br><span class="line"></span><br><span class="line">app.secret_key = os.urandom(<span class="number">24</span>)             <span class="comment">#加盐,服务端每次重启都会变化</span></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    app.run()</span><br></pre></td></tr></table></figure>
+<h3 id="◆表格结构遍历◆"><a href="#◆表格结构遍历◆" class="headerlink" title="◆表格结构遍历◆"></a>◆表格结构遍历◆</h3><p><strong>HTML</strong> index.html<br><figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">table</span> <span class="attr">border</span>=<span class="string">"1"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">thead</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">th</span>&gt;</span>书名<span class="tag">&lt;/<span class="name">th</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">th</span>&gt;</span>作者<span class="tag">&lt;/<span class="name">th</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">th</span>&gt;</span>价格<span class="tag">&lt;/<span class="name">th</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">thead</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">tbody</span>&gt;</span></span><br><span class="line">                &#123;% for book in temp %&#125;</span><br><span class="line">                    <span class="tag">&lt;<span class="name">tr</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; book.name &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; book.author &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; book.price &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">tr</span>&gt;</span></span><br><span class="line">                &#123;% endfor %&#125;</span><br><span class="line">            <span class="tag">&lt;/<span class="name">tbody</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">table</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>后台:</strong> app.py<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask,render_template,request</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route('/')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span><span class="params">()</span>:</span></span><br><span class="line">    book = [</span><br><span class="line">        &#123;<span class="string">'name'</span>:<span class="string">'西游记'</span>,<span class="string">'author'</span>:<span class="string">'吴承恩'</span>,<span class="string">'price'</span>:<span class="number">111</span>&#125;,</span><br><span class="line">        &#123;<span class="string">'name'</span>: <span class="string">'红楼梦'</span>, <span class="string">'author'</span>: <span class="string">'曹雪芹'</span>, <span class="string">'price'</span>: <span class="number">121</span>&#125;,</span><br><span class="line">        &#123;<span class="string">'name'</span>: <span class="string">'水浒传'</span>, <span class="string">'author'</span>: <span class="string">'施耐庵'</span>, <span class="string">'price'</span>: <span class="number">131</span>&#125;,</span><br><span class="line">        &#123;<span class="string">'name'</span>: <span class="string">'三国演义'</span>, <span class="string">'author'</span>: <span class="string">'罗贯中'</span>, <span class="string">'price'</span>: <span class="number">141</span>&#125;</span><br><span class="line">    ]</span><br><span class="line">    <span class="keyword">return</span> render_template(<span class="string">'index.html'</span>,temp=book)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    app.run()</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆表格属性增强◆"><a href="#◆表格属性增强◆" class="headerlink" title="◆表格属性增强◆"></a>◆表格属性增强◆</h3><p><strong>HTML</strong> index.html<br><figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">form</span> <span class="attr">action</span>=<span class="string">"/"</span> <span class="attr">method</span>=<span class="string">"post"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">placeholder</span>=<span class="string">"用户名"</span> <span class="attr">name</span>=<span class="string">"username"</span> /&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"password"</span> <span class="attr">placeholder</span>=<span class="string">"密码"</span> <span class="attr">name</span>=<span class="string">"password"</span> /&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"submit"</span> <span class="attr">value</span>=<span class="string">"发送"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br><span class="line"></span><br><span class="line">     <span class="tag">&lt;<span class="name">table</span> <span class="attr">border</span>=<span class="string">"1"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">thead</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">th</span>&gt;</span>用户名<span class="tag">&lt;/<span class="name">th</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">th</span>&gt;</span>密码<span class="tag">&lt;/<span class="name">th</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">thead</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">tbody</span>&gt;</span></span><br><span class="line">                &#123;% for temp in user %&#125;</span><br><span class="line">                    <span class="tag">&lt;<span class="name">tr</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; temp.user &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">td</span>&gt;</span>&#123;&#123; temp.pass &#125;&#125;<span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line"></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">tr</span>&gt;</span></span><br><span class="line">                &#123;% endfor %&#125;</span><br><span class="line">            <span class="tag">&lt;/<span class="name">tbody</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">table</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>后台:</strong> app.py<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask,render_template,request</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line">temp = [</span><br><span class="line">    &#123;<span class="string">"user"</span>:<span class="string">"admin"</span>,<span class="string">"pass"</span>:<span class="string">"1233"</span>&#125;,</span><br><span class="line">    &#123;<span class="string">"user"</span>:<span class="string">"lyshark"</span>,<span class="string">"pass"</span>:<span class="string">"qwer"</span>&#125;,</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route("/",methods=['POST','GET'])</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">if</span> request.method == <span class="string">"POST"</span>:</span><br><span class="line">        username = request.form.get(<span class="string">"username"</span>)</span><br><span class="line">        password = request.form.get(<span class="string">"password"</span>)</span><br><span class="line">        data = &#123;<span class="string">"user"</span>:username,<span class="string">"pass"</span>:password&#125;     <span class="comment">#组合数据</span></span><br><span class="line">        temp.append(data)                            <span class="comment">#追加数据到列表</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> render_template(<span class="string">"index.html"</span>,user=temp)</span><br><span class="line">    <span class="keyword">elif</span> request.method == <span class="string">"GET"</span>:</span><br><span class="line">        <span class="keyword">return</span> render_template(<span class="string">"index.html"</span>,user=temp)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    app.run()</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2019/02/28/Web 前端/Web开发框架之Flask入门-6/">Web开发框架之Flask入门(6)</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2019年02月28日 - 18:02</p>
+  <p><span>最后更新:</span>2019年04月16日 - 14:04</p>
+  <p><span>原始链接:</span><a href="/2019/02/28/Web 前端/Web开发框架之Flask入门-6/" title="Web开发框架之Flask入门(6)">https://www.mkdirs.com/2019/02/28/Web 前端/Web开发框架之Flask入门-6/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Web-前端/" rel="tag"> <i class="fa fa-tag"></i> Web 前端</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/02/25/Web 前端/Web前端开发JQuery框架-5/" rel="next" title="Web前端开发JQuery框架(5)">
+                <i class="fa fa-chevron-left"></i> Web前端开发JQuery框架(5)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/04/网络设备配置/计算机网络体系概述/" rel="prev" title="计算机网络体系概述">
+                计算机网络体系概述 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Web-框架的本质"><span class="nav-text">Web 框架的本质</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Flask-表单操作"><span class="nav-text">Flask 表单操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆CheckBox-复选框◆"><span class="nav-text">◆CheckBox 复选框◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆Select-选择框◆"><span class="nav-text">◆Select 选择框◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Ajax-发送数据◆"><span class="nav-text">Ajax 发送数据◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Ajax-获取数据◆"><span class="nav-text">Ajax 获取数据◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Flask-过滤器"><span class="nav-text">Flask 过滤器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Flask-应用实例"><span class="nav-text">Flask 应用实例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆URL传递参数◆"><span class="nav-text">◆URL传递参数◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆URL反向解析◆"><span class="nav-text">◆URL反向解析◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆URL地址跳转◆"><span class="nav-text">◆URL地址跳转◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆静态文件引入◆"><span class="nav-text">◆静态文件引入◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆简单的参数传递◆"><span class="nav-text">◆简单的参数传递◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆复杂的参数传递◆"><span class="nav-text">◆复杂的参数传递◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆自定义错误页◆"><span class="nav-text">◆自定义错误页◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆IF语句的使用◆"><span class="nav-text">◆IF语句的使用◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆FOR语句的使用◆"><span class="nav-text">◆FOR语句的使用◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆钩子函数的使用◆"><span class="nav-text">◆钩子函数的使用◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Flask-实战例子"><span class="nav-text">Flask 实战例子</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆实现登陆验证◆"><span class="nav-text">◆实现登陆验证◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆实现文件上传◆"><span class="nav-text">◆实现文件上传◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆实现Cookie◆"><span class="nav-text">◆实现Cookie◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆实现Session◆"><span class="nav-text">◆实现Session◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆表格结构遍历◆"><span class="nav-text">◆表格结构遍历◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆表格属性增强◆"><span class="nav-text">◆表格属性增强◆</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

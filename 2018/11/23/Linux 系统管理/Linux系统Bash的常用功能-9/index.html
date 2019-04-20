@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Linux 是一套免费使用和自由传播的类Unix操作系统,是一个基于POSIX和UNIX的多用户、多任务、支持多线程和多CPU的操作系统.它能运行主要的UNIX工具软件、应用程序和网络协议.它支持32位和64位硬件.Linux继承了Unix以网络为核心的设计思想,是一个性能稳定的多用户网络操作系统. 了解了基本的Linux文件文件系统的概念后,我们将更深入的了解一下Linux的其他方面的内容,那就">
+<meta name="keywords" content="Linux 系统管理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux系统Bash的常用功能(9)">
+<meta property="og:url" content="https://www.mkdirs.com/2018/11/23/Linux 系统管理/Linux系统Bash的常用功能-9/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="Linux 是一套免费使用和自由传播的类Unix操作系统,是一个基于POSIX和UNIX的多用户、多任务、支持多线程和多CPU的操作系统.它能运行主要的UNIX工具软件、应用程序和网络协议.它支持32位和64位硬件.Linux继承了Unix以网络为核心的设计思想,是一个性能稳定的多用户网络操作系统. 了解了基本的Linux文件文件系统的概念后,我们将更深入的了解一下Linux的其他方面的内容,那就">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20181124212542.jpg">
+<meta property="og:updated_time" content="2019-04-16T12:35:11.307Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux系统Bash的常用功能(9)">
+<meta name="twitter:description" content="Linux 是一套免费使用和自由传播的类Unix操作系统,是一个基于POSIX和UNIX的多用户、多任务、支持多线程和多CPU的操作系统.它能运行主要的UNIX工具软件、应用程序和网络协议.它支持32位和64位硬件.Linux继承了Unix以网络为核心的设计思想,是一个性能稳定的多用户网络操作系统. 了解了基本的Linux文件文件系统的概念后,我们将更深入的了解一下Linux的其他方面的内容,那就">
+<meta name="twitter:image" content="https://www.mkdirs.com/picture/20181124212542.jpg">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/11/23/Linux 系统管理/Linux系统Bash的常用功能-9/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Linux系统Bash的常用功能(9) | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/11/23/Linux 系统管理/Linux系统Bash的常用功能-9/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Linux系统Bash的常用功能(9)
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-11-23 12:02:37" itemprop="dateCreated datePublished" datetime="2018-11-23T12:02:37+08:00">2018-11-23</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-16 20:35:11" itemprop="dateModified" datetime="2019-04-16T20:35:11+08:00">2019-04-16</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Linux-系统管理/" itemprop="url" rel="index"><span itemprop="name">Linux 系统管理</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Linux 是一套免费使用和自由传播的类Unix操作系统,是一个基于POSIX和UNIX的多用户、多任务、支持多线程和多CPU的操作系统.它能运行主要的UNIX工具软件、应用程序和网络协议.它支持32位和64位硬件.Linux继承了Unix以网络为核心的设计思想,是一个性能稳定的多用户网络操作系统.</p>
+<p>了解了基本的Linux文件文件系统的概念后,我们将更深入的了解一下Linux的其他方面的内容,那就是我们所使用的用户接口,也就是大家常听到的 『Shell』 ,『这个shell并不是黑客反弹的shell』,而是一种Linux的命令接口,在 Linux 的世界中,默认使用的是 GNU 开发出来的 shell ,称为 BASH Shell,简单来说,我们之前使用的几个命令都是 bash 管理的,除此之外,bash还具备记录命令、文件或命令的补全功能、环境变量的使用等,下面我们会介绍bash的发展以及常用的特性.本章的内容,是一个呈上启一下的东西,在以后的主机维护中作用很大,务必掌握.</p>
+<a id="more"></a>
+<p><br><br><strong>硬件内核与Shell的关系</strong></p>
+<p>我们都知道,管理整个计算机硬件的其实是操作系统的内核(kernel),这个内核是需要被保护的,设想一下如果我们不对内核进行保护的话,每个人都可以随意操作,那么是不是很糟糕,『用不了多久,你的系统就完犊子了』,根据这种请款,我们就开发出了,用户接口,简称Shell,一般使用者是通过 shell 来跟内核沟通的,以让内核达到我们所想要达到的工作,那么系统有多少 shell 可用呢？ 为什么我们要使用 bash 呢？ 接下来我们就开始细细的研究一下吧.</p>
+<p>有时候我们想给系统下达命令,我们必须通过Shell与内核进行通信,好让内核可以正确无误的进行工作,其实Shell的功能只是提供用户操作系统的一个接口,因此这个Shell程序需要可以调用其他软件才好,我们在前面提到过的很多命令,包括 man, chmod, chown, vi, fdisk, mkfs 等,这些命令都是独立的应用程序,但是我们可以通过Shell程序(就是命令行模式)来操作这些应用程序,让这些应用程序调用内核,来运行所需的工作.</p>
+<p>换句话说,只要能够操作应用程序的接口都能够称为Shell程序,狭义的Shell程序指的是命令行方面的软件,包括本章要介绍的 bash 等,广义的Shell程序则包括图形接口的软件,例如 X-Window 因为图形接口其实也能够操作各种应用程序来调用内核工作,不过我们常用的Shell还是Bash,因为其简洁明了,方便管理.</p>
+<p><strong>系统中的默认合法Shell</strong></p>
+<p>知道什么是 Shell 之后,那么我们来了解一下Linux系统可以使用的Shell接口,其实Linux系统有很多Shell,由于早年的 Unix 年代,发展者众多,又因为Linux起源于Unix,所以由于 shell 依据发展者的不同就有许多的版本,例如常听到的 Bourne SHell (sh) 、在 Sun 里头默认的 C SHell、 商业上常用的 K SHell、还有 TCSH 等,每一种 Shell 都各有其特点,至于 Linux 使用的这一种版本就称为『 Bourne Again SHell (简称 bash) 』,这个 Shell 是 Bourne Shell 的增强版本,也是基准于 GNU 的架构下发展出来的.</p>
+<p>下面我们先来介绍一下Shell的简单历史吧,第一个流行的 shell 是由 Steven Bourne 发展出来的,为了纪念他所以就称为 Bourne shell 或直接简称为 sh .而后来另一个广为流传的 shell 是由柏克莱大学的 Bill Joy 设计依附于 BSD 版的 Unix 系统中的 shell 这个 shell 的语法有点类似 C 语言,所以才得名为 C shell 简称为 csh .由于在学术界 Sun 主机势力相当的庞大,而 Sun 主要是 BSD 的分支之一,所以 C shell 也是另一个很重要而且流传很广的 shell 之一 .</p>
+<blockquote>
+<p>在Linux系统中,常用的shell可以在/etc/shells文件中查到.</p>
+<blockquote>
+<p>● /bin/sh (已经被 /bin/bash 所取代)<br>● /bin/bash (就是 Linux 默认的 shell)<br>● /bin/ksh (Kornshell 由 AT&amp;T Bell lab. 发展出来的，兼容于 bash)<br>● /bin/tcsh (整合 C Shell ，提供更多的功能)<br>● /bin/csh (已经被 /bin/tcsh 所取代)<br>● /bin/zsh (基于 ksh 发展出来的，功能更强大的 shell)</p>
+</blockquote>
+</blockquote>
+<p>上面我们可以看到有很多Shell的程序,我们作为初学者,最应该掌握的就是Bash,因为他是系统的默认Shell,还有一些特殊的Shell这里没有列出,比如:/sbin/nologin这个无法登陆的Shell.</p>
+<p><strong>Bash-Shell的常用功能</strong></p>
+<p>既然 /bin/bash 是 Linux 默认的 shell 那么总是得了解一下这个Shell有哪些特性吧,bash 是 GNU 计划中重要的工具软件之一,目前也是 Linux 发行版的标准 shell ,bash 兼容于 sh ,下面我们看一下bash到底有哪些特点吧,好让我们以后的使用更加得心应手.</p>
+<blockquote>
+<p>● 命令记忆功能(history)</p>
+<blockquote>
+<p>在默认的Linux环境中,我认为Bash最赞的功能,就是它的命令记忆功能了,其默认的记忆功能,可达到记忆1000条命令,也就是说,你曾经执行过的命令1000条以内会被记录下来,超出部分会自动清除.<br>你或许会有个疑问,命令被记录到哪里了呢？其实我们的命令在退出终端是是记录在内存中的,当用户正式退出终端是会自动写入到,自己家目录,名字为.bash_history文件当中.虽然我们可以自己设置记录条数,但是建议设置条目小一些,因为一旦你的系统被黑客入侵,那么他可以通过翻阅你的命令执行找到一些核心数据.</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>● 命令与文件补全(TAB)</p>
+<blockquote>
+<p>在使用Linux时,有时候我们会忘记一些命令的具体参数,此时我们可以通过命令补全功能,来实现补全.补全的按键是TAB.灵活运用命令补全功能,不但可以提高输入效率,还能减小误输入概率.实在是,棒棒哒！</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>● 命令别名(alias)</p>
+<blockquote>
+<p>有时候我们需要给指定命令设置别名,比如说,一个命令过长,我们可以使用Bash提供的这一特性来将其简化一下.</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>● Bash程序脚本(Shell)</p>
+<blockquote>
+<p>在Linux上面,Shell脚本发挥着及其强大的功能,我们的主机管理,日常维护,都离不开Shell脚本的支持.</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>● Shell通配符</p>
+<blockquote>
+<p>除了以上功能外,BASH还支持很多简单的通配符,这对于我们的维护减小了很大的负担.</p>
+</blockquote>
+</blockquote>
+<h2 id="Bash-Shell常用命令"><a href="#Bash-Shell常用命令" class="headerlink" title="Bash-Shell常用命令"></a>Bash-Shell常用命令</h2><p>好了,看了这么多理论,是不是有点懵圈,没关系,我也懵了,不过接下来,我们来点干货,开始实战,看一下Bash常用的相关命令吧.前面的理论可以不看,会操作就行.</p>
+<h3 id="◆alias-设置别名◆"><a href="#◆alias-设置别名◆" class="headerlink" title="◆alias 设置别名◆"></a>◆alias 设置别名◆</h3><p>alias命令用来设置指令的别名,我们可以使用该命令可以将一些较长的命令进行简化,使用alias时,用户必须使用单引号’’将原来的命令引起来,防止特殊字符导致错误,alias命令的作用只局限于该次登入的操作,若要每次登入都能够使用这些命令别名,则可将相应的alias命令存放到bash的初始化文件 <code>/etc/bashrc</code> 中,如果是对指定用户生效则要写入用户家目录中的 <code>~/.bashrc</code> 中.</p>
+<blockquote>
+<p>这里我不得不罗嗦一下,关于不同类型命令的执行顺序,面试时可能会问到.</p>
+<blockquote>
+<p>NO.1 用绝对路径或相对的方式执行命令<br>NO.2 别名命令<br>NO.3 bash 内置命令<br>NO.4 根据环境变量定义的目录查询找到的命令</p>
+</blockquote>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># alias --help</span></span><br><span class="line"></span><br><span class="line">命令语法：[ <span class="built_in">alias</span> [原命令]=<span class="string">"新命令"</span> ]</span><br><span class="line"></span><br><span class="line">        -p              <span class="comment">#打印已经设置的命令别名</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># unalias --help</span></span><br><span class="line"></span><br><span class="line">命令语法：[ <span class="built_in">unalias</span> [命令] ]</span><br></pre></td></tr></table></figure>
+<h3 id="◆history-历史命令◆"><a href="#◆history-历史命令◆" class="headerlink" title="◆history 历史命令◆"></a>◆history 历史命令◆</h3><p>history命令用于显示指定数目的指令命令,读取历史命令文件中的目录到历史命令缓冲区和将历史命令缓冲区中的目录写入命令文件,该命令单独使用时,仅显示历史命令,在命令行中,可以使用符号!执行指定序号的历史命令.例如:要执行第2个历史命令,则输入!2.</p>
+<p>历史命令是被保存在内存中的,当退出或者登录shell时,会自动保存或读取.在内存中,历史命令仅能够存储1000条历史命令,该数量是由环境变量HISTSIZE进行控制.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># history --help</span></span><br><span class="line"></span><br><span class="line">命令语法：[ <span class="built_in">history</span> [选项] ]</span><br><span class="line"></span><br><span class="line">        -c              <span class="comment">#清空当前历史命令</span></span><br><span class="line">        -a              <span class="comment">#将历史命令缓冲区中命令写入历史命令文件中</span></span><br><span class="line">        -r              <span class="comment">#将历史命令文件中的命令读入当前历史命令缓冲区</span></span><br><span class="line">        -w              <span class="comment">#将当前历史命令缓冲区命令写入历史命令文件中</span></span><br><span class="line">        <span class="string">"!n"</span>            <span class="comment">#重复执行第n条历史命令</span></span><br><span class="line">        <span class="string">"!!"</span>            <span class="comment">#重复执行上一条命令</span></span><br><span class="line">        <span class="string">"!字符"</span>         <span class="comment">#重复执行最近一条以此字符开头的命令</span></span><br></pre></td></tr></table></figure>
+<h3 id="◆ulimit-磁盘限制◆"><a href="#◆ulimit-磁盘限制◆" class="headerlink" title="◆ulimit 磁盘限制◆"></a>◆ulimit 磁盘限制◆</h3><p>ulimit命令用来限制系统用户对shell资源的访问,想象一个状况：我的 Linux 主机里面同时登陆了十个人,这十个人不知怎么搞的,同时开启了 100 个文件,每个文件的大小约 10MBytes,请问一下,我的 Linux 主机的内存要有多大才够,<code>10*100*10 = 10000 MBytes = 10GBytes</code>这样我们的Linux就完蛋了,为了要预防这个情况的发生,所以我们的 bash 是可以『限制用户的某些系统资源』的,包括可以开启的文件数量,可以使用的 CPU 时间,可以使用的内存总量等等.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ulimit --help</span></span><br><span class="line"></span><br><span class="line">命令语法：[ <span class="built_in">ulimit</span> [选项] ]</span><br><span class="line"></span><br><span class="line">        -c              <span class="comment">#清空当前历史命令</span></span><br><span class="line">        -H              <span class="comment">#严格限制,不能超过此限制</span></span><br><span class="line">        -S              <span class="comment">#宽限模式,可超过,超过后有警告</span></span><br><span class="line">        -a              <span class="comment">#列出所有系统限额信息</span></span><br><span class="line">        -f              <span class="comment">#此Shell可创建的最大容量,默认KB</span></span><br><span class="line">        -d              <span class="comment">#进程可用最大断裂内存(seqment)容量</span></span><br><span class="line">        -l              <span class="comment">#可用于锁定的内存(lock)量</span></span><br><span class="line">        -t              <span class="comment">#可使用最大CPU时间,(单位为秒)</span></span><br><span class="line">        -u              <span class="comment">#单一用户可使用最大进程数量</span></span><br></pre></td></tr></table></figure>
+<p>来看一下它的结果的解析吧.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ulimit -a</span></span><br><span class="line"></span><br><span class="line">core file size          (blocks, -c) 0           <span class="comment">#core文件的最大值为100 blocks</span></span><br><span class="line">data seg size           (kbytes, -d) unlimited   <span class="comment">#进程的数据段可以任意大</span></span><br><span class="line">scheduling priority             (-e) 0</span><br><span class="line">file size               (blocks, -f) unlimited   <span class="comment">#文件可以任意大</span></span><br><span class="line">pending signals                 (-i) 98304       <span class="comment">#最多有98304个待处理的信号</span></span><br><span class="line">max locked memory       (kbytes, -l) 32          <span class="comment">#一个任务锁住的物理内存的最大值为32KB</span></span><br><span class="line">max memory size         (kbytes, -m) unlimited   <span class="comment">#一个任务的常驻物理内存的最大值</span></span><br><span class="line">open files                      (-n) 1024        <span class="comment">#一个任务最多可以同时打开1024的文件</span></span><br><span class="line">pipe size            (512 bytes, -p) 8           <span class="comment">#管道的最大空间为4096字节</span></span><br><span class="line">POSIX message queues     (bytes, -q) 819200      <span class="comment">#POSIX的消息队列的最大值为819200字节</span></span><br><span class="line">real-time priority              (-r) 0</span><br><span class="line">stack size              (kbytes, -s) 10240       <span class="comment">#进程的栈的最大值为10240字节</span></span><br><span class="line">cpu time               (seconds, -t) unlimited   <span class="comment">#进程使用的CPU时间</span></span><br><span class="line">max user processes              (-u) 98304       <span class="comment">#当前用户同时打开的进程（包括线程）的最大个数为98304</span></span><br><span class="line">virtual memory          (kbytes, -v) unlimited   <span class="comment">#没有限制进程的最大地址空间</span></span><br><span class="line">file locks                      (-x) unlimited   <span class="comment">#所能锁住的文件的最大个数没有限制</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="◆stty-设置终端◆"><a href="#◆stty-设置终端◆" class="headerlink" title="◆stty 设置终端◆"></a>◆stty 设置终端◆</h3><p>这个东西,太简单了,暂时不写了！<br><br></p>
+<h2 id="Bash-Shell操作环境"><a href="#Bash-Shell操作环境" class="headerlink" title="Bash-Shell操作环境"></a>Bash-Shell操作环境</h2><p>是否记得我们登陆主机的时候,屏幕上头会有一些说明文字,告知我们的 Linux 版本啊什么的,还有登陆的时候我们还可以给予用户一些信息或者欢迎文字,此外,我们习惯的环境变量、命令别名等等的,是否可以登陆就主动的帮我配置好,这些都是需要注意的,下面我们就来介绍一下吧.</p>
+<p><strong>关于Bash的登陆tty终端提示信息</strong></p>
+<p>其实我们的Bash也有登陆提示信息的,细心的你也会发现,当我们登陆Linux系统时,默认会提示,Linux的版本等相关信息,这些登陆tty的相关信息是在 <code>/etc/issue</code> 这个配置文件中保存的,我们可以看一下它的结构.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cat /etc/issue</span></span><br><span class="line">\S</span><br><span class="line">Kernel \r on an \m</span><br></pre></td></tr></table></figure></p>
+<p>上图可以看到,里面默认有三行,issue里面的内容,是可以使用反斜杠作为变量调用的,我们下面来具体看一下它所支持的的代码.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">代码</th>
+<th style="text-align:center">issue内的各代码的意义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">\d</td>
+<td style="text-align:center">本地端时间的日期</td>
+</tr>
+<tr>
+<td style="text-align:left">\l</td>
+<td style="text-align:center">显示第几个终端机接口</td>
+</tr>
+<tr>
+<td style="text-align:left">\m</td>
+<td style="text-align:center">显示硬件等级</td>
+</tr>
+<tr>
+<td style="text-align:left">\n</td>
+<td style="text-align:center">显示主机网络名称</td>
+</tr>
+<tr>
+<td style="text-align:left">\o</td>
+<td style="text-align:center">显示domain name</td>
+</tr>
+<tr>
+<td style="text-align:left">\r</td>
+<td style="text-align:center">操作系统版本</td>
+</tr>
+<tr>
+<td style="text-align:left">\t</td>
+<td style="text-align:center">显示本地端的时间</td>
+</tr>
+<tr>
+<td style="text-align:left">\s</td>
+<td style="text-align:center">显示操作系统名称</td>
+</tr>
+<tr>
+<td style="text-align:left">\v</td>
+<td style="text-align:center">显示操作系统版本</td>
+</tr>
+</tbody>
+</table>
+<p>如果我们想定制自己的登陆界面的话,我们可以修改这个配置文件,制作出属于自己的登陆界面.此时你还需要注意的是,除了issue文件外,还有一个issue.net的配置文件,这个是提供给telnet的远程登陆程序用的,当用户用telnet方式登陆主机时,就会自动读取 <code>/etc/issue.net</code> 这个配置文件里的信息,并输出到屏幕上.</p>
+<p><strong>关于Bash通过SSH登陆的提示信息</strong></p>
+<p>如果,你想让通过SSH登陆的用户,登陆成功后取得一些信息的话,那么可以讲信息加入到 <code>/etc/motd</code> 这个文件里,当用户下次登陆时,就会默认显示里面的内容.</p>
+<p>例如,我们写入警告信息,让每个登陆用户下次登陆自动显示.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cat /etc/motd</span></span><br><span class="line">===============================================================</span><br><span class="line">警告：您的操作已被记录</span><br><span class="line">===============================================================</span><br></pre></td></tr></table></figure></p>
+<p>接下来我们通过 <code>ssh</code> 来模拟登陆一下,看一下效果.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ssh root@192.168.1.10</span></span><br><span class="line">root@192.168.1.10 password:</span><br><span class="line"></span><br><span class="line">Last failed login: Sat Nov 24 15:28:30 EST 2018 from 192.168.1.20 on ssh:notty</span><br><span class="line">There was 1 failed login attempt since the last successful login.</span><br><span class="line">Last login: Sat Nov 24 15:26:36 2018 from 192.168.1.20</span><br><span class="line">================================================================</span><br><span class="line">警告：您的操作已被记录</span><br><span class="line">===============================================================</span><br></pre></td></tr></table></figure></p>
+<p><strong>Bash的环境配置文件,与相关调用顺序</strong></p>
+<p>你是否会觉得奇怪,怎么我们什么动作都没有进行,但是一进入 bash 就取得一堆有用的变量了,这是因为系统有一些环境配置文件案的存在,让 bash 在启动时直接读取这些配置文件,以规划好 bash 的操作环境,而这些配置文件又可以分为全体系统的配置文件以及用户个人偏好配置文件.接下来,我们就来看看常用的配置文件以及调用顺序吧.</p>
+<blockquote>
+<p><code>/etc/profile</code></p>
+<blockquote>
+<p>这是一个系统全局配置文件,每个用户登录取得Bash时一定会读取次配置文件,加载一些配置参数,当此配置文件执行的时候还会调用其他的配置文件,比如下面的这几个.</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p><code>/etc/profile</code>首先调用<code>/etc/inputrc</code></p>
+<blockquote>
+<p>其实这个文件并没有被运行,/etc/profile 会主动的判断使用者有没有自定义输入的按键功能,如果没有的话,/etc/profile 就会决定配置『INPUTRC=/etc/inputrc』这个变量,此一文件内容为 bash 的热键啦、[tab]要不要有声音啦等等的数据.不建议修改这个文件</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p><code>/etc/profile</code>其次调用<code>/etc/profile.d/.sh</code></p>
+<blockquote>
+<p>这个目录内有很多文件,只要在 /etc/profile.d/ 这个目录内且扩展名为 .sh 并且使用者能够具有读权限那么该文件就会被 /etc/profile调用,如果你需要帮所有使用者配置一些共享的命令别名时,可以在这个目录底下自行创建扩展名为 .sh 的文件,并将所需要的数据写入即可.</p>
+</blockquote>
+</blockquote>
+<p>上面的说明,我们可以看出,其实只有 /etc/profile 被调用啦,但是 /etc/profile 还会调用出其他的配置文件,所以让我们的 bash 操作接口变的非常的友善啦.</p>
+<blockquote>
+<p><code>~./bash_profile</code></p>
+<blockquote>
+<p>bash 在读完了整体环境配置的 /etc/profile 并借此调用其他配置文件后,接下来则是会读取使用者的个人配置文件.所读取的个人偏好配置文件其实主要有三个,依序分别是：<br><code>~/.bash_profile</code> –&gt; <code>~/.bash_login</code> –&gt; <code>~/.prifile</code></p>
+</blockquote>
+</blockquote>
+<p>其实 bash 只会读取上面三个文件的其中一个,而读取的顺序则是依照上面的顺序,也就是说,如果 ~/.bash_profile 存在,那么其他两个文件不论有无存在,都不会被读取.如果 ~/.bash_profile 不存在才会去读取 ~/.bash_login,而前两者都不存在才会读取 ~/.profile 的意思.</p>
+<blockquote>
+<p><code>~/.bash_history</code></p>
+<blockquote>
+<p>默认的情况下,我们的历史命令就记录在这里,而这个文件能够记录多少数据,则与 HISTFILESIZE 这个变量有关,每次登陆 bash 后,bash 会先读取这个文件,将所有的历史命令读入内存,因此当我们登陆 bash 后就可以查看以前使用过的命令啦.</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p><code>~/.bash_logout</code></p>
+<blockquote>
+<p>当系统用户注销时,系统会读取此配置文件,你可以去读取一下这个文件的内容,默认的情况下注销时bash 只是帮我们清掉屏幕的信息而已.不过,你也可以将一些备份或者是其他你认为重要的工作写在这个文件中(例如清空缓存盘),那么当你离开 Linux 的时候,就可以解决一些烦人的事情.</p>
+</blockquote>
+</blockquote>
+<p>具体的调用情况,下面一张图,搞定.</p>
+<p><img src="/picture/20181124212542.jpg" alt="blockchain"></p>
+<blockquote>
+<p>1.首先执行主配置下的：<code>/etc/profile</code><br>2.执行主配置目录下的：<code>/etc/profile.d/*.sh</code><br>3.执行当前家目录下的：<code>~/.bash_profile</code><br>4.执行当前家目录下的：<code>~/.bashrc</code><br>5.最后执行主配置下的：<code>/etc/bashrc</code></p>
+</blockquote>
+<p>以上就是,系统加载环境变量的全部过程!<br><br></p>
+<h2 id="Shell快捷键与通配符"><a href="#Shell快捷键与通配符" class="headerlink" title="Shell快捷键与通配符"></a>Shell快捷键与通配符</h2><h3 id="◆Bash-常用快捷键◆"><a href="#◆Bash-常用快捷键◆" class="headerlink" title="◆Bash 常用快捷键◆"></a>◆Bash 常用快捷键◆</h3><p>Bashe这个默认shell支持一些,比较常用的快捷键,这些快捷键,对于命令行下的操作,大有好处,你应该好好掌握这些按键.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">快捷键</th>
+<th style="text-align:left">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">ctrl+A</td>
+<td style="text-align:left">将光标移动到命令开头</td>
+</tr>
+<tr>
+<td style="text-align:left">ctrl+E</td>
+<td style="text-align:left">将光标移动到命令结尾</td>
+</tr>
+<tr>
+<td style="text-align:left">ctrl+C</td>
+<td style="text-align:left">强制终止当前命令</td>
+</tr>
+<tr>
+<td style="text-align:left">ctrl+L</td>
+<td style="text-align:left">清屏</td>
+</tr>
+<tr>
+<td style="text-align:left">ctrl+U</td>
+<td style="text-align:left">删除或剪切光标之前的命令</td>
+</tr>
+<tr>
+<td style="text-align:left">ctrl+K</td>
+<td style="text-align:left">删除或剪切光标之后的命令</td>
+</tr>
+<tr>
+<td style="text-align:left">ctrl+Y</td>
+<td style="text-align:left">粘贴,ctrl+U或ctrl+K的内容</td>
+</tr>
+<tr>
+<td style="text-align:left">ctrl+R</td>
+<td style="text-align:left">在历史命令中搜索,按下后会出现搜索命令</td>
+</tr>
+<tr>
+<td style="text-align:left">ctrl+D</td>
+<td style="text-align:left">退出当前终端</td>
+</tr>
+<tr>
+<td style="text-align:left">ctrl+Z</td>
+<td style="text-align:left">暂停,并放入后台</td>
+</tr>
+<tr>
+<td style="text-align:left">ctrl+S</td>
+<td style="text-align:left">暂停屏幕输出</td>
+</tr>
+<tr>
+<td style="text-align:left">ctrl+Q</td>
+<td style="text-align:left">恢复屏幕输出</td>
+</tr>
+</tbody>
+</table>
+<h3 id="◆Bash-常用通配符◆"><a href="#◆Bash-常用通配符◆" class="headerlink" title="◆Bash 常用通配符◆"></a>◆Bash 常用通配符◆</h3><table>
+<thead>
+<tr>
+<th style="text-align:center">通 配 符</th>
+<th style="text-align:left">作    用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">?</td>
+<td style="text-align:left">匹配任意一个字符</td>
+</tr>
+<tr>
+<td style="text-align:center">*</td>
+<td style="text-align:left">匹配0个或多个任意字符,也就是可以匹配任何内容</td>
+</tr>
+<tr>
+<td style="text-align:center">[]</td>
+<td style="text-align:left">匹配括号内的任意一个字符 例如：[abc],在abc中任选一个</td>
+</tr>
+<tr>
+<td style="text-align:center">[-]</td>
+<td style="text-align:left">匹配一定范围的字符 例如：[a-z],在a-z之间的都可以被匹配</td>
+</tr>
+<tr>
+<td style="text-align:center">[^]</td>
+<td style="text-align:left">逻辑非,匹配不包括,括号内的字符</td>
+</tr>
+<tr>
+<td style="text-align:center">^[]</td>
+<td style="text-align:left">匹配开头是,括号内的字符</td>
+</tr>
+<tr>
+<td style="text-align:center">^[^]</td>
+<td style="text-align:left">匹配开头不是,括号内的字符</td>
+</tr>
+</tbody>
+</table>
+<p><strong>实例1：</strong>使用 <code>?</code> 匹配任意一个字符,匹配开头任意一个字符,只能匹配一个字符.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ls</span></span><br><span class="line">123  1233  12333  abbc  abc  abcc  abccc  admin  lyshark  multiuser  rui  sec  wang</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ls ?ang</span></span><br><span class="line">wang</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例2：</strong>使用 <code>*</code> 匹配0个或多个任意字符,也就是可以匹配任何内容<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ls</span></span><br><span class="line">123  1233  12333  abbc  abc  abcc  abccc  admin  lyshark  multiuser  rui  sec  wang</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ls *</span></span><br><span class="line">123  1233  12333  abbc  abc  abcc  abccc  admin  lyshark  multiuser  rui  sec  wang</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ls *ang</span></span><br><span class="line">wang</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例3：</strong>使用 <code>[-]</code> 匹配范围,匹配一个范围<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ls</span></span><br><span class="line">123  1233  12333  abbc  abc  abcc  abccc  admin  lyshark  lyssark  multiuser  rui  sec  wang</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ls lys[a-z]ark</span></span><br><span class="line">lyshark  lyssark</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例4：</strong>使用 <code>^[]</code> 匹配开头是0-9的任意字符<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ls</span></span><br><span class="line">123  1233  12333  abbc  abc  abcc  abccc  admin  lyshark  lyssark  multiuser  rui  sec  wang</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ls [0-9]*</span></span><br><span class="line">123  1233  12333</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例5：</strong>使用 <code>^[^]</code> 匹配开头不是0-9的任意字符<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ls</span></span><br><span class="line">123  1233  12333  abbc  abc  abcc  abccc  admin  lyshark  lyssark  multiuser  rui  sec  wang</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ls [^0-9]*</span></span><br><span class="line">abbc  abc  abcc  abccc  admin  lyshark  lyssark  multiuser  rui  sec  wang</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆bash-特殊通配符◆"><a href="#◆bash-特殊通配符◆" class="headerlink" title="◆bash 特殊通配符◆"></a>◆bash 特殊通配符◆</h3><table>
+<thead>
+<tr>
+<th style="text-align:center">符  号</th>
+<th style="text-align:left">作    用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">‘’</td>
+<td style="text-align:left">单引号：在单引号中的内容,全部会脱意,它是脱意字符.</td>
+</tr>
+<tr>
+<td style="text-align:center">“”</td>
+<td style="text-align:left">双引号：双引号内,拥有$调用变量,引用命令,和转义符的特殊含义.</td>
+</tr>
+<tr>
+<td style="text-align:center">``</td>
+<td style="text-align:left">反引号：反引号内会被当成命令解析,先执行</td>
+</tr>
+<tr>
+<td style="text-align:center">$()</td>
+<td style="text-align:left">$加括号：同反引号作用相同,执行解析命令</td>
+</tr>
+<tr>
+<td style="text-align:center">()</td>
+<td style="text-align:left">小括号：用于命令执行,小括号中的命令会在子shell中执行</td>
+</tr>
+<tr>
+<td style="text-align:center">{}</td>
+<td style="text-align:left">中括号：用于命令执行,中括号中的命令会在当前shell中执行</td>
+</tr>
+<tr>
+<td style="text-align:center">[]</td>
+<td style="text-align:left">大括号：用于测试变量</td>
+</tr>
+<tr>
+<td style="text-align:center">#</td>
+<td style="text-align:left">警号：在shell脚本中,警号表示注释</td>
+</tr>
+<tr>
+<td style="text-align:center">$</td>
+<td style="text-align:left">$符号：用于调用变量值</td>
+</tr>
+<tr>
+<td style="text-align:center">\</td>
+<td style="text-align:left">转义符：用于转义\之后的内容不被执行</td>
+</tr>
+</tbody>
+</table>
+<p><strong>单引号与双引号：</strong> 单引号当中的特殊字符被脱意了,而双引号也是脱意,但是$和\不会脱意<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># name=lyshark</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo '$name'</span></span><br><span class="line"><span class="variable">$name</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "$name"</span></span><br><span class="line">lyshark</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "&#123;&#123;&#123; lyshark"</span></span><br><span class="line">&#123;&#123;&#123; lyshark</span><br></pre></td></tr></table></figure></p>
+<p><strong>单引号与反引号：</strong> 单引号和双引号会脱意,在双引号中的反引号会执行<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># echo 'date'</span></span><br><span class="line">date</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "date"</span></span><br><span class="line">date</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo '`date`'</span></span><br><span class="line">`date`</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "`date`"</span></span><br><span class="line">Sun Sep 23 22:56:34 EDT 2018</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $(date)</span></span><br><span class="line">Sun Sep 23 22:56:46 EDT 2018</span><br></pre></td></tr></table></figure></p>
+<p><strong>反引号与$()</strong> 关于反引号,和$()两种都是命令执行<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost /]<span class="comment"># echo ls</span></span><br><span class="line">ls</span><br><span class="line"></span><br><span class="line">[root@localhost /]<span class="comment"># echo `ls`</span></span><br><span class="line">bin boot dev etc home lib lib64 media mnt opt proc root run sbin srv sys tmp usr var</span><br><span class="line"></span><br><span class="line">[root@localhost /]<span class="comment"># echo $(ls)</span></span><br><span class="line">bin boot dev etc home lib lib64 media mnt opt proc root run sbin srv sys tmp usr var</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>关于小括号,中括号,和大括号的说明</p>
+<blockquote>
+<p>● ()执行一串命令时,需要重新开一个子shell进行执行<br>● {}执行一串命令时,是在当前shell执行<br>● ()和{}都是把一串的命令放在括号里面,并且命令之间用;号隔开<br>● ()最后一个命令可以不用分号<br>● {}最后一个命令要用分号<br>● {}的第一个命令和左括号之间必须要有一个空格<br>● ()里的各命令不必和括号有空格</p>
+</blockquote>
+</blockquote>
+<p><strong>小括号：</strong> ()执行命令时,新开一个子shell执行<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># name=lyshark</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ( name=bash;echo $name )</span></span><br><span class="line">bash</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $name</span></span><br><span class="line">lyshark</span><br></pre></td></tr></table></figure></p>
+<p><strong>中括号：</strong>{}执行命令时,会在当前shell中执行<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># name=lyshark</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># &#123; name=bash;echo $name; &#125;</span></span><br><span class="line">bash</span><br><span class="line">[root@localhost ~]<span class="comment"># echo $name</span></span><br><span class="line">bash</span><br><span class="line">[root@localhost ~]<span class="comment">#</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="Shell的数据流重定向"><a href="#Shell的数据流重定向" class="headerlink" title="Shell的数据流重定向"></a>Shell的数据流重定向</h2><table>
+<thead>
+<tr>
+<th style="text-align:left">设备</th>
+<th style="text-align:center">设备文件名</th>
+<th style="text-align:center">文件描述符</th>
+<th>类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">键盘</td>
+<td style="text-align:center">/dev/stdin</td>
+<td style="text-align:center">0</td>
+<td>标准输入</td>
+</tr>
+<tr>
+<td style="text-align:left">显示器</td>
+<td style="text-align:center">/dev/stdout</td>
+<td style="text-align:center">1</td>
+<td>标准正确输出</td>
+</tr>
+<tr>
+<td style="text-align:left">显示器</td>
+<td style="text-align:center">/dev/stderr</td>
+<td style="text-align:center">2</td>
+<td>标准错误输出</td>
+</tr>
+<tr>
+<td style="text-align:left">垃圾桶</td>
+<td style="text-align:center">/dev/null</td>
+<td style="text-align:center"></td>
+<td>垃圾桶</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">类型</th>
+<th style="text-align:left">符号</th>
+<th style="text-align:left">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">标准输出重定向</td>
+<td style="text-align:left">命令 &gt; 文件</td>
+<td style="text-align:left">以覆盖的方式,把命令的正确输出输出到指定文件或设备中</td>
+</tr>
+<tr>
+<td style="text-align:left"></td>
+<td style="text-align:left">命令 &gt;&gt; 文件</td>
+<td style="text-align:left">以追加的方式,把命令的正确输出输出到指定的文件或设备当中</td>
+</tr>
+<tr>
+<td style="text-align:left">标准错误输出重定向</td>
+<td style="text-align:left">错误命令 2 &gt; 文件</td>
+<td style="text-align:left">以覆盖方式,把命令的错误输出输出到指定的文件或设备中</td>
+</tr>
+<tr>
+<td style="text-align:left"></td>
+<td style="text-align:left">错误命令 2&gt;&gt; 文件</td>
+<td style="text-align:left">以追加的方式,把命令的错误输出输出到指定文件或设备中</td>
+</tr>
+<tr>
+<td style="text-align:left">正确输出和错误输出同时保存</td>
+<td style="text-align:left">命令 &gt; 文件 2&gt;&amp;1</td>
+<td style="text-align:left">以覆盖的方式,把正确输出和错误输出同时保存到一个文件中</td>
+</tr>
+<tr>
+<td style="text-align:left"></td>
+<td style="text-align:left">命令 &gt;&gt; 文件 2&gt;&amp;1</td>
+<td style="text-align:left">以追加的方式,把正确输出和错误输出同时保存到一个文件中</td>
+</tr>
+<tr>
+<td style="text-align:left"></td>
+<td style="text-align:left">命令 &amp;&gt;文件</td>
+<td style="text-align:left">以覆盖的方式,把正确输出和错误输出同时保存到同一个文件中</td>
+</tr>
+<tr>
+<td style="text-align:left"></td>
+<td style="text-align:left">命令 &amp;&gt;&gt;文件</td>
+<td style="text-align:left">以追加的方式,把正确输出和错误输出都保存到同一个文件当中</td>
+</tr>
+<tr>
+<td style="text-align:left"></td>
+<td style="text-align:left">命令 &gt;&gt; 文件1 2&gt;&gt;文件2</td>
+<td style="text-align:left">把正确的输出追加到文件1中,把错误输出追加到文件2中</td>
+</tr>
+</tbody>
+</table>
+<p>本小结内容相当的简单,这里就不再介绍了.结束<br><br></p>
+<h2 id="Bash-Shell管道命令"><a href="#Bash-Shell管道命令" class="headerlink" title="Bash-Shell管道命令"></a>Bash-Shell管道命令</h2><h3 id="◆sort-排序命令◆"><a href="#◆sort-排序命令◆" class="headerlink" title="◆sort 排序命令◆"></a>◆sort 排序命令◆</h3><p>sort命令是在Linux里非常有用,它将文件进行排序,并将排序结果标准输出,sort命令既可以从特定的文件,也可以从stdin中获取输入.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># sort --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ sort [选项] ]</span><br><span class="line"></span><br><span class="line">        -a              <span class="comment">#显示所有文件,包括隐藏文件,连同.与..的文件也列出来</span></span><br><span class="line">        -f              <span class="comment">#忽略大小写</span></span><br><span class="line">        -b              <span class="comment">#忽略每行前的空白部分</span></span><br><span class="line">        -n              <span class="comment">#以数值型进行排序,默认使用字符串类型排序</span></span><br><span class="line">        -r              <span class="comment">#反向排序</span></span><br><span class="line">        -u              <span class="comment">#删除重复行（=下面的uniq）</span></span><br><span class="line">        -t              <span class="comment">#指定分隔符,默认分割符是制表符</span></span><br><span class="line">        -k n[,m]        <span class="comment">#按照指定字段范围排序,从n字段开始到m字段结束</span></span><br></pre></td></tr></table></figure>
+<p><strong>实例1：</strong> sort 命令默认使用每行开头第一个字符进行排序<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># sort /etc/passwd</span></span><br><span class="line">adm:x:3:4:adm:/var/adm:/sbin/nologin</span><br><span class="line">bin:x:1:1:bin:/bin:/sbin/nologin</span><br><span class="line">chrony:x:998:996::/var/lib/chrony:/sbin/nologin</span><br><span class="line">daemon:x:2:2:daemon:/sbin:/sbin/nologin</span><br><span class="line">dbus:x:81:81:System message bus:/:/sbin/nologin</span><br><span class="line">ftp:x:14:50:FTP User:/var/ftp:/sbin/nologin</span><br><span class="line">....省略....</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例2：</strong> 进行反向排序则需要加 -r 选项<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># sort -r /etc/passwd</span></span><br><span class="line">systemd-network:x:192:192:systemd Network Management:/:/sbin/nologin</span><br><span class="line">sync:x:5:0:sync:/sbin:/bin/sync</span><br><span class="line">sshd:x:74:74:Privilege-separated SSH:/var/empty/sshd:/sbin/nologin</span><br><span class="line">shutdown:x:6:0:shutdown:/sbin:/sbin/shutdown</span><br><span class="line">root:x:0:0:root:/root:/bin/bash</span><br><span class="line">....省略....</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例3：</strong> 按照指定的排序字段进行字符排序,使用 -t 指定分割符,并且使用 -k 指定段号<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># sort -t ":" -k 3 /etc/passwd     #以：作为分隔符,排序是按照第三段排列</span></span><br><span class="line">root:x:0:0:root:/root:/bin/bash</span><br><span class="line">operator:x:11:0:operator:/root:/sbin/nologin</span><br><span class="line">bin:x:1:1:bin:/bin:/sbin/nologin</span><br><span class="line">games:x:12:100:games:/usr/games:/sbin/nologin</span><br><span class="line">....省略....</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例4：</strong> 上面的例子,排序方式是字符排序,而加上 -n 之后成为了数值排序<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># sort -n -t ":" -k 3 /etc/passwd</span></span><br><span class="line">root:x:0:0:root:/root:/bin/bash</span><br><span class="line">bin:x:1:1:bin:/bin:/sbin/nologin</span><br><span class="line">daemon:x:2:2:daemon:/sbin:/sbin/nologin</span><br><span class="line">adm:x:3:4:adm:/var/adm:/sbin/nologin</span><br><span class="line">....省略....</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># sort -n -t ":" -k 3,4 /etc/passwd</span></span><br><span class="line">root:x:0:0:root:/root:/bin/bash</span><br><span class="line">bin:x:1:1:bin:/bin:/sbin/nologin</span><br><span class="line">daemon:x:2:2:daemon:/sbin:/sbin/nologin</span><br><span class="line">adm:x:3:4:adm:/var/adm:/sbin/nologin</span><br><span class="line">....省略....</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆wc-字数统计◆"><a href="#◆wc-字数统计◆" class="headerlink" title="◆wc 字数统计◆"></a>◆wc 字数统计◆</h3><p>wc命令用来计算数字,利用wc指令我们可以计算文件的Byte数、字数或是列数,若不指定文件名称,或是所给予的文件名为”-“ 则wc指令会从标准输入设备读取数据.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># wc --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ wc [选项] 文件名 ]</span><br><span class="line"></span><br><span class="line">        -c              <span class="comment">#统计字数(字符)</span></span><br><span class="line">        -w              <span class="comment">#统计单词数(字符串)</span></span><br><span class="line">        -l              <span class="comment">#统计行数</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="◆uniq-取消重复行◆"><a href="#◆uniq-取消重复行◆" class="headerlink" title="◆uniq 取消重复行◆"></a>◆uniq 取消重复行◆</h3><p>uniq命令用于报告或忽略文件中的重复行,一般与sort命令结合使用.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># uniq --hlep</span></span><br><span class="line"></span><br><span class="line">语法格式：[ uniq [选项] ]</span><br><span class="line"></span><br><span class="line">        -i              <span class="comment">#忽略大小写</span></span><br><span class="line">        -c              <span class="comment">#在每列旁边显示该行重复出现的次数</span></span><br><span class="line">        -d              <span class="comment">#仅显示重复出现的行列</span></span><br><span class="line">        -f              <span class="comment">#忽略比较指定的栏位</span></span><br><span class="line">        -s              <span class="comment">#忽略比较指定的字符</span></span><br><span class="line">        -u              <span class="comment">#仅显示出一次的行列</span></span><br><span class="line">        -w              <span class="comment">#指定要比较的字符</span></span><br></pre></td></tr></table></figure>
+<p><strong>实例1：</strong> 单独过滤,不排序,uniq命令只能过滤紧挨着的重复行<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cat lyshark.log</span></span><br><span class="line">123123</span><br><span class="line">123123</span><br><span class="line"></span><br><span class="line">qwrtyyu</span><br><span class="line">sasdfgh</span><br><span class="line">1234wsx</span><br><span class="line">123123</span><br><span class="line">ffffgh</span><br><span class="line">123123</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># cat lyshark.log |uniq</span></span><br><span class="line">123123</span><br><span class="line"></span><br><span class="line">qwrtyyu</span><br><span class="line">sasdfgh</span><br><span class="line">1234wsx</span><br><span class="line">123123</span><br><span class="line">ffffgh</span><br><span class="line">123123</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例2：</strong> 先排序再过滤,既可以过滤掉所有重复行<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cat lyshark.log</span></span><br><span class="line">123123</span><br><span class="line">123123</span><br><span class="line"></span><br><span class="line">qwrtyyu</span><br><span class="line">sasdfgh</span><br><span class="line">1234wsx</span><br><span class="line">123123</span><br><span class="line">ffffgh</span><br><span class="line">123123</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># cat lyshark.log | sort |uniq</span></span><br><span class="line"></span><br><span class="line">123123</span><br><span class="line">1234wsx</span><br><span class="line">ffffgh</span><br><span class="line">qwrtyyu</span><br><span class="line">sasdfgh</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆tr-文本转换命令◆"><a href="#◆tr-文本转换命令◆" class="headerlink" title="◆tr 文本转换命令◆"></a>◆tr 文本转换命令◆</h3><p>tr命令可以对来自标准输入的字符进行替换、压缩和删除,它可以将一组字符变成另一组字符,经常用来编写优美的单行命令,作用很强大.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># tr --hlep</span></span><br><span class="line"></span><br><span class="line">语法格式：[ tr [选项] ]</span><br><span class="line"></span><br><span class="line">        -d              <span class="comment">#删除信息中的,SET1这个字符串.</span></span><br><span class="line">        -s              <span class="comment">#替换掉重复字符串</span></span><br><span class="line">        -c              <span class="comment">#取代所有不属于第一字符集的字符</span></span><br><span class="line">        -t              <span class="comment">#先删除第一字符集较第二字符集多出的字符</span></span><br></pre></td></tr></table></figure>
+<p><strong>实例1：</strong> 将last命令中的小写字符,全部变成大写(小写-&gt;大写)<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># who</span></span><br><span class="line">root     pts/0        2018-11-25 07:43 (192.168.1.20)</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># who | tr '[a-z]' '[A-Z]'</span></span><br><span class="line">ROOT     PTS/0        2018-11-25 07:43 (192.168.1.20)</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例2：</strong> 将 <code>/etc/passwd</code> 中的冒号全部删除<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cat /etc/passwd | tr -d ":"</span></span><br><span class="line"></span><br><span class="line">rootx00root/root/bin/bash</span><br><span class="line">binx11bin/bin/sbin/nologin</span><br><span class="line">daemonx22daemon/sbin/sbin/nologin</span><br><span class="line">admx34adm/var/adm/sbin/nologin</span><br><span class="line">lpx47lp/var/spool/lpd/sbin/nologin</span><br><span class="line">....省略....</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆col-文本过滤器◆"><a href="#◆col-文本过滤器◆" class="headerlink" title="◆col 文本过滤器◆"></a>◆col 文本过滤器◆</h3><p>col命令是一个标准输入文本过滤器,它从标注输入设备读取文本内容,并把内容显示到标注输出设备.在许多UNIX说明文件里,都有RLF控制字符.当我们运用shell特殊字符&gt;和&gt;&gt; 把说明文件的内容输出成纯文本文件时,控制字符会变成乱码,col命令则能有效滤除这些控制字符.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># col --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ tr [选项] ]</span><br><span class="line"></span><br><span class="line">        -x              <span class="comment">#将TAB键转换为对等的空格</span></span><br><span class="line">        -b              <span class="comment">#过滤掉所有的控制字符,包括RLF和HRLF</span></span><br></pre></td></tr></table></figure>
+<h3 id="◆join-连接文件◆"><a href="#◆join-连接文件◆" class="headerlink" title="◆join 连接文件◆"></a>◆join 连接文件◆</h3><p>join命令用来将两个文件中,制定栏位内容相同的行连接起来.找出两个文件中,指定栏位内容相同的行,并加以合并,再输出到标准输出设备.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># join --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ join [选项] ]</span><br><span class="line"></span><br><span class="line">        -t              <span class="comment">#默认以空格符分割数据</span></span><br><span class="line">        -i              <span class="comment">#忽略大小写差异</span></span><br><span class="line">        -1              <span class="comment">#代表第一个文件用那个字段来分析</span></span><br><span class="line">        -2              <span class="comment">#代表第二个文件用那个字段来分析</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>实例：</strong> 将<code>/etc/passwd</code>和<code>/etc/shadow</code>相同的行,连接在一起<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># head -n 3 /etc/passwd /etc/shadow</span></span><br><span class="line">==&gt; /etc/passwd &lt;==</span><br><span class="line">root:x:0:0:root:/root:/bin/bash</span><br><span class="line">bin:x:1:1:bin:/bin:/sbin/nologin</span><br><span class="line">daemon:x:2:2:daemon:/sbin:/sbin/nologin</span><br><span class="line"></span><br><span class="line">==&gt; /etc/shadow &lt;==</span><br><span class="line">root:<span class="variable">$6</span><span class="variable">$gMIJWbnKgxk</span>.lpzY<span class="variable">$t3l0u</span>.PNORfSTrjLIdizynMF5uA8LwnSth1tGS/2/89sPiMjVMGdKBPtmUNPYeaeeNRky..xh9Y7FS6LGqSu1/::0:99999:7:::</span><br><span class="line">bin:*:17492:0:99999:7:::</span><br><span class="line">daemon:*:17492:0:99999:7:::</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># join -t ":" /etc/passwd /etc/shadow |head -n 3</span></span><br><span class="line"></span><br><span class="line">root:x:0:0:root:/root:/bin/bash:<span class="variable">$6</span><span class="variable">$gMIJWbnKgxk</span>.lpzY<span class="variable">$t3l0u</span>.PNORfSTrjLIdizynMF5uA8LwnSth1tGS/2/89sPiMjVMGdKBPtmUNPYeaeeNRky..xh9Y7FS6LGqSu1/::0:99999:7:::</span><br><span class="line">bin:x:1:1:bin:/bin:/sbin/nologin:*:17492:0:99999:7:::</span><br><span class="line">daemon:x:2:2:daemon:/sbin:/sbin/nologin:*:17492:0:99999:7:::</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆paste-连接文件◆"><a href="#◆paste-连接文件◆" class="headerlink" title="◆paste 连接文件◆"></a>◆paste 连接文件◆</h3><p>这个命令,相对于join就简单多了,paste是直接将两个文件贴在一起,且中间以TAB隔开而已.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># paste --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ paste [选项] ]</span><br><span class="line"></span><br><span class="line">        -d              <span class="comment">#后面可接分隔符,默认是TAB来分割</span></span><br></pre></td></tr></table></figure>
+<p><strong>实例：</strong> 实现文本的连接<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># paste /etc/passwd /etc/shadow | head -n 3</span></span><br><span class="line"></span><br><span class="line">root:x:0:0:root:/root:/bin/bash root:<span class="variable">$6</span><span class="variable">$gMIJWbnKgxk</span>.lpzY<span class="variable">$t3l0u</span>.PNORfSTrjLIdizynMF5uA8LwnSth1tGS/2/89sPiMjVMGdKBPtmUNPYeaeeNRky..xh9Y7FS6LGqSu1/::0:99999:7:::</span><br><span class="line">bin:x:1:1:bin:/bin:/sbin/nologin        bin:*:17492:0:99999:7:::</span><br><span class="line">daemon:x:2:2:daemon:/sbin:/sbin/nologin daemon:*:17492:0:99999:7:::</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆expand-转空格◆"><a href="#◆expand-转空格◆" class="headerlink" title="◆expand 转空格◆"></a>◆expand 转空格◆</h3><p>expand命令用于将文件的制表符(TAB)转换为空白字符(space),将结果显示到标准输出设备.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># expand --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ expand [选项] ]</span><br><span class="line"></span><br><span class="line">        -t              <span class="comment">#后面接数字,转换成几个空格</span></span><br></pre></td></tr></table></figure>
+<h3 id="◆split-文本切割◆"><a href="#◆split-文本切割◆" class="headerlink" title="◆split 文本切割◆"></a>◆split 文本切割◆</h3><p>split命令可以将一个大文件分割成很多个小文件,有时需要将文件分割成更小的片段,比如为提高可读性,生成日志等.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># split --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ split [选项] [大小] [文件] ]</span><br><span class="line"></span><br><span class="line">        -b              <span class="comment">#后面可跟切割大小,可跟b,m,k</span></span><br><span class="line">        -l              <span class="comment">#以行数来进行切割</span></span><br></pre></td></tr></table></figure>
+<h3 id="◆xargs-代数转换◆"><a href="#◆xargs-代数转换◆" class="headerlink" title="◆xargs 代数转换◆"></a>◆xargs 代数转换◆</h3><p>xargs命令是给其他命令传递参数的一个过滤器,也是组合多个命令的一个工具,它擅长将标准输入数据转换成命令行参数,xargs能够处理管道或者stdin并将其转换成特定命令的命令参数.xargs也可以将单行或多行文本输入转换为其他格式,例如多行变单行,单行变多行.xargs的默认命令是echo,空格是默认定界符,这意味着通过管道传递给xargs的输入将会包含换行和空白,不过通过xargs的处理,换行和空白将被空格取代.xargs是构建单行命令的重要组件之一.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># xargs --help</span></span><br><span class="line"></span><br><span class="line">[小例子]</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "-lh" |ls</span></span><br><span class="line">anaconda-ks.cfg</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "-lh" |xargs ls</span></span><br><span class="line">total 4.0K</span><br><span class="line">-rw-------. 1 root root 1.2K Sep 18 09:12 anaconda-ks.cfg</span><br></pre></td></tr></table></figure>
+<p><strong>实例1：</strong> 通过使用 <code>xargs</code> 将多行文本转换成单行<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cat lyshark.log</span></span><br><span class="line"></span><br><span class="line">a b c d e f g</span><br><span class="line">h i j k l m n</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># cat lyshark.log | xargs</span></span><br><span class="line"></span><br><span class="line">a b c d e f g h i j k l m n</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例2：</strong> 通过 <code>xargs -n</code> 指定每行打印的行数<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cat lyshark.log</span></span><br><span class="line"></span><br><span class="line">a b c d e f g</span><br><span class="line">h i j k l m n</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># cat lyshark.log | xargs -n3</span></span><br><span class="line"></span><br><span class="line">a b c</span><br><span class="line">d e f</span><br><span class="line">g h i</span><br><span class="line">j k l</span><br><span class="line">m n</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例3：</strong> 通过 <code>xargs -d</code> 指定一个限定符<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># echo "nameXnameXnameXname" | xargs -dX</span></span><br><span class="line"></span><br><span class="line">name name name name</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "nameXnameXnameXname" | xargs -dX -n2</span></span><br><span class="line"></span><br><span class="line">name name</span><br><span class="line">name name</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/11/23/Linux 系统管理/Linux系统Bash的常用功能-9/">Linux系统Bash的常用功能(9)</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年11月23日 - 12:11</p>
+  <p><span>最后更新:</span>2019年04月16日 - 20:04</p>
+  <p><span>原始链接:</span><a href="/2018/11/23/Linux 系统管理/Linux系统Bash的常用功能-9/" title="Linux系统Bash的常用功能(9)">https://www.mkdirs.com/2018/11/23/Linux 系统管理/Linux系统Bash的常用功能-9/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux-系统管理/" rel="tag"> <i class="fa fa-tag"></i> Linux 系统管理</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/18/Linux 系统管理/Linux高级文件系统管理-8/" rel="next" title="Linux高级文件系统管理(8)">
+                <i class="fa fa-chevron-left"></i> Linux高级文件系统管理(8)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/11/23/Linux 系统管理/Linux正则与文本处理工具-10/" rel="prev" title="Linux正则与文本处理工具(10)">
+                Linux正则与文本处理工具(10) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Bash-Shell常用命令"><span class="nav-text">Bash-Shell常用命令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆alias-设置别名◆"><span class="nav-text">◆alias 设置别名◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆history-历史命令◆"><span class="nav-text">◆history 历史命令◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆ulimit-磁盘限制◆"><span class="nav-text">◆ulimit 磁盘限制◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆stty-设置终端◆"><span class="nav-text">◆stty 设置终端◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Bash-Shell操作环境"><span class="nav-text">Bash-Shell操作环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Shell快捷键与通配符"><span class="nav-text">Shell快捷键与通配符</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆Bash-常用快捷键◆"><span class="nav-text">◆Bash 常用快捷键◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆Bash-常用通配符◆"><span class="nav-text">◆Bash 常用通配符◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆bash-特殊通配符◆"><span class="nav-text">◆bash 特殊通配符◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Shell的数据流重定向"><span class="nav-text">Shell的数据流重定向</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Bash-Shell管道命令"><span class="nav-text">Bash-Shell管道命令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆sort-排序命令◆"><span class="nav-text">◆sort 排序命令◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆wc-字数统计◆"><span class="nav-text">◆wc 字数统计◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆uniq-取消重复行◆"><span class="nav-text">◆uniq 取消重复行◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆tr-文本转换命令◆"><span class="nav-text">◆tr 文本转换命令◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆col-文本过滤器◆"><span class="nav-text">◆col 文本过滤器◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆join-连接文件◆"><span class="nav-text">◆join 连接文件◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆paste-连接文件◆"><span class="nav-text">◆paste 连接文件◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆expand-转空格◆"><span class="nav-text">◆expand 转空格◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆split-文本切割◆"><span class="nav-text">◆split 文本切割◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆xargs-代数转换◆"><span class="nav-text">◆xargs 代数转换◆</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

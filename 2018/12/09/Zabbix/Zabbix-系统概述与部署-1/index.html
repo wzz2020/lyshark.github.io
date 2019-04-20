@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Zabbix是一个非常强大的监控系统,是企业级的软件,来监控IT基础设施的可用性和性能.它是一个能够快速搭建起来的开源的监控系统,Zabbix能监视各种网络参数,保证服务器系统的安全运营,并提供灵活的通知机制以让系统管理员快速定位解决存在的各种问题,Zabbix系统几乎可用于任何系统的监控过程,它可以运行在Linux,Solaris,HP-UX,AIX,Free BSD,Open BSD,OS X">
+<meta name="keywords" content="Zabbix">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Zabbix 系统概述与部署(1)">
+<meta property="og:url" content="https://www.mkdirs.com/2018/12/09/Zabbix/Zabbix-系统概述与部署-1/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="Zabbix是一个非常强大的监控系统,是企业级的软件,来监控IT基础设施的可用性和性能.它是一个能够快速搭建起来的开源的监控系统,Zabbix能监视各种网络参数,保证服务器系统的安全运营,并提供灵活的通知机制以让系统管理员快速定位解决存在的各种问题,Zabbix系统几乎可用于任何系统的监控过程,它可以运行在Linux,Solaris,HP-UX,AIX,Free BSD,Open BSD,OS X">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-12-11T13:20:34.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Zabbix 系统概述与部署(1)">
+<meta name="twitter:description" content="Zabbix是一个非常强大的监控系统,是企业级的软件,来监控IT基础设施的可用性和性能.它是一个能够快速搭建起来的开源的监控系统,Zabbix能监视各种网络参数,保证服务器系统的安全运营,并提供灵活的通知机制以让系统管理员快速定位解决存在的各种问题,Zabbix系统几乎可用于任何系统的监控过程,它可以运行在Linux,Solaris,HP-UX,AIX,Free BSD,Open BSD,OS X">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/12/09/Zabbix/Zabbix-系统概述与部署-1/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Zabbix 系统概述与部署(1) | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/12/09/Zabbix/Zabbix-系统概述与部署-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Zabbix 系统概述与部署(1)
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-09 09:40:28" itemprop="dateCreated datePublished" datetime="2018-12-09T09:40:28+08:00">2018-12-09</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-12-11 21:20:34" itemprop="dateModified" datetime="2018-12-11T21:20:34+08:00">2018-12-11</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Zabbix/" itemprop="url" rel="index"><span itemprop="name">Zabbix</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Zabbix是一个非常强大的监控系统,是企业级的软件,来监控IT基础设施的可用性和性能.它是一个能够快速搭建起来的开源的监控系统,Zabbix能监视各种网络参数,保证服务器系统的安全运营,并提供灵活的通知机制以让系统管理员快速定位解决存在的各种问题,Zabbix系统几乎可用于任何系统的监控过程,它可以运行在Linux,Solaris,HP-UX,AIX,Free BSD,Open BSD,OS X,等平台上. </p>
+<a id="more"></a>
+<p><br></p>
+<p><strong>Zabbix 是什么?</strong></p>
+<p>Zabbix 是一个高度集成的网络监控解决方案,可以提供企业级的开源分布式监控解决方案,由一个国外的团队持续维护更新,软件可以自由下载使用,运作团队靠提供收费的技术支持赢利.</p>
+<p>Zabbix可以对网络和服务进行监控,Zabbix利用灵活的告警机制,可实现微信、短信和邮件的自动报警.Zabbix利用存储的监控数据提供监控报告及实现图形化显示,</p>
+<p>Zabbix支持polling和trapping两种方式,所有的Zabbix报告都可以通过配置参数在WEB界面进行访问,你可以通过Web界面实时查看网络和服务的监控状况,不管你是小型组织还是大规模的公司.Zabbix都可以通过不通的配置来扮演监控你的IT基础框架的角色,Zabbix是零成本的,因为Zabbix编写和发布基于GPL V2协议,意味着源代码是免费发布的.</p>
+<h2 id="通过YUM仓库安装"><a href="#通过YUM仓库安装" class="headerlink" title="通过YUM仓库安装"></a>通过YUM仓库安装</h2><h3 id="◆Zabbix服务端配置◆"><a href="#◆Zabbix服务端配置◆" class="headerlink" title="◆Zabbix服务端配置◆"></a>◆Zabbix服务端配置◆</h3><p>1.在开始安装软件之前,需要配置yum源与zabbix源,这里我们就使用163的YUM源吧.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.163.com/.help/CentOS7-Base-163.repo</span></span><br><span class="line">[root@localhost ~]<span class="comment"># wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo</span></span><br><span class="line">[root@localhost ~]<span class="comment"># rpm -ivh http://repo.zabbix.com/zabbix/4.1/rhel/7/x86_64/zabbix-release-4.1-1.el7.noarch.rpm</span></span><br></pre></td></tr></table></figure></p>
+<p>2.由于Zabbix需要一个Web展现出页面来,所以在这里我们需要自行安装一个LAMP或LNMP环境.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y mariadb mariadb-server httpd php php-mysql</span></span><br><span class="line"></span><br><span class="line">Package 1:mariadb-5.5.60-1.el7_5.x86_64 already installed and latest version</span><br><span class="line">Package 1:mariadb-server-5.5.60-1.el7_5.x86_64 already installed and latest version</span><br><span class="line">Package httpd-2.4.6-88.el7.centos.x86_64 already installed and latest version</span><br><span class="line">Package php-5.4.16-46.el7.x86_64 already installed and latest version</span><br><span class="line">Package php-mysql-5.4.16-46.el7.x86_64 already installed and latest version</span><br><span class="line">Nothing to <span class="keyword">do</span></span><br></pre></td></tr></table></figure></p>
+<p>3.接着安装Zabbix组件,这里由于是YUM安装所以直接执行<code>yum install</code>就搞定了.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y net-snmp zabbix-web zabbix-agent zabbix-server-mysql zabbix-web-mysql</span></span><br><span class="line"></span><br><span class="line">Package 1:net-snmp-5.7.2-37.el7.x86_64 already installed and latest version</span><br><span class="line">Package zabbix-web-4.2.0-0.1alpha1.el7.noarch already installed and latest version</span><br><span class="line">Package zabbix-agent-4.2.0-0.1alpha1.el7.x86_64 already installed and latest version</span><br><span class="line">Package zabbix-server-mysql-4.2.0-0.1alpha1.el7.x86_64 already installed and latest version</span><br><span class="line">Package zabbix-web-mysql-4.2.0-0.1alpha1.el7.noarch already installed and latest version</span><br><span class="line">Nothing to <span class="keyword">do</span></span><br></pre></td></tr></table></figure></p>
+<p>4.配置Zabbix表结构,创建MariaDB用户并用于Zabbix授权使用,并恢复Zabbix表结构.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># systemctl start mariadb</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl enable mariadb</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># mysql</span></span><br><span class="line">Welcome to the MariaDB monitor.  Commands end with ; or \g.</span><br><span class="line">Your MariaDB connection id is 2</span><br><span class="line">Server version: 5.5.60-MariaDB MariaDB Server</span><br><span class="line"></span><br><span class="line">Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.</span><br><span class="line"></span><br><span class="line">Type <span class="string">'help;'</span> or <span class="string">'\h'</span> <span class="keyword">for</span> <span class="built_in">help</span>. Type <span class="string">'\c'</span> to clear the current input statement.</span><br><span class="line"></span><br><span class="line">MariaDB [(none)]&gt; create database zabbix character <span class="built_in">set</span> utf8 collate utf8_bin;</span><br><span class="line">MariaDB [(none)]&gt; grant all privileges on zabbix.* to zabbix@localhost identified by <span class="string">'zabbix'</span>;</span><br><span class="line">MariaDB [(none)]&gt; <span class="built_in">exit</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># zcat /usr/share/doc/zabbix-server-mysql*/create.sql.gz | mysql -uzabbix -pzabbix zabbix</span></span><br></pre></td></tr></table></figure></p>
+<p>5.将Zabbix的页面文件拷贝到指定目录(跟apache配置的相同即可).<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cp -a /usr/share/zabbix/* /var/www/html/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># chmod 755 -R /var/www/html/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># chown apache.apache -R /var/www/html/*</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl restart httpd</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl enable httpd</span></span><br></pre></td></tr></table></figure></p>
+<p>6.修改PHP配置文件,在PHP配置文件的末尾添加即可,主要目的是调整一下PHP参数,否则Zabbix不通过.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/php.ini</span></span><br><span class="line"></span><br><span class="line">date.timezone = Asia/Shanghai</span><br><span class="line">max_execution_time = 300</span><br><span class="line">max_input_time = 300</span><br><span class="line">post_max_size = 32M</span><br><span class="line">memory_limit = 128M</span><br><span class="line">mbstring.func_overload = 0</span><br></pre></td></tr></table></figure></p>
+<p>7.配置Zabbix Server端配置文件,主要目的是定义数据库的IP、用户名、密码等.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/zabbix/zabbix_server.conf</span></span><br><span class="line"></span><br><span class="line">DBHost=localhost         <span class="comment">#监控主机数据库IP,这里是本地</span></span><br><span class="line">DBName=zabbix            <span class="comment">#数据库名</span></span><br><span class="line">DBUser=zabbix            <span class="comment">#访问,数据库的用户名</span></span><br><span class="line">DBPassword=zabbix        <span class="comment">#访问,数据库访问密码</span></span><br></pre></td></tr></table></figure></p>
+<p>8.所有工作配置完成以后,启动一下Zabbix进程和Apache服务.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">systemctl restart httpd</span><br><span class="line">systemctl restart mariadb</span><br><span class="line">systemctl restart zabbix-server</span><br><span class="line">systemctl restart zabbix-agent</span><br></pre></td></tr></table></figure></p>
+<p>9.拓展环节:如果你的Zabbix登陆密码忘记了,你可以使用以下命令找回来.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">MariaDB [(none)]&gt; update zabbix.users <span class="built_in">set</span> passwd=md5(123123) <span class="built_in">where</span> name=<span class="string">"Zabbix"</span>;</span><br></pre></td></tr></table></figure></p>
+<p>10.解决中文乱码问题,并登陆系统看结果吧.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment">#在windows系统中：Win+R -&gt; fonts -&gt; 拷贝微软雅黑字体改名为 msyh.ttf</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># cp -a msyh.ttf /var/www/html/fonts//</span></span><br><span class="line">[root@localhost ~]<span class="comment"># vim /var/www/html/include/defines.inc.php</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#修改 zabbix php 页面配置，将'DejaVuSans' 修改为 'msyh'</span></span><br><span class="line"></span><br><span class="line">65 define(<span class="string">'ZBX_GRAPH_FONT_NAME'</span>,           <span class="string">'msyh'</span>); // font file name</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl restart httpd</span></span><br><span class="line"></span><br><span class="line">用户名:Admin	  密码:zabbix</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆监控一台Linux◆"><a href="#◆监控一台Linux◆" class="headerlink" title="◆监控一台Linux◆"></a>◆监控一台Linux◆</h3><p>1.在监控之前我们首先要安装一个工具,就是Zabbix的客户端组件.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[RHEL6]</span><br><span class="line">[root@localhost ~]<span class="comment"># wget http://repo.zabbix.com/zabbix/4.1/rhel/6/x86_64/zabbix-agent-4.2.0-0.1alpha1.el6.x86_64.rpm</span></span><br><span class="line">[root@localhost ~]<span class="comment"># rpm -ivh zabbix-agent-4.2.0-0.1alpha1.el6.x86_64.rpm</span></span><br><span class="line"></span><br><span class="line">[RHEL7]</span><br><span class="line">[root@localhost ~]<span class="comment"># wget http://repo.zabbix.com/zabbix/4.1/rhel/7/x86_64/zabbix-agent-4.2.0-0.1alpha1.el7.x86_64.rpm</span></span><br><span class="line">[root@localhost ~]<span class="comment"># rpm -ivh zabbix-agent-4.2.0-0.1alpha1.el7.x86_64.rpm</span></span><br></pre></td></tr></table></figure></p>
+<p>2.编辑Zabbix客户端配置文件,指定Zabbix服务器的IP地址.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/zabbix/zabbix_agentd.conf     </span></span><br><span class="line"></span><br><span class="line">Server=192.168.1.10                <span class="comment">#填写Server的IP地址</span></span><br><span class="line">ServerActive=192.168.1.10          <span class="comment">#修改为Server的IP地址</span></span><br><span class="line">Hostname=centos_01                 <span class="comment">#填写本机的HostName</span></span><br></pre></td></tr></table></figure></p>
+<p>3.启动Zabbix客户端进程,并设置开机自启动.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># systemctl restart zabbix-agent</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl enable zabbix-agent</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># /usr/sbin/zabbix_agentd</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="◆监控一台Windows◆"><a href="#◆监控一台Windows◆" class="headerlink" title="◆监控一台Windows◆"></a>◆监控一台Windows◆</h3><p>1.首先下载监控Windows的客户端组件,并修改一下配置文件.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">https://assets.zabbix.com/downloads/3.4.6/zabbix_agents_3.4.6.win.zip</span><br><span class="line">https://www.zabbix.com/downloads/4.0.0/zabbix_agents-4.0.0-win-amd64.zip</span><br><span class="line"></span><br><span class="line">修改文件:zabbix_agentd.win.conf</span><br><span class="line"></span><br><span class="line">Server=192.168.1.10                <span class="comment">#填写Server的IP地址</span></span><br><span class="line">ServerActive=192.168.1.10          <span class="comment">#修改为Server的IP地址</span></span><br><span class="line">Hostname=centos_01                 <span class="comment">#填写本机的HostName</span></span><br></pre></td></tr></table></figure></p>
+<p>2.打开命令行,并启动相应服务即可.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">zabbix_agentd.exe -c C:\zabbix\conf\zabbix_agentd.win.conf -i	<span class="comment">#将进程添加到 windows 服务管理</span></span><br><span class="line">zabbix_agentd.exe -c C:\zabbix\conf\zabbix_agentd.win.conf -s	<span class="comment">#开启服务</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="通过源码编译安装"><a href="#通过源码编译安装" class="headerlink" title="通过源码编译安装"></a>通过源码编译安装</h2><h3 id="◆Zabbix服务端搭建◆"><a href="#◆Zabbix服务端搭建◆" class="headerlink" title="◆Zabbix服务端搭建◆"></a>◆Zabbix服务端搭建◆</h3><p>1.由于Zabbix是基于Web界面的,所以在编译安装Zabbix之前,我们应该准备好一个LAMP或者LNMP的系统环境,来确保Zabbix能够通过Web展现出来.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y gcc httpd httpd-devel mariadb mariadb-server mariadb-devel php php-mysql php-common php-gd php-xml</span></span><br><span class="line"></span><br><span class="line">Package gcc-4.8.5-36.el7.x86_64 already installed and latest version</span><br><span class="line">Package httpd-2.4.6-88.el7.centos.x86_64 already installed and latest version</span><br><span class="line">Package httpd-devel-2.4.6-88.el7.centos.x86_64 already installed and latest version</span><br><span class="line">Package 1:mariadb-5.5.60-1.el7_5.x86_64 already installed and latest version</span><br><span class="line">Package 1:mariadb-server-5.5.60-1.el7_5.x86_64 already installed and latest version</span><br><span class="line">Package 1:mariadb-devel-5.5.60-1.el7_5.x86_64 already installed and latest version</span><br><span class="line">Package php-5.4.16-46.el7.x86_64 already installed and latest version</span><br><span class="line">Package php-mysql-5.4.16-46.el7.x86_64 already installed and latest version</span><br><span class="line">Package php-common-5.4.16-46.el7.x86_64 already installed and latest version</span><br><span class="line">Package php-gd-5.4.16-46.el7.x86_64 already installed and latest version</span><br><span class="line">Package php-xml-5.4.16-46.el7.x86_64 already installed and latest version</span><br><span class="line">Nothing to <span class="keyword">do</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># yum install -y libevent-devel php-bcmath php-common php-mbstring</span></span><br><span class="line"></span><br><span class="line">Package libevent-devel-2.0.21-4.el7.x86_64 already installed and latest version</span><br><span class="line">Package php-bcmath-5.4.16-46.el7.x86_64 already installed and latest version</span><br><span class="line">Package php-common-5.4.16-46.el7.x86_64 already installed and latest version</span><br><span class="line">Package php-mbstring-5.4.16-46.el7.x86_64 already installed and latest version</span><br><span class="line">Nothing to <span class="keyword">do</span></span><br></pre></td></tr></table></figure></p>
+<p>2.接着我们先来安装一下Zabbix编译所依赖的包文件,具体操作如下.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y net-snmp-devel curl curl-devel libxml2-devel libcurl-devel libevent libevent-devel</span></span><br><span class="line"></span><br><span class="line">Package 1:net-snmp-devel-5.7.2-37.el7.x86_64 already installed and latest version</span><br><span class="line">Package curl-7.29.0-51.el7.x86_64 already installed and latest version</span><br><span class="line">Package libcurl-devel-7.29.0-51.el7.x86_64 already installed and latest version</span><br><span class="line">Package libxml2-devel-2.9.1-6.el7_2.3.x86_64 already installed and latest version</span><br><span class="line">Package libcurl-devel-7.29.0-51.el7.x86_64 already installed and latest version</span><br><span class="line">Package libevent-2.0.21-4.el7.x86_64 already installed and latest version</span><br><span class="line">Package libevent-devel-2.0.21-4.el7.x86_64 already installed and latest version</span><br><span class="line">Nothing to <span class="keyword">do</span></span><br></pre></td></tr></table></figure></p>
+<p>3.继续,我们通过wget命令下载一个Zabbix源码包,执行以下编译过程.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># wget https://nchc.dl.sourceforge.net/project/zabbix/ZABBIX%20Latest%20Stable/4.0.2/zabbix-4.0.2.tar.gz</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># useradd -M -s /sbin/nologin zabbix</span></span><br><span class="line">[root@localhost ~]<span class="comment"># tar -xzvf zabbix-4.0.2.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd zabbix-4.0.2/</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ./configure --prefix=/usr/local/zabbix --enable-server \</span></span><br><span class="line">--<span class="built_in">enable</span>-agent --with-mysql --<span class="built_in">enable</span>-ipv6 --with-net-snmp \</span><br><span class="line">--with-libcurl --with-libxml2 --<span class="built_in">enable</span>-java</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># make &amp;&amp; make install</span></span><br></pre></td></tr></table></figure></p>
+<p>4.配置Zabbix表结构,创建MariaDB用户并用于Zabbix授权使用,并恢复Zabbix表结构.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># systemctl start mariadb</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl enable mariadb</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># mysql</span></span><br><span class="line">Welcome to the MariaDB monitor.  Commands end with ; or \g.</span><br><span class="line">Your MariaDB connection id is 2</span><br><span class="line">Server version: 5.5.60-MariaDB MariaDB Server</span><br><span class="line"></span><br><span class="line">Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.</span><br><span class="line"></span><br><span class="line">Type <span class="string">'help;'</span> or <span class="string">'\h'</span> <span class="keyword">for</span> <span class="built_in">help</span>. Type <span class="string">'\c'</span> to clear the current input statement.</span><br><span class="line"></span><br><span class="line">MariaDB [(none)]&gt; create database zabbix DEFAULT CHARACTER SET utf8 COLLATE utf8_bin;</span><br><span class="line">MariaDB [(none)]&gt; grant all on zabbix.* to zabbix@<span class="string">"%"</span> identified by <span class="string">"zabbix"</span>;</span><br><span class="line">MariaDB [(none)]&gt; grant all on zabbix.* to zabbix@<span class="string">"localhost"</span> identified by <span class="string">"zabbix"</span>;</span><br><span class="line">MariaDB [(none)]&gt; <span class="built_in">exit</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># cd /root/zabbix-4.0.2/database/mysql/</span></span><br><span class="line">[root@localhost mysql]<span class="comment"># mysql -uzabbix -pzabbix zabbix &lt;schema.sql</span></span><br><span class="line">[root@localhost mysql]<span class="comment"># mysql -uzabbix -pzabbix zabbix &lt;images.sql</span></span><br><span class="line">[root@localhost mysql]<span class="comment"># mysql -uzabbix -pzabbix zabbix &lt;data.sql</span></span><br></pre></td></tr></table></figure></p>
+<p>5.将Zabbix的页面文件拷贝到指定目录(跟apache配置的相同即可).<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cp -a /root/zabbix-4.0.2/frontends/php/* /var/www/html/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># chown -R apache:apache /var/www/html/</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl restart httpd</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl enable httpd</span></span><br></pre></td></tr></table></figure></p>
+<p>6.修改PHP配置文件,在PHP配置文件的末尾添加即可,主要目的是调整一下PHP参数,否则Zabbix不通过.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/php.ini</span></span><br><span class="line"></span><br><span class="line">date.timezone = Asia/Shanghai</span><br><span class="line">max_execution_time = 300</span><br><span class="line">max_input_time = 300</span><br><span class="line">post_max_size = 32M</span><br><span class="line">memory_limit = 128M</span><br><span class="line">mbstring.func_overload = 0</span><br></pre></td></tr></table></figure></p>
+<p>7.配置Zabbix Server端配置文件,主要目的是定义数据库的IP、用户名、密码等.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /usr/local/zabbix/etc/zabbix_server.conf</span></span><br><span class="line"></span><br><span class="line">DBHost=localhost         <span class="comment">#监控主机数据库IP,这里是本地</span></span><br><span class="line">DBName=zabbix            <span class="comment">#数据库名</span></span><br><span class="line">DBUser=zabbix            <span class="comment">#访问,数据库的用户名</span></span><br><span class="line">DBPassword=zabbix        <span class="comment">#访问,数据库访问密码</span></span><br></pre></td></tr></table></figure></p>
+<p>8.所有工作配置完成以后,启动一下Zabbix进程和Apache服务.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># /usr/local/zabbix/sbin/zabbix_server </span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "/usr/local/zabbix/sbin/zabbix_server" &gt;&gt; /etc/bashrc </span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl restart httpd</span></span><br></pre></td></tr></table></figure></p>
+<p>9.拓展环节:如果你的Zabbix登陆密码忘记了,你可以使用以下命令找回来.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">MariaDB [(none)]&gt; update zabbix.users <span class="built_in">set</span> passwd=md5(123123) <span class="built_in">where</span> name=<span class="string">"Zabbix"</span>;</span><br></pre></td></tr></table></figure></p>
+<p>10.解决中文乱码问题,并登陆系统看结果吧.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment">#在windows系统中：Win+R -&gt; fonts -&gt; 拷贝微软雅黑字体改名为 msyh.ttf</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># cp -a msyh.ttf /var/www/html/fonts//</span></span><br><span class="line">[root@localhost ~]<span class="comment"># vim /var/www/html/include/defines.inc.php</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#修改 zabbix php 页面配置，将'DejaVuSans' 修改为 'msyh'</span></span><br><span class="line"></span><br><span class="line">65 define(<span class="string">'ZBX_GRAPH_FONT_NAME'</span>,           <span class="string">'msyh'</span>); // font file name</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl restart httpd</span></span><br><span class="line"></span><br><span class="line">用户名:Admin	  密码:zabbix</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆Zabbix客户端配置◆"><a href="#◆Zabbix客户端配置◆" class="headerlink" title="◆Zabbix客户端配置◆"></a>◆Zabbix客户端配置◆</h3><p>1.首先安装依赖和,编译环境.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y gcc pcre-devel pcre-static pcre-tools</span></span><br></pre></td></tr></table></figure></p>
+<p>2.编译安装Zabbix客户端监控程序,这里同样适用相同的压缩包.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># wget https://nchc.dl.sourceforge.net/project/zabbix/ZABBIX%20Latest%20Stable/4.0.2/zabbix-4.0.2.tar.gz</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># useradd -M -s /sbin/nologin zabbix</span></span><br><span class="line">[root@localhost ~]<span class="comment"># tar -xzvf zabbix-4.0.2.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd zabbix-4.0.2/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ./configure --prefix=/usr/local/zabbix --sysconfdir=/etc/zabbix --enable-agent</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make &amp;&amp; make install</span></span><br></pre></td></tr></table></figure></p>
+<p>3.配置Zabbix-Agent端配置文件,修改主机列表.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/zabbix/zabbix_agentd.conf     </span></span><br><span class="line"></span><br><span class="line">Server=192.168.22.195                   <span class="comment">#填写Server的IP地址</span></span><br><span class="line">ServerActive=192.168.22.195             <span class="comment">#修改为Server的IP地址</span></span><br><span class="line">Hostname=centos_1                       <span class="comment">#填写本机的HostName</span></span><br></pre></td></tr></table></figure></p>
+<p>4.启动zabbix-agent端,并设置开机自启动.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># /usr/local/zabbix/sbin/zabbix_agentd </span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "/usr/local/zabbix/sbin/zabbix_agentd" &gt;&gt; /etc/bashrc</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/12/09/Zabbix/Zabbix-系统概述与部署-1/">Zabbix 系统概述与部署(1)</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年12月09日 - 09:12</p>
+  <p><span>最后更新:</span>2018年12月11日 - 21:12</p>
+  <p><span>原始链接:</span><a href="/2018/12/09/Zabbix/Zabbix-系统概述与部署-1/" title="Zabbix 系统概述与部署(1)">https://www.mkdirs.com/2018/12/09/Zabbix/Zabbix-系统概述与部署-1/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Zabbix/" rel="tag"> <i class="fa fa-tag"></i> Zabbix</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/03/Ansible/通过PlayBook部署Zabbix-6/" rel="next" title="通过PlayBook部署Zabbix(6)">
+                <i class="fa fa-chevron-left"></i> 通过PlayBook部署Zabbix(6)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/10/Zabbix/Zabbix-自带监控项与Kye-2/" rel="prev" title="Zabbix 自带监控项与Kye(2)">
+                Zabbix 自带监控项与Kye(2) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#通过YUM仓库安装"><span class="nav-text">通过YUM仓库安装</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆Zabbix服务端配置◆"><span class="nav-text">◆Zabbix服务端配置◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆监控一台Linux◆"><span class="nav-text">◆监控一台Linux◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆监控一台Windows◆"><span class="nav-text">◆监控一台Windows◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#通过源码编译安装"><span class="nav-text">通过源码编译安装</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆Zabbix服务端搭建◆"><span class="nav-text">◆Zabbix服务端搭建◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆Zabbix客户端配置◆"><span class="nav-text">◆Zabbix客户端配置◆</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

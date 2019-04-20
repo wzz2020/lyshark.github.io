@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="MooseFS是一个分布式文件系统,其本身具有高可用性,高拓展性,开放源代码,高容错,等在数据的读写性能方面,通过dd测试,MooseFS也就是写入的速度稍微好于NFS,读上没有差别.  MooseFS的文件系统结构体系可分为以下四种角色,分别对应不同的功能:  1.管理服务器managing server (master)2.元数据日志服务器Metalogger server（Metalogge">
+<meta name="keywords" content="Linux 服务配置">
+<meta property="og:type" content="article">
+<meta property="og:title" content="部署MooseFS分布式文件系统">
+<meta property="og:url" content="https://www.mkdirs.com/2018/09/15/Linux 服务配置/部署MooseFS分布式文件系统/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="MooseFS是一个分布式文件系统,其本身具有高可用性,高拓展性,开放源代码,高容错,等在数据的读写性能方面,通过dd测试,MooseFS也就是写入的速度稍微好于NFS,读上没有差别.  MooseFS的文件系统结构体系可分为以下四种角色,分别对应不同的功能:  1.管理服务器managing server (master)2.元数据日志服务器Metalogger server（Metalogge">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-04-16T12:38:45.384Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="部署MooseFS分布式文件系统">
+<meta name="twitter:description" content="MooseFS是一个分布式文件系统,其本身具有高可用性,高拓展性,开放源代码,高容错,等在数据的读写性能方面,通过dd测试,MooseFS也就是写入的速度稍微好于NFS,读上没有差别.  MooseFS的文件系统结构体系可分为以下四种角色,分别对应不同的功能:  1.管理服务器managing server (master)2.元数据日志服务器Metalogger server（Metalogge">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/09/15/Linux 服务配置/部署MooseFS分布式文件系统/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>部署MooseFS分布式文件系统 | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/09/15/Linux 服务配置/部署MooseFS分布式文件系统/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">部署MooseFS分布式文件系统
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-09-15 16:20:43" itemprop="dateCreated datePublished" datetime="2018-09-15T16:20:43+08:00">2018-09-15</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-16 20:38:45" itemprop="dateModified" datetime="2019-04-16T20:38:45+08:00">2019-04-16</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Linux-服务配置/" itemprop="url" rel="index"><span itemprop="name">Linux 服务配置</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>MooseFS是一个分布式文件系统,其本身具有高可用性,高拓展性,开放源代码,高容错,等在数据的读写性能方面,通过dd测试,MooseFS也就是写入的速度稍微好于NFS,读上没有差别.</p>
+<blockquote>
+<p>MooseFS的文件系统结构体系可分为以下四种角色,分别对应不同的功能:</p>
+<blockquote>
+<p>1.管理服务器managing server (master)<br>2.元数据日志服务器Metalogger server（Metalogger）<br>3.数据存储服务器data servers (chunkservers)<br>4.客户机挂载使用client computers</p>
+</blockquote>
+</blockquote>
+<p>下面我们分别编译安装MFS的每个组件,实现一个企业环境的分布式文件系统.</p>
+<a id="more"></a>
+<h2 id="实验环境与IP分配"><a href="#实验环境与IP分配" class="headerlink" title="实验环境与IP分配"></a>实验环境与IP分配</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[主机类型]		[主机IP]		[主机作用]</span><br><span class="line"></span><br><span class="line">Master-Server		192.168.22.195		主控服务器</span><br><span class="line"></span><br><span class="line">MetaLogger-Server	192.168.22.191		备份服务器</span><br><span class="line"></span><br><span class="line">Cunk-Server		192.168.22.192		存储节点1</span><br><span class="line">Cunk-Server		192.168.22.193		存储节点2</span><br><span class="line"></span><br><span class="line">Client			192.168.22.194		挂载客户端</span><br></pre></td></tr></table></figure>
+<p><br></p>
+<h2 id="Master-Server配置"><a href="#Master-Server配置" class="headerlink" title="Master-Server配置"></a>Master-Server配置</h2><p>管理服务器managing server (master):负责各个数据存储服务器的管理,文件读写调度,文件空间回收以及恢复,多节点拷贝单个机器管理整个文件系统,用来存储记录每一个文件的Metadata(记录文件的大小、文件的属性、文件的位置,也包括非规则文件的系统,如目录、sockets、管道和设备),Master-Server相当于MFS的大脑,用于管理协调服务器之间正常工作,此处也就是主控服务器.</p>
+<p>1.服务器上的/etc/hosts中添加下面指向,指明主服务器IP.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/hosts</span></span><br><span class="line">127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4</span><br><span class="line">::1         localhost localhost.localdomain localhost6 localhost6.localdomain6</span><br><span class="line">192.168.22.195 mfsmaster				<span class="comment">#在原来的基础上添加这一条即可</span></span><br></pre></td></tr></table></figure></p>
+<p>2.源码编译安装Master-Server.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y gcc zlib zlib-devel                #安装依赖</span></span><br><span class="line">[root@localhost ~]<span class="comment"># groupadd mfs                                      #创建用户组</span></span><br><span class="line">[root@localhost ~]<span class="comment"># useradd -M -s /sbin/nologin -g mfs mfs            #创建用户并将其加入用户组</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># tar –xzvf moosefs-3.0.99.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd moosefs-3.0.99/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ./configure --prefix=/usr --sysconfdir=/etc \</span></span><br><span class="line">--localstatedir=/var/lib --with-default-user=mfs \</span><br><span class="line">--with-default-group=mfs --<span class="built_in">disable</span>-mfschunkserver \</span><br><span class="line">--<span class="built_in">disable</span>-mfsmount</span><br><span class="line"></span><br><span class="line"><span class="comment">#----------------------------------------------------------------------------------</span></span><br><span class="line"><span class="comment">#[参数解释]</span></span><br><span class="line"></span><br><span class="line">	--prefix=/usr                   <span class="comment">#指定主目录存放位置</span></span><br><span class="line">	--sysconfdir=/etc               <span class="comment">#指定配置文件存放位置</span></span><br><span class="line">	--localstatedir=/var/lib        <span class="comment">#存放二进制文件metadata和文本文件changelog</span></span><br><span class="line">	--with-default-user=mfs         <span class="comment">#指定用户</span></span><br><span class="line">	--with-default-group=mfs        <span class="comment">#指定组</span></span><br><span class="line">	--<span class="built_in">disable</span>-mfschunkserver        <span class="comment">#关闭chunk-server</span></span><br><span class="line">	--<span class="built_in">disable</span>-mfsmount              <span class="comment">#关闭挂载</span></span><br><span class="line"><span class="comment">#---------------------------------------------------------------------------------</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># make &amp;&amp; make install</span></span><br></pre></td></tr></table></figure></p>
+<p>3.成功安装Master以后,系统会在<code>/etc/mfs</code>目录自动生成样例配置文件,我们需要将此配置文件修改一下,去掉后缀<code>.sample</code>配置文件才会生效.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cd /etc/mfs/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cp -a mfsmaster.cfg.sample mfsmaster.cfg</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cp -a mfsmetalogger.cfg.sample mfsmetalogger.cfg</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cp -a mfsexports.cfg.sample mfsexports.cfg</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># cd /var/lib/mfs</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cp -a metadata.mfs.empty metadata.mfs</span></span><br></pre></td></tr></table></figure></p>
+<p>4.启动Master-Server服务和CGI监控服务.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># /usr/sbin/mfsmaster start           #启动Master-Server</span></span><br><span class="line">[root@localhost ~]<span class="comment"># /usr/sbin/mfscgiserv                #启动监控服务</span></span><br></pre></td></tr></table></figure></p>
+<p>5.设置Mfsmaster和mfscgiserv进程开机自启动,此处将开机命令追加写入/etc/profile系统每次开机都会执行这条指令,从而实现开机自启动.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># echo "/usr/sbin/mfsmaster start" &gt;&gt; /etc/profile</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "/usr/sbin/mfscgiserv" &gt;&gt; /etc/profile</span></span><br></pre></td></tr></table></figure></p>
+<p>6.现在我们来测试一下,使用浏览器访问以下地址,成功的话会看到监控页面.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># curl http://192.168.22.195:9425     #查看是否启动成功</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="MetaLogger-Server配置"><a href="#MetaLogger-Server配置" class="headerlink" title="MetaLogger-Server配置"></a>MetaLogger-Server配置</h2><p>元数据日志服务器Metalogger server(Metalogger):负责备份master服务器的变化日志文件,文件类型为<code>changelog_ml.*.mfs</code>,以便于在master server出问题的时候接替其进行工作,Metalogger server主要作用是主控服务器的备份,他的作用是起到主控服务器崩溃了它自动顶上,所以Metalogger server的安装和master server的安装大体是一样的,当然备份服务器不安装照样能使用,但是就失去了备份的功能.</p>
+<p>1.服务器上的/etc/hosts中添加下面指向,指向主服务器IP(可选/如果不做第1步则要做第3步).<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/hosts</span></span><br><span class="line">127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4</span><br><span class="line">::1         localhost localhost.localdomain localhost6 localhost6.localdomain6</span><br><span class="line">192.168.22.195 mfsmaster				<span class="comment">#在原来的基础上添加这一条即可</span></span><br></pre></td></tr></table></figure></p>
+<p>2.源码编译安装Masterlog-Server.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y gcc zlib zlib-devel                #安装依赖</span></span><br><span class="line">[root@localhost ~]<span class="comment"># groupadd mfs                                      #创建用户组</span></span><br><span class="line">[root@localhost ~]<span class="comment"># useradd -M -s /sbin/nologin -g mfs mfs            #创建用户并将其加入用户组</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># tar -xzvf moosefs-3.0.99.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd moosefs-3.0.99/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var/lib \</span></span><br><span class="line">--with-default-user=mfs --with-default-group=mfs \</span><br><span class="line">--<span class="built_in">disable</span>-mfschunkserver --<span class="built_in">disable</span>-mfsmount</span><br><span class="line"></span><br><span class="line"><span class="comment">#----------------------------------------------------------------------------------</span></span><br><span class="line"><span class="comment">#[参数解释]</span></span><br><span class="line"></span><br><span class="line">	--prefix=/usr                   <span class="comment">#指定主目录存放位置</span></span><br><span class="line">	--sysconfdir=/etc               <span class="comment">#指定配置文件存放位置</span></span><br><span class="line">	--localstatedir=/var/lib        <span class="comment">#存放二进制文件metadata和文本文件changelog</span></span><br><span class="line">	--with-default-user=mfs         <span class="comment">#指定用户</span></span><br><span class="line">	--with-default-group=mfs        <span class="comment">#指定组</span></span><br><span class="line">	--<span class="built_in">disable</span>-mfschunkserver        <span class="comment">#关闭chunk-server</span></span><br><span class="line">	--<span class="built_in">disable</span>-mfsmount              <span class="comment">#关闭挂载</span></span><br><span class="line"><span class="comment">#----------------------------------------------------------------------------------</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># make &amp;&amp; make install</span></span><br></pre></td></tr></table></figure></p>
+<p>3.Masterlog-Server修改主配置文件,指定主服务器IP.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment">#[开启配置文件]</span></span><br><span class="line"><span class="comment">#----------------------------------------------------------------------------------</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd /etc/mfs</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cp -a mfsmetalogger.cfg.sample mfsmetalogger.cfg</span></span><br><span class="line"><span class="comment">#----------------------------------------------------------------------------------</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#[配置参数]</span></span><br><span class="line"><span class="comment">#----------------------------------------------------------------------------------</span></span><br><span class="line">[root@localhost ~]<span class="comment"># vim /etc/mfs/mfsmetalogger.cfg</span></span><br><span class="line"></span><br><span class="line">META_DOWNLOAD_FREQ = 2         				<span class="comment">#元数据备份文件下载请求频率(默认24小时)</span></span><br><span class="line">MASTER_HOST = 192.168.22.195				<span class="comment">#指定Master-Server地址(主控地址)</span></span><br><span class="line"><span class="comment">#----------------------------------------------------------------------------------</span></span><br></pre></td></tr></table></figure></p>
+<p>4.启动Metalogger server备用服务器进程,并设置开机自启动.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># /usr/sbin/mfsmetalogger start</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "/usr/sbin/mfsmetalogger start" &gt;&gt; /etc/profile</span></span><br></pre></td></tr></table></figure></p>
+<p>5.检查从服务器是否启动成功并同步了数据.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cd /var/lib/mfs    #查看是否有文件产生(产生了文件说明成功)</span></span><br><span class="line">[root@localhost ~]<span class="comment"># lsof -i :9419      #检查端口是否开启</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="Cunk-Server配置"><a href="#Cunk-Server配置" class="headerlink" title="Cunk-Server配置"></a>Cunk-Server配置</h2><p>数据存储服务器data servers (chunkservers):负责连接管理服务器,听从管理服务器调度,提供存储空间,并为客户提供数据传输.真正存储数据的节点,扩建它增加容量,可以多台每个文件可能在不同服务器间拷贝.</p>
+<p>1.Cunk-server服务器上的/etc/hosts中添加下面指向,指明主服务器IP<br>(可选/如果不做第1步则要做第3步).<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/hosts</span></span><br><span class="line">127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4</span><br><span class="line">::1         localhost localhost.localdomain localhost6 localhost6.localdomain6</span><br><span class="line">192.168.22.195 mfsmaster				<span class="comment">#在原来的基础上添加这一条即可</span></span><br></pre></td></tr></table></figure></p>
+<p>2.源码编译安装Cunk-Server.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y gcc zlib zlib-devel                 #安装依赖</span></span><br><span class="line">[root@localhost ~]<span class="comment"># groupadd mfs                                       #创建用户组</span></span><br><span class="line">[root@localhost ~]<span class="comment"># useradd -M -s /sbin/nologin -g mfs mfs             #创建用户并将其加入用户组</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># tar -xzvf moosefs-3.0.99.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd moosefs-3.0.99/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ./configure --prefix=/usr --sysconfdir=/etc \</span></span><br><span class="line">--localstatedir=/var/lib --with-default-user=mfs \</span><br><span class="line">--with-default-group=mfs --<span class="built_in">disable</span>-mfsmaster</span><br><span class="line"></span><br><span class="line"><span class="comment">#----------------------------------------------------------------------------------</span></span><br><span class="line"><span class="comment">#[参数解释]</span></span><br><span class="line"></span><br><span class="line">	--prefix=/usr                  <span class="comment">#指定主目录存放位置</span></span><br><span class="line">	--sysconfdir=/etc              <span class="comment">#指定配置文件存放位置</span></span><br><span class="line">	--localstatedir=/var/lib       <span class="comment">#存放二进制文件metadata和文本文件changelog</span></span><br><span class="line">	--with-default-user=mfs        <span class="comment">#指定用户</span></span><br><span class="line">	--with-default-group=mfs       <span class="comment">#指定组</span></span><br><span class="line">	--<span class="built_in">disable</span>-mfschunkserver       <span class="comment">#关闭chunk-server</span></span><br><span class="line">	--<span class="built_in">disable</span>-mfsmount             <span class="comment">#关闭挂载</span></span><br><span class="line"><span class="comment">#----------------------------------------------------------------------------------</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># make &amp;&amp; make install</span></span><br></pre></td></tr></table></figure></p>
+<p>3.拷贝 Chunk-Server 服务所需的配置文件(开启配置文件),去掉.sample后缀开启.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cd /etc/mfs</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cp -a mfschunkserver.cfg.sample mfschunkserver.cfg</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cp -a mfshdd.cfg.sample mfshdd.cfg</span></span><br></pre></td></tr></table></figure></p>
+<p>4.修改Chunk-Server 配置文件,指定服务器地址,端口,和共享的磁盘.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/mfs/mfschunkserver.cfg	</span></span><br><span class="line"></span><br><span class="line">MASTER_HOST = 192.168.22.195              <span class="comment">#指明Master-Server服务器地址</span></span><br><span class="line">MASTER_PORT = 9420                        <span class="comment">#指明Master-Server端口</span></span><br><span class="line">HDD_CONF_FILENAME = /etc/mfs/mfshdd.cfg   <span class="comment">#指明哪个配置文件来配置共享磁盘的</span></span><br></pre></td></tr></table></figure></p>
+<p>5.编辑<code>/etc/mfs/mfshdd.cfg</code>,在最后面添加下面的文本行,并创建相应挂载目录.</p>
+<p>在配置文件 mfshdd.cfg 中我们给出了用于客户端挂接 MooseFS 分布式文件系统根分区所使用的共享空间位置.<br>建议在Chunk-Server上划分单独的空间给 MooseFS 使用,这样做的好处是便于管理剩余空间.<br>此处我们假定要使用一个共享点/mnt/mfschunk(如果没有,请先创建共享点).</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment">#----------------------------------------------------------------------------------</span></span><br><span class="line"><span class="comment">#[写入配置]</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "/mnt/mfschunk" &gt;&gt;/etc/mfs/mfshdd.cfg #Chunk-Server共享的目录</span></span><br><span class="line"><span class="comment">#----------------------------------------------------------------------------------</span></span><br><span class="line"><span class="comment">#[创建共享目录]</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># mkdir -p /mnt/mfschunk</span></span><br><span class="line">[root@localhost ~]<span class="comment"># chown -R mfs:mfs /mnt/mfschunk</span></span><br><span class="line"><span class="comment">#----------------------------------------------------------------------------------</span></span><br></pre></td></tr></table></figure>
+<p>6.启动 Cunk-Server 服务,并设置开机自启动.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># /usr/sbin/mfschunkserver start</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "/usr/sbin/mfschunkserver start" &gt;&gt; /etc/profile</span></span><br></pre></td></tr></table></figure></p>
+<p>7.现在通过浏览器访问,主控地址.</p>
+<p>网页中,应该可以看见这个 MooseFS 系统的全部信息（包括主控 master和存储服务 chunkserver）<br>在Disks上可以看到我们的挂载/ghost目录了<br><br></p>
+<h2 id="Client客户端配置"><a href="#Client客户端配置" class="headerlink" title="Client客户端配置"></a>Client客户端配置</h2><p>实际的使用节点,例如:每台Apache都挂载上共享目录,即可实现所有Apache服务器全部共享一个目录</p>
+<p>1.在/etc/hosts中添加下面指向,指明主服务器IP(可选/不指定则要通过IP挂载).<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/hosts</span></span><br><span class="line">127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4</span><br><span class="line">::1         localhost localhost.localdomain localhost6 localhost6.localdomain6</span><br><span class="line">192.168.22.195 mfsmaster				<span class="comment">#在原来的基础上添加这一条即可</span></span><br></pre></td></tr></table></figure></p>
+<p>2.为了挂载基于MooseFS的文件系统,需要所有客户端安装FUSE包.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># tar -xzvf fuse-2.9.3.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd fuse-2.9.3/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ./configure</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make &amp;&amp; make install</span></span><br></pre></td></tr></table></figure></p>
+<p>3.Linux下执行下面命令,不然编译mfsmount会报Fuse不存在的错.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH</span></span><br></pre></td></tr></table></figure></p>
+<p>4.编译安装客户端软件mfsmount.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y gcc zlib zlib-devel                   #安装依赖</span></span><br><span class="line">[root@localhost ~]<span class="comment"># groupadd mfs                                         #创建用户组</span></span><br><span class="line">[root@localhost ~]<span class="comment"># useradd -M -s /sbin/nologin -g mfs mfs               #创建用户并将其加入用户组</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># tar -xzvf moosefs-3.0.99.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd moosefs-3.0.99/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ./configure --prefix=/usr --sysconfdir=/etc \</span></span><br><span class="line">--localstatedir=/var/lib --with-default-user=mfs \</span><br><span class="line">--with-default-group=mfs --<span class="built_in">disable</span>-mfsmaster \</span><br><span class="line">--<span class="built_in">disable</span>-mfschunkserver</span><br><span class="line"></span><br><span class="line"><span class="comment">#----------------------------------------------------------------------------------</span></span><br><span class="line"><span class="comment">#[参数解释]</span></span><br><span class="line"></span><br><span class="line">	--prefix=/usr                   <span class="comment">#指定主目录存放位置</span></span><br><span class="line">	--sysconfdir=/etc               <span class="comment">#指定配置文件存放位置</span></span><br><span class="line">	--localstatedir=/var/lib        <span class="comment">#存放二进制文件metadata和文本文件changelog</span></span><br><span class="line">	--with-default-user=mfs         <span class="comment">#指定用户</span></span><br><span class="line">	--with-default-group=mfs        <span class="comment">#指定组</span></span><br><span class="line">	--<span class="built_in">disable</span>-mfschunkserver        <span class="comment">#关闭chunk-server</span></span><br><span class="line">	--<span class="built_in">disable</span>-mfsmount              <span class="comment">#关闭挂载</span></span><br><span class="line"><span class="comment">#----------------------------------------------------------------------------------</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># make &amp;&amp; make install</span></span><br></pre></td></tr></table></figure></p>
+<p>5.假定客户端的挂接点是 /media,我们将以下面的指令来使用 MooseFS 分布式系统.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># /usr/bin/mfsmount/mfsmount /media -H mfsmaster     #不指定挂接地址</span></span><br><span class="line">[root@localhost ~]<span class="comment"># /usr/bin/mfsmount/mfsmount /media -H 192.168.1.12  #挂接地址挂载(指定主存储IP)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#上面的解释,用/usr/bin/mfsmount将192.168.22.195的资源挂载到本地/media下</span></span><br><span class="line"><span class="comment">#挂载成功后，执行命令 df -h 查看分区情况</span></span><br></pre></td></tr></table></figure></p>
+<p>6.应该写入配置文件/etc/fstab或者/etc/profile开机自动挂载.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># echo "/usr/bin/mfsmount /media -H 192.168.22.195" &gt;&gt; /etc/profile</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="MooseFS常用功能"><a href="#MooseFS常用功能" class="headerlink" title="MooseFS常用功能"></a>MooseFS常用功能</h2><p>1.数据误删除恢复操作,垃圾回收站机制.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mfssettrashtime  64800  /ghost/l1.txt       #给1.txt设置一个保存时间</span></span><br><span class="line">[root@localhost ~]<span class="comment"># mkdir /back</span></span><br><span class="line">[root@localhost ~]<span class="comment"># chown mfs.mfs /back</span></span><br><span class="line">[root@localhost ~]<span class="comment"># mfsmount -m /back -H 192.168.22.195         #指定服务器IP</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># find . -name *1.txt*                        #搜索删除的1.txt</span></span><br><span class="line">[root@localhost ~]<span class="comment"># mv 002/00000002\|1.txt  /back/trash/undel/  #拿到undel队列里,就恢复了</span></span><br></pre></td></tr></table></figure></p>
+<p>2.快照功能(提取数据).<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mkdir  /back</span></span><br><span class="line">[root@localhost ~]<span class="comment"># chown  mfs.mfs  back/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># mfsmakesnapshot  1.txt  back/               #拷贝1.txt的源信息到back/目录下</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd back/                                    #拷贝出来的数据</span></span><br></pre></td></tr></table></figure></p>
+<p>3.冗余goal设置(自定义备份个数).<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mfsgetgoal /ghost/1.txt                    #查看1.txt的冗余数</span></span><br><span class="line">[root@localhost ~]<span class="comment"># mfsfileinfo /ghost/1.txt                   #查看1.txt的冗余分布在那几台机器上</span></span><br><span class="line">[root@localhost ~]<span class="comment"># mfssetgoal 	3 /ghost/1.txt                 #设置1.txt的冗余个数(要备份几份)</span></span><br></pre></td></tr></table></figure></p>
+<p>4.还原 master数据(主服务器的宕机/数据丢失/恢复数据).</p>
+<p>我们要去从服务器,将从里的数据拷贝到主上,并重新建立文件索引,即可恢复丢失文件</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># scp /usr/local/mfs/var/mfs/*  root@10.10.10.12:/usr/local/mfs/var/mfs</span></span><br><span class="line">[root@localhost ~]<span class="comment"># mfsmaster -a                               #自动恢复重新建立索引</span></span><br><span class="line">[root@localhost ~]<span class="comment"># netstat -an |grep "9419"                   #检查是否开启成功</span></span><br></pre></td></tr></table></figure>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/09/15/Linux 服务配置/部署MooseFS分布式文件系统/">部署MooseFS分布式文件系统</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年09月15日 - 16:09</p>
+  <p><span>最后更新:</span>2019年04月16日 - 20:04</p>
+  <p><span>原始链接:</span><a href="/2018/09/15/Linux 服务配置/部署MooseFS分布式文件系统/" title="部署MooseFS分布式文件系统">https://www.mkdirs.com/2018/09/15/Linux 服务配置/部署MooseFS分布式文件系统/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux-服务配置/" rel="tag"> <i class="fa fa-tag"></i> Linux 服务配置</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/09/15/Linux 服务配置/Redis数据库配置与应用/" rel="next" title="Redis 数据库配置与应用">
+                <i class="fa fa-chevron-left"></i> Redis 数据库配置与应用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/09/16/Linux 服务配置/使用Bind提供域名解析服务/" rel="prev" title="使用Bind提供域名解析服务">
+                使用Bind提供域名解析服务 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#实验环境与IP分配"><span class="nav-text">实验环境与IP分配</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Master-Server配置"><span class="nav-text">Master-Server配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MetaLogger-Server配置"><span class="nav-text">MetaLogger-Server配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Cunk-Server配置"><span class="nav-text">Cunk-Server配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Client客户端配置"><span class="nav-text">Client客户端配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MooseFS常用功能"><span class="nav-text">MooseFS常用功能</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

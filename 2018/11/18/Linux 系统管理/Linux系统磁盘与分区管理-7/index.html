@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Linux 是一套免费使用和自由传播的类Unix操作系统,是一个基于POSIX和UNIX的多用户、多任务、支持多线程和多CPU的操作系统.它能运行主要的UNIX工具软件、应用程序和网络协议.它支持32位和64位硬件.Linux继承了Unix以网络为核心的设计思想,是一个性能稳定的多用户网络操作系统. Linux最传统的磁盘文件系统(filesystem)使用的是EXT4格式,所以要了解文件系统就得">
+<meta name="keywords" content="Linux 系统管理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux系统磁盘与分区管理(7)">
+<meta property="og:url" content="https://www.mkdirs.com/2018/11/18/Linux 系统管理/Linux系统磁盘与分区管理-7/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="Linux 是一套免费使用和自由传播的类Unix操作系统,是一个基于POSIX和UNIX的多用户、多任务、支持多线程和多CPU的操作系统.它能运行主要的UNIX工具软件、应用程序和网络协议.它支持32位和64位硬件.Linux继承了Unix以网络为核心的设计思想,是一个性能稳定的多用户网络操作系统. Linux最传统的磁盘文件系统(filesystem)使用的是EXT4格式,所以要了解文件系统就得">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-04-16T12:35:00.992Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux系统磁盘与分区管理(7)">
+<meta name="twitter:description" content="Linux 是一套免费使用和自由传播的类Unix操作系统,是一个基于POSIX和UNIX的多用户、多任务、支持多线程和多CPU的操作系统.它能运行主要的UNIX工具软件、应用程序和网络协议.它支持32位和64位硬件.Linux继承了Unix以网络为核心的设计思想,是一个性能稳定的多用户网络操作系统. Linux最传统的磁盘文件系统(filesystem)使用的是EXT4格式,所以要了解文件系统就得">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/11/18/Linux 系统管理/Linux系统磁盘与分区管理-7/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Linux系统磁盘与分区管理(7) | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/11/18/Linux 系统管理/Linux系统磁盘与分区管理-7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Linux系统磁盘与分区管理(7)
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-11-18 10:18:09" itemprop="dateCreated datePublished" datetime="2018-11-18T10:18:09+08:00">2018-11-18</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-16 20:35:00" itemprop="dateModified" datetime="2019-04-16T20:35:00+08:00">2019-04-16</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Linux-系统管理/" itemprop="url" rel="index"><span itemprop="name">Linux 系统管理</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Linux 是一套免费使用和自由传播的类Unix操作系统,是一个基于POSIX和UNIX的多用户、多任务、支持多线程和多CPU的操作系统.它能运行主要的UNIX工具软件、应用程序和网络协议.它支持32位和64位硬件.Linux继承了Unix以网络为核心的设计思想,是一个性能稳定的多用户网络操作系统.</p>
+<p>Linux最传统的磁盘文件系统(filesystem)使用的是EXT4格式,所以要了解文件系统就得要由认识EXT4开始,而文件系统是创建在硬盘上面的,因此我们得了解硬盘的物理组成才行,下面我们回来详细谈一谈磁盘,inode,block还有superblock等文件系统,的理论知识.</p>
+<a id="more"></a>
+<p><strong>关于磁盘与分区</strong></p>
+<p>目前在市场中磁盘的分类也是五花八门,一般在主机中使用的磁盘无外乎,以下几种,包括常用的构造,我们在这里说明.</p>
+<blockquote>
+<p>接口分类：IDE、SATA、SCSI、SAS、光纤通道接口等<br>构造分类：机械硬盘(HDD)、固态硬盘(SSD)、混合硬盘(HHD)<br>制造厂商：希捷、西部数据、东芝、三星、英特尔、闪迪<br>尺寸大小：3.5英寸、2.5 英寸、1.8英寸、1.3/1.0/0.85英寸</p>
+</blockquote>
+<p>磁盘的常用参数,有以下几种形式:</p>
+<blockquote>
+<p>容量：MB、GB、TB、PB、EB、ZB、YB、BB、NB、DB<br>转速：台式机(7200rpm)、笔记本(5400rpm)、服务器(10000rpm,15000rpm)<br>传输速度： STAT3(500M/s)、SCSI(320M/s)、SAS(500M/s)、PCI-E(1200M/s)<br>缓存：硬盘控制器的内存芯片，内部存储和接口的缓存</p>
+</blockquote>
+<p>接下来我们在说明一下磁盘的物理组成,整个磁盘的组成主要有：</p>
+<blockquote>
+<p>● 圆形的盘片(主要记录数据的部分)<br>● 机械手臂与手臂上的磁头(用来读写盘片上的数据)<br>● 主轴马达,可以转动盘片,让机械臂在盘片上都写</p>
+</blockquote>
+<p>从上面我们知道数据储存与读取的重点在于磁盘的盘片,而盘片上的物理组成则为,以下构造：</p>
+<blockquote>
+<p>● 扇区(Sector):为最小的物理存储单位,每个扇区为512bytes<br>● 柱面(Cylinder):将扇区组成一个圆就是柱面,柱面是分区(partition)的最小单位<br>● 第一个扇区最重要,里面记录着硬盘主引导记录(MBR)以及分区表(PT),其中MBR占446bytes,而PT则占用64bytes</p>
+</blockquote>
+<p>所谓的磁盘分区指的是告诉操作系统 『我这块磁盘在此分区可以访问的区域是,由A柱面到B柱面之间的块』,如此一来操作系统就能够知道,他可以在所指定的区块内进行文件数据的读/写/查找等操作,也就是说,磁盘分区意即指定分区的起始于结束柱面就可以.</p>
+<p>因为分区表仅有64bytes而已,因此最多只能记录四条分区的记录,这四条分区记录我们称为主分区(primary)或扩展分区(extended),其中扩展分区还可以再分出逻辑分区(logical),而能被格式化的则仅有主分区和逻辑分区.</p>
+<p>最后我们再把分区的定义拿出来说明一下：</p>
+<blockquote>
+<p>1.主分区与扩展分区最对可以有4个(硬盘限制)<br>2.扩展分区最多只有一个(操作系统的限制)<br>3.逻辑分区是由扩展分区持续分出来的分区<br>4.只有逻辑分区能被格式化,扩展分区无法格式化<br>5.逻辑分区在Linux系统中,IDE硬盘最多59个,SATA硬盘最多11个</p>
+</blockquote>
+<p><strong>关于文件系统的特性</strong></p>
+<p>我们都知道磁盘分区完毕后还需要进行格式化(format),之后操作系统才能够使用这个分区,为什么需要进行『格式化』呢? 这是因为每种操作系统所配置的文件属性/权限并不相同,为了存放这些文件所需的数据,因此就需要将分区进行格式化,以成为操作系统能够利用的『文件系统格式(filesystem)』.</p>
+<p>那么文件系统是如何运行的呢? 这与操作系统的文件数据有关,较新的操作系统的文件数据除了文件实际内容外,通常含有非常多的属性,例如 Linux 操作系统的文件权限(rwx)与文件属性(拥有者、群组、时间参数等),文件系统通常会将这两部份的数据分别存放在不同的区块,权限与属性放置到 inode 中,至于实际数据则放置到 data block 区块中,另外,还有一个超级区块 (superblock) 会记录整个文件系统的整体信息,包括 inode 与 block 的总量、使用量、剩余量等.</p>
+<blockquote>
+<p>superblock：记录此文件系统的整体信息,包括inode/block的总量、使用量、剩余量,以及文件系统的格式与相关信息等<br>inode：记录文件的属性,一个文件占用一个inode,同时记录此文件的数据所在的 block 号码<br>block：实际记录文件的内容,若文件太大时,会占用多个 block</p>
+</blockquote>
+<p>由于每个 inode 与 block 都有编号,而每个文件都会占用一个 inode,inode 内则有文件数据放置的 block 号,因此我们可以知道的是,如果能够找到文件的 inode 的话,那么自然就会知道这个文件所放置数据的 block 号,当然也就能够读出该文件的实际数据了,这是个比较有效率的作法,因为如此一来我们的磁盘就能够在短时间内读取出全部的数据,读写的效率非常好.</p>
+<blockquote>
+<p>data block 真正存储数据的地方</p>
+</blockquote>
+<p>data block 是用来放置文件内容数据地方,在 Ext4 文件系统中所支持的 block 大小有 1K, 2K 及 4K 三种而已,在格式化时 block 的大小就固定了,且每个 block 都有编号,以方便 inode 的记录,不过要注意的是,由于 block 大小的差异,会导致该文件系统能够支持的最大磁盘容量与最大单一文件容量并不相同。,因为 block 大小而产生的 Ext4 文件系统限制如下：<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Block大小	           1KB	      2KB	      4KB</span><br><span class="line">最大单一文件限制            16GB	      256GB	      2TB</span><br><span class="line">最大文件系统总容量	   2TB	      8TB	      16TB</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>除此之外 Ext4 文件系统的 block 还有什么限制呢？ 有的！基本限制如下：</p>
+<blockquote>
+<p>● 原则上block的大小与数量在格式化完就不能够再改变了(除非重新格式化)<br>● 每个block内最多只能够放置一个文件的数据<br>● 承上如果文件大于block的大小则一个文件会占用多个 block 数量<br>● 承上若文件小于block则该block的剩余容量就不能够再被使用了(磁盘空间会浪费)</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>Superblock 超级块记录</p>
+</blockquote>
+<blockquote>
+<p>Superblock 是记录整个文件系统分配的地方,没有 Superblock 就没有这个文件系统了,他记录的信息主要有：</p>
+<blockquote>
+<p>● block 与 inode 的总量<br>● 未使用与已使用的 inode / block 数量<br>● block 与 inode 的大小 (block 为 1, 2, 4K，inode 为 128 bytes)<br>● 文件系统的挂载时间、最近一次写入数据的时间、最近一次检验磁盘 (fsck) 的时间等文件系统的相关信息<br>● 一个 valid bit 数值若此文件系统已被挂载,则 valid bit 为 0 若未被挂载则 valid bit 为 1 </p>
+</blockquote>
+</blockquote>
+<p>Superblock 是非常重要的,因为我们这个文件系统的基本信息都写在这里,因此如果 superblock 死掉了,你的文件系统可能就需要花费很多时间去挽救,一般来说 superblock 的大小为 1024bytes.</p>
+<p><strong>关于主引导记录的解释</strong></p>
+<p>主引导记录（MBR，Main Boot Record）是位于磁盘最前边的一段引导（Loader）代码,它负责磁盘操作系统(DOS)对磁盘进行读写时分区合法性的判别、分区引导信息的定位,它由磁盘操作系统(DOS)在对硬盘进行初始化时产生的.</p>
+<blockquote>
+<p>主引导记录在磁盘最前边的一段引导代码，占用了磁盘的第一个分区，结构为：</p>
+<blockquote>
+<p>● 主引导程序（boot loader）占用了446byte<br>● 分区表（Partition table）占用了64byte<br>● 有效标志符（magic number）占用了2byte（55AAH代表有效）</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>主引导扇区的读取流程是 ?</p>
+<blockquote>
+<p>● BIOS 加电自检 ( Power On Self Test – POST )BIOS执行内存地址的跳转指令,跳转到固化在ROM中的自检程序,对系统硬件(包括内存)进行检查<br>● 读取主引导记录(MBR),当BIOS检查到硬件正常并与 CMOS 中的设置相符后,按照 CMOS 中对启动设备的设置顺序检测可用的启动设备,BIOS将相应启动设备的第一个扇区(也就是MBR扇区)读入内存<br>● 检查MBR的结束标志位是否等于55AAH,若不等于则转去尝试其他启动设备,如果没有启动设备满足要求则显示“NO ROM BASIC”然后死机<br>● 当检测到有启动设备满足要求后,BIOS将控制权交给相应启动设备,启动设备的MBR将自己复制到0000：0600H处,然后继续执行<br>● 根据MBR中的引导代码启动引导程序,进入下一个引导环节</p>
+</blockquote>
+</blockquote>
+<p><strong>关于MBR分区表的介绍</strong></p>
+<p>主引导记录（Master Boot Record，缩写：MBR）又叫做主引导扇区,是计算机开机后访问硬盘时所必须要读取的首个扇区,它在硬盘上的三维地址为（柱面，磁头，扇区）＝（0，0，1）.</p>
+<p>MBR是由分区程序（如Fdisk，Parted）所产生的,它不依赖任何操作系统,而且硬盘引导程序也是可以改变的,从而能够实现多系统引导.</p>
+<p>从主引导记录的结构可以知道,它仅仅包含一个64个字节的硬盘分区表,由于每个分区信息需要16个字节,所以对于采用MBR型分区结构的硬盘(其磁盘卷标类型为MS-DOS),最多只能识别4个主要分区,所以对于一个采用此种分区结构的硬盘来说,想要得到4个以上的主要分区是不可能的,这里就需要引出扩展分区了,扩展分区也是主分区（Primary partition）的一种,但它与主分区的不同在于理论上可以划分为无数个逻辑分区,每一个逻辑分区都有一个和MBR结构类似的扩展引导记录(EBR),在MBR分区表中最多4个主分区或者3个主分区＋1个扩展分区,也就是说扩展分区只能有一个,然后可以再细分为多个逻辑分区.</p>
+<p>在Linux系统中,硬盘分区命名为sda1－sda4或者hda1－hda4（其中a表示硬盘编号可能是a、b、c等等）,在MBR硬盘中,分区号1－4是主分区（或者扩展分区）,逻辑分区号只能从5开始.</p>
+<p>在MBR分区表中,一个分区最大的容量为2T,且每个分区的起始柱面必须在这个disk的前2T内,你有一个3T的硬盘,根据要求你至少要把它划分为2个分区,且最后一个分区的起始扇区要位于硬盘的前2T空间内,如果硬盘太大则必须改用GPT.</p>
+<p><strong>关于GPT分区表的介绍</strong></p>
+<p>全局唯一标识分区表（GUID Partition Table，缩写：GPT）是一个实体硬盘的分区结构,它是EFI(可扩展固件接口标准)的一部分,用来替代BIOS中的主引导记录分区表,但因为MBR分区表不支持容量大于2.2TB（2.2 × 1012字节）的分区,所以也有一些BIOS系统为了支持大容量硬盘而用GPT分区表取代MBR分区表.</p>
+<p>在MBR硬盘中,分区信息直接存储于主引导记录(MBR)中（主引导记录中还存储着系统的引导程序）,但在GPT硬盘中,分区表的位置信息储存在GPT头中,但出于兼容性考虑,硬盘的第一个扇区仍然用作MBR,之后才是GPT头.</p>
+<p>与支持最大卷为2 TB（Terabytes）并且每个磁盘最多有4个主分区（或3个主分区，1个扩展分区和无限制的逻辑驱动器）的MBR磁盘分区的样式相比,GPT磁盘分区样式支持最大卷为18 EB（Exabytes）（1EB=1048576TB）并且每磁盘的分区数没有上限,只受到操作系统限制（由于分区表本身需要占用一定空间，最初规划硬盘分区时，留给分区表的空间决定了最多可以有多少个分区，IA-64版Windows限制最多有128个分区,这也是EFI标准规定的分区表的最小尺寸）,与MBR分区的磁盘不同,至关重要的平台操作数据位于分区,而不是位于非分区或隐藏扇区.另外,GPT分区磁盘有备份分区表来提高分区数据结构的完整性.</p>
+<p>其中转换为GPT的时候可以创建两个隐藏分区,ESP和MSR.ESP是efi系统分区用于保存引导文件,MSR是微软的保留分区,用于安装操作系统.</p>
+<p><strong><em>MBR与GPT,两种分区的小总结</em></strong></p>
+<ol>
+<li><p>MBR分区表：Master Boot Record，即硬盘主引导记录分区表，只支持容量在 2.1TB 以下的硬盘，超过2.1TB的硬盘只能管理2.1TB，最多只支持4个主分区或三个主分区和一个扩展分区，扩展分区下可以有多个逻辑分区。</p>
+</li>
+<li><p>GPT分区表：GPT，全局唯一标识分区表(GUID Partition Table)，与MBR最大4个分区表项的限制相比，GPT对分区数量没有限制，但Windows最大仅支持128个GPT分区，GPT可管理硬盘大小达到了18EB。只有基于UEFI平台的主板才支持GPT分区引导启动。</p>
+</li>
+<li><p>GPT分区表下的隐藏分区：</p>
+</li>
+</ol>
+<p>①. ESP分区：EFI system partition，该分区用于采用了EFI BIOS的电脑系统，用来启动操作系统。分区内存放引导管理程序、驱动程序、系统维护工具等。如果电脑采用了EFI系统，或当前磁盘用于在EFI平台上启动操作系统，则应建议ESP分区。</p>
+<p>②. MSR分区：即微软保留分区，是GPT磁盘上用于保留空间以备用的分区，例如在将磁盘转换为动态磁盘时需要使用这些分区空间。</p>
+<ol start="4">
+<li>两种硬盘分区模式分别对应的BIOS启动方式：</li>
+</ol>
+<p>硬盘分区格式为MBR格式，启动模式应该为Legacy；<br>硬盘分区格式为GUID（GPT）格式，启动模式应该为UEFI。</p>
+<ol start="5">
+<li>MBR分区表的构成：</li>
+</ol>
+<p>⦁主引导程序（boot loader）占用了446byte<br>⦁分区表（Partition table）占用了64byte<br>⦁有效标志符（magic number）占用了2byte（55AAH代表有效）</p>
+<ol start="6">
+<li>GPT分区表的构成：</li>
+</ol>
+<p>⦁LBA 0 ：GPT分区的最开头，考虑兼容性问题，开头仍然存放MBR分区表，只是里面存放的是指向GPT的指针。防止有一些系统不识别GPT分区表。</p>
+<p>⦁LBA 1 ：存储了硬盘的总存储空间，以及GPT分区表的信息，定义最多能创建128个分区，每个分信息占用的空间是128字节；128个分区中有一个是用来存储备份分区表的，所以可以手动指定的分区数为127个分区。</p>
+<p>⦁LBA 2-33：每个分区信息存放的位置，上边说了每个分信息占用的空间是128字节。2-33正好是32个扇区。32*512=16384，每个分区信息占用了128字节，16384/128=128个分区。<br><br></p>
+<h2 id="磁盘管理命令"><a href="#磁盘管理命令" class="headerlink" title="磁盘管理命令"></a>磁盘管理命令</h2><h3 id="◆dumpe2fs-查询磁盘参数◆"><a href="#◆dumpe2fs-查询磁盘参数◆" class="headerlink" title="◆dumpe2fs 查询磁盘参数◆"></a>◆dumpe2fs 查询磁盘参数◆</h3><p>dumpe2fs命令用于打印 ext2/ext3/ext4 文件系统的超级块和块组信息,其实它可以查询磁盘的很多参数,下面我们先来看一下它的具体参数吧.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># dumpe2fs --help</span></span><br><span class="line"></span><br><span class="line">命令语法：[ dumpe2fs [选项] 磁盘路径 ]</span><br><span class="line"></span><br><span class="line">        -b              <span class="comment">#打印文件系统中预留的块信息</span></span><br><span class="line">        -h              <span class="comment">#仅显示超级块信息</span></span><br><span class="line">        -i              <span class="comment">#从指定的文件系统映像文件中读取文件系统信息</span></span><br><span class="line">        -x              <span class="comment">#以16进制格式打印信息块成员</span></span><br><span class="line">        -ob 超级块      <span class="comment">#指定检查文件系统时使用的超级块</span></span><br><span class="line">        -OB 块大小      <span class="comment">#检查文件系统时使用的指定的块大小</span></span><br></pre></td></tr></table></figure>
+<p><strong>实例：</strong>通过<code>dumpe2fs -h</code>显示指定<code>/dev/sdb</code>分区的详细参数<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># dumpe2fs -h /dev/sdb</span></span><br><span class="line">dumpe2fs 1.42.9 (28-Dec-2013)</span><br><span class="line">Filesystem volume name:   &lt;none&gt;                  <span class="comment">#文件分区的名字(Label)</span></span><br><span class="line">Last mounted on:          &lt;not available&gt;</span><br><span class="line">Filesystem UUID:          5dc23dc0-8245-4113-b40a-4cb09ad9f4de   <span class="comment">#文件系统的UUID</span></span><br><span class="line">Filesystem magic number:  0xEF53</span><br><span class="line">Filesystem revision <span class="comment">#:    1 (dynamic)</span></span><br><span class="line">Filesystem features:      has_journal ext_attr resize_inode dir_index filetype needs_recovery extent 64bit flex_bg sparse_super large_file huge_file uninit_bg dir_nlink extra_isize</span><br><span class="line">Filesystem flags:         signed_directory_hash</span><br><span class="line">Default mount options:    user_xattr acl           <span class="comment">#默认挂载的参数</span></span><br><span class="line">Filesystem state:         clean                    <span class="comment">#这个文件系统是没有问题的(clean)</span></span><br><span class="line">Errors behavior:          Continue</span><br><span class="line">Filesystem OS <span class="built_in">type</span>:       Linux                    <span class="comment">#文件系统类型是Linux</span></span><br><span class="line">Inode count:              1310720                  <span class="comment">#Inode的总数</span></span><br><span class="line">Block count:              5242880                  <span class="comment">#Block的总数</span></span><br><span class="line">Reserved block count:     262144</span><br><span class="line">Free blocks:              5116558                  <span class="comment">#剩余Blocks数量</span></span><br><span class="line">Free inodes:              1310709                  <span class="comment">#剩余Inodes数量</span></span><br><span class="line">First block:              0</span><br><span class="line">Block size:               4096                     <span class="comment">#每个Block块的大小</span></span><br><span class="line">Fragment size:            4096</span><br><span class="line">Group descriptor size:    64</span><br><span class="line">Reserved GDT blocks:      1024</span><br><span class="line">Blocks per group:         32768</span><br><span class="line">Fragments per group:      32768</span><br><span class="line">Inodes per group:         8192</span><br><span class="line">Inode blocks per group:   512</span><br><span class="line">Flex block group size:    16</span><br><span class="line">Filesystem created:       Sun Nov 18 08:59:48 2018</span><br><span class="line">Last mount time:          Sun Nov 18 08:59:59 2018</span><br><span class="line">Last write time:          Sun Nov 18 08:59:59 2018</span><br><span class="line">Mount count:              1</span><br><span class="line">Maximum mount count:      -1</span><br><span class="line">Last checked:             Sun Nov 18 08:59:48 2018</span><br><span class="line">Check interval:           0 (&lt;none&gt;)</span><br><span class="line">Lifetime writes:          132 MB</span><br><span class="line">Reserved blocks uid:      0 (user root)</span><br><span class="line">Reserved blocks gid:      0 (group root)</span><br><span class="line">First inode:              11</span><br><span class="line">Inode size:               256                      <span class="comment">#每个Inodes块的大小</span></span><br><span class="line">Required extra isize:     28</span><br><span class="line">Desired extra isize:      28</span><br><span class="line">Journal inode:            8</span><br><span class="line">Default directory <span class="built_in">hash</span>:   half_md4</span><br><span class="line">Directory Hash Seed:      f00ad08a-e990-4c45-96c3-749116a4e540</span><br><span class="line">Journal backup:           inode blocks</span><br><span class="line">Journal features:         journal_64bit</span><br><span class="line">Journal size:             128M</span><br><span class="line">Journal length:           32768</span><br><span class="line">Journal sequence:         0x00000002</span><br><span class="line">Journal start:            1</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆df-查询磁盘信息◆"><a href="#◆df-查询磁盘信息◆" class="headerlink" title="◆df 查询磁盘信息◆"></a>◆df 查询磁盘信息◆</h3><p>df命令用于显示磁盘分区上的可使用的磁盘空间,默认显示单位为KB,可以利用该命令来获取硬盘被占用了多少空间,目前还剩下多少空间等信息,下面我们先来看一下它的具体参数吧.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># df --help</span></span><br><span class="line"></span><br><span class="line">命令语法：[ df [选项] ]</span><br><span class="line"></span><br><span class="line">        -a              <span class="comment">#列出所有的文件系统,包括/proc等系统</span></span><br><span class="line">        -k              <span class="comment">#以KB为单位,显示各文件系统</span></span><br><span class="line">        -m              <span class="comment">#以MB为单位,显示各文件系统</span></span><br><span class="line">        -h              <span class="comment">#以常用单位显示文件系统大小</span></span><br><span class="line">        -H              <span class="comment">#以M=1000替代M=1024显示数据</span></span><br><span class="line">        -T              <span class="comment">#显示文件系统类型</span></span><br><span class="line">        -i              <span class="comment">#不用硬盘容量,以Inode数量来显示</span></span><br></pre></td></tr></table></figure>
+<p><strong>实例：</strong>以通用格式显示系统文件信息.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># df -hT</span></span><br><span class="line">Filesystem            Type      Size  Used Avail Use% Mounted on</span><br><span class="line"></span><br><span class="line">/dev/mapper/rhel-root xfs        17G  1.2G   16G   7% /</span><br><span class="line">devtmpfs              devtmpfs   98M     0   98M   0% /dev</span><br><span class="line">tmpfs                 tmpfs     110M     0  110M   0% /dev/shm</span><br><span class="line">tmpfs                 tmpfs     110M  5.5M  104M   6% /run</span><br><span class="line">tmpfs                 tmpfs     110M     0  110M   0% /sys/fs/cgroup</span><br><span class="line">/dev/sr0              iso9660   4.4G  4.4G     0 100% /mnt</span><br><span class="line">/dev/sda1             xfs      1014M  130M  885M  13% /boot</span><br><span class="line">tmpfs                 tmpfs      22M     0   22M   0% /run/user/0</span><br><span class="line">/dev/sdb              ext4       20G   45M   19G   1% /lyshark</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆du-统计文件大小◆"><a href="#◆du-统计文件大小◆" class="headerlink" title="◆du 统计文件大小◆"></a>◆du 统计文件大小◆</h3><p>du命令也是查看使用空间的,但是与df命令不同的是Linux,du命令是对文件和目录磁盘使用的空间的查看,还是和df命令有一些区别的,下面我们先来看一下它的具体参数吧.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># du --help</span></span><br><span class="line"></span><br><span class="line">命令语法：[ du [选项] 文件或目录 ]</span><br><span class="line"></span><br><span class="line">        -a              <span class="comment">#列出所有的文件与目录容量</span></span><br><span class="line">        -h              <span class="comment">#以常用单位显示容量信息</span></span><br><span class="line">        -s              <span class="comment">#只列出总容量,而不统计每个个别目录占用容量</span></span><br><span class="line">        -S              <span class="comment">#不包括子目录下的总计,区别于 -s</span></span><br><span class="line">        -m              <span class="comment">#以MB为单位显示</span></span><br><span class="line">        -k              <span class="comment">#以KB为单位显示</span></span><br></pre></td></tr></table></figure>
+<p><strong>实例:</strong>通过<code>du -sh</code>显示目录的总容量.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># du -sh /etc/</span></span><br><span class="line">31M     /etc/</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># du -sh /usr/bin/</span></span><br><span class="line">63M     /usr/bin/</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆lsblk-查所有可用设备◆"><a href="#◆lsblk-查所有可用设备◆" class="headerlink" title="◆lsblk 查所有可用设备◆"></a>◆lsblk 查所有可用设备◆</h3><p>lsblk命令用于列出所有可用块设备的信息,而且还能显示他们之间的依赖关系,但是它不会列出RAM盘的信息,块设备有硬盘,闪存盘,cd-ROM等,lsblk命令包含在util-linux-ng包中,现在该包改名为util-linux,这个包带了几个其它工具,如dmesg,要安装lsblk,请使用 yum install util-linux-ng 来安装,下面我们先来看一下它的具体参数吧.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># lsblk --hlep</span></span><br><span class="line"></span><br><span class="line">命令语法：[ lsblk [选项] ]</span><br><span class="line"></span><br><span class="line">        -a              <span class="comment">#显示所有设备</span></span><br><span class="line">        -m              <span class="comment">#显示权限信息</span></span><br><span class="line">        -l              <span class="comment">#使用列表格式显示</span></span><br><span class="line">        -n              <span class="comment">#不显示标题</span></span><br><span class="line">        -o 列名         <span class="comment">#输出指定列</span></span><br><span class="line">        -P              <span class="comment">#以键和值的方式显示</span></span><br><span class="line">        -t              <span class="comment">#使用拓展格式输出</span></span><br><span class="line">        -r              <span class="comment">#使用原始格式输出</span></span><br></pre></td></tr></table></figure>
+<p><strong>实例：</strong>使用<code>lsblk -t</code>显示磁盘信息<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># lsblk -t</span></span><br><span class="line">NAME          ALIGNMENT MIN-IO OPT-IO PHY-SEC LOG-SEC ROTA SCHED    RQ-SIZE   RA WSAME</span><br><span class="line">sda                   0    512      0     512     512    1 deadline     128 4096   32M</span><br><span class="line">├─sda1                0    512      0     512     512    1 deadline     128 4096   32M</span><br><span class="line">└─sda2                0    512      0     512     512    1 deadline     128 4096   32M</span><br><span class="line">  ├─rhel-root         0    512      0     512     512    1              128 4096   32M</span><br><span class="line">  └─rhel-swap         0    512      0     512     512    1              128 4096   32M</span><br><span class="line">sdb                   0    512      0     512     512    1 deadline     128 4096    0B</span><br><span class="line">sr0                   0   2048      0    2048    2048    1 deadline     128  128    0B</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆e2label-设置卷标名◆"><a href="#◆e2label-设置卷标名◆" class="headerlink" title="◆e2label 设置卷标名◆"></a>◆e2label 设置卷标名◆</h3><p>e2label命令用来设置第二扩展文件系统的卷标,此命令无参数,下面直接看一下使用技巧.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># dumpe2fs -h /dev/sdb |grep "Filesystem volume name"</span></span><br><span class="line">dumpe2fs 1.42.9 (28-Dec-2013)</span><br><span class="line">Filesystem volume name:   &lt;none&gt;</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># e2label /dev/sdb "lyshark desk"</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># dumpe2fs -h /dev/sdb |grep "Filesystem volume name"</span></span><br><span class="line">dumpe2fs 1.42.9 (28-Dec-2013)</span><br><span class="line">Filesystem volume name:   lyshark desk</span><br></pre></td></tr></table></figure>
+<h3 id="◆fsck-检查修复文件系统◆"><a href="#◆fsck-检查修复文件系统◆" class="headerlink" title="◆fsck 检查修复文件系统◆"></a>◆fsck 检查修复文件系统◆</h3><p>fsck命令被用于检查并且试图修复文件系统中的错误,当文件系统发生错误,可用fsck指令尝试加以修复.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># fsck --help</span></span><br><span class="line"></span><br><span class="line">命令语法：[ fsck [选项] 磁盘路径 ]</span><br><span class="line"></span><br><span class="line">        -a              <span class="comment">#自动修复文件系统,不询问</span></span><br><span class="line">        -A              <span class="comment">#依照/etc/fstab配置文件的内容,检查文件内所列的全部文件系统</span></span><br><span class="line">        -t 类型         <span class="comment">#指定检查文件系统类型</span></span><br><span class="line">        -V              <span class="comment">#显示指令执行过程</span></span><br></pre></td></tr></table></figure>
+<p><strong>实例：</strong>检查并修复一个文件系统,应该先卸载在检查.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># fsck -t ext4 -a /dev/sdb</span></span><br><span class="line"></span><br><span class="line">fsck from util-linux 2.23.2</span><br><span class="line">lyshark_desk: clean, 11/1310720 files, 126322/5242880 blocks</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆mkfs-格式化◆"><a href="#◆mkfs-格式化◆" class="headerlink" title="◆mkfs 格式化◆"></a>◆mkfs 格式化◆</h3><p>mkfs命令用于在设备上（通常为硬盘）创建Linux文件系统,mkfs本身并不执行建立文件系统的工作,而是去调用相关的程序来执行,下面我们先来看一下它的具体参数吧.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mkfs -help</span></span><br><span class="line"></span><br><span class="line">命令语法：[ mkfs [文件类型] 磁盘路径 ]</span><br><span class="line"></span><br><span class="line">        -t ext2          <span class="comment">#格式化为ext2</span></span><br><span class="line">        -t ext3          <span class="comment">#格式化为ext3</span></span><br><span class="line">        -t ext4          <span class="comment">#格式化为ext4</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># mkfs.</span></span><br><span class="line"></span><br><span class="line">mkfs.btrfs   mkfs.cramfs  mkfs.ext2    mkfs.ext3    mkfs.ext4    mkfs.minix   mkfs.xfs</span><br><span class="line"></span><br><span class="line">xfs_group</span><br></pre></td></tr></table></figure>
+<p><strong>实例：</strong>格式化一个分区,试一下.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mkfs -t ext4 /dev/sdb</span></span><br><span class="line"></span><br><span class="line">mke2fs 1.42.9 (28-Dec-2013)</span><br><span class="line">/dev/sdb is entire device, not just one partition!</span><br><span class="line">Proceed anyway? (y,n) y</span><br><span class="line">Filesystem label=</span><br><span class="line">OS <span class="built_in">type</span>: Linux</span><br><span class="line">Block size=4096 (<span class="built_in">log</span>=2)</span><br><span class="line">Fragment size=4096 (<span class="built_in">log</span>=2)</span><br><span class="line">Stride=0 blocks, Stripe width=0 blocks</span><br><span class="line">1310720 inodes, 5242880 blocks</span><br><span class="line">262144 blocks (5.00%) reserved <span class="keyword">for</span> the super user</span><br><span class="line">First data block=0</span><br><span class="line">Maximum filesystem blocks=2153775104</span><br><span class="line">160 block groups</span><br><span class="line">32768 blocks per group, 32768 fragments per group</span><br><span class="line">8192 inodes per group</span><br><span class="line">Superblock backups stored on blocks:</span><br><span class="line">        32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208,</span><br><span class="line">        4096000</span><br><span class="line"></span><br><span class="line">Allocating group tables: <span class="keyword">done</span></span><br><span class="line">Writing inode tables: <span class="keyword">done</span></span><br><span class="line">Creating journal (32768 blocks): <span class="keyword">done</span></span><br><span class="line">Writing superblocks and filesystem accounting information: <span class="keyword">done</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="◆mount-umount-挂载与卸载磁盘◆"><a href="#◆mount-umount-挂载与卸载磁盘◆" class="headerlink" title="◆mount/umount 挂载与卸载磁盘◆"></a>◆mount/umount 挂载与卸载磁盘◆</h3><p>mount命令用于加载文件系统到指定的加载点,此命令的最常用于挂载cdrom,使我们可以访问cdrom中的数据,因为你将光盘插入cdrom中,Linux并不会自动挂载,必须使用Linux mount命令来手动完成挂载,下面老样子先看参数.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mount --help</span></span><br><span class="line"></span><br><span class="line">命令语法：[ mount [选项] [原盘符] [挂载到] ]</span><br><span class="line"></span><br><span class="line">        -t ext2          <span class="comment">#格式化为ext2</span></span><br><span class="line">        -a               <span class="comment">#根据/etc/fstab配置,重新挂载一遍</span></span><br><span class="line">        -l               <span class="comment">#显示已挂载文件系统列表</span></span><br><span class="line">        -t               <span class="comment">#指定挂载类型(ext2/ext3/vfat/reiserfs/iso9660)</span></span><br><span class="line">        -L               <span class="comment">#通过文件系统的卷标名称进行挂载</span></span><br><span class="line">        -r               <span class="comment">#将文件系统加载为只读模式</span></span><br><span class="line">        -v               <span class="comment">#输出指令执行详细信息</span></span><br><span class="line">        -o               <span class="comment">#指定额外挂载参数(ro,rw只读读写/exec,noexec是否可执行/remount 重新挂载)</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>实例1：</strong> 挂载光盘 /dev/sr0 挂载到 /mnt 目录下<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mount -t iso9660 /dev/sr0 /mnt/</span></span><br><span class="line"></span><br><span class="line">mount: /dev/sr0 is write-protected, mounting <span class="built_in">read</span>-only</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例2：</strong> 挂载硬盘,挂载时指定语系为 iocharset=cp950 挂载到 /mnt/flash<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mount -t vfat -o iocharset=cp950 /dev/sda1 /mnt/flash</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>实例3：</strong> 将根分区重新挂载,并加上读写权限<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mount -o remount,rw,auto  /</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>实例4：</strong> 将/home这个目录,临时挂载到/tmp/home下<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mount --bind /home/ /tmp/home/</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ll /tmp/home/</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>实例5：</strong> 利用卷标名来挂载<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost home]<span class="comment"># mount -L "LyShark_Disk" /tmp/disk/</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>实例6：</strong> 挂载一个ISO镜像,例如Centos.iso<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mount -o loop /root/Centos.iso /mnt/centos_dvd</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>实例7：</strong> 卸载磁盘或任意外部介质<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost home]<span class="comment"># umount -v /dev/sr0</span></span><br><span class="line"></span><br><span class="line">umount: /mnt (/dev/sr0) unmounted</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="磁盘分区命令-Fdisk"><a href="#磁盘分区命令-Fdisk" class="headerlink" title="磁盘分区命令-Fdisk"></a>磁盘分区命令-Fdisk</h2><p>fdisk命令用于观察硬盘实体使用情况,也可对硬盘分区,它采用传统的问答式界面,而非类似DOS fdisk的cfdisk互动式操作界面,因此在使用上较为不便,但功能却丝毫不打折扣.</p>
+<h3 id="◆命令参数解释◆"><a href="#◆命令参数解释◆" class="headerlink" title="◆命令参数解释◆"></a>◆命令参数解释◆</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># fdisk -l                         #查看系统所有硬盘及分区</span></span><br><span class="line">[root@localhost ~]<span class="comment"># fdisk 磁盘设备名(/dev/sda)        #创建或修改磁盘的分区结构</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># fdisk /dev/sd*</span></span><br><span class="line">Welcome to fdisk (util-linux 2.23.2).</span><br><span class="line"></span><br><span class="line">Changes will remain <span class="keyword">in</span> memory only, until you decide to write them.</span><br><span class="line">Be careful before using the write <span class="built_in">command</span>.</span><br><span class="line"></span><br><span class="line">Command (m <span class="keyword">for</span> <span class="built_in">help</span>): <span class="built_in">help</span></span><br><span class="line">h: unknown <span class="built_in">command</span></span><br><span class="line">Command action</span><br><span class="line"></span><br><span class="line">	p：打印分区表</span><br><span class="line"> 	n：新建一个新分区</span><br><span class="line"> 	d：删除一个分区</span><br><span class="line"> 	t：更改分区类型(82=交换分区)</span><br><span class="line"> 	m：输出菜单</span><br><span class="line"> 	q：退出不保存</span><br><span class="line"> 	w：把分区写进分区表，保存并退出</span><br><span class="line"></span><br><span class="line">Command (m <span class="keyword">for</span> <span class="built_in">help</span>):</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">注：若报错Device or resource busy. The kernel still uses the old table.The new table will be used at the next reboot。则需要重启系统，重新加载硬盘，才能进一步操作。</span><br><span class="line">		</span><br><span class="line">partprobe	强制读取所有分区</span><br><span class="line"></span><br><span class="line">⦁当出现上述情况时，也可不必重启，问题导致原因为内核正在使用分区表，那么我们可以是用partprobe强制读取所有分区达到不需要重启从而解决设备占用的问题。</span><br><span class="line"></span><br><span class="line">命令没有请安装：parted-2.*-*-*.rpm</span><br></pre></td></tr></table></figure>
+<h3 id="◆fdisk-分区实例◆"><a href="#◆fdisk-分区实例◆" class="headerlink" title="◆fdisk 分区实例◆"></a>◆fdisk 分区实例◆</h3><p>1.查看磁盘,查看是否有新的磁盘且没有被格式化的.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ls -l /dev/sd*</span></span><br><span class="line">brw-rw---- 1 root disk 8,  0 Sep 21 07:26 /dev/sda</span><br><span class="line">brw-rw---- 1 root disk 8,  1 Sep 21 07:26 /dev/sda1</span><br><span class="line">brw-rw---- 1 root disk 8,  2 Sep 21 07:26 /dev/sda2</span><br><span class="line">brw-rw---- 1 root disk 8, 16 Sep 21 07:26 /dev/sdb</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># fdisk -l</span></span><br><span class="line"></span><br><span class="line">Disk /dev/sda: 10.7 GB, 10737418240 bytes, 20971520 sectors</span><br><span class="line">Units = sectors of 1 * 512 = 512 bytes</span><br><span class="line">Sector size (logical/physical): 512 bytes / 512 bytes</span><br><span class="line">I/O size (minimum/optimal): 512 bytes / 512 bytes</span><br><span class="line">Disk label <span class="built_in">type</span>: dos</span><br><span class="line">Disk identifier: 0x000cc3ff</span><br><span class="line"></span><br><span class="line">   Device Boot      Start         End      Blocks   Id  System</span><br><span class="line">/dev/sda1   *        2048     2099199     1048576   83  Linux</span><br><span class="line">/dev/sda2         2099200    20971519     9436160   8e  Linux LVM</span><br><span class="line"></span><br><span class="line">↓ 此处就是我们的新磁盘,且没有被格式化</span><br><span class="line"></span><br><span class="line">Disk /dev/sdb: 10.7 GB, 10737418240 bytes, 20971520 sectors</span><br><span class="line">Units = sectors of 1 * 512 = 512 bytes</span><br><span class="line">Sector size (logical/physical): 512 bytes / 512 bytes</span><br><span class="line">I/O size (minimum/optimal): 512 bytes / 512 bytes</span><br></pre></td></tr></table></figure>
+<p>2.输入相应盘符进入分区界面<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># fdisk /dev/sdb</span></span><br><span class="line">Welcome to fdisk (util-linux 2.23.2).</span><br><span class="line"></span><br><span class="line">Changes will remain <span class="keyword">in</span> memory only, until you decide to write them.</span><br><span class="line">Be careful before using the write <span class="built_in">command</span>.</span><br><span class="line"></span><br><span class="line">Device does not contain a recognized partition table</span><br><span class="line">Building a new DOS disklabel with disk identifier 0x5b3d4ae9.</span><br><span class="line"></span><br><span class="line">Command (m <span class="keyword">for</span> <span class="built_in">help</span>):</span><br></pre></td></tr></table></figure></p>
+<p>3.开始分区,下面将逐个解释其分区含义<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># fdisk /dev/sdb                                     #指定要分区的盘符</span></span><br><span class="line">Welcome to fdisk (util-linux 2.23.2).</span><br><span class="line"></span><br><span class="line">Changes will remain <span class="keyword">in</span> memory only, until you decide to write them.</span><br><span class="line">Be careful before using the write <span class="built_in">command</span>.</span><br><span class="line"></span><br><span class="line">Device does not contain a recognized partition table</span><br><span class="line">Building a new DOS disklabel with disk identifier 0x5b3d4ae9.</span><br><span class="line"></span><br><span class="line">Command (m <span class="keyword">for</span> <span class="built_in">help</span>): p                                                <span class="comment">#打印当前分区信息</span></span><br><span class="line"></span><br><span class="line">Disk /dev/sdb: 10.7 GB, 10737418240 bytes, 20971520 sectors</span><br><span class="line">Units = sectors of 1 * 512 = 512 bytes</span><br><span class="line">Sector size (logical/physical): 512 bytes / 512 bytes</span><br><span class="line">I/O size (minimum/optimal): 512 bytes / 512 bytes</span><br><span class="line">Disk label <span class="built_in">type</span>: dos</span><br><span class="line">Disk identifier: 0x5b3d4ae9</span><br><span class="line"></span><br><span class="line">   Device Boot      Start         End      Blocks   Id  System</span><br><span class="line">--------------------------------------------------------------------------------</span><br><span class="line">[划分主分区]</span><br><span class="line"></span><br><span class="line">Command (m <span class="keyword">for</span> <span class="built_in">help</span>): n                                              <span class="comment">#新建一个分区</span></span><br><span class="line">Partition <span class="built_in">type</span>:</span><br><span class="line">   p   primary (0 primary, 0 extended, 4 free)                       <span class="comment">#创建一个主分区</span></span><br><span class="line">   e   extended                                                      <span class="comment">#创建一个逻辑分区</span></span><br><span class="line">Select (default p): p</span><br><span class="line">Partition number (1-4, default 1): 1</span><br><span class="line">First sector (2048-20971519, default 2048): 2048                     <span class="comment">#默认从哪里开始划分</span></span><br><span class="line">Last sector, +sectors or +size&#123;K,M,G&#125; (2048-20971519, default 20971519): +5G   <span class="comment">#指定划分5个GB</span></span><br><span class="line">Partition 1 of <span class="built_in">type</span> Linux and of size 5 GiB is <span class="built_in">set</span></span><br><span class="line"></span><br><span class="line">Command (m <span class="keyword">for</span> <span class="built_in">help</span>): p                                               <span class="comment">#打印分区情况</span></span><br><span class="line"></span><br><span class="line">Disk /dev/sdb: 10.7 GB, 10737418240 bytes, 20971520 sectors</span><br><span class="line">Units = sectors of 1 * 512 = 512 bytes</span><br><span class="line">Sector size (logical/physical): 512 bytes / 512 bytes</span><br><span class="line">I/O size (minimum/optimal): 512 bytes / 512 bytes</span><br><span class="line">Disk label <span class="built_in">type</span>: dos</span><br><span class="line">Disk identifier: 0x5b3d4ae9</span><br><span class="line"></span><br><span class="line">   Device Boot      Start         End      Blocks   Id  System</span><br><span class="line">/dev/sdb1            2048    10487807     5242880   83  Linux        <span class="comment">#此处可看到一个主分区了</span></span><br><span class="line">--------------------------------------------------------------------------------</span><br><span class="line">[划分拓展分区]</span><br><span class="line"></span><br><span class="line">Command (m <span class="keyword">for</span> <span class="built_in">help</span>): n                                              <span class="comment">#继续创建分区</span></span><br><span class="line"></span><br><span class="line">Partition <span class="built_in">type</span>:</span><br><span class="line">   p   primary (1 primary, 0 extended, 3 free)</span><br><span class="line">   e   extended</span><br><span class="line">Select (default p): e                                                <span class="comment">#这次选择创建逻辑分区</span></span><br><span class="line">Partition number (2-4, default 2): 2                                 <span class="comment">#默认从2开始</span></span><br><span class="line">First sector (10487808-20971519, default 10487808): 10487808         <span class="comment">#默认开始无需动</span></span><br><span class="line">Last sector, +sectors or +size&#123;K,M,G&#125; (10487808-20971519, default 20971519):   <span class="comment">#由于是拓展分区,所以这里不能指定大小</span></span><br><span class="line">Using default value 20971519</span><br><span class="line">Partition 2 of <span class="built_in">type</span> Extended and of size 5 GiB is <span class="built_in">set</span></span><br><span class="line"></span><br><span class="line">Command (m <span class="keyword">for</span> <span class="built_in">help</span>): p</span><br><span class="line"></span><br><span class="line">Disk /dev/sdb: 10.7 GB, 10737418240 bytes, 20971520 sectors</span><br><span class="line">Units = sectors of 1 * 512 = 512 bytes</span><br><span class="line">Sector size (logical/physical): 512 bytes / 512 bytes</span><br><span class="line">I/O size (minimum/optimal): 512 bytes / 512 bytes</span><br><span class="line">Disk label <span class="built_in">type</span>: dos</span><br><span class="line">Disk identifier: 0x5b3d4ae9</span><br><span class="line"></span><br><span class="line">   Device Boot      Start         End      Blocks   Id  System</span><br><span class="line">/dev/sdb1            2048    10487807     5242880   83  Linux</span><br><span class="line">/dev/sdb2        10487808    20971519     5241856    5  Extended        <span class="comment">#这里可以看到已经有一个拓展结构了,接下来分区</span></span><br><span class="line">--------------------------------------------------------------------------------</span><br><span class="line">[在拓展分区的基础上划分逻辑分区]</span><br><span class="line"></span><br><span class="line">Command (m <span class="keyword">for</span> <span class="built_in">help</span>): n</span><br><span class="line"></span><br><span class="line">Partition <span class="built_in">type</span>:</span><br><span class="line">   p   primary (1 primary, 1 extended, 2 free)</span><br><span class="line">   l   logical (numbered from 5)                                       <span class="comment">#这里选择l新建逻辑分区</span></span><br><span class="line">Select (default p): l</span><br><span class="line">Adding logical partition 5</span><br><span class="line">First sector (10489856-20971519, default 10489856): 10489856           <span class="comment">#默认开始位置</span></span><br><span class="line">Last sector, +sectors or +size&#123;K,M,G&#125; (10489856-20971519, default 20971519):  <span class="comment">#划分全部空间</span></span><br><span class="line">Using default value 20971519</span><br><span class="line">Partition 5 of <span class="built_in">type</span> Linux and of size 5 GiB is <span class="built_in">set</span></span><br><span class="line"></span><br><span class="line">Command (m <span class="keyword">for</span> <span class="built_in">help</span>): w                                              <span class="comment">#保存分区表并退出</span></span><br><span class="line">The partition table has been altered!</span><br><span class="line"></span><br><span class="line">Calling ioctl() to re-read partition table.</span><br><span class="line">Syncing disks.</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment">#</span></span><br></pre></td></tr></table></figure></p>
+<p>4.接下来使用fdisk -l 可以查看分区情况<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># fdisk -l</span></span><br><span class="line"></span><br><span class="line">Disk /dev/sda: 10.7 GB, 10737418240 bytes, 20971520 sectors            <span class="comment">#这是/dev/sda逻辑磁盘</span></span><br><span class="line">Units = sectors of 1 * 512 = 512 bytes</span><br><span class="line">Sector size (logical/physical): 512 bytes / 512 bytes</span><br><span class="line">I/O size (minimum/optimal): 512 bytes / 512 bytes</span><br><span class="line">Disk label <span class="built_in">type</span>: dos</span><br><span class="line">Disk identifier: 0x000cc3ff</span><br><span class="line"></span><br><span class="line">   Device Boot      Start         End      Blocks   Id  System</span><br><span class="line">/dev/sda1   *        2048     2099199     1048576   83  Linux</span><br><span class="line">/dev/sda2         2099200    20971519     9436160   8e  Linux LVM</span><br><span class="line"></span><br><span class="line">Disk /dev/sdb: 10.7 GB, 10737418240 bytes, 20971520 sectors            <span class="comment">#这是/dev/sdb逻辑磁盘</span></span><br><span class="line">Units = sectors of 1 * 512 = 512 bytes</span><br><span class="line">Sector size (logical/physical): 512 bytes / 512 bytes</span><br><span class="line">I/O size (minimum/optimal): 512 bytes / 512 bytes</span><br><span class="line">Disk label <span class="built_in">type</span>: dos</span><br><span class="line">Disk identifier: 0x5b3d4ae9</span><br><span class="line"></span><br><span class="line">   Device Boot      Start         End      Blocks   Id  System</span><br><span class="line">/dev/sdb1            2048    10487807     5242880   83  Linux          <span class="comment">#这就是刚刚划分的主分区</span></span><br><span class="line">/dev/sdb2        10487808    20971519     5241856    5  Extended       <span class="comment">#这是拓展结构</span></span><br><span class="line">/dev/sdb5        10489856    20971519     5240832   83  Linux          <span class="comment">#这是逻辑分区</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="磁盘分区命令-Parted"><a href="#磁盘分区命令-Parted" class="headerlink" title="磁盘分区命令-Parted"></a>磁盘分区命令-Parted</h2><p>parted命令是由GNU组织开发的一款功能强大的磁盘分区和分区大小调整工具,与fdisk不同它支持调整分区的大小,作为一种设计用于Linux的工具,它没有构建成处理与fdisk关联的多种分区类型,但是它可以处理最常见的分区格式,包括：ext2、ext3、fat16、fat32、NTFS、ReiserFS、JFS、XFS、UFS、HFS以及Linux交换分区.</p>
+<blockquote>
+<p>既然有fdisk为啥还出个parted分区呢?</p>
+<blockquote>
+<p>1.parted命令可以划分单个分区大于2T的GPT格式的分区,也可以划分普通的MBR分区,fdisk命令对于大于2T的分区无法划分.<br>2.大于2.2TB的存储空间用fdisk不支持,需要采用parted来分区,所以用fdisk无法看到parted划分的GPT格式的分区.</p>
+</blockquote>
+</blockquote>
+<h3 id="◆parted常用参数◆"><a href="#◆parted常用参数◆" class="headerlink" title="◆parted常用参数◆"></a>◆parted常用参数◆</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># parted</span></span><br><span class="line">GNU Parted 3.1</span><br><span class="line">Using /dev/sda</span><br><span class="line">Welcome to GNU Parted! Type <span class="string">'help'</span> to view a list of commands.</span><br><span class="line">(parted) <span class="built_in">help</span></span><br><span class="line">  align-check TYPE N                       check partition N <span class="keyword">for</span> TYPE(min|opt) alignment</span><br><span class="line">  <span class="built_in">help</span> [COMMAND]                           <span class="built_in">print</span> general <span class="built_in">help</span>, or <span class="built_in">help</span> on COMMAND</span><br><span class="line">  mklabel,mktable LABEL-TYPE               创建新的磁盘卷标(分区表)</span><br><span class="line">  mkpart PART-TYPE [FS-TYPE] START END     创建一个分区</span><br><span class="line">  name NUMBER NAME                         name partition NUMBER as NAME</span><br><span class="line">  <span class="built_in">print</span> [devices|free|list,all|NUMBER]     打印当前分区信息</span><br><span class="line"></span><br><span class="line">  quit                                     <span class="built_in">exit</span> program</span><br><span class="line">  rescue START END                         rescue a lost partition near START and END</span><br><span class="line"></span><br><span class="line">  resizepart NUMBER END                    resize partition NUMBER</span><br><span class="line">  rm NUMBER                                删除一个分区</span><br><span class="line">  select DEVICE                            选择需要编辑的设备</span><br><span class="line">  disk_set FLAG STATE                      change the FLAG on selected device</span><br><span class="line">  disk_toggle [FLAG]                       toggle the state of FLAG on selected device</span><br><span class="line">  <span class="built_in">set</span> NUMBER FLAG STATE                    change the FLAG on partition NUMBER</span><br><span class="line">  toggle [NUMBER [FLAG]]                   切换分区表状态</span><br><span class="line">  unit UNIT                                <span class="built_in">set</span> the default unit to UNIT</span><br><span class="line">  version                                  display the version number and copyright information of GNU Parted</span><br><span class="line">(parted)</span><br></pre></td></tr></table></figure>
+<h3 id="◆parted-分区实例◆"><a href="#◆parted-分区实例◆" class="headerlink" title="◆parted 分区实例◆"></a>◆parted 分区实例◆</h3><p>1.磁盘参数解释<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">--------------------------------------------------------------------------------</span><br><span class="line">[root@localhost ~]<span class="comment"># parted /dev/sdb</span></span><br><span class="line">GNU Parted 3.1</span><br><span class="line">Using /dev/sdb</span><br><span class="line">Welcome to GNU Parted! Type <span class="string">'help'</span> to view a list of commands.</span><br><span class="line">(parted) <span class="built_in">print</span></span><br><span class="line"></span><br><span class="line">                          ↓ 磁盘参数</span><br><span class="line">Model: VMware, VMware Virtual S (scsi)</span><br><span class="line"></span><br><span class="line">                 ↓ 磁盘大小</span><br><span class="line">Disk /dev/sdb: 10.7GB</span><br><span class="line">                                ↓ 扇区大小</span><br><span class="line">Sector size (logical/physical): 512B/512B</span><br><span class="line"></span><br><span class="line">Partition Table: msdos  ← 分区表格式</span><br><span class="line">Disk Flags:</span><br><span class="line"></span><br><span class="line">   1     2     3    4     5       6            7       </span><br><span class="line">Number  Start  End  Size  Type  File system  Flags</span><br><span class="line"></span><br><span class="line">(parted)</span><br><span class="line"></span><br><span class="line">1.Number：分区号</span><br><span class="line">2.Start：分区起始位置，这里不再像fdisk用柱面表示，而是使用byte更加直观</span><br><span class="line">3.End：分区结束位置</span><br><span class="line">4.Size：分区大小</span><br><span class="line">5.Type：分区类型</span><br><span class="line">6.FileSystem：文件系统类型,parted不支持格式化成ext4,但能识别</span><br><span class="line">7.标志（flags）：分区标记</span><br><span class="line"></span><br><span class="line">--------------------------------------------------------------------------------</span><br></pre></td></tr></table></figure></p>
+<p>2.将分区表格式修改成GPT<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">(parted) p</span><br><span class="line">Model: VMware, VMware Virtual S (scsi)</span><br><span class="line">Disk /dev/sdb: 10.7GB</span><br><span class="line">Sector size (logical/physical): 512B/512B</span><br><span class="line">Partition Table: msdos</span><br><span class="line">Disk Flags:</span><br><span class="line"></span><br><span class="line">Number  Start  End  Size  Type  File system  Flags</span><br><span class="line"></span><br><span class="line">(parted) mklabel msdos    <span class="comment">#原格式是mbr</span></span><br><span class="line"></span><br><span class="line">Warning: The existing disk label on /dev/sdb will be destroyed and all data on this disk will be</span><br><span class="line">lost. Do you want to <span class="built_in">continue</span>?</span><br><span class="line"></span><br><span class="line">Yes/No? Yes</span><br><span class="line"></span><br><span class="line">(parted) p</span><br><span class="line"></span><br><span class="line">Model: VMware, VMware Virtual S (scsi)</span><br><span class="line">Disk /dev/sdb: 10.7GB</span><br><span class="line">Sector size (logical/physical): 512B/512B</span><br><span class="line">Partition Table: gpt    <span class="comment">#新格式是gpe</span></span><br><span class="line">Disk Flags:</span><br><span class="line"></span><br><span class="line">Number  Start  End  Size  File system  Name  Flags</span><br><span class="line"></span><br><span class="line">(parted)</span><br></pre></td></tr></table></figure></p>
+<p>3.创建一个分区<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">(parted) p</span><br><span class="line">Model: VMware, VMware Virtual S (scsi)</span><br><span class="line">Disk /dev/sdb: 10.7GB</span><br><span class="line">Sector size (logical/physical): 512B/512B</span><br><span class="line">Partition Table: gpt</span><br><span class="line">Disk Flags:</span><br><span class="line"></span><br><span class="line">Number  Start  End  Size  File system  Name  Flags</span><br><span class="line"></span><br><span class="line">(parted) mkpart                        <span class="comment">#创建分区</span></span><br><span class="line">Partition name?  []? disk1             <span class="comment">#分区名</span></span><br><span class="line">File system <span class="built_in">type</span>?  [ext2]? ext2        <span class="comment">#分区格式,parted只能创建ext2,这里我们出去格式化吧</span></span><br><span class="line">Start? 1MB                             <span class="comment">#磁盘开始位置</span></span><br><span class="line">End? 2000MB                            <span class="comment">#磁盘结束为止</span></span><br><span class="line">(parted) <span class="built_in">print</span></span><br><span class="line">Model: VMware, VMware Virtual S (scsi)</span><br><span class="line">Disk /dev/sdb: 10.7GB</span><br><span class="line">Sector size (logical/physical): 512B/512B</span><br><span class="line">Partition Table: gpt</span><br><span class="line">Disk Flags:</span><br><span class="line"></span><br><span class="line">Number  Start   End     Size    File system  Name   Flags</span><br><span class="line"> 1      1049kB  2000MB  1999MB  ext2         disk1            <span class="comment">#此处已创建完成</span></span><br><span class="line"></span><br><span class="line">(parted) q</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="磁盘分区命令-Swap"><a href="#磁盘分区命令-Swap" class="headerlink" title="磁盘分区命令-Swap"></a>磁盘分区命令-Swap</h2><p>swap命令用于创建交换空间（包括交换文件和交换分区）</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># free -h</span></span><br><span class="line">              total        used        free      shared  buff/cache   available</span><br><span class="line">Mem:           218M        112M         22M        5.1M         82M         69M</span><br><span class="line">Swap:          1.0G        520K        1.0G</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># dd if=/dev/zero of=/tmp/swap bs=1024 count=100000</span></span><br><span class="line">100000+0 records <span class="keyword">in</span></span><br><span class="line">100000+0 records out</span><br><span class="line">102400000 bytes (102 MB) copied, 2.6988 s, 37.9 MB/s</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># mkswap /tmp/swap</span></span><br><span class="line">Setting up swapspace version 1, size = 99996 KiB</span><br><span class="line">no label, UUID=7d7f22ed-466e-4205-8efe-1b6184dc5e1b</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># swapon /tmp/swap</span></span><br><span class="line">swapon: /tmp/swap: insecure permissions 0644, 0600 suggested.</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># free -h</span></span><br><span class="line">              total        used        free      shared  buff/cache   available</span><br><span class="line">Mem:           218M        109M        3.2M        2.8M        105M         75M</span><br><span class="line">Swap:          1.1G        2.8M        1.1G</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># cat /etc/fstab</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># /etc/fstab</span></span><br><span class="line"><span class="comment"># Created by anaconda on Tue Sep 18 09:05:06 2018</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># Accessible filesystems, by reference, are maintained under '/dev/disk'</span></span><br><span class="line"><span class="comment"># See man pages fstab(5), findfs(8), mount(8) and/or blkid(8) for more info</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line">/dev/mapper/centos-root /                       xfs     defaults        0 0</span><br><span class="line">UUID=13d5ccc2-52db-4aec-963a-f88e8edcf01c /boot                   xfs     defaults        0 0</span><br><span class="line">/dev/mapper/centos-swap swap                    swap    defaults        0 0</span><br><span class="line"></span><br><span class="line">UUID=7d7f22ed-466e-4205-8efe-1b6184dc5e1b swap swap defaults 0 0</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># swapoff /tmp/swap</span></span><br><span class="line">[root@localhost ~]<span class="comment"># free -h</span></span><br><span class="line">              total        used        free      shared  buff/cache   available</span><br><span class="line">Mem:           218M        109M        5.5M        2.8M        103M         75M</span><br><span class="line">Swap:          1.0G        2.7M        1.0G</span><br></pre></td></tr></table></figure>
+<p><br></p>
+<h2 id="磁盘的挂载与自动挂载"><a href="#磁盘的挂载与自动挂载" class="headerlink" title="磁盘的挂载与自动挂载"></a>磁盘的挂载与自动挂载</h2><h3 id="◆格式化与挂载◆"><a href="#◆格式化与挂载◆" class="headerlink" title="◆格式化与挂载◆"></a>◆格式化与挂载◆</h3><p>1.首先格式化一个磁盘.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ll /dev/sd*</span></span><br><span class="line">brw-rw---- 1 root disk 8,  0 Sep 21 07:26 /dev/sda</span><br><span class="line">brw-rw---- 1 root disk 8,  1 Sep 21 07:26 /dev/sda1</span><br><span class="line">brw-rw---- 1 root disk 8,  2 Sep 21 07:26 /dev/sda2</span><br><span class="line">brw-rw---- 1 root disk 8, 16 Sep 21 07:50 /dev/sdb</span><br><span class="line">brw-rw---- 1 root disk 8, 17 Sep 21 07:50 /dev/sdb1</span><br><span class="line">brw-rw---- 1 root disk 8, 18 Sep 21 07:50 /dev/sdb2</span><br><span class="line">brw-rw---- 1 root disk 8, 21 Sep 21 07:50 /dev/sdb5</span><br><span class="line">[root@localhost ~]<span class="comment">#</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># mkfs -t ext4 /dev/sdb1           #格式化一个磁盘</span></span><br><span class="line">mke2fs 1.42.9 (28-Dec-2013)</span><br><span class="line">Filesystem label=</span><br><span class="line">OS <span class="built_in">type</span>: Linux</span><br><span class="line">Block size=4096 (<span class="built_in">log</span>=2)</span><br><span class="line">Fragment size=4096 (<span class="built_in">log</span>=2)</span><br><span class="line">Stride=0 blocks, Stripe width=0 blocks</span><br><span class="line">327680 inodes, 1310720 blocks</span><br><span class="line">65536 blocks (5.00%) reserved <span class="keyword">for</span> the super user</span><br><span class="line">First data block=0</span><br><span class="line">Maximum filesystem blocks=1342177280</span><br><span class="line">40 block groups</span><br><span class="line">32768 blocks per group, 32768 fragments per group</span><br><span class="line">8192 inodes per group</span><br><span class="line">Superblock backups stored on blocks:</span><br><span class="line">        32768, 98304, 163840, 229376, 294912, 819200, 884736</span><br><span class="line"></span><br><span class="line">Allocating group tables: <span class="keyword">done</span></span><br><span class="line">Writing inode tables: <span class="keyword">done</span></span><br><span class="line">Creating journal (32768 blocks): <span class="keyword">done</span></span><br><span class="line">Writing superblocks and filesystem accounting information: <span class="keyword">done</span></span><br></pre></td></tr></table></figure></p>
+<p>2.接着挂载这个磁盘<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mkdir /sdb1                      #创建挂载点</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># mount -t ext4 /dev/sdb1 /sdb1/   #将磁盘挂载</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># df -h</span></span><br><span class="line"></span><br><span class="line">Filesystem               Size  Used Avail Use% Mounted on</span><br><span class="line">/dev/mapper/centos-root  8.0G  1.3G  6.8G  16% /</span><br><span class="line">devtmpfs                  98M     0   98M   0% /dev</span><br><span class="line">/dev/sda1               1014M  130M  885M  13% /boot</span><br><span class="line">/dev/sdb1                4.8G   20M  4.6G   1% /sdb1      <span class="comment">#这个就是我们的磁盘</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="◆分区的自动挂载◆"><a href="#◆分区的自动挂载◆" class="headerlink" title="◆分区的自动挂载◆"></a>◆分区的自动挂载◆</h3><p>1.首先我们要查看指定磁盘的UUID号<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ls -l /dev/disk/by-uuid/</span></span><br><span class="line">total 0</span><br><span class="line">lrwxrwxrwx 1 root root 10 Sep 21 07:26 13d5ccc2-52db-4aec-963a-f88e8edcf01c -&gt; ../../sda1</span><br><span class="line">lrwxrwxrwx 1 root root  9 Sep 21 07:26 2018-05-03-20-55-23-00 -&gt; ../../sr0</span><br><span class="line">lrwxrwxrwx 1 root root 10 Sep 21 07:56 3439c4dd-d074-4900-a507-126e41b55e26 -&gt; ../../sdb1      <span class="comment">#此处就是我们sdb1的UUID</span></span><br><span class="line">lrwxrwxrwx 1 root root 10 Sep 21 07:26 4604dcf2-da39-455a-9719-e7c5833e566c -&gt; ../../dm-0</span><br><span class="line">lrwxrwxrwx 1 root root 10 Sep 21 07:26 f6a4b420-aa6a-4e66-bbb3-c8e8280a099f -&gt; ../../dm-1</span><br></pre></td></tr></table></figure></p>
+<p>2.打开/etc/fstab写入以下内容实现效果,这里千万别写错<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cat /etc/fstab</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># /etc/fstab</span></span><br><span class="line"><span class="comment"># Created by anaconda on Tue Sep 18 09:05:06 2018</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># Accessible filesystems, by reference, are maintained under '/dev/disk'</span></span><br><span class="line"><span class="comment"># See man pages fstab(5), findfs(8), mount(8) and/or blkid(8) for more info</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line">/dev/mapper/centos-root /                       xfs     defaults        0 0</span><br><span class="line">UUID=13d5ccc2-52db-4aec-963a-f88e8edcf01c /boot                   xfs     defaults        0 0</span><br><span class="line">/dev/mapper/centos-swap swap                    swap    defaults        0 0</span><br><span class="line"></span><br><span class="line">UUID=3439c4dd-d074-4900-a507-126e41b55e26 /sdb1  ext4   defaults 0 0</span><br><span class="line"></span><br><span class="line">--------------------------------------------------------------------------------</span><br><span class="line">[说明]</span><br><span class="line"></span><br><span class="line">1.设备文件名（UUID）</span><br><span class="line">2.挂载点</span><br><span class="line">3.文件系统类型</span><br><span class="line">4.挂载特殊选项</span><br><span class="line">5.是否备份： 0不备份 1每天备份 2不定期备份</span><br><span class="line">6.是否检查磁盘状态： 0不检查 1启动时检查 2启动后检查</span><br></pre></td></tr></table></figure></p>
+<p>3.最后使用mount -a 测试是否能挂载上<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mount -a</span></span><br><span class="line">[root@localhost ~]<span class="comment">#</span></span><br><span class="line">[root@localhost ~]<span class="comment"># df -h</span></span><br><span class="line">Filesystem               Size  Used Avail Use% Mounted on</span><br><span class="line">/dev/mapper/centos-root  8.0G  1.3G  6.8G  16% /</span><br><span class="line">devtmpfs                  98M     0   98M   0% /dev</span><br><span class="line">tmpfs                    110M     0  110M   0% /dev/shm</span><br><span class="line">tmpfs                    110M  5.5M  104M   5% /run</span><br><span class="line">tmpfs                    110M     0  110M   0% /sys/fs/cgroup</span><br><span class="line">/dev/sda1               1014M  130M  885M  13% /boot</span><br><span class="line">tmpfs                     22M     0   22M   0% /run/user/0</span><br><span class="line">/dev/sdb1                4.8G   20M  4.6G   1% /sdb1             <span class="comment">#能说明成功</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/11/18/Linux 系统管理/Linux系统磁盘与分区管理-7/">Linux系统磁盘与分区管理(7)</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年11月18日 - 10:11</p>
+  <p><span>最后更新:</span>2019年04月16日 - 20:04</p>
+  <p><span>原始链接:</span><a href="/2018/11/18/Linux 系统管理/Linux系统磁盘与分区管理-7/" title="Linux系统磁盘与分区管理(7)">https://www.mkdirs.com/2018/11/18/Linux 系统管理/Linux系统磁盘与分区管理-7/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux-系统管理/" rel="tag"> <i class="fa fa-tag"></i> Linux 系统管理</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/17/Linux 系统管理/Linux系统文件权限管理-6/" rel="next" title="Linux系统文件权限管理(6)">
+                <i class="fa fa-chevron-left"></i> Linux系统文件权限管理(6)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/11/18/Linux 系统管理/Linux高级文件系统管理-8/" rel="prev" title="Linux高级文件系统管理(8)">
+                Linux高级文件系统管理(8) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#磁盘管理命令"><span class="nav-text">磁盘管理命令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆dumpe2fs-查询磁盘参数◆"><span class="nav-text">◆dumpe2fs 查询磁盘参数◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆df-查询磁盘信息◆"><span class="nav-text">◆df 查询磁盘信息◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆du-统计文件大小◆"><span class="nav-text">◆du 统计文件大小◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆lsblk-查所有可用设备◆"><span class="nav-text">◆lsblk 查所有可用设备◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆e2label-设置卷标名◆"><span class="nav-text">◆e2label 设置卷标名◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆fsck-检查修复文件系统◆"><span class="nav-text">◆fsck 检查修复文件系统◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆mkfs-格式化◆"><span class="nav-text">◆mkfs 格式化◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆mount-umount-挂载与卸载磁盘◆"><span class="nav-text">◆mount/umount 挂载与卸载磁盘◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#磁盘分区命令-Fdisk"><span class="nav-text">磁盘分区命令-Fdisk</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆命令参数解释◆"><span class="nav-text">◆命令参数解释◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆fdisk-分区实例◆"><span class="nav-text">◆fdisk 分区实例◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#磁盘分区命令-Parted"><span class="nav-text">磁盘分区命令-Parted</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆parted常用参数◆"><span class="nav-text">◆parted常用参数◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆parted-分区实例◆"><span class="nav-text">◆parted 分区实例◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#磁盘分区命令-Swap"><span class="nav-text">磁盘分区命令-Swap</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#磁盘的挂载与自动挂载"><span class="nav-text">磁盘的挂载与自动挂载</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆格式化与挂载◆"><span class="nav-text">◆格式化与挂载◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆分区的自动挂载◆"><span class="nav-text">◆分区的自动挂载◆</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

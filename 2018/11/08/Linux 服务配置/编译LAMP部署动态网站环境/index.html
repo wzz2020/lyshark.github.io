@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="LAMP动态网站部署架构是由一套 Linux+Apache+MySQL+PHP 组成的动态网站系统解决方案.以下配置环境为：Linux=RHEL7 –&amp;gt; Apache=2.4.33 –&amp;gt; MySQL=5.5 –&amp;gt; PHP=7.0 无错误版.">
+<meta name="keywords" content="Linux 服务配置">
+<meta property="og:type" content="article">
+<meta property="og:title" content="编译LAMP部署动态网站环境">
+<meta property="og:url" content="https://www.mkdirs.com/2018/11/08/Linux 服务配置/编译LAMP部署动态网站环境/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="LAMP动态网站部署架构是由一套 Linux+Apache+MySQL+PHP 组成的动态网站系统解决方案.以下配置环境为：Linux=RHEL7 –&amp;gt; Apache=2.4.33 –&amp;gt; MySQL=5.5 –&amp;gt; PHP=7.0 无错误版.">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-04-16T12:38:27.515Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="编译LAMP部署动态网站环境">
+<meta name="twitter:description" content="LAMP动态网站部署架构是由一套 Linux+Apache+MySQL+PHP 组成的动态网站系统解决方案.以下配置环境为：Linux=RHEL7 –&amp;gt; Apache=2.4.33 –&amp;gt; MySQL=5.5 –&amp;gt; PHP=7.0 无错误版.">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/11/08/Linux 服务配置/编译LAMP部署动态网站环境/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>编译LAMP部署动态网站环境 | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/11/08/Linux 服务配置/编译LAMP部署动态网站环境/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">编译LAMP部署动态网站环境
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-11-08 19:08:41" itemprop="dateCreated datePublished" datetime="2018-11-08T19:08:41+08:00">2018-11-08</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-16 20:38:27" itemprop="dateModified" datetime="2019-04-16T20:38:27+08:00">2019-04-16</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Linux-服务配置/" itemprop="url" rel="index"><span itemprop="name">Linux 服务配置</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>LAMP动态网站部署架构是由一套 Linux+Apache+MySQL+PHP 组成的动态网站系统解决方案.<br>以下配置环境为：Linux=RHEL7 –&gt; Apache=2.4.33 –&gt; MySQL=5.5 –&gt; PHP=7.0 无错误版.</p>
+<a id="more"></a>
+<p><br></p>
+<h2 id="安装准备环境"><a href="#安装准备环境" class="headerlink" title="安装准备环境"></a>安装准备环境</h2><h3 id="◆安装gcc◆"><a href="#◆安装gcc◆" class="headerlink" title="◆安装gcc◆"></a>◆安装gcc◆</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo</span><br><span class="line"></span><br><span class="line">yum -y install epel-release</span><br><span class="line"></span><br><span class="line">yum -y install gcc gcc-c++</span><br></pre></td></tr></table></figure>
+<h3 id="◆安装libxml2◆"><a href="#◆安装libxml2◆" class="headerlink" title="◆安装libxml2◆"></a>◆安装libxml2◆</h3><p>Libxml2 是一个xml c语言版的解析器，本来是为Gnome项目开发的工具，是一个基于MIT License的免费开源软件。<br>它除了支持c语言版以外，还支持c++、PHP、Pascal、Ruby、Tcl等语言的绑定，能在Windows、Linux、Solaris、MacOsX等平台上运行。<br>功能还是相当强大的，相信满足一般用户需求没有任何问题。</p>
+<p>libxml是一个用来解析XML文档的函数库。它用C语言写成, 并且能为多种语言所调用，例如C语言，C++，XSH。<br>C#, Python，Kylix/Delphi，Ruby，和PHP等。<br>Perl中也可以使用XML::LibXML模块。它最初是为GNOME开发的项目，但现在可以用在各种各样的方面。<br>libXML 代码可移植性非常好，因为它基于标准的ANSI C库, 并采用MIT许可证。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">yum -y install libxml2-devel python-devel</span><br><span class="line"></span><br><span class="line">wget ftp://xmlsoft.org/libxml2/libxml2-2.9.1.tar.gz</span><br><span class="line"></span><br><span class="line">tar -xzvf libxml2-2.9.1.tar.gz</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span>  libxml2-2.9.1/</span><br><span class="line"></span><br><span class="line">./configure --prefix=/usr/<span class="built_in">local</span>/libxml2/</span><br><span class="line"></span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+<h3 id="◆安装libmcrypt◆"><a href="#◆安装libmcrypt◆" class="headerlink" title="◆安装libmcrypt◆"></a>◆安装libmcrypt◆</h3><p>libmcrypt是加密算法扩展库。支持DES, 3DES, RIJNDAEL, Twofish, IDEA, GOST, CAST-256, ARCFOUR, SERPENT, SAFER+等算法。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">wget https://sourceforge.net/projects/mcrypt/files/Libmcrypt/2.5.8/libmcrypt-2.5.8.tar.gz</span><br><span class="line"></span><br><span class="line">tar -xzvf libmcrypt-2.5.8.tar.gz</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span>  libmcrypt-2.5.8/</span><br><span class="line"></span><br><span class="line">./configure --prefix=/usr/<span class="built_in">local</span>/libmcrypt/</span><br><span class="line"></span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+<h3 id="◆安装libtdl也在libmcrypt包中◆"><a href="#◆安装libtdl也在libmcrypt包中◆" class="headerlink" title="◆安装libtdl也在libmcrypt包中◆"></a>◆安装libtdl也在libmcrypt包中◆</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cd</span>  libmcrypt-2.5.8/libltdl/</span><br><span class="line"></span><br><span class="line">./configure --<span class="built_in">enable</span>-ltdl-install</span><br><span class="line"></span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+<h3 id="◆安装mhash◆"><a href="#◆安装mhash◆" class="headerlink" title="◆安装mhash◆"></a>◆安装mhash◆</h3><p>Mhash是基于离散数学原理的不可逆向的php加密方式扩展库，其在默认情况下不开启。<br>mhash的可以用于创建校验数值，消息摘要，消息认证码，以及无需原文的关键信息保存（如密码）等。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">wget https://sourceforge.net/projects/mhash/files/mhash/0.9.9.9/mhash-0.9.9.9.tar.gz</span><br><span class="line"></span><br><span class="line">tar -xzvf mhash-0.9.9.9.tar.gz</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span>  mhash-0.9.9.9/</span><br><span class="line"></span><br><span class="line">./configure</span><br><span class="line"></span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+<h3 id="◆安装mcrypt◆"><a href="#◆安装mcrypt◆" class="headerlink" title="◆安装mcrypt◆"></a>◆安装mcrypt◆</h3><p>mcrypt 是 php 里面重要的加密支持扩展库。Mcrypt库支持20多种加密算法和8种加密模式。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">wget https://sourceforge.net/projects/mcrypt/files/MCrypt/2.6.8/mcrypt-2.6.8.tar.gz</span><br><span class="line"></span><br><span class="line">tar -xzvf mcrypt-2.6.8.tar.gz</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span>  mcrypt-2.6.8/</span><br><span class="line"></span><br><span class="line">LD_LIBRARY_PATH=/usr/<span class="built_in">local</span>/libmcrypt/lib:/usr/<span class="built_in">local</span>/lib \</span><br><span class="line">./configure --with-libmcrypt-prefix=/usr/<span class="built_in">local</span>/libmcrypt</span><br><span class="line"></span><br><span class="line"><span class="comment">#以上↑为一条命令。LD_LIBRARY_PATH用于指定libmcrypt和mhash的库的位置。</span></span><br><span class="line">--with-libmcrypt-prefix用于指定libmcrypt软件位置</span><br><span class="line"></span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+<h3 id="◆安装zlib库◆"><a href="#◆安装zlib库◆" class="headerlink" title="◆安装zlib库◆"></a>◆安装zlib库◆</h3><p>zlib是提供数据压缩用的函式库，由Jean-loup Gailly与Mark Adler所开发，初版0.9版在1995年5月1日发表。<br>zlib使用DEFLATE算法，最初是为libpng函式库所写的，后来普遍为许多软件所使用。此函式库为自由软件，使用zlib授权。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">wget http://www.zlib.net/zlib-1.2.11.tar.gz</span><br><span class="line"></span><br><span class="line">tar -xzvf zlib-1.2.11.tar.gz</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span>  zlib-1.2.11/</span><br><span class="line"></span><br><span class="line">./configure</span><br><span class="line"></span><br><span class="line">sed -i <span class="string">"s/CFLAGS=-O3 -DUSE_MMAP/CFLAGS=-O3 -DUSE_MMAP -fPIC/g"</span> Makefile</span><br><span class="line"></span><br><span class="line"><span class="comment">#vim Makefile</span></span><br><span class="line"><span class="comment">#找到CFLAGS=-O3 -DUSE_MMAP</span></span><br><span class="line"><span class="comment">#在后面加入 –fPIC 变成 </span></span><br><span class="line"><span class="comment">#CFLAGS=-O3 –DUSE_MMAP –fPIC</span></span><br><span class="line"></span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+<h3 id="◆安装libpng◆"><a href="#◆安装libpng◆" class="headerlink" title="◆安装libpng◆"></a>◆安装libpng◆</h3><p>libpng 软件包包含 libpng 库.这些库被其他程式用于解码png图片。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">wget https://sourceforge.net/projects/libpng/files/libpng16/older-releases/1.6.21/libpng-1.6.21.tar.gz</span><br><span class="line"></span><br><span class="line">tar -xzvf libpng-1.6.21.tar.gz</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span>  libpng-1.6.21/</span><br><span class="line"></span><br><span class="line">./configure --prefix=/usr/<span class="built_in">local</span>/libpng</span><br><span class="line"></span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+<h3 id="◆安装jpeg9◆"><a href="#◆安装jpeg9◆" class="headerlink" title="◆安装jpeg9◆"></a>◆安装jpeg9◆</h3><p>用于解码.jpg和.jpeg图片。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">yum -y install libtool*</span><br><span class="line"></span><br><span class="line">wget http://www.ijg.org/files/jpegsrc.v9c.tar.gz</span><br><span class="line"></span><br><span class="line">tar -xzvf jpegsrc.v9c.tar.gz</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span>  jpeg-9c/</span><br><span class="line"></span><br><span class="line">cp -a /usr/share/libtool/config/config.sub .</span><br><span class="line">cp -a /usr/share/libtool/config/config.guess .</span><br><span class="line"></span><br><span class="line">./configure --prefix=/usr/<span class="built_in">local</span>/jpeg6/ --<span class="built_in">enable</span>-shared --<span class="built_in">enable</span>-static</span><br><span class="line"></span><br><span class="line">* --<span class="built_in">enable</span>-shared与--<span class="built_in">enable</span>-static参数分别为建立共享库和静态库使用的libtool</span><br><span class="line"></span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+<h3 id="◆安装freetype◆"><a href="#◆安装freetype◆" class="headerlink" title="◆安装freetype◆"></a>◆安装freetype◆</h3><p>FreeType库是一个完全免费(开源)的、高质量的且可移植的字体引擎，它提供统一的接口来访问多种字体格式文件。<br>包括TrueType, OpenType, Type1, CID, CFF, Windows FON/FNT, X11 PCF等。支持单色位图、反走样位图的渲染。<br>FreeType库是高度模块化的程序库，虽然它是使用ANSI C开发，但是采用面向对象的思想，因此，FreeType的用户可以灵活地对它进行裁剪。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">wget https://download.savannah.gnu.org/releases/freetype/freetype-old/freetype-2.3.5.tar.gz</span><br><span class="line"></span><br><span class="line">tar -xzvf freetype-2.3.5.tar.gz</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span>  freetype-2.3.5/</span><br><span class="line"></span><br><span class="line">./configure --prefix=/usr/<span class="built_in">local</span>/freetype/</span><br><span class="line"></span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+<p><br></p>
+<h2 id="安装Apache服务"><a href="#安装Apache服务" class="headerlink" title="安装Apache服务"></a>安装Apache服务</h2><h3 id="◆安装Pcre◆"><a href="#◆安装Pcre◆" class="headerlink" title="◆安装Pcre◆"></a>◆安装Pcre◆</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">yum install -y openssl-devel</span><br><span class="line"></span><br><span class="line">wget ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.42.tar.gz</span><br><span class="line"></span><br><span class="line">tar -xzvf pcre-8.42.tar.gz</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span>  pcre-8.42/</span><br><span class="line"></span><br><span class="line">./configure</span><br><span class="line"></span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+<h3 id="◆安装Apr◆"><a href="#◆安装Apr◆" class="headerlink" title="◆安装Apr◆"></a>◆安装Apr◆</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">wget http://www-eu.apache.org/dist//apr/apr-1.6.3.tar.gz</span><br><span class="line"></span><br><span class="line">tar -xzvf apr-1.6.3.tar.gz</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> apr-1.6.3/</span><br><span class="line"></span><br><span class="line">CC=<span class="string">"gcc -m64"</span> ./configure --prefix=/usr/<span class="built_in">local</span>/apr</span><br><span class="line"></span><br><span class="line">./configure --prefix=/usr/<span class="built_in">local</span>/apr</span><br><span class="line"></span><br><span class="line">make &amp;&amp; make install</span><br><span class="line"></span><br><span class="line">注意：APR 1.6.3版本有变更,进行了加密设置,进行编译时需要使用cc命令解密</span><br><span class="line">否则在安装Apache是无法调用该库文件</span><br></pre></td></tr></table></figure>
+<h3 id="◆安装Apr-util◆"><a href="#◆安装Apr-util◆" class="headerlink" title="◆安装Apr-util◆"></a>◆安装Apr-util◆</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">yum install -y expat-devel</span><br><span class="line"></span><br><span class="line">wget http://www-eu.apache.org/dist//apr/apr-util-1.6.1.tar.gz</span><br><span class="line"></span><br><span class="line">tar -xzvf apr-util-1.6.1.tar.gz</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> apr-util-1.6.1/</span><br><span class="line"></span><br><span class="line">./configure --prefix=/usr/<span class="built_in">local</span>/apr-util \</span><br><span class="line">--with-apr=/usr/<span class="built_in">local</span>/apr</span><br><span class="line"></span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+<h3 id="◆安装Apache◆"><a href="#◆安装Apache◆" class="headerlink" title="◆安装Apache◆"></a>◆安装Apache◆</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">wget http://www-eu.apache.org/dist//httpd/httpd-2.4.33.tar.gz</span><br><span class="line"></span><br><span class="line">tar -xzvf httpd-2.4.33.tar.gz</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> httpd-2.4.33/</span><br><span class="line"></span><br><span class="line">./configure --prefix=/usr/<span class="built_in">local</span>/apache2 \</span><br><span class="line">--<span class="built_in">enable</span>-rewrite \</span><br><span class="line">--<span class="built_in">enable</span>-so \</span><br><span class="line">--<span class="built_in">enable</span>-headers \</span><br><span class="line">--<span class="built_in">enable</span>-expires \</span><br><span class="line">--with-mpm=worker \</span><br><span class="line">--<span class="built_in">enable</span>-modules=most \</span><br><span class="line">--<span class="built_in">enable</span>-deflate \</span><br><span class="line">--<span class="built_in">enable</span>-ssl \</span><br><span class="line">--with-apr=/usr/<span class="built_in">local</span>/apr \</span><br><span class="line">--with-apr-util=/usr/<span class="built_in">local</span>/apr-util \</span><br><span class="line">--with-pcre=/usr/<span class="built_in">local</span>/pcre</span><br><span class="line"></span><br><span class="line">make &amp;&amp; make install</span><br><span class="line"></span><br><span class="line">/usr/<span class="built_in">local</span>/apache2/bin/apachectl start</span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"/usr/local/apache2/bin/apachectl start"</span> &gt;&gt; /etc/rc.d/rc.local</span><br><span class="line"></span><br><span class="line">netstat -antp |grep 80 &amp;&gt;/dev/null &amp;&amp; <span class="built_in">echo</span> <span class="string">"ckeck ok"</span> || <span class="built_in">echo</span> <span class="string">"no running"</span></span><br></pre></td></tr></table></figure>
+<p><br></p>
+<h2 id="安装MySQL和相关依赖"><a href="#安装MySQL和相关依赖" class="headerlink" title="安装MySQL和相关依赖"></a>安装MySQL和相关依赖</h2><h3 id="◆安装ncurses◆"><a href="#◆安装ncurses◆" class="headerlink" title="◆安装ncurses◆"></a>◆安装ncurses◆</h3><p>Ncurses 提供字符终端处理库，包括面板和菜单。它提供了一套控制光标，建立窗口，改变前景背景颜色以及处理鼠标操作的函数。<br>使用户在字符终端下编写应用程序时绕过了那些恼人的底层机制。简而言之，他是一个可以使应用程序直接控制终端屏幕显示的函数库。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">yum install -y ncurses-devel</span><br><span class="line"></span><br><span class="line">wget http://ftp.gnu.org/gnu/ncurses/ncurses-6.1.tar.gz</span><br><span class="line"></span><br><span class="line">tar -xzvf ncurses-6.1.tar.gz</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span>  ncurses-6.1/</span><br><span class="line"></span><br><span class="line">./configure --with-shared \</span><br><span class="line">--without-debug \</span><br><span class="line">--without-ada \</span><br><span class="line">--<span class="built_in">enable</span>-overwrite</span><br><span class="line"></span><br><span class="line"><span class="comment"># 若不安装ncurses编译MySQL时会报错</span></span><br><span class="line"><span class="comment"># --without-ada参数为设定不编译为ada绑定，因进入chroot环境不能使用ada ；</span></span><br><span class="line"><span class="comment"># --enable-overwrite参数为定义把头文件安装到/tools/include下而不是/tools/include/ncurses目录</span></span><br><span class="line"><span class="comment"># --with-shared	生成共享库</span></span><br><span class="line"></span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+<h3 id="◆安装cmake和bison◆"><a href="#◆安装cmake和bison◆" class="headerlink" title="◆安装cmake和bison◆"></a>◆安装cmake和bison◆</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">yum install -y cmake bison</span><br></pre></td></tr></table></figure>
+<h3 id="◆安装MySQL◆"><a href="#◆安装MySQL◆" class="headerlink" title="◆安装MySQL◆"></a>◆安装MySQL◆</h3><p>1.编译环节<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">groupadd mysql</span><br><span class="line"></span><br><span class="line">useradd -M -g mysql -s /sbin/nologin mysql</span><br><span class="line"></span><br><span class="line">http://mirrors.sohu.com/mysql/	搜狐MySQL镜像站</span><br><span class="line"></span><br><span class="line">wget http://mirrors.sohu.com/mysql/MySQL-5.5/mysql-5.5.54.tar.gz</span><br><span class="line"></span><br><span class="line">tar -xzvf mysql-5.5.59.tar.gz</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span>  mysql-5.5.59/</span><br><span class="line"></span><br><span class="line">cmake -DCMAKE_INSTALL_PREFIX=/usr/<span class="built_in">local</span>/mysql-5.5 \</span><br><span class="line">-DMYSQL_UNIX_ADDR=/tmp/mysql.sock \</span><br><span class="line">-DEXTRA_CHARSETS=all \</span><br><span class="line">-DDEFAULT_CHARSET=utf8 \</span><br><span class="line">-DDEFAULT_COLLATION=utf8_general_ci \</span><br><span class="line">-DWITH_MYISAM_STORAGE_ENGINE=1 \</span><br><span class="line">-DWITH_INNOBASE_STORAGE_ENGINE=1 \</span><br><span class="line">-DWITH_MEMORY_STORAGE_ENGINE=1 \</span><br><span class="line">-DWITH_READLINE=1 \</span><br><span class="line">-DENABLED_LOCAL_INFILE=1 \</span><br><span class="line">-DMYSQL_USER=mysql \</span><br><span class="line">-DMYSQL_TCP_PORT=3306</span><br><span class="line"></span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure></p>
+<p>2.修改 MySQL 目录权限<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cd</span> /usr/<span class="built_in">local</span>/mysql-5.5/</span><br><span class="line"></span><br><span class="line">chown -R root.mysql .</span><br><span class="line">chown -R mysql data</span><br><span class="line">chmod 755 -R /usr/<span class="built_in">local</span>/mysql-5.5/</span><br></pre></td></tr></table></figure></p>
+<p>3.拷贝相关配置文件<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">cp -a /usr/<span class="built_in">local</span>/mysql-5.5/support-files/my-medium.cnf /etc/my.cnf</span><br><span class="line">cp -a /usr/<span class="built_in">local</span>/mysql-5.5/support-files/mysql.server /etc/init.d/mysqld</span><br><span class="line"></span><br><span class="line">chmod +x /etc/init.d/mysqld</span><br></pre></td></tr></table></figure></p>
+<p>4.初始化MySQL<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cd</span> /usr/<span class="built_in">local</span>/mysql-5.5/scripts/</span><br><span class="line"></span><br><span class="line">/usr/<span class="built_in">local</span>/mysql-5.5/scripts/mysql_install_db \</span><br><span class="line">--basedir=/usr/<span class="built_in">local</span>/mysql-5.5/ \</span><br><span class="line">--datadir=/usr/<span class="built_in">local</span>/mysql-5.5/data/ \</span><br><span class="line">--user=mysql</span><br></pre></td></tr></table></figure></p>
+<p>5.创建数据库授权表,初始化数据库<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cd</span> /usr/<span class="built_in">local</span>/mysql-5.5/</span><br><span class="line">/usr/<span class="built_in">local</span>/mysql-5.5/scripts/mysql_install_db --user=mysql --basedir=/usr/<span class="built_in">local</span>/mysql-5.5/</span><br></pre></td></tr></table></figure></p>
+<p>6.启动 MySQL 服务<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">/usr/<span class="built_in">local</span>/mysql-5.5/bin/mysqld_safe --user=mysql &amp;</span><br></pre></td></tr></table></figure></p>
+<p>7.设置MySQL开机自启动<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">"/usr/local/mysql/bin/mysqld_safe --user=mysql &amp;"</span> &gt;&gt;/etc/rc.local</span><br><span class="line">chkconfig mysqld on</span><br><span class="line">chkconfig --list mysqld</span><br></pre></td></tr></table></figure></p>
+<p>8.设定 MySQL 初始密码<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">'export PATH=/usr/local/mysql-5.5/bin:$PATH'</span> &gt;&gt; /etc/profile</span><br><span class="line"><span class="built_in">source</span> /etc/profile</span><br><span class="line">mysql_secure_installation</span><br></pre></td></tr></table></figure></p>
+<p>9.测试 MySQL数据库能否使用<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">/usr/<span class="built_in">local</span>/mysql-5.5/bin/mysql -u root -p</span><br></pre></td></tr></table></figure></p>
+<h2 id="安装-配置PHP"><a href="#安装-配置PHP" class="headerlink" title="安装-配置PHP"></a>安装-配置PHP</h2><h3 id="◆安装依赖◆"><a href="#◆安装依赖◆" class="headerlink" title="◆安装依赖◆"></a>◆安装依赖◆</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">yum install -y libevent* libevent-devel libevent-doc libevent-headers</span><br><span class="line"></span><br><span class="line"><span class="comment">#注意：编译前确保系统已经安装了libtool和libtool-ltdl软件包</span></span><br></pre></td></tr></table></figure>
+<h3 id="编译安装PHP"><a href="#编译安装PHP" class="headerlink" title="编译安装PHP"></a>编译安装PHP</h3><p>1.编译环节<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment">#cp -a /usr/local/freetype/include/freetype2/ft2build.h php-7.2.4/ext/gd/</span></span><br><span class="line"></span><br><span class="line">wget http://cn2.php.net/distributions/php-7.0.0.tar.gz</span><br><span class="line"></span><br><span class="line">tar -xzvf php-7.0.0.tar.gz</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span>  php-7.0.0/</span><br><span class="line"></span><br><span class="line">./configure --prefix=/usr/<span class="built_in">local</span>/php/ \</span><br><span class="line">--with-config-file-path=/usr/<span class="built_in">local</span>/php/etc/ \</span><br><span class="line">--with-apxs2=/usr/<span class="built_in">local</span>/apache2/bin/apxs \</span><br><span class="line">--with-libxml-dir=/usr/<span class="built_in">local</span>/libxml2/ \</span><br><span class="line">--with-jpeg-dir=/usr/<span class="built_in">local</span>/jpeg6/ \</span><br><span class="line">--with-png-dir=/usr/<span class="built_in">local</span>/libpng/ \</span><br><span class="line">--with-freetype-dir=/usr/<span class="built_in">local</span>/freetype/ \</span><br><span class="line">--with-mcrypt=/usr/<span class="built_in">local</span>/libmcrypt/ \</span><br><span class="line">--with-mysqli=/usr/<span class="built_in">local</span>/mysql-5.5/bin/mysql_config \</span><br><span class="line">--<span class="built_in">enable</span>-soap \</span><br><span class="line">--<span class="built_in">enable</span>-mbstring=all--<span class="built_in">enable</span>-sockets \</span><br><span class="line">--with-pdo-mysql=/usr/<span class="built_in">local</span>/mysql-5.5 \</span><br><span class="line">--with-gd \</span><br><span class="line">--without-pear</span><br><span class="line"></span><br><span class="line">==================================================================================================</span><br><span class="line">若前面配置zlib时没有指定安装目录，PHP配置时不要添加--with-zlib-dir=/usr/<span class="built_in">local</span>/zlib/参数</span><br><span class="line">--with-config-file-path=/usr/<span class="built_in">local</span>/php/etc/				<span class="comment">#指定配置文件目录</span></span><br><span class="line">--with-apxs2=/usr/<span class="built_in">local</span>/apache2/bin/apxs				<span class="comment">#指定apache动态模块位置</span></span><br><span class="line">--with-libxml-dir=/usr/<span class="built_in">local</span>/libxml2/					<span class="comment">#指定libxml位置</span></span><br><span class="line">--with-jpeg-dir=/usr/<span class="built_in">local</span>/jpeg6/					<span class="comment">#指定jpeg位置</span></span><br><span class="line">--with-png-dir=/usr/<span class="built_in">local</span>/libpng/					<span class="comment">#指定libpng位置</span></span><br><span class="line">--with-freetype-dir=/usr/<span class="built_in">local</span>/freetype/				<span class="comment">#指定freetype位置</span></span><br><span class="line">--with-mcrypt=/usr/<span class="built_in">local</span>/libmcrypt/					<span class="comment">#指定libmcrypt位置</span></span><br><span class="line">--with-mysqli=/usr/<span class="built_in">local</span>/mysql/bin/mysql_config				<span class="comment">#指定mysqli位置</span></span><br><span class="line">--with-gd                               				<span class="comment">#启用gd库</span></span><br><span class="line">--<span class="built_in">enable</span>-soap								<span class="comment">#支持soap服务</span></span><br><span class="line">--<span class="built_in">enable</span>-mbstring=all							<span class="comment">#支持多字节，字符串</span></span><br><span class="line">--<span class="built_in">enable</span>-sockets							<span class="comment">#支持套接字</span></span><br><span class="line">--with-pdo-mysql=/usr/<span class="built_in">local</span>/mysql					<span class="comment">#启用mysql的pdo模块支持</span></span><br><span class="line">--without-pear								<span class="comment">#不安装pear</span></span><br><span class="line">==================================================================================================</span><br><span class="line"></span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure></p>
+<p>2.测试Apache与PHP的连通性,看Apache是否能解析php文件,创建并复制配置文件<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">mkdir /usr/<span class="built_in">local</span>/php/etc/</span><br><span class="line">cp -a php-7.0.0/php.ini-production /usr/<span class="built_in">local</span>/php/etc/php.ini</span><br></pre></td></tr></table></figure></p>
+<p>3.追加到httpd.conf<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">vim /usr/<span class="built_in">local</span>/apache2/conf/httpd.conf</span><br><span class="line"></span><br><span class="line">定位特征：AddType allows you to add to or override</span><br><span class="line"></span><br><span class="line">写入↓</span><br><span class="line"></span><br><span class="line">AddType application/x-httpd-php .php .phtml</span><br><span class="line">AddType application/x-httpd-php-source .phps</span><br><span class="line"></span><br><span class="line"><span class="comment">#.phtml为将.phps做为PHP源文件进行语法高亮显示</span></span><br></pre></td></tr></table></figure></p>
+<p>4.重启apache<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">/usr/<span class="built_in">local</span>/apache2/bin/apachectl stop</span><br><span class="line">/usr/<span class="built_in">local</span>/apache2/bin/apachectl start</span><br></pre></td></tr></table></figure></p>
+<p>5.测试PHP是否生效<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">vim /usr/<span class="built_in">local</span>/apache2/htdocs/index.php</span><br><span class="line"></span><br><span class="line">写入↓</span><br><span class="line"></span><br><span class="line">&lt;?php</span><br><span class="line">		phpinfo();</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure></p>
+<p>6.通过浏览器输入地址</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">http://服务器地址/index.php</span><br></pre></td></tr></table></figure>
+<h2 id="安装OpenSSL"><a href="#安装OpenSSL" class="headerlink" title="安装OpenSSL"></a>安装OpenSSL</h2><p>OpenSSL 是一个强大的安全套接字层密码库，囊括主要的密码算法、常用的密钥和证书封装管理功能及SSL协议，并提供丰富的应用程序供测试或其它目的使用。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cd</span>  php-7.0.0/ext/openssl</span><br><span class="line"></span><br><span class="line">mv  config0.m4 config.m4</span><br><span class="line"></span><br><span class="line">/usr/<span class="built_in">local</span>/php/bin/phpize</span><br><span class="line"></span><br><span class="line">./configure --with-openssl --with-php-config=/usr/<span class="built_in">local</span>/php/bin/php-config</span><br><span class="line"></span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+<h2 id="安装-配置Memcache"><a href="#安装-配置Memcache" class="headerlink" title="安装-配置Memcache"></a>安装-配置Memcache</h2><p>Memcache是一个高性能的分布式的内存对象缓存系统，通过在内存里维护一个统一的巨大的hash表。<br>它能够用来存储各种格式的数据，包括图像、视频、文件以及数据库检索的结果等。简单的说就是将数据调用到内存中，然后从内存中读取，从而大大提高读取速度。</p>
+<h3 id="◆安装依赖libevent◆"><a href="#◆安装依赖libevent◆" class="headerlink" title="◆安装依赖libevent◆"></a>◆安装依赖libevent◆</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">wget https://github.com/downloads/libevent/libevent/libevent-2.0.21-stable.tar.gz</span><br><span class="line"></span><br><span class="line">tar -xzvf libevent-2.0.21-stable.tar.gz</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> libevent-2.0.21-stable/</span><br><span class="line"></span><br><span class="line">./configure -prefix=/usr/<span class="built_in">local</span>/libevent</span><br><span class="line"></span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+<h3 id="◆安装Memcache◆"><a href="#◆安装Memcache◆" class="headerlink" title="◆安装Memcache◆"></a>◆安装Memcache◆</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">useradd  -M -s /sbin/nologin memcache</span><br><span class="line"></span><br><span class="line">wget http://memcached.org/files/memcached-1.5.7.tar.gz</span><br><span class="line"></span><br><span class="line">tar -xzvf memcached-1.5.7.tar.gz</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span>  memcached-1.5.7/</span><br><span class="line"></span><br><span class="line">./configure --prefix=/usr/<span class="built_in">local</span>/memcache \</span><br><span class="line">--with-libevent=/usr/<span class="built_in">local</span>/libevent</span><br><span class="line"></span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+<p>2.启动Memcache<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">/usr/<span class="built_in">local</span>/memcache/bin/memcached -d -m 128 -l 127.0.0.1 -p 11211 -u root 	<span class="comment"># (128为内存, 11211为端口,root为用户组)</span></span><br></pre></td></tr></table></figure></p>
+<p>3.设置开机自启动<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">"/usr/local/memcache/bin/memcached -d -m 128 -l 127.0.0.1 -p 11211 -u root"</span> &gt;&gt;/etc/rc.d/rc.local</span><br></pre></td></tr></table></figure></p>
+<p>4.查询是否开启<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ps aux|grep memcached</span><br><span class="line"></span><br><span class="line">netstat -antp |grep 11211</span><br></pre></td></tr></table></figure></p>
+<p>5.安装pecl-memcache-php7<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">wget https://github.com/websupport-sk/pecl-memcache/archive/php7.zip</span><br><span class="line"></span><br><span class="line">unzip php7.zip</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span>  pecl-memcache-php7/</span><br><span class="line"></span><br><span class="line">/usr/<span class="built_in">local</span>/php/bin/phpize</span><br><span class="line"></span><br><span class="line">./configure --with-php-config=/usr/<span class="built_in">local</span>/php/bin/php-config</span><br><span class="line"></span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure></p>
+<p>8.修改php.ini 加载Memcache组件<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">vim /usr/<span class="built_in">local</span>/php/etc/php.ini</span><br><span class="line"></span><br><span class="line">[memcache]</span><br><span class="line">extension_dir = <span class="string">"/usr/local/php/lib/php/extensions/no-debug-zts-20151012/"</span></span><br><span class="line">extension = <span class="string">"memcache.so"</span></span><br><span class="line">extension=<span class="string">"openssl.so"</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">/usr/<span class="built_in">local</span>/apache2/bin/apachtctl stop</span><br><span class="line">/usr/<span class="built_in">local</span>/apache2/bin/apachtctl start</span><br></pre></td></tr></table></figure></p>
+<h2 id="LAMP测试环节"><a href="#LAMP测试环节" class="headerlink" title="LAMP测试环节"></a>LAMP测试环节</h2><p>1.检查/etc/profile是否有以下3项<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">/usr/<span class="built_in">local</span>/apache2/bin/apachectl start</span><br><span class="line">/usr/<span class="built_in">local</span>/mysql/bin/mysqld_safe --user=mysql &amp;</span><br><span class="line">/usr/<span class="built_in">local</span>/memcache/bin/memcached -d -m 128 -l 127.0.0.1 -p 11211 -u root</span><br></pre></td></tr></table></figure></p>
+<p>2.检查php代码<br><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">        phpinfo();</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>3.检查mysql代码<br><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">$pdo = <span class="keyword">new</span> PDO(<span class="string">'mysql:host=localhost;dbname=mysql;charset=utf8'</span>,<span class="string">'root'</span>,<span class="string">'123'</span>);</span><br><span class="line"><span class="keyword">if</span>($pdo)&#123;</span><br><span class="line"><span class="keyword">echo</span> <span class="string">'check on'</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>4.检查memcache代码<br><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line">$mm=<span class="keyword">new</span> Memcache(); <span class="comment">//创建对象</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//添加memcache服务器</span></span><br><span class="line">$mm-&gt;addServer(<span class="string">"127.0.0.1"</span>,<span class="number">11211</span>);</span><br><span class="line"></span><br><span class="line">$sql = <span class="string">"select * from db"</span>; <span class="comment">//查询</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//先尝试从memcahe获取</span></span><br><span class="line">$mlist = $mm-&gt;get(<span class="string">'res'</span>);</span><br><span class="line">var_dump($mlist);</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>(<span class="keyword">empty</span>($stulist))&#123;</span><br><span class="line">	<span class="comment">//执行查询</span></span><br><span class="line">	$pdo = <span class="keyword">new</span> PDO(<span class="string">"mysql:host=localhost;dbname=mysql"</span>,<span class="string">"root"</span>,<span class="string">""</span>);</span><br><span class="line">	$stmt = $pdo-&gt;query($sql);</span><br><span class="line">	$sqllist = $stmt-&gt;fetchAll(PDO::FETCH_ASSOC);</span><br><span class="line">	<span class="comment">// echo $sql."&lt;br/&gt;";</span></span><br><span class="line">	var_dump($sqllist);</span><br><span class="line">	<span class="comment">//缓存</span></span><br><span class="line">	$mm-&gt;set(<span class="string">'res'</span>,$sqllist,MEMCACHE_COMPRESSED,<span class="number">3600</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// $mm-&gt;flush(); 	//清除所有缓存。</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/11/08/Linux 服务配置/编译LAMP部署动态网站环境/">编译LAMP部署动态网站环境</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年11月08日 - 19:11</p>
+  <p><span>最后更新:</span>2019年04月16日 - 20:04</p>
+  <p><span>原始链接:</span><a href="/2018/11/08/Linux 服务配置/编译LAMP部署动态网站环境/" title="编译LAMP部署动态网站环境">https://www.mkdirs.com/2018/11/08/Linux 服务配置/编译LAMP部署动态网站环境/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux-服务配置/" rel="tag"> <i class="fa fa-tag"></i> Linux 服务配置</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/08/Linux 服务配置/编译LNMP部署动态网站环境/" rel="next" title="编译LNMP部署动态网站环境">
+                <i class="fa fa-chevron-left"></i> 编译LNMP部署动态网站环境
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/11/11/Linux 服务配置/编译Apache服务部署静态网站/" rel="prev" title="编译Apache服务部署静态网站">
+                编译Apache服务部署静态网站 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装准备环境"><span class="nav-text">安装准备环境</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆安装gcc◆"><span class="nav-text">◆安装gcc◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆安装libxml2◆"><span class="nav-text">◆安装libxml2◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆安装libmcrypt◆"><span class="nav-text">◆安装libmcrypt◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆安装libtdl也在libmcrypt包中◆"><span class="nav-text">◆安装libtdl也在libmcrypt包中◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆安装mhash◆"><span class="nav-text">◆安装mhash◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆安装mcrypt◆"><span class="nav-text">◆安装mcrypt◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆安装zlib库◆"><span class="nav-text">◆安装zlib库◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆安装libpng◆"><span class="nav-text">◆安装libpng◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆安装jpeg9◆"><span class="nav-text">◆安装jpeg9◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆安装freetype◆"><span class="nav-text">◆安装freetype◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装Apache服务"><span class="nav-text">安装Apache服务</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆安装Pcre◆"><span class="nav-text">◆安装Pcre◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆安装Apr◆"><span class="nav-text">◆安装Apr◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆安装Apr-util◆"><span class="nav-text">◆安装Apr-util◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆安装Apache◆"><span class="nav-text">◆安装Apache◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装MySQL和相关依赖"><span class="nav-text">安装MySQL和相关依赖</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆安装ncurses◆"><span class="nav-text">◆安装ncurses◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆安装cmake和bison◆"><span class="nav-text">◆安装cmake和bison◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆安装MySQL◆"><span class="nav-text">◆安装MySQL◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装-配置PHP"><span class="nav-text">安装-配置PHP</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆安装依赖◆"><span class="nav-text">◆安装依赖◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编译安装PHP"><span class="nav-text">编译安装PHP</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装OpenSSL"><span class="nav-text">安装OpenSSL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装-配置Memcache"><span class="nav-text">安装-配置Memcache</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆安装依赖libevent◆"><span class="nav-text">◆安装依赖libevent◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆安装Memcache◆"><span class="nav-text">◆安装Memcache◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LAMP测试环节"><span class="nav-text">LAMP测试环节</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

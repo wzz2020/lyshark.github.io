@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="MariaDB数据库管理系统是MySQL的一个分支,主要由开源社区在维护,采用GPL授权许可MariaDB的目的是完全兼容MySQL,包括API和命令行,MySQL由于现在闭源了,而能轻松成为MySQL的代替品.在存储引擎方面,使用XtraDB来代替MySQL的InnoDB,MariaDB由MySQL的创始人Michael Widenius主导开发,他早前曾以10亿美元的价格,将自己创建的公司My">
+<meta name="keywords" content="MariaDB">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MariaDB 用户与权限管理(12)">
+<meta property="og:url" content="https://www.mkdirs.com/2018/12/30/MariaDB/MariaDB-用户与权限管理-12/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="MariaDB数据库管理系统是MySQL的一个分支,主要由开源社区在维护,采用GPL授权许可MariaDB的目的是完全兼容MySQL,包括API和命令行,MySQL由于现在闭源了,而能轻松成为MySQL的代替品.在存储引擎方面,使用XtraDB来代替MySQL的InnoDB,MariaDB由MySQL的创始人Michael Widenius主导开发,他早前曾以10亿美元的价格,将自己创建的公司My">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-12-30T03:49:22.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MariaDB 用户与权限管理(12)">
+<meta name="twitter:description" content="MariaDB数据库管理系统是MySQL的一个分支,主要由开源社区在维护,采用GPL授权许可MariaDB的目的是完全兼容MySQL,包括API和命令行,MySQL由于现在闭源了,而能轻松成为MySQL的代替品.在存储引擎方面,使用XtraDB来代替MySQL的InnoDB,MariaDB由MySQL的创始人Michael Widenius主导开发,他早前曾以10亿美元的价格,将自己创建的公司My">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/12/30/MariaDB/MariaDB-用户与权限管理-12/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>MariaDB 用户与权限管理(12) | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/12/30/MariaDB/MariaDB-用户与权限管理-12/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">MariaDB 用户与权限管理(12)
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-30 09:48:06 / 修改时间：11:49:22" itemprop="dateCreated datePublished" datetime="2018-12-30T09:48:06+08:00">2018-12-30</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/MariaDB/" itemprop="url" rel="index"><span itemprop="name">MariaDB</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>MariaDB数据库管理系统是MySQL的一个分支,主要由开源社区在维护,采用GPL授权许可MariaDB的目的是完全兼容MySQL,包括API和命令行,MySQL由于现在闭源了,而能轻松成为MySQL的代替品.在存储引擎方面,使用XtraDB来代替MySQL的InnoDB,MariaDB由MySQL的创始人Michael Widenius主导开发,他早前曾以10亿美元的价格,将自己创建的公司MySQL AB卖给了SUN,此后,随着SUN被甲骨文收购MySQL的所有权也落入Oracle的手中.MariaDB名称来自MichaelWidenius的女儿Maria的名字.</p>
+<a id="more"></a>
+<p>MariaDB 是一个多用户数据库,具有功能强大的访问控制系统,可以为不同用户指定允许的权限.MariaDB用户可以分为普通用户和ROOT用户.ROOT用户是超级管理员,拥有所有权限,包括创建用户、删除用户和修改用户的密码等管理权限,普通用户只拥有被授予的各种权限.<br><br></p>
+<h2 id="MariaDB-权限概述"><a href="#MariaDB-权限概述" class="headerlink" title="MariaDB 权限概述"></a>MariaDB 权限概述</h2><p>MariaDB 服务器通过权限表来控制用户对数据库的访问,权限表存放在MariaDB的数据库中,由<code>MySQL_install_db</code>脚本初始化，,存储账户权限信息表主要有:<code>user、db、host、table_priv,columns_priv和procs_priv</code>.</p>
+<h3 id="◆USER表◆"><a href="#◆USER表◆" class="headerlink" title="◆USER表◆"></a>◆USER表◆</h3><p>user表是MariaDB中最重要的一个权限表,记录允许连接到服务器的账号信息,里面的权限是全局的,MariaDB中user表一共有42个字段,用户列可分为4类,分别是用户列,权限列,安全列和资源控制列,下面我们介绍介个常用列的作用.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">字段名</th>
+<th style="text-align:left">数据类型</th>
+<th style="text-align:left">默认值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Host</td>
+<td style="text-align:left">char</td>
+<td style="text-align:left">NULL</td>
+</tr>
+<tr>
+<td style="text-align:left">User</td>
+<td style="text-align:left">char</td>
+<td style="text-align:left">NULL</td>
+</tr>
+<tr>
+<td style="text-align:left">Password</td>
+<td style="text-align:left">char</td>
+<td style="text-align:left">NULL</td>
+</tr>
+<tr>
+<td style="text-align:left">ssl_cipher</td>
+<td style="text-align:left">blob</td>
+<td style="text-align:left">NULL</td>
+</tr>
+<tr>
+<td style="text-align:left">x509_issuer</td>
+<td style="text-align:left">blob</td>
+<td style="text-align:left">NULL</td>
+</tr>
+<tr>
+<td style="text-align:left">x509_subject</td>
+<td style="text-align:left">blob</td>
+<td style="text-align:left">NULL</td>
+</tr>
+<tr>
+<td style="text-align:left">max_questions</td>
+<td style="text-align:left">int</td>
+<td style="text-align:left">0</td>
+</tr>
+<tr>
+<td style="text-align:left">max_updates</td>
+<td style="text-align:left">int</td>
+<td style="text-align:left">0</td>
+</tr>
+<tr>
+<td style="text-align:left">max_connections</td>
+<td style="text-align:left">int</td>
+<td style="text-align:left">0</td>
+</tr>
+<tr>
+<td style="text-align:left">max_user_connections</td>
+<td style="text-align:left">int</td>
+<td style="text-align:left">0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>用户列:</strong></p>
+<p>user表的用户列包括<code>Host、User、Password</code>,分别表示主机名、用户名和密码.其中User和Host为User表的联合主键,当用户与服务器之间建立连接时,输入的账户信息中的用户名称、主机名和密码必须匹配User表中对应的字段,只有3个值都匹配的时候,才允许连接建立.这3个字段的值就是创建账户时保存的账户信息,修改用户密码时,实际就是修改user表的Password字段的值.</p>
+<p><strong>权限列:</strong></p>
+<p>权限列的字段决定了用户的权限,描述了在全局范围内允许对数据和数据库进行的操作.包括查询权限、修改权限等普通权限,还包括了关闭服务器、超级权限和加载用户等高级权限,普通权限用于操作数据库,高级权限用于数据库管理.</p>
+<p><strong>安全列:</strong></p>
+<p>安全列只有6个字段,其中两个是SSL相关的,两个是 x509 相关的,另外两个是授权插件相关的,SSL用于加密, x509 标准可用于标识用户,Plugin字段标识可以用于验证用户身份的插件,如果该字段为空,服务器使用内建授权验证机制验证用户身份.</p>
+<p><strong>资源控制列:</strong></p>
+<p>资源控制列用来限制用户使用的资源,包括以下4个字段,分别为:</p>
+<blockquote>
+<p>max_questions:用户每小时允许执行查询次数.<br>max_updates:用户每小时允许执行更新次数.<br>max_connections:用户每小时允许执行的连接次数.<br>max_user_connection:用户允许同时建立的连接次数.</p>
+</blockquote>
+<h3 id="◆DB权限表◆"><a href="#◆DB权限表◆" class="headerlink" title="◆DB权限表◆"></a>◆DB权限表◆</h3><p>DB表和HOST表,在数据库中非常重要的权限表,DB表中存储了用户对某个数据库的操作权限,决定用户能从哪个主机存取哪个数据库.host表中存储了某个主机对数据库的操作权限,配合db权限表对给定主机上数据库级操作权限做更细致的控制.这个权限表不受<code>GRANT 和 REVOKE</code>语句的影响,db表比较常用,host表一般很少使用.db表和host表结构相似,字段大致可以分为两类:用户列和权限列.</p>
+<p>select_priv,Insert_priv,update_priv,delete_priv,Create_priv,Drop_priv,Alter_priv,Grant_priv</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">字段名</th>
+<th style="text-align:left">数据类型</th>
+<th style="text-align:left">默认值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Host</td>
+<td style="text-align:left">char</td>
+<td style="text-align:left">NULL</td>
+</tr>
+<tr>
+<td style="text-align:left">DB</td>
+<td style="text-align:left">char</td>
+<td style="text-align:left">NULL</td>
+</tr>
+<tr>
+<td style="text-align:left">USER</td>
+<td style="text-align:left">char</td>
+<td style="text-align:left">NULL</td>
+</tr>
+<tr>
+<td style="text-align:left">select_priv</td>
+<td style="text-align:left">enum(N,Y)</td>
+<td style="text-align:left">NO</td>
+</tr>
+<tr>
+<td style="text-align:left">insert_priv</td>
+<td style="text-align:left">enum(N,Y)</td>
+<td style="text-align:left">NO</td>
+</tr>
+<tr>
+<td style="text-align:left">update_priv</td>
+<td style="text-align:left">enum(N,Y)</td>
+<td style="text-align:left">NO</td>
+</tr>
+<tr>
+<td style="text-align:left">delete_priv</td>
+<td style="text-align:left">enum(N,Y)</td>
+<td style="text-align:left">NO</td>
+</tr>
+<tr>
+<td style="text-align:left">create_priv</td>
+<td style="text-align:left">enum(N,Y)</td>
+<td style="text-align:left">NO</td>
+</tr>
+<tr>
+<td style="text-align:left">drop_priv</td>
+<td style="text-align:left">enum(N,Y)</td>
+<td style="text-align:left">NO</td>
+</tr>
+<tr>
+<td style="text-align:left">alter_priv</td>
+<td style="text-align:left">enum(N,Y)</td>
+<td style="text-align:left">NO</td>
+</tr>
+<tr>
+<td style="text-align:left">grant_priv</td>
+<td style="text-align:left">enum(N,Y)</td>
+<td style="text-align:left">NO</td>
+</tr>
+</tbody>
+</table>
+<p>DB表用户列有3个字段,分别是<code>Host、User、Db</code>标识从某个主机连接某个用户对某个数据库的操作权限,这3个字段的组合构成了db表的主键.host表不存储用户名称,用户列只有2个字段,分别是Host和DB,表示从某个主机连接的用户对某个数据库的操作权限,其主键包括<code>Host和Db</code>两个字段,host很少用到,一般情况下db表就可以满足权限控制需求了.<br><br></p>
+<h2 id="MariaDB-账户管理"><a href="#MariaDB-账户管理" class="headerlink" title="MariaDB 账户管理"></a>MariaDB 账户管理</h2><p>MariaDB提供了许多语句来管理用户账号,这些语句可以用来管理包括登陆和退出MariaDB服务器,创建用户,删除用户,密码管理和权限管理等,MariaDB数据库的安全性,需要通过账户管理来保证.</p>
+<h3 id="◆查询在线用户◆"><a href="#◆查询在线用户◆" class="headerlink" title="◆查询在线用户◆"></a>◆查询在线用户◆</h3><p><strong>本地查询:</strong> 当我们本地登录到数据库时,可以使用本地查询,查询SQL语句如下.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">MariaDB [(none)]&gt; show processlist;</span><br><span class="line">+----+---------+-----------+------+---------+------+-------+------------------+----------+</span><br><span class="line">| Id | User    | Host      | db   | Command | Time | State | Info             | Progress |</span><br><span class="line">+----+---------+-----------+------+---------+------+-------+------------------+----------+</span><br><span class="line">|  2 | root    | localhost | NULL | Query   |    0 | NULL  | show processlist |    0.000 |</span><br><span class="line">|  5 | lyshark | localhost | NULL | Sleep   |    4 |       | NULL             |    0.000 |</span><br><span class="line">+----+---------+-----------+------+---------+------+-------+------------------+----------+</span><br><span class="line"></span><br><span class="line">2 rows <span class="keyword">in</span> <span class="built_in">set</span> (0.08 sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>远程查询:</strong> 如果在远程终端机上查询远程数据库,前提是数据库开启了远程授权我们可以使用以下SQL语句.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mysqladmin -uroot -p123 processlist</span></span><br><span class="line">+----+---------+-----------+----+---------+------+-------+------------------+----------+</span><br><span class="line">| Id | User    | Host      | db | Command | Time | State | Info             | Progress |</span><br><span class="line">+----+---------+-----------+----+---------+------+-------+------------------+----------+</span><br><span class="line">| 5  | lyshark | localhost |    | Sleep   | 154  |       |                  | 0.000    |</span><br><span class="line">| 11 | root    | localhost |    | Query   | 0    |       | show processlist | 0.000    |</span><br><span class="line">+----+---------+-----------+----+---------+------+-------+------------------+----------+</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment">#</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>查全部用户:</strong> 我们通过构建Select语句查询指定字段(Host,User,Password),查询<code>mysql.user</code>这个数据表,SQL语句如下.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">MariaDB [none]&gt; select Host,User,Password from mysql.user;</span><br><span class="line">+-----------+---------+-------------------------------------------+</span><br><span class="line">| Host      | User    | Password                                  |</span><br><span class="line">+-----------+---------+-------------------------------------------+</span><br><span class="line">| localhost | root    | *23AE809DDACAF96AF0FD78ED04B6A265E05AA257 |</span><br><span class="line">| 127.0.0.1 | root    | *23AE809DDACAF96AF0FD78ED04B6A265E05AA257 |</span><br><span class="line">| ::1       | root    | *23AE809DDACAF96AF0FD78ED04B6A265E05AA257 |</span><br><span class="line">| localhost | lyshark | *23AE809DDACAF96AF0FD78ED04B6A265E05AA257 |</span><br><span class="line">+-----------+---------+-------------------------------------------+</span><br><span class="line"></span><br><span class="line">4 rows <span class="keyword">in</span> <span class="built_in">set</span> (0.01 sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>去重查询:</strong> 通过使用distinct命令使查询结果不重复,自动过滤重复的记录.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">MariaDB [(none)]&gt; select distinct User,Password from mysql.user;</span><br><span class="line">+---------+-------------------------------------------+</span><br><span class="line">| User    | Password                                  |</span><br><span class="line">+---------+-------------------------------------------+</span><br><span class="line">| root    | *23AE809DDACAF96AF0FD78ED04B6A265E05AA257 |</span><br><span class="line">| lyshark | *23AE809DDACAF96AF0FD78ED04B6A265E05AA257 |</span><br><span class="line">+---------+-------------------------------------------+</span><br><span class="line"></span><br><span class="line">2 rows <span class="keyword">in</span> <span class="built_in">set</span> (0.00 sec)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆新建普通用户◆"><a href="#◆新建普通用户◆" class="headerlink" title="◆新建普通用户◆"></a>◆新建普通用户◆</h3><p>创建新用户,必须有相应的权限来执行创建操作.在MariaDB数据库中,有两种方式创建新用户:一种是使用<code>CREATE USER或GRANT</code>语句,另一种是直接操作MariaDB授权表,最好的方法是使用GRANT语句,因为这样更精确,如果使用create语句创建用户后用户无权限,需要手动添加权限,而直接使用grant语句可以一步到位.</p>
+<p><strong>使用create user语句创建新用户:</strong></p>
+<p>1.使用<code>create user</code>创建一个用户,名称为<code>jeffrey</code>,密码是<code>mypass</code>,指定开启<code>%</code>远程权限.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [(none)]&gt; create user 'jeffrey'@'%' identified by 'mypass';</span><br><span class="line">Query OK, 0 rows affected (0.05 sec)</span><br></pre></td></tr></table></figure></p>
+<p>2.接着继续创建一个新用户<code>jeffreys</code>,密码是<code>mypass</code>,并指定使用<code>localhost</code>本地权限.<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [(none)]&gt; select password('mypass');</span><br><span class="line">+<span class="comment">-------------------------------------------+</span></span><br><span class="line">| password('mypass')                        |</span><br><span class="line">+<span class="comment">-------------------------------------------+</span></span><br><span class="line">| *6C8989366EAF75BB670AD8EA7A7FC1176A95CEF4 |</span><br><span class="line">+<span class="comment">-------------------------------------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">MariaDB [(<span class="keyword">none</span>)]&gt; <span class="keyword">create</span> <span class="keyword">user</span> <span class="string">'jeffreys'</span>@<span class="string">'localhost'</span> <span class="keyword">identified</span> <span class="keyword">by</span> <span class="keyword">password</span> <span class="string">'*6C8989366EAF75BB670AD8EA7A7FC1176A95CEF4'</span>;</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>使用grant user语句创建新用户:</strong></p>
+<p>使用<code>grant</code>语句创建一个新用户<code>myuser</code>,密码是<code>123123</code>,并授予用户对所有表的<code>select和update</code>权限,SQL语句如下:<br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [(none)]&gt; grant select,update ON *.* TO 'myuser'@'localhost' identified by '123123';</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [(none)]&gt; select Host,User,Select_priv,Update_priv from mysql.user where user='myuser';</span><br><span class="line">+<span class="comment">-----------+--------+-------------+-------------+</span></span><br><span class="line">| Host      | User   | Select_priv | Update_priv |</span><br><span class="line">+<span class="comment">-----------+--------+-------------+-------------+</span></span><br><span class="line">| localhost | myuser | Y           | Y           |</span><br><span class="line">+<span class="comment">-----------+--------+-------------+-------------+</span></span><br><span class="line">1 row in <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆删除普通用户◆"><a href="#◆删除普通用户◆" class="headerlink" title="◆删除普通用户◆"></a>◆删除普通用户◆</h3><p><strong>使用drop user语句删除用户:</strong><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">MariaDB [(none)]&gt; select distinct User,Host from mysql.user;</span><br><span class="line">+---------+-----------+</span><br><span class="line">| User    | Host      |</span><br><span class="line">+---------+-----------+</span><br><span class="line">| root    | 127.0.0.1 |</span><br><span class="line">| root    | ::1       |</span><br><span class="line">| lyshark | localhost |</span><br><span class="line">| root    | localhost |</span><br><span class="line">+---------+-----------+</span><br><span class="line">4 rows <span class="keyword">in</span> <span class="built_in">set</span> (0.07 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [(none)]&gt; drop user lyshark@<span class="string">"localhost"</span>;</span><br><span class="line">Query OK, 0 rows affected (0.37 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [(none)]&gt; select distinct User,Host from mysql.user;</span><br><span class="line">+------+-----------+</span><br><span class="line">| User | Host      |</span><br><span class="line">+------+-----------+</span><br><span class="line">| root | 127.0.0.1 |</span><br><span class="line">| root | ::1       |</span><br><span class="line">| root | localhost |</span><br><span class="line">+------+-----------+</span><br><span class="line">3 rows <span class="keyword">in</span> <span class="built_in">set</span> (0.00 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [(none)]&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>使用delete语句删除用户:</strong><br><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MariaDB [(none)]&gt; delete from mysql.user where host='localhost' and user='myuser';</span><br><span class="line">Query OK, 1 row affected (0.01 sec)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆修改用户密码◆"><a href="#◆修改用户密码◆" class="headerlink" title="◆修改用户密码◆"></a>◆修改用户密码◆</h3><p><strong>修改自身密码:</strong> 修改自己用户的用户名和密码.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">MariaDB [(none)]&gt; <span class="built_in">set</span> password=password(<span class="string">"123123"</span>);</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>修改指定用户的密码:</strong> 修改<code>lyshark用户</code>授权方式为<code>localhost</code>的密码为<code>123123</code><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">MariaDB [(none)]&gt; <span class="built_in">set</span> password <span class="keyword">for</span> <span class="string">"lyshark"</span>@<span class="string">"localhost"</span>=password(<span class="string">"123123"</span>);</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆ROOT密码找回◆"><a href="#◆ROOT密码找回◆" class="headerlink" title="◆ROOT密码找回◆"></a>◆ROOT密码找回◆</h3><p>1.关闭MariaDB数据库<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># systemctl stop mariadb</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl status mariadb</span></span><br></pre></td></tr></table></figure></p>
+<p>2.修改MariaDB的主配置文件,在Mysqld区域添加<code>skip-grant-table</code>语句,保存退出<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost etc]<span class="comment"># ll /etc/my.cnf</span></span><br><span class="line">-rw-r--r--. 1 root root 570 6月   8 2017 /etc/my.cnf</span><br><span class="line">[root@localhost etc]<span class="comment">#</span></span><br><span class="line">[root@localhost etc]<span class="comment"># vim /etc/my.cnf</span></span><br><span class="line"></span><br><span class="line">[mysqld]</span><br><span class="line"></span><br><span class="line">skip-grant-table       <span class="comment">#添加我就可以了</span></span><br><span class="line"></span><br><span class="line">datadir=/var/lib/mysql</span><br><span class="line">socket=/var/lib/mysql/mysql.sock</span><br><span class="line"><span class="comment"># Disabling symbolic-links is recommended to prevent assorted security risks</span></span><br></pre></td></tr></table></figure></p>
+<p>3.重启MariaDB数据库<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># systemctl restart mariadb</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl status mariadb</span></span><br></pre></td></tr></table></figure></p>
+<p>4.免密码登陆数据库,并执行修改数据库的SQL语句<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mysql -uroot -p</span></span><br><span class="line">MariaDB [(none)]&gt; update mysql.user <span class="built_in">set</span> password=password(<span class="string">"123"</span>) <span class="built_in">where</span> user=<span class="string">"root"</span>;</span><br><span class="line">MariaDB [(none)]&gt; Ctrl-C -- <span class="built_in">exit</span>!</span><br></pre></td></tr></table></figure></p>
+<p>5.修改完成后将主配置文件的<code>skip-grant-table</code>属性去掉,重启数据库即可,下次使用密码登陆即可<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/my.cnf</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl restart mariadb</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># mysql -uroot -p123</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="MariaDB-权限管理"><a href="#MariaDB-权限管理" class="headerlink" title="MariaDB 权限管理"></a>MariaDB 权限管理</h2><p>权限管理主要是对登录到MariaDB的用户进行权限验证所有用户的权限都存储在MariaDB的权限表中,不合理的权限规划会给MariaDB服务器带来安全隐患,数据库管理员要对所有用户的权限进行合理规划管理.</p>
+<h3 id="◆查看权限◆"><a href="#◆查看权限◆" class="headerlink" title="◆查看权限◆"></a>◆查看权限◆</h3><p><strong>查询所有权限:</strong> 查询数据库中所有用户列表和权限信息.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">MariaDB [(none)]&gt; select distinct concat(<span class="string">"用户:"</span>,user,<span class="string">" 权限:"</span>,host,<span class="string">" : "</span>) as query from mysql.user;</span><br><span class="line">+------------------------------------+</span><br><span class="line">| query                              |</span><br><span class="line">+------------------------------------+</span><br><span class="line">| 用户:root 权限:localhost :         |</span><br><span class="line">| 用户:root 权限:127.0.0.1 :         |</span><br><span class="line">| 用户:root 权限:::1 :               |</span><br><span class="line">| 用户:lyshark 权限:localhost :      |</span><br><span class="line">| 用户:lyshark 权限:% :              |</span><br><span class="line">+------------------------------------+</span><br><span class="line">8 rows <span class="keyword">in</span> <span class="built_in">set</span> (0.46 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [(none)]&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>查询指定权限:</strong> 查询关于<code>lyshark</code>的所有权限信息<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">MariaDB [(none)]&gt; show grants <span class="keyword">for</span> lyshark;</span><br><span class="line">+----------------------------------------------+</span><br><span class="line">| Grants <span class="keyword">for</span> lyshark@%                         |</span><br><span class="line">+----------------------------------------------+</span><br><span class="line">| GRANT ALL PRIVILEGES ON *.* TO <span class="string">'lyshark'</span>@<span class="string">'%'</span> |</span><br><span class="line">+----------------------------------------------+</span><br><span class="line">1 row <span class="keyword">in</span> <span class="built_in">set</span> (0.00 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [(none)]&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>查询指定权限:</strong> 查询<code>lyshark用户</code>的<code>远程%</code>权限,和本地<code>localhost</code>权限<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">MariaDB [(none)]&gt; show grants <span class="keyword">for</span> <span class="string">"lyshark"</span>@<span class="string">"%"</span>;</span><br><span class="line">+----------------------------------------------+</span><br><span class="line">| Grants <span class="keyword">for</span> lyshark@%                         |</span><br><span class="line">+----------------------------------------------+</span><br><span class="line">| GRANT ALL PRIVILEGES ON *.* TO <span class="string">'lyshark'</span>@<span class="string">'%'</span> |</span><br><span class="line">+----------------------------------------------+</span><br><span class="line">1 row <span class="keyword">in</span> <span class="built_in">set</span> (0.00 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [(none)]&gt; show grants <span class="keyword">for</span> <span class="string">"lyshark"</span>@<span class="string">"localhost"</span>;</span><br><span class="line">+----------------------------------------------------------------------------------------------------------------+</span><br><span class="line">| Grants <span class="keyword">for</span> lyshark@localhost                                                                                   |</span><br><span class="line">+----------------------------------------------------------------------------------------------------------------+</span><br><span class="line">| GRANT USAGE ON *.* TO <span class="string">'lyshark'</span>@<span class="string">'localhost'</span> IDENTIFIED BY PASSWORD <span class="string">'*23AE809DDACAF96AF0FD78ED04B6A265E05AA257'</span> |</span><br><span class="line">+----------------------------------------------------------------------------------------------------------------+</span><br><span class="line">1 row <span class="keyword">in</span> <span class="built_in">set</span> (0.37 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [(none)]&gt;</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆授予权限◆"><a href="#◆授予权限◆" class="headerlink" title="◆授予权限◆"></a>◆授予权限◆</h3><p><strong>创建用户并授权:</strong> 创建<code>wang</code>用户并给予<code>%</code>远程登陆的权限,并对所有数据库全部授权<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">MariaDB [(none)]&gt; grant all on *.* to <span class="string">"wang"</span>@<span class="string">"%"</span> identified by <span class="string">"123"</span>;</span><br><span class="line">Query OK, 0 rows affected (0.15 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [(none)]&gt; show grants <span class="keyword">for</span> <span class="string">"wang"</span>@<span class="string">"%"</span>;</span><br><span class="line">+--------------------------------------------------------------------------------------------------------------+</span><br><span class="line">| Grants <span class="keyword">for</span> wang@%                                                                                            |</span><br><span class="line">+--------------------------------------------------------------------------------------------------------------+</span><br><span class="line">| GRANT ALL PRIVILEGES ON *.* TO <span class="string">'wang'</span>@<span class="string">'%'</span> IDENTIFIED BY PASSWORD <span class="string">'*23AE809DDACAF96AF0FD78ED04B6A265E05AA257'</span> |</span><br><span class="line">+--------------------------------------------------------------------------------------------------------------+</span><br><span class="line">1 row <span class="keyword">in</span> <span class="built_in">set</span> (0.00 sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>创建用户并授权:</strong> 创建用户名<code>wang1</code>,并允许<code>localhost</code>本机访问,对<code>mysql库</code>中的所有表具有<code>select</code>查询权限,密码为<code>123</code><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">MariaDB [(none)]&gt; grant select on mysql.* to <span class="string">"wang1"</span>@<span class="string">"localhost"</span> identified by <span class="string">"123"</span>;</span><br><span class="line">Query OK, 0 rows affected (0.36 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [(none)]&gt; show grants <span class="keyword">for</span> <span class="string">"wang1"</span>@<span class="string">"localhost"</span>;</span><br><span class="line">+--------------------------------------------------------------------------------------------------------------+</span><br><span class="line">| Grants <span class="keyword">for</span> wang1@localhost                                                                                   |</span><br><span class="line">+--------------------------------------------------------------------------------------------------------------+</span><br><span class="line">| GRANT USAGE ON *.* TO <span class="string">'wang1'</span>@<span class="string">'localhost'</span> IDENTIFIED BY PASSWORD <span class="string">'*23AE809DDACAF96AF0FD78ED04B6A265E05AA257'</span> |</span><br><span class="line">| GRANT SELECT ON `mysql`.* TO <span class="string">'wang1'</span>@<span class="string">'localhost'</span>                                                             |</span><br><span class="line">+--------------------------------------------------------------------------------------------------------------+</span><br><span class="line">2 rows <span class="keyword">in</span> <span class="built_in">set</span> (0.00 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [(none)]&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>创建用户并授权:</strong> 创建用户名<code>wang2</code>,且可在任意主机<code>%</code>登陆,并对所有数据库有(增删改查)权限,密码为<code>123</code><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">MariaDB [(none)]&gt; grant insert,delete,update,select on *.* to <span class="string">"wang2"</span>@<span class="string">"%"</span> identified by <span class="string">"123"</span>;</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [(none)]&gt; show grants <span class="keyword">for</span> <span class="string">"wang2"</span>@<span class="string">"%"</span>;</span><br><span class="line">+-------------------------------------------------------------------------------------------------------------------------------+</span><br><span class="line">| Grants <span class="keyword">for</span> wang2@%                                                                                                            |</span><br><span class="line">+-------------------------------------------------------------------------------------------------------------------------------+</span><br><span class="line">| GRANT SELECT, INSERT, UPDATE, DELETE ON *.* TO <span class="string">'wang2'</span>@<span class="string">'%'</span> IDENTIFIED BY PASSWORD <span class="string">'*23AE809DDACAF96AF0FD78ED04B6A265E05AA257'</span> |</span><br><span class="line">+-------------------------------------------------------------------------------------------------------------------------------+</span><br><span class="line">1 row <span class="keyword">in</span> <span class="built_in">set</span> (0.00 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [(none)]&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>创建用户并授权:</strong> 创建用户名<code>wang3</code>,且<code>只能在192.168.1.59</code>上登陆,并对mysql数据库有(查)权限,密码为123<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">MariaDB [(none)]&gt; grant select on mysql.* to <span class="string">"wang3"</span>@<span class="string">"192.168.1.59"</span> identified by <span class="string">"123"</span>;</span><br><span class="line">Query OK, 0 rows affected (0.15 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [(none)]&gt; show grants <span class="keyword">for</span> <span class="string">"wang3"</span>@<span class="string">"192.168.1.59"</span>;</span><br><span class="line">+-----------------------------------------------------------------------------------------------------------------+</span><br><span class="line">| Grants <span class="keyword">for</span> wang3@192.168.1.59                                                                                   |</span><br><span class="line">+-----------------------------------------------------------------------------------------------------------------+</span><br><span class="line">| GRANT USAGE ON *.* TO <span class="string">'wang3'</span>@<span class="string">'192.168.1.59'</span> IDENTIFIED BY PASSWORD <span class="string">'*23AE809DDACAF96AF0FD78ED04B6A265E05AA257'</span> |</span><br><span class="line">| GRANT SELECT ON `mysql`.* TO <span class="string">'wang3'</span>@<span class="string">'192.168.1.59'</span>                                                             |</span><br><span class="line">+-----------------------------------------------------------------------------------------------------------------+</span><br><span class="line">2 rows <span class="keyword">in</span> <span class="built_in">set</span> (0.50 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [(none)]&gt;</span><br></pre></td></tr></table></figure></p>
+<p><strong>创建用户并授权:</strong> 创建一个普通用户<code>wang4</code>,且<code>仅有mysql库的(查)权限</code>,密码为123<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">MariaDB [(none)]&gt; grant usage,select on mysql.* to <span class="string">"wang4"</span>@<span class="string">"localhost"</span> identified by <span class="string">"123"</span>;</span><br><span class="line">Query OK, 0 rows affected (0.35 sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>只授权用户权限:</strong> 授权用户<code>wang4</code>,对所有数据库的全部权限,密码123<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">MariaDB [(none)]&gt; grant all privileges on *.* to <span class="string">"wang4"</span>@<span class="string">"localhost"</span> identified by <span class="string">"123"</span>;</span><br><span class="line">Query OK, 0 rows affected (0.36 sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>只授权用户权限:</strong> 授权一个已存在账号允许远程登陆最大权限<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">MariaDB [(none)]&gt; grant all on *.* to <span class="string">"root"</span>@<span class="string">"%"</span>;</span><br><span class="line">Query OK, 0 rows affected (0.07 sec)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆收回权限◆"><a href="#◆收回权限◆" class="headerlink" title="◆收回权限◆"></a>◆收回权限◆</h3><p><strong>收回用户授权:</strong> 撤销<code>lyshark用户</code>,对所有数据库的<code>远程%</code>用户权限<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">MariaDB [(none)]&gt; show grants <span class="keyword">for</span> lyshark;</span><br><span class="line">+----------------------------------------------+</span><br><span class="line">| Grants <span class="keyword">for</span> lyshark@%                         |</span><br><span class="line">+----------------------------------------------+</span><br><span class="line">| GRANT ALL PRIVILEGES ON *.* TO <span class="string">'lyshark'</span>@<span class="string">'%'</span> |</span><br><span class="line">+----------------------------------------------+</span><br><span class="line">1 row <span class="keyword">in</span> <span class="built_in">set</span> (0.00 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [(none)]&gt; revoke all on *.* from <span class="string">"lyshark"</span>@<span class="string">"%"</span>;</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [(none)]&gt; show grants <span class="keyword">for</span> lyshark;</span><br><span class="line">+-------------------------------------+</span><br><span class="line">| Grants <span class="keyword">for</span> lyshark@%                |</span><br><span class="line">+-------------------------------------+</span><br><span class="line">| GRANT USAGE ON *.* TO <span class="string">'lyshark'</span>@<span class="string">'%'</span> |</span><br><span class="line">+-------------------------------------+</span><br><span class="line">1 row <span class="keyword">in</span> <span class="built_in">set</span> (0.00 sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>收回用户授权:</strong> 撤销<code>lyshark用户</code>的远程登陆权限<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">MariaDB [(none)]&gt; revoke create on *.* from <span class="string">"lyshark"</span>@<span class="string">"%"</span>;</span><br><span class="line">Query OK, 0 rows affected (0.01 sec)</span><br></pre></td></tr></table></figure></p>
+<p><strong>刷新权限:</strong> 修改完成以后,记得执行权限的刷新操作.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">MariaDB [(none)]&gt; flush privileges;</span><br><span class="line">Query OK, 0 rows affected (0.01 sec)</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/12/30/MariaDB/MariaDB-用户与权限管理-12/">MariaDB 用户与权限管理(12)</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年12月30日 - 09:12</p>
+  <p><span>最后更新:</span>2018年12月30日 - 11:12</p>
+  <p><span>原始链接:</span><a href="/2018/12/30/MariaDB/MariaDB-用户与权限管理-12/" title="MariaDB 用户与权限管理(12)">https://www.mkdirs.com/2018/12/30/MariaDB/MariaDB-用户与权限管理-12/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/MariaDB/" rel="tag"> <i class="fa fa-tag"></i> MariaDB</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/29/MariaDB/MariaDB-视图与触发器-11/" rel="next" title="MariaDB 视图与触发器(11)">
+                <i class="fa fa-chevron-left"></i> MariaDB 视图与触发器(11)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/30/MariaDB/MariaDB-备份与日志管理-13/" rel="prev" title="MariaDB 备份与日志管理(13)">
+                MariaDB 备份与日志管理(13) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#MariaDB-权限概述"><span class="nav-text">MariaDB 权限概述</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆USER表◆"><span class="nav-text">◆USER表◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆DB权限表◆"><span class="nav-text">◆DB权限表◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MariaDB-账户管理"><span class="nav-text">MariaDB 账户管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆查询在线用户◆"><span class="nav-text">◆查询在线用户◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆新建普通用户◆"><span class="nav-text">◆新建普通用户◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆删除普通用户◆"><span class="nav-text">◆删除普通用户◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆修改用户密码◆"><span class="nav-text">◆修改用户密码◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆ROOT密码找回◆"><span class="nav-text">◆ROOT密码找回◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MariaDB-权限管理"><span class="nav-text">MariaDB 权限管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆查看权限◆"><span class="nav-text">◆查看权限◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆授予权限◆"><span class="nav-text">◆授予权限◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆收回权限◆"><span class="nav-text">◆收回权限◆</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

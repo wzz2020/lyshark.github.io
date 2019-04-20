@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Linux 是一套免费使用和自由传播的类Unix操作系统,是一个基于POSIX和UNIX的多用户、多任务、支持多线程和多CPU的操作系统.它能运行主要的UNIX工具软件、应用程序和网络协议.它支持32位和64位硬件.Linux继承了Unix以网络为核心的设计思想,是一个性能稳定的多用户网络操作系统. 防火墙指的是一个由软件和硬件设备组合而成、在内部网和外部网之间、专用网与公共网之间的边界上构造的保">
+<meta name="keywords" content="Linux 系统管理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux防火墙配置与管理(16)">
+<meta property="og:url" content="https://www.mkdirs.com/2018/11/30/Linux 系统管理/Linux防火墙配置与管理-16/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="Linux 是一套免费使用和自由传播的类Unix操作系统,是一个基于POSIX和UNIX的多用户、多任务、支持多线程和多CPU的操作系统.它能运行主要的UNIX工具软件、应用程序和网络协议.它支持32位和64位硬件.Linux继承了Unix以网络为核心的设计思想,是一个性能稳定的多用户网络操作系统. 防火墙指的是一个由软件和硬件设备组合而成、在内部网和外部网之间、专用网与公共网之间的边界上构造的保">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-04-16T12:35:27.166Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux防火墙配置与管理(16)">
+<meta name="twitter:description" content="Linux 是一套免费使用和自由传播的类Unix操作系统,是一个基于POSIX和UNIX的多用户、多任务、支持多线程和多CPU的操作系统.它能运行主要的UNIX工具软件、应用程序和网络协议.它支持32位和64位硬件.Linux继承了Unix以网络为核心的设计思想,是一个性能稳定的多用户网络操作系统. 防火墙指的是一个由软件和硬件设备组合而成、在内部网和外部网之间、专用网与公共网之间的边界上构造的保">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/11/30/Linux 系统管理/Linux防火墙配置与管理-16/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Linux防火墙配置与管理(16) | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/11/30/Linux 系统管理/Linux防火墙配置与管理-16/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Linux防火墙配置与管理(16)
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-11-30 13:30:01" itemprop="dateCreated datePublished" datetime="2018-11-30T13:30:01+08:00">2018-11-30</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-16 20:35:27" itemprop="dateModified" datetime="2019-04-16T20:35:27+08:00">2019-04-16</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Linux-系统管理/" itemprop="url" rel="index"><span itemprop="name">Linux 系统管理</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Linux 是一套免费使用和自由传播的类Unix操作系统,是一个基于POSIX和UNIX的多用户、多任务、支持多线程和多CPU的操作系统.它能运行主要的UNIX工具软件、应用程序和网络协议.它支持32位和64位硬件.Linux继承了Unix以网络为核心的设计思想,是一个性能稳定的多用户网络操作系统.</p>
+<p>防火墙指的是一个由软件和硬件设备组合而成、在内部网和外部网之间、专用网与公共网之间的边界上构造的保护屏障.是一种获取安全性方法的形象说法,它是一种计算机硬件和软件的结合,使Internet与Intranet之间建立起一个安全网关(Security Gateway),从而保护内部网免受非法用户的侵入,防火墙主要由服务访问规则、验证工具、包过滤和应用网关4个部分组成,防火墙就是一个位于计算机和它所连接的网络之间的软件或硬件.该计算机流入流出的所有网络通信和数据包均要经过此防火墙,实际上防火墙是一种隔离技术,防火墙是在两个网络通讯时执行的一种访问控制尺度,它能允许你”同意”的人和数据进入你的网络,同时将你”不同意”的人和数据拒之门外,最大限度地阻止网络中的黑客来访问你的网络.</p>
+<a id="more"></a>
+<p><br></p>
+<h2 id="Iptables防火墙"><a href="#Iptables防火墙" class="headerlink" title="Iptables防火墙"></a>Iptables防火墙</h2><p>Iptables的前身叫ipfirewall,这是一个作者从FreeBSD上移植过来的,能够工作在内核当中的,对数据包进行检测的一款简易访问控制工具.但是ipfirewall工作功能极其有限(它需要将所有的规则都放进内核当中,这样规则才能够运行起来,而放进内核,这个做法一般是极其困难的).当内核发展到2.x系列的时候,软件更名为ipchains,它可以定义多条规则,将他们串起来,共同发挥作用,而现在,它叫做iptables,可以将规则组成一个列表,实现绝对详细的访问控制功能.</p>
+<p>IPTABLES是与 3.5 版本 Linux 内核集成的 IP 信息包过滤系统,如果 Linux 系统连接到因特网或 LAN、服务器或连接 LAN 和因特网的代理服务器,则该系统有利于在 Linux 系统上更好地控制 IP 信息包过滤和防火墙配置.</p>
+<blockquote>
+<p>网络安全设备的分类：</p>
+<blockquote>
+<p>基础类防火墙：通过数据包过滤加固服务器<br>IDS类防火墙：入侵检测系统,没有防护能力,仅仅提供事后日志的报告<br>IPS类防火墙：入侵防御系统<br>主动安全类防火墙：waf和daf<br>云盾:相当于代理服务器,有大量带宽,和性能,普通攻击无效</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>关于常见的DDOS攻击：</p>
+<blockquote>
+<p>SYN攻击：发起最小syn包,通过频繁发送大量数据包,导致CPU消耗殆尽<br>CC攻击：请求大量请求,通过http协议发起大量正常连接,导致内存消耗殆尽<br>长连接攻击：通过http1.1协议,建立正常通信,一点一点的发送请求,导致网络带宽消耗殆尽<br>UDP攻击：DNS攻击,向DNS一直发送解析请求,导致瘫痪<br>死亡Ping：把你的外网带宽占满,正常主机就无法访问<br>QPS：代表每秒攻击数</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>防火墙的安装位置：</p>
+<blockquote>
+<p>工作在主机边缘处或工作在网络边缘处，根据自定义规则或者默认规则对数据报文操作的组件<br>如果路由器性能比防火墙好,应把路由器放在前面（让路由器抗压）<br>如果防火墙性能比路由器好,应把防火墙放在前面（让交换机抗压）<br>如果装在主机与交换机之间,可以隔离内网,但一般不这样配置,不方便</p>
+</blockquote>
+</blockquote>
+<h3 id="◆替换默认防火墙◆"><a href="#◆替换默认防火墙◆" class="headerlink" title="◆替换默认防火墙◆"></a>◆替换默认防火墙◆</h3><p>在早期的Linux系统中,默认使用的是Iptables防火墙管理服务来配置防火墙,尽管新型的防火墙已经投入使用多年,但是大量的企业生产环境中,依然出于各种原因继续使用Iptables,下面我们将手动关闭系统中的Firewall防火墙,而安装Iptables防火墙.</p>
+<p>1.在替换之前我们要先将firewalld防火墙关闭,并设置开机禁止启动<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># systemctl stop firewalld</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl disable firewalld</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl status firewalld</span></span><br></pre></td></tr></table></figure></p>
+<p>2.通过Yum仓库安装,Iptables防火墙管理工具<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y iptables iptables-services</span></span><br><span class="line"></span><br><span class="line">Loaded plugins: product-id, search-disabled-repos, subscription-manager</span><br><span class="line">This system is not registered with an entitlement server. You can use subscription-manager.</span><br><span class="line">Package iptables-1.4.21-24.el7.x86_64 already installed and latest version</span><br><span class="line">Package iptables-services-1.4.21-24.el7.x86_64 already installed and latest version</span><br><span class="line">Nothing to <span class="keyword">do</span></span><br></pre></td></tr></table></figure></p>
+<p>3.启动Iptables并设置成开机自启动.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># systemctl restart iptables</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl enable iptables</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl status iptables</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="◆配置防火墙实例◆"><a href="#◆配置防火墙实例◆" class="headerlink" title="◆配置防火墙实例◆"></a>◆配置防火墙实例◆</h3><p>此处在配置规则的时候,要注意防火墙规则顺序是按照,从上到下的规则匹配的,因此一定要把允许动作放在拒绝动作前面,否则所有流量就被拒绝掉了,从而导致任何主机都无法访问我们的服务.</p>
+<p><strong>Iptable常用参数说明:</strong><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># iptables --help</span></span><br><span class="line"></span><br><span class="line">Commands:</span><br><span class="line"></span><br><span class="line">    -P               <span class="comment">#设置默认策略</span></span><br><span class="line">    -F               <span class="comment">#清空策略</span></span><br><span class="line">    -L               <span class="comment">#查看规则链</span></span><br><span class="line">    -A               <span class="comment">#在规则链末尾加入新规则</span></span><br><span class="line">    -I num           <span class="comment">#在规则链头部加入新规则</span></span><br><span class="line">    -D num           <span class="comment">#删除一个规则</span></span><br><span class="line">    -s               <span class="comment">#匹配来源地址IP/MASK,加！表示除这个IP外</span></span><br><span class="line">    -d               <span class="comment">#匹配目标地址</span></span><br><span class="line">    -i 网卡名称       <span class="comment">#匹配从这块网卡流入的数据</span></span><br><span class="line">    -o 网卡名称       <span class="comment">#匹配从这块网卡流出的数据</span></span><br><span class="line">    -p               <span class="comment">#匹配协议,如TCP,UDP,ICMP</span></span><br><span class="line">    --dport num      <span class="comment">#匹配目标端口</span></span><br><span class="line">    --sport num      <span class="comment">#匹配来源端口</span></span><br><span class="line"></span><br><span class="line">[添加配置]</span><br><span class="line"></span><br><span class="line">    -A               <span class="comment">#在规则链末尾加入新规则</span></span><br><span class="line">    -I num           <span class="comment">#在规则链头部加入新规则</span></span><br><span class="line"></span><br><span class="line">[查看配置]</span><br><span class="line"></span><br><span class="line">    -L               <span class="comment">#列出所有规则项目</span></span><br><span class="line">    -n               <span class="comment">#以数字形式显示地址,端口等信息</span></span><br><span class="line">    -v               <span class="comment">#详细信息显示</span></span><br><span class="line">    --line-numbers   <span class="comment">#查看规则时,显示规则序号</span></span><br><span class="line"></span><br><span class="line">[删除清空]</span><br><span class="line"></span><br><span class="line">    -D num           <span class="comment">#删除一个规则</span></span><br><span class="line">    -F               <span class="comment">#清空策略</span></span><br><span class="line">    -P               <span class="comment">#设置默认策略</span></span><br><span class="line"></span><br><span class="line">[协议匹配]</span><br><span class="line"></span><br><span class="line">    -p 协议名        <span class="comment">#匹配协议,如TCP,UDP,ICMP</span></span><br><span class="line">    -s 源地址        <span class="comment">#匹配来源地址IP/MASK,加！表示除这个IP外</span></span><br><span class="line">    -d 目标地址      <span class="comment">#匹配目标地址</span></span><br><span class="line">    -i 入站网卡      <span class="comment">#匹配从这块网卡流入的数据</span></span><br><span class="line">    -o 出站网卡      <span class="comment">#匹配从这块网卡流出的数据</span></span><br><span class="line"></span><br><span class="line">[隐含匹配]</span><br><span class="line"></span><br><span class="line">    --dport 目的端口        <span class="comment">#匹配目标端口号</span></span><br><span class="line">    --sport 源端口号        <span class="comment">#匹配源端口号</span></span><br><span class="line">    --tcp-flags 检查范围    <span class="comment">#tcp标记匹配</span></span><br><span class="line">    --icmp-type ICMP类型    <span class="comment">#icmp类型匹配</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>查询规则:</strong> 使用 <code>-L -n --line-numbers</code> 参数查看防火墙默认配置规则.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># iptables -L -n --line-numbers</span></span><br><span class="line"></span><br><span class="line">Chain INPUT (policy ACCEPT)</span><br><span class="line">num  target     prot opt <span class="built_in">source</span>               destination         </span><br><span class="line">1    ACCEPT     all  --  0.0.0.0/0            0.0.0.0/0            state RELATED,ESTABLISHED</span><br><span class="line">2    ACCEPT     icmp --  0.0.0.0/0            0.0.0.0/0           </span><br><span class="line">3    ACCEPT     all  --  0.0.0.0/0            0.0.0.0/0           </span><br><span class="line">4    ACCEPT     tcp  --  0.0.0.0/0            0.0.0.0/0            state NEW tcp dpt:22</span><br><span class="line">5    REJECT     all  --  0.0.0.0/0            0.0.0.0/0            reject-with icmp-host-prohibited</span><br><span class="line"></span><br><span class="line">Chain FORWARD (policy ACCEPT)</span><br><span class="line">num  target     prot opt <span class="built_in">source</span>               destination         </span><br><span class="line">1    REJECT     all  --  0.0.0.0/0            0.0.0.0/0            reject-with icmp-host-prohibited</span><br><span class="line"></span><br><span class="line">Chain OUTPUT (policy ACCEPT)</span><br><span class="line">num  target     prot opt <span class="built_in">source</span>               destination</span><br></pre></td></tr></table></figure></p>
+<p><strong>清空规则:</strong> 使用 <code>-F</code> 参数暂时清空防火墙规则,需要注意的是暂时清空后下次登陆后依旧会恢复回来.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># iptables -F</span></span><br><span class="line">[root@localhost ~]<span class="comment"># iptables -L -n --line-numbers</span></span><br><span class="line"></span><br><span class="line">Chain INPUT (policy ACCEPT)</span><br><span class="line">num  target     prot opt <span class="built_in">source</span>               destination         </span><br><span class="line"></span><br><span class="line">Chain FORWARD (policy ACCEPT)</span><br><span class="line">num  target     prot opt <span class="built_in">source</span>               destination         </span><br><span class="line"></span><br><span class="line">Chain OUTPUT (policy ACCEPT)</span><br><span class="line">num  target     prot opt <span class="built_in">source</span>               destination</span><br></pre></td></tr></table></figure></p>
+<p><strong>设置默认拒绝:</strong> 设置默认拒绝规则,把 <code>INPUT</code> 链设置为默认拒绝,也就是拒绝所有连接请求.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># iptables -P INPUT DROP</span></span><br><span class="line">[root@localhost ~]<span class="comment"># iptables -L -n --line-numbers</span></span><br><span class="line"></span><br><span class="line">Chain INPUT (policy DROP)       <span class="comment">#这里可以看出INPUT链已变成DROP</span></span><br><span class="line">num  target     prot opt <span class="built_in">source</span>               destination         </span><br><span class="line"></span><br><span class="line">Chain FORWARD (policy ACCEPT)</span><br><span class="line">num  target     prot opt <span class="built_in">source</span>               destination         </span><br><span class="line"></span><br><span class="line">Chain OUTPUT (policy ACCEPT)</span><br><span class="line">num  target     prot opt <span class="built_in">source</span>               destination</span><br></pre></td></tr></table></figure></p>
+<p><strong>开启ICMP:</strong> 在默认规则拒绝的情况下,设置开启ICMP测试,允许主机ping通.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># iptables -I INPUT -p icmp -j ACCEPT</span></span><br><span class="line">[root@localhost ~]<span class="comment"># iptables -L -n --line-numbers</span></span><br><span class="line"></span><br><span class="line">Chain INPUT (policy DROP)</span><br><span class="line">num  target     prot opt <span class="built_in">source</span>               destination         </span><br><span class="line">1    ACCEPT     icmp --  0.0.0.0/0            0.0.0.0/0           </span><br><span class="line"></span><br><span class="line">Chain FORWARD (policy ACCEPT)</span><br><span class="line">num  target     prot opt <span class="built_in">source</span>               destination         </span><br><span class="line"></span><br><span class="line">Chain OUTPUT (policy ACCEPT)</span><br><span class="line">num  target     prot opt <span class="built_in">source</span>               destination</span><br></pre></td></tr></table></figure></p>
+<p><strong>允许SSH连接:</strong> 在默认拒绝的情况下,设置开启22号端口,允许远程ssh连接到本机.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># iptables -I INPUT -p tcp --dport 22 -j ACCEPT</span></span><br><span class="line">[root@localhost ~]<span class="comment"># iptables -I OUTPUT -p tcp --sport 22 -j ACCEPT</span></span><br><span class="line">[root@localhost ~]<span class="comment"># iptables -L -n --line-numbers</span></span><br><span class="line"></span><br><span class="line">Chain INPUT (policy ACCEPT)</span><br><span class="line">num  target     prot opt <span class="built_in">source</span>               destination         </span><br><span class="line">1    ACCEPT     tcp  --  0.0.0.0/0            0.0.0.0/0            tcp dpt:22</span><br><span class="line"></span><br><span class="line">Chain FORWARD (policy ACCEPT)</span><br><span class="line">num  target     prot opt <span class="built_in">source</span>               destination         </span><br><span class="line"></span><br><span class="line">Chain OUTPUT (policy ACCEPT)</span><br><span class="line">num  target     prot opt <span class="built_in">source</span>               destination         </span><br><span class="line">1    ACCEPT     tcp  --  0.0.0.0/0            0.0.0.0/0            tcp spt:22</span><br></pre></td></tr></table></figure></p>
+<p><strong>规则的删除:</strong> 在默认拒绝的情况下,删除INPUT链,第2条数据,删除ICMP规则.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># iptables -L -n --line-numbers</span></span><br><span class="line">Chain INPUT (policy DROP)</span><br><span class="line">num  target     prot opt <span class="built_in">source</span>               destination         </span><br><span class="line">1    ACCEPT     tcp  --  0.0.0.0/0            0.0.0.0/0            tcp dpt:22</span><br><span class="line">2    ACCEPT     icmp --  0.0.0.0/0            0.0.0.0/0           </span><br><span class="line"></span><br><span class="line">Chain FORWARD (policy ACCEPT)</span><br><span class="line">num  target     prot opt <span class="built_in">source</span>               destination         </span><br><span class="line"></span><br><span class="line">Chain OUTPUT (policy ACCEPT)</span><br><span class="line">num  target     prot opt <span class="built_in">source</span>               destination         </span><br><span class="line">1    ACCEPT     tcp  --  0.0.0.0/0            0.0.0.0/0            tcp spt:22</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># iptables -D INPUT 2</span></span><br><span class="line">[root@localhost ~]<span class="comment"># iptables -L -n --line-numbers</span></span><br><span class="line">Chain INPUT (policy DROP)</span><br><span class="line">num  target     prot opt <span class="built_in">source</span>               destination         </span><br><span class="line">1    ACCEPT     tcp  --  0.0.0.0/0            0.0.0.0/0            tcp dpt:22</span><br><span class="line"></span><br><span class="line">Chain FORWARD (policy ACCEPT)</span><br><span class="line">num  target     prot opt <span class="built_in">source</span>               destination         </span><br><span class="line"></span><br><span class="line">Chain OUTPUT (policy ACCEPT)</span><br><span class="line">num  target     prot opt <span class="built_in">source</span>               destination         </span><br><span class="line">1    ACCEPT     tcp  --  0.0.0.0/0            0.0.0.0/0            tcp spt:22</span><br></pre></td></tr></table></figure></p>
+<p><strong>指定允许网段:</strong> 在默认拒绝的情况下,设置只允许<code>192.168.1.0/24</code>网段的主机访问本机的22号端口.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># iptables -I INPUT -s 192.168.1.0/24 -p tcp --dport 22 -j ACCEPT</span></span><br><span class="line">[root@localhost ~]<span class="comment"># iptables -I OUTPUT -s 192.168.1.0/24 -p tcp --sport 22 -j ACCEPT</span></span><br><span class="line">[root@localhost ~]<span class="comment"># iptables -L -n --line-numbers</span></span><br><span class="line"></span><br><span class="line">Chain INPUT (policy DROP)</span><br><span class="line">num  target     prot opt <span class="built_in">source</span>               destination         </span><br><span class="line">1    ACCEPT     tcp  --  192.168.1.0/24       0.0.0.0/0            tcp dpt:22</span><br><span class="line"></span><br><span class="line">Chain FORWARD (policy ACCEPT)</span><br><span class="line">num  target     prot opt <span class="built_in">source</span>               destination         </span><br><span class="line"></span><br><span class="line">Chain OUTPUT (policy ACCEPT)</span><br><span class="line">num  target     prot opt <span class="built_in">source</span>               destination         </span><br><span class="line">1    ACCEPT     tcp  --  192.168.1.0/24       0.0.0.0/0            tcp spt:22</span><br></pre></td></tr></table></figure></p>
+<p><strong>拒绝指定端口:</strong> 在INPUT规则链中,添加拒绝所有人访问本机的8888号端口.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># iptables -I INPUT -p tcp --dport 8888 -j REJECT</span></span><br><span class="line">[root@localhost ~]<span class="comment"># iptables -L -n --line-numbers</span></span><br><span class="line"></span><br><span class="line">Chain INPUT (policy DROP)</span><br><span class="line">num  target     prot opt <span class="built_in">source</span>               destination         </span><br><span class="line">1    REJECT     tcp  --  0.0.0.0/0            0.0.0.0/0            tcp dpt:8888 reject-with icmp-port-unreachable</span><br><span class="line">2    ACCEPT     tcp  --  192.168.1.0/24       0.0.0.0/0            tcp dpt:22</span><br><span class="line"></span><br><span class="line">Chain FORWARD (policy ACCEPT)</span><br><span class="line">num  target     prot opt <span class="built_in">source</span>               destination         </span><br><span class="line"></span><br><span class="line">Chain OUTPUT (policy ACCEPT)</span><br><span class="line">num  target     prot opt <span class="built_in">source</span>               destination         </span><br><span class="line">1    ACCEPT     tcp  --  192.168.1.0/24       0.0.0.0/0            tcp spt:22</span><br></pre></td></tr></table></figure></p>
+<p><strong>拒绝指定端口:</strong> 在INPUT规则链中,添加拒绝<code>192.168.1.20</code>主机访问本机的80端口.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># iptables -I INPUT -p tcp -s 192.168.1.20 --dport 80 -j REJECT</span></span><br><span class="line">[root@localhost ~]<span class="comment"># iptables -L -n --line-numbers</span></span><br><span class="line"></span><br><span class="line">Chain INPUT (policy DROP)</span><br><span class="line">num  target     prot opt <span class="built_in">source</span>               destination         </span><br><span class="line">1    REJECT     tcp  --  192.168.1.20         0.0.0.0/0            tcp dpt:80 reject-with icmp-port-unreachable</span><br><span class="line">2    REJECT     tcp  --  0.0.0.0/0            0.0.0.0/0            tcp dpt:8888 reject-with icmp-port-unreachable</span><br><span class="line">3    ACCEPT     tcp  --  192.168.1.0/24       0.0.0.0/0            tcp dpt:22</span><br><span class="line"></span><br><span class="line">Chain FORWARD (policy ACCEPT)</span><br><span class="line">num  target     prot opt <span class="built_in">source</span>               destination         </span><br><span class="line"></span><br><span class="line">Chain OUTPUT (policy ACCEPT)</span><br><span class="line">num  target     prot opt <span class="built_in">source</span>               destination         </span><br><span class="line">1    ACCEPT     tcp  --  192.168.1.0/24       0.0.0.0/0            tcp spt:22</span><br></pre></td></tr></table></figure></p>
+<p><strong>拒绝端口范围:</strong> 在INPUT规则链中,添加拒绝所有主机访问本机1000-2000端口.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># iptables -A INPUT -p tcp --dport 1000:2000 -j REJECT</span></span><br><span class="line">[root@localhost ~]<span class="comment"># iptables -A INPUT -p udp --dport 1000:2000 -j REJECT</span></span><br><span class="line">[root@localhost ~]<span class="comment"># iptables -L -n --line-numbers</span></span><br><span class="line"></span><br><span class="line">Chain INPUT (policy DROP)</span><br><span class="line">num  target     prot opt <span class="built_in">source</span>               destination         </span><br><span class="line">1    REJECT     tcp  --  192.168.1.20         0.0.0.0/0            tcp dpt:80 reject-with icmp-port-unreachable</span><br><span class="line">2    REJECT     tcp  --  0.0.0.0/0            0.0.0.0/0            tcp dpt:8888 reject-with icmp-port-unreachable</span><br><span class="line">3    ACCEPT     tcp  --  192.168.1.0/24       0.0.0.0/0            tcp dpt:22</span><br><span class="line">4    REJECT     tcp  --  0.0.0.0/0            0.0.0.0/0            tcp dpts:1000:2000 reject-with icmp-port-unreachable</span><br><span class="line">5    REJECT     udp  --  0.0.0.0/0            0.0.0.0/0            udp dpts:1000:2000 reject-with icmp-port-unreachable</span><br><span class="line"></span><br><span class="line">Chain FORWARD (policy ACCEPT)</span><br><span class="line">num  target     prot opt <span class="built_in">source</span>               destination         </span><br><span class="line"></span><br><span class="line">Chain OUTPUT (policy ACCEPT)</span><br><span class="line">num  target     prot opt <span class="built_in">source</span>               destination         </span><br><span class="line">1    ACCEPT     tcp  --  192.168.1.0/24       0.0.0.0/0            tcp spt:22</span><br></pre></td></tr></table></figure></p>
+<p><strong>SNAT-源地址转换&lt;内网–&gt;公网&gt;:</strong> 从本地发出的数据包,经过SNAT后,会自动伪装成公网的IP,并以公网IP访问指定服务.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment">#例：将本地 192.168.1.1 的请求自动伪装成外网地址 8.8.8.8</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># iptables -t nat -A POSTROUTING -o ens32 -s 192.168.1.1 -j SNAT --to-source 8.8.8.8</span></span><br><span class="line"></span><br><span class="line">  -o                  <span class="comment">#指定外网接口,此处为ens32</span></span><br><span class="line">  -s                  <span class="comment">#指定内网口地址,此处为192.168.1.1</span></span><br><span class="line">  --to-source         <span class="comment">#外网口的地址</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>DNAT-目标地址转换&lt;公网–&gt;内网&gt;:</strong> 从公网接收的数据包,经过DNAT后,会自动将数据包转到指定的内网主机.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment">#例：将请求 8.8.8.8 且端口为 80 的数据包,自动映射到内网 192.168.1.1 </span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># iptables -t nat -A PREROUTING -i ens32 -d 8.8.8.8 -p tcp --dport 80 -j DNAT --to-destination 192.168.1.1</span></span><br><span class="line"></span><br><span class="line">  --to-destination     <span class="comment">#内网口地址,此处为192.168.1.1</span></span><br><span class="line">  -i                   <span class="comment">#绑定外网接口,此处为ens32</span></span><br><span class="line">  -d                   <span class="comment">#外网地址,此处为8.8.8.8</span></span><br><span class="line">  -dport               <span class="comment">#内网端口,此处为80</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>其他常用总结:</strong> 下面是几个生产常用小总结,这些基础很重要,必须要掌握.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">iptables -L -n --line-number                               <span class="comment">#查看默认规则</span></span><br><span class="line">iptables -F                                                <span class="comment">#清空当前的规则</span></span><br><span class="line"></span><br><span class="line">iptables -t filter -A INPUT -p tcp --dport 80 -j ACCEPT    <span class="comment">#放行80端口</span></span><br><span class="line">iptables -t filter -I INPUT -p tcp --dport 443-j ACCEPT    <span class="comment">#插入在顶端一条放行443端口的规则</span></span><br><span class="line">iptables -t filter -I INPUT 2 -p tcp --dport 443 -j ACCEPT <span class="comment">#在第二列插入一条443放行规则</span></span><br><span class="line">iptables -t filter -A INPUT -p tcp --dport 80 -j DROP      <span class="comment">#丢弃80端口的请求</span></span><br><span class="line">iptables -I INPUT 2 -p icmp -j DROP                        <span class="comment">#丢弃ICMP请求</span></span><br><span class="line">iptables -t filter -D INPUT 3                              <span class="comment">#删除第三条规则</span></span><br><span class="line"></span><br><span class="line">iptables -t filter -P INPUT DROP                           <span class="comment">#设置默认规则，拒绝所有</span></span><br><span class="line">iptables -t filter -A INPUT -p tcp --dport 80 -j ACCEPT    <span class="comment">#放行80口</span></span><br><span class="line">iptables -t filter -A INPUT -p tcp --dport 443 -j ACCEPT   <span class="comment">#放行22口</span></span><br><span class="line">iptables -t filter -A INPUT -p tcp --dport 22 -j ACCEPT    <span class="comment">#放行22口</span></span><br><span class="line"></span><br><span class="line">iptables -A FORWARD -s 192.168.1.10 -j REJECT              <span class="comment">#拒接IP的转发请求</span></span><br><span class="line">iptables -I INPUT -s 10.20.30.0/24 -j DROP                 <span class="comment">#丢弃IP网段的入站请求</span></span><br><span class="line">iptables -A INPUT -i eth1 -s 192.168.0.0/16 -j DROP</span><br><span class="line">iptables -A INPUT -p tcp --dport 20:21 -j ACCEPT</span><br><span class="line">ables -I INPUT -p tcp -m multiport --dport 80-82,85 -j  ACCEPT</span><br><span class="line">iptables -A FORWARD -p tcp -m iprange --src-range 192.168.1.10-192.168.1.100 -j ACCEPT</span><br><span class="line"></span><br><span class="line">/sbin/iptables-save                                        <span class="comment">#保存规则</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>配置生产规则:</strong> 以下一段脚本,用来配置生产环境中最基本的防火墙规则.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment">#===================================================================</span></span><br><span class="line"><span class="comment"># 删除已有规则</span></span><br><span class="line">iptables --delete-chain</span><br><span class="line">iptables --flush</span><br><span class="line"><span class="comment"># 禁止进,允许出,允许回环网卡</span></span><br><span class="line">iptables -P INPUT DROP   </span><br><span class="line">iptables -P FORWARD DROP </span><br><span class="line">iptables -P OUTPUT ACCEPT</span><br><span class="line">iptables -A INPUT -i lo -j ACCEPT</span><br><span class="line"><span class="comment">#===================================================================</span></span><br><span class="line"><span class="comment"># 允许已建立的或相关连接的通行</span></span><br><span class="line">iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT</span><br><span class="line">iptables -A OUTPUT -m state --state RELATED,ESTABLISHED -j ACCEPT</span><br><span class="line"><span class="comment">#===================================================================</span></span><br><span class="line"><span class="comment"># 限制80端口单个IP的最大连接数为10</span></span><br><span class="line">iptables -I INPUT -p tcp --dport 80 -m connlimit --connlimit-above 10 -j DROP</span><br><span class="line"><span class="comment"># 允许80(HTTP)/873(RSYNC)/443(HTTPS)/20,21(FTP)/25(SMTP)端口的连接</span></span><br><span class="line">iptables -A INPUT -p tcp -m tcp --dport 80 -j ACCEPT</span><br><span class="line">iptables -A INPUT -p tcp -m tcp --dport 873 -j ACCEPT</span><br><span class="line">iptables -A INPUT -p tcp -m tcp --dport 443 -j ACCEPT</span><br><span class="line">iptables -A INPUT -p tcp -m tcp --dport 20 -j ACCEPT</span><br><span class="line">iptables -A INPUT -p tcp -m tcp --dport 21 -j ACCEPT</span><br><span class="line">iptables -A INPUT -p tcp -m tcp --dport 25 -j ACCEPT</span><br><span class="line"><span class="comment">#===================================================================</span></span><br><span class="line"><span class="comment"># 允许SSH端口的连接,脚本自动侦测目前的SSH端口,否则默认为22端口</span></span><br><span class="line"><span class="comment"># 获取SSH端口</span></span><br><span class="line"><span class="keyword">if</span> grep <span class="string">"^Port"</span> /etc/ssh/sshd_config&gt;/dev/null;<span class="keyword">then</span></span><br><span class="line">sshdport=`grep <span class="string">"^Port"</span> /etc/ssh/sshd_config | sed <span class="string">"s/Port\s//g"</span> `</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">sshdport=22</span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"><span class="comment"># 放行SSH端口</span></span><br><span class="line">iptables -A INPUT -p tcp -m tcp --dport <span class="variable">$sshdport</span> -j ACCEPT</span><br><span class="line">iptables -A OUTPUT -p tcp -m tcp --dport <span class="variable">$sshdport</span> -j ACCEPT</span><br><span class="line"><span class="comment">#===================================================================</span></span><br><span class="line"><span class="comment"># 允许ping</span></span><br><span class="line">iptables -A INPUT -p icmp -m icmp --icmp-type 8 -j ACCEPT </span><br><span class="line">iptables -A INPUT -p icmp -m icmp --icmp-type 11 -j ACCEPT</span><br><span class="line"><span class="comment">#===================================================================</span></span><br><span class="line"><span class="comment"># 放行允许DNS解析端口.</span></span><br><span class="line"><span class="comment"># 获取DNS服务器IP</span></span><br><span class="line"><span class="keyword">if</span> [ -s /etc/resolv.conf ]</span><br><span class="line"><span class="keyword">then</span></span><br><span class="line">DNS1=`cat /etc/resolv.conf |grep nameserver |awk <span class="string">'NR==1&#123;print $2 &#125;'</span>`</span><br><span class="line">DNS2=`cat /etc/resolv.conf |grep nameserver |awk <span class="string">'NR==2&#123;print $2 &#125;'</span>`</span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"><span class="comment"># 放行允许DNS解析端口.</span></span><br><span class="line">[ ! -z <span class="string">"<span class="variable">$DNS1</span>"</span> ] &amp;&amp; iptables -A OUTPUT -p udp -m udp -d <span class="variable">$DNS1</span> --dport 53 -j ACCEPT</span><br><span class="line">[ ! -z <span class="string">"<span class="variable">$DNS2</span>"</span> ] &amp;&amp; iptables -A OUTPUT -p udp -m udp -d <span class="variable">$DNS2</span> --dport 53 -j ACCEPT</span><br><span class="line"><span class="comment">#===================================================================</span></span><br><span class="line"><span class="comment"># 保存规则</span></span><br><span class="line">iptables-save</span><br><span class="line"><span class="comment">#===================================================================</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="firewall-防火墙"><a href="#firewall-防火墙" class="headerlink" title="firewall 防火墙"></a>firewall 防火墙</h2><p>在Centos7系统中默认集成了许多防火墙,其中firewalld服务是默认的防火墙工具,它拥有基于CLI和基于GUI的两种工作方式,相比于iptables防火墙firewall支持动态更新的技术并且加入的区域(zone)相关的概念.简单来说,区域就是firewall预先准备了几套防火墙策略的集合,从而实现防火墙之间策列的快速切换技术,从而极大地提升了防火墙的快速切换应用效率.</p>
+<blockquote>
+<p>firewalld跟iptables比起来的两大优势:</p>
+<blockquote>
+<p>1.firewalld可以动态修改单条规则,而不需要像iptables那样,在修改了规则后必须得全部刷新才可以生效.<br>2.firewalld在使用上要比iptables人性化很多,即使不明白”5表5链”,而且对TCP/IP协议也不理解也可以实现大部分功能.<br>3.firewalld自身并不具备防火墙的功能,而是和iptables一样需要通过内核的netfilter来实现,也就是说firewalld和iptables一样,他们的作用都是用于维护规则,而真正使用规则干活的是内核的netfilter,只不过firewalld和iptables的结构以及使用方法不一样罢了.</p>
+</blockquote>
+</blockquote>
+<p><strong>firewall的常用区域说明:</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">区域</th>
+<th style="text-align:left">默认策略规则</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">trusted</td>
+<td style="text-align:left">允许所有数据包</td>
+</tr>
+<tr>
+<td style="text-align:left">home</td>
+<td style="text-align:left">拒绝流入流量,但是与ssh,mdns,ipp-client,dhcpv6-client服务则允许通过</td>
+</tr>
+<tr>
+<td style="text-align:left">internal</td>
+<td style="text-align:left">等同于home区域</td>
+</tr>
+<tr>
+<td style="text-align:left">work</td>
+<td style="text-align:left">拒绝流入流量,但是与ssh,ipp-client,dhcpv6-client服务则允许通过</td>
+</tr>
+<tr>
+<td style="text-align:left">public</td>
+<td style="text-align:left">拒绝流入流量,但是与ssh,ipp-client,dhcpv6-client服务则允许通过</td>
+</tr>
+<tr>
+<td style="text-align:left">external</td>
+<td style="text-align:left">拒绝流入流量,但是与ssh服务相关则允许通过</td>
+</tr>
+<tr>
+<td style="text-align:left">dmz</td>
+<td style="text-align:left">拒绝流入流量,但是与ssh服务相关则允许通过</td>
+</tr>
+<tr>
+<td style="text-align:left">block</td>
+<td style="text-align:left">拒绝流入流量,除非与流出的流量相关</td>
+</tr>
+<tr>
+<td style="text-align:left">drop</td>
+<td style="text-align:left">拒绝流入流量,除非与流出的流量相关</td>
+</tr>
+</tbody>
+</table>
+<h3 id="◆常用命令说明◆"><a href="#◆常用命令说明◆" class="headerlink" title="◆常用命令说明◆"></a>◆常用命令说明◆</h3><p><strong>状态显示相关:</strong><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --version                     #显示版本</span></span><br><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --state                       #显示运行状态</span></span><br><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --get-zones                   #显示所有zone区域</span></span><br><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --get-active-zones            #显示当前使用的区域</span></span><br><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --get-default-zone            #显示默认使用的区域</span></span><br><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --get-zone-of-interface=ens32 #查看ens32网口的区域</span></span><br><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --zone=public --list-ports    #显示public区域所有开放的端口</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>常用配置相关:</strong><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --panic-on           #拒绝所有包</span></span><br><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --panic-off          #取消拒绝状态</span></span><br><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --query-panic        #查看是否拒绝</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>查询服务相关:</strong><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --get-services                 #显示服务列表</span></span><br><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --list-service                 #查询当前放行服务</span></span><br><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --reload                       #重新加载防火墙</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --add-service=nfs              #临时允许nfs服务通过</span></span><br><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --add-service=nfs --permanent  #永久允许nfs服务通过</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>端口管理相关:</strong><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --add-port=443/tcp                 #临时开启443端口</span></span><br><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --add-port=3306/tcp --permanent    #永久开启3306端口</span></span><br><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --remove-port=443/tcp              #删除443端口</span></span><br><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --list-all                         #显示所有端口列表</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --add-service=mysql                #开放mysql端口</span></span><br><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --remove-service=http              #阻止http端口</span></span><br><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --list-services                    #查看开放的服务</span></span><br><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --add-port=3306/tcp                #开放通过tcp访问3306</span></span><br><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --remove-port=80/tcp               #阻止通过tcp访问3306</span></span><br><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --add-port=233/udp                 #开放通过udp访问233</span></span><br><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --list-ports                       #查看开放的端口</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>端口转发:</strong><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">firewall-cmd --add-forward-port=port=80:proto=tcp:toport=8080                         <span class="comment">#将80端口的流量转发至8080</span></span><br><span class="line">firewall-cmd --add-forward-port=proto=80:proto=tcp:toaddr=192.168.1.1.1               <span class="comment">#将80端口的流量转发至192.168.1.1</span></span><br><span class="line">firewall-cmd --add-forward-port=proto=80:proto=tcp:toaddr=192.168.1.1:toport=8080     <span class="comment">#将80端口的流量转发至192.168.1.1的8080</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="◆几个小例子◆"><a href="#◆几个小例子◆" class="headerlink" title="◆几个小例子◆"></a>◆几个小例子◆</h3><p><strong>区域查询:</strong> 查询firewall服务当前所使用的区域.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --get-default-zone</span></span><br><span class="line">public</span><br></pre></td></tr></table></figure></p>
+<p><strong>特定区域查询:</strong> 查看ens32网卡的所在区域信息.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --get-zone-of-interface=ens32</span></span><br><span class="line">public</span><br></pre></td></tr></table></figure></p>
+<p><strong>修改默认区域:</strong> 修改ens32的public区域到external区域,并永久生效.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --get-zone-of-interface=ens32</span></span><br><span class="line">public</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --zone=external --change-interface=ens32</span></span><br><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --zone=external --change-interface=ens32 --permanent</span></span><br><span class="line">success</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --get-zone-of-interface=ens32</span></span><br><span class="line">external</span><br></pre></td></tr></table></figure></p>
+<p><strong>设置默认区域:</strong> 把当前服务的默认区域设置为external.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --get-default-zone</span></span><br><span class="line">public</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --set-default-zone=external</span></span><br><span class="line">success</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --get-default-zone</span></span><br><span class="line">external</span><br></pre></td></tr></table></figure></p>
+<p><strong>请求查询:</strong> 查询public区域是否允许请求SSH和HTTPS协议的流量.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --zone=public --query-service=ssh</span></span><br><span class="line">yes</span><br><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --zone=public --query-service=https</span></span><br><span class="line">no</span><br></pre></td></tr></table></figure></p>
+<p><strong>允许请求设置:</strong> 把public区域的https请求,永久允许通过.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --zone=public --add-service=https</span></span><br><span class="line">success</span><br><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --zone=public --add-service=https --permanent</span></span><br><span class="line">success</span><br></pre></td></tr></table></figure></p>
+<p><strong>拒绝请求设置:</strong> 把public区域的https请求,设置为永久拒绝.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --zone=public --remove-service=https</span></span><br><span class="line">success</span><br><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --zone=public --remove-service=https --permanent</span></span><br><span class="line">success</span><br></pre></td></tr></table></figure></p>
+<p><strong>放行端口:</strong> 临时放行8080端口,和8081端口.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --zone=public --add-port=8080-8081/tcp</span></span><br><span class="line">success</span><br><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --zone=public --list-ports</span></span><br><span class="line">8080-8081/tcp</span><br></pre></td></tr></table></figure></p>
+<p><strong>端口转发:</strong> 在<code>192.168.1.0/24</code>网络中的系统,访问本地端口<code>5423</code>将被转发到本地的<code>80</code>端口.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --add-rich-rule 'rule family=ipv4 source address=192.168.1.0/24 forward-port port=5423 protocol=tcp to-port=80' --permanent</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>放行端口:</strong> 另一种放行方法放行本地的3260端口.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --add-rich-rule 'rule family=ipv4 source address=192.168.1.0/24 port port=3260 protocol=tcp accept'</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>放行服务:</strong> 另一种方法,放行https服务数据包通过.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --add-rich-rule 'rule family=ipv4 source address=192.168.1.0/24 service name=httpd accept'</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --list-rich-rule</span></span><br><span class="line">rule family=<span class="string">"ipv4"</span> <span class="built_in">source</span> address=<span class="string">"192.168.1.0/24"</span> service name=<span class="string">"https"</span> accept</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/11/30/Linux 系统管理/Linux防火墙配置与管理-16/">Linux防火墙配置与管理(16)</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年11月30日 - 13:11</p>
+  <p><span>最后更新:</span>2019年04月16日 - 20:04</p>
+  <p><span>原始链接:</span><a href="/2018/11/30/Linux 系统管理/Linux防火墙配置与管理-16/" title="Linux防火墙配置与管理(16)">https://www.mkdirs.com/2018/11/30/Linux 系统管理/Linux防火墙配置与管理-16/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux-系统管理/" rel="tag"> <i class="fa fa-tag"></i> Linux 系统管理</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/29/Linux 系统管理/Linux启动流程与模块管理-15/" rel="next" title="Linux启动流程与模块管理(15)">
+                <i class="fa fa-chevron-left"></i> Linux启动流程与模块管理(15)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/01/Ansible/Ansible 系统概述与部署-1/" rel="prev" title="Ansible 系统概述与部署(1)">
+                Ansible 系统概述与部署(1) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Iptables防火墙"><span class="nav-text">Iptables防火墙</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆替换默认防火墙◆"><span class="nav-text">◆替换默认防火墙◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆配置防火墙实例◆"><span class="nav-text">◆配置防火墙实例◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#firewall-防火墙"><span class="nav-text">firewall 防火墙</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆常用命令说明◆"><span class="nav-text">◆常用命令说明◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆几个小例子◆"><span class="nav-text">◆几个小例子◆</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

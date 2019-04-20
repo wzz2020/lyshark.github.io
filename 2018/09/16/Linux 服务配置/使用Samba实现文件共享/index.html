@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="1987年,微软公司和英特尔公司,共同制定了SMB(Server Messages Block 服务消息块)协议,指在解决局域网内的文件或打印机等资源的共享问题,这也使得在多个主机之间共享文件变得越来越简单.到了1991年,当时还在读大学的Tridgwell为了解决Linux系统与Windows系统的文件共享问题,基于SMB协议,开发出了SMBServer服务程序,后来由于名称冲突,改名为Samb">
+<meta name="keywords" content="Linux 服务配置">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用Samba实现文件共享">
+<meta property="og:url" content="https://www.mkdirs.com/2018/09/16/Linux 服务配置/使用Samba实现文件共享/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="1987年,微软公司和英特尔公司,共同制定了SMB(Server Messages Block 服务消息块)协议,指在解决局域网内的文件或打印机等资源的共享问题,这也使得在多个主机之间共享文件变得越来越简单.到了1991年,当时还在读大学的Tridgwell为了解决Linux系统与Windows系统的文件共享问题,基于SMB协议,开发出了SMBServer服务程序,后来由于名称冲突,改名为Samb">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-04-16T12:39:12.669Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用Samba实现文件共享">
+<meta name="twitter:description" content="1987年,微软公司和英特尔公司,共同制定了SMB(Server Messages Block 服务消息块)协议,指在解决局域网内的文件或打印机等资源的共享问题,这也使得在多个主机之间共享文件变得越来越简单.到了1991年,当时还在读大学的Tridgwell为了解决Linux系统与Windows系统的文件共享问题,基于SMB协议,开发出了SMBServer服务程序,后来由于名称冲突,改名为Samb">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/09/16/Linux 服务配置/使用Samba实现文件共享/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>使用Samba实现文件共享 | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/09/16/Linux 服务配置/使用Samba实现文件共享/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">使用Samba实现文件共享
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-09-16 23:10:08" itemprop="dateCreated datePublished" datetime="2018-09-16T23:10:08+08:00">2018-09-16</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-16 20:39:12" itemprop="dateModified" datetime="2019-04-16T20:39:12+08:00">2019-04-16</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Linux-服务配置/" itemprop="url" rel="index"><span itemprop="name">Linux 服务配置</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>1987年,微软公司和英特尔公司,共同制定了SMB(Server Messages Block 服务消息块)协议,指在解决局域网内的文件或打印机等资源的共享问题,这也使得在多个主机之间共享文件变得越来越简单.到了1991年,当时还在读大学的Tridgwell为了解决Linux系统与Windows系统的文件共享问题,基于SMB协议,开发出了SMBServer服务程序,后来由于名称冲突,改名为Samba,而如今Samba服务已经成为了,Linux系统与Windows系统之间数据传输的最佳选择.</p>
+<a id="more"></a>
+<p><strong>Samba 服务概述</strong></p>
+<p>Samba是SMB的一种实现方法,主要用来实现Linux系统的文件和打印服务.Linux用户通过配置使用Samba服务器可以实现与Windows用户的资源共享.守护进程smbd和nmbd是Samba的核心,在全部时间内运行.nmbd程序使得通过企图计算机可以浏览Linux服务器.</p>
+<p>SMB (Server Messages Block 信息服务块)是一种在局域网上共享文件和打印机的一种通信协议,它为局域网内的不同计算机之间提供文件及打印机等资源的共享服务.SMB协议是客户机/服务器型协议,客户机通过该协议可以访问服务器上的共享文件系统、打印机及其他资源.通过设置 “NetBIOS over TCP/IP” 使得Samba不但能与局域网络主机分享资源,还能与全世界的电脑分享资源.</p>
+<p>smb: 实现资源共享、权限验证 -&gt; TCP 139 445<br>nmb: 实现计算机名解析 -&gt; UDP 137</p>
+<p><strong>Samba和FTP的区别</strong></p>
+<p>Samba可以实现跨平台的文件传输,并且支持在线修改,这一点是它和FTP服务器的明显区别.</p>
+<p>Linux 系统之间的资源共享,我们使用的是NFS协议.<br>Windows 系统之间的资源共享,我们使用的是NetBIOS协议.<br>Linux 和 Windows 之间资源共享我们就要使用SMB协议了.CIFS协议.</p>
+<p><strong>Samba的作用</strong></p>
+<p>1.共享文件与打印机等资源的服务<br>2.支持跨平台访问的身份验证和权限设置,支持SSL<br>3.解析NetBIOS名字:Samba通过nmbd服务可以搭建NBNS(NetBIOS Name Service)服务器,提供名称解析,将    计算机的NetBIOS名解析为IP地址,实现主机之间的访问定位(windows独有).<br><br></p>
+<h2 id="匿名验证Samba配置"><a href="#匿名验证Samba配置" class="headerlink" title="匿名验证Samba配置"></a>匿名验证Samba配置</h2><p>匿名Samba的主要作用是,在局域网内编辑共享文件,比如你有一个word文件需要让大家填写,此时我们就可以使用Samb服务将Word文档匿名分享出去,让大家填写文档</p>
+<h3 id="◆配置服务端◆"><a href="#◆配置服务端◆" class="headerlink" title="◆配置服务端◆"></a>◆配置服务端◆</h3><p>1.首先通过yum,来安装samba服务程序,恰巧samba服务名也是samba<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y samba samba-client</span></span><br><span class="line">Loaded plugins: product-id, search-disabled-repos, subscription-manager</span><br><span class="line">This system is not registered with an entitlement server. You can use subscription-manager.</span><br><span class="line">Package samba-4.7.1-6.el7.x86_64 already installed and latest version</span><br><span class="line">Package samba-client-4.7.1-6.el7.x86_64 already installed and latest version</span><br><span class="line">Nothing to <span class="keyword">do</span></span><br></pre></td></tr></table></figure></p>
+<p>2.然后创建一个共享目录,这个目录主要用来存储一些文件,后期要共享出去<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mkdir /smb_file</span></span><br><span class="line">[root@localhost ~]<span class="comment">#</span></span><br><span class="line">[root@localhost ~]<span class="comment"># chmod 755 -R /smb_file/</span></span><br><span class="line">[root@localhost ~]<span class="comment">#</span></span><br></pre></td></tr></table></figure></p>
+<p>3.编辑Samba主配置文件,在配置文件最下面创建匿名共享区域,如果有多个匿名区域可以继续往下写配置<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/samba/smb.conf</span></span><br><span class="line"></span><br><span class="line">  6 [global]</span><br><span class="line">  7         workgroup = SAMBA</span><br><span class="line">  8         security = user</span><br><span class="line">  9         map to guest=Bad User   <span class="comment">#添加此项,开启免密码认证</span></span><br><span class="line"></span><br><span class="line"> .....</span><br><span class="line"> 38</span><br><span class="line"> 39 [smb_file]                       <span class="comment">#共享目录显示的名称</span></span><br><span class="line"> 40         comment=hello guest      <span class="comment">#描述信息(可以自定义)</span></span><br><span class="line"> 41         path=/smb_file           <span class="comment">#共享的目录</span></span><br><span class="line"> 42         browseable=yes           <span class="comment">#共享目录是否对所有人可见</span></span><br><span class="line"> 43         guest ok=yes             <span class="comment">#允许匿名用户访问</span></span><br><span class="line"> 44         writable=yes             <span class="comment">#匿名用户可写</span></span><br><span class="line"> 45         public=yes               <span class="comment">#所有人可见</span></span><br></pre></td></tr></table></figure></p>
+<p>4.重启SMB服务,并设置开机自启动<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># systemctl restart smb</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl enable smb</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="◆配置Linux客户端◆"><a href="#◆配置Linux客户端◆" class="headerlink" title="◆配置Linux客户端◆"></a>◆配置Linux客户端◆</h3><p>1.首先想要使用Samba资源,需要在Linxu客户端安装一个Samba的客户端工具,下面就开始安装吧<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y samba-client</span></span><br><span class="line">Loaded plugins: product-id, search-disabled-repos, subscription-manager</span><br><span class="line">This system is not registered with an entitlement server. You can use subscription-manager.</span><br><span class="line">Package samba-client-4.7.1-6.el7.x86_64 already installed and latest version</span><br><span class="line">Nothing to <span class="keyword">do</span></span><br></pre></td></tr></table></figure></p>
+<p>2.匿名用户访问,我们可以直接使用下面的命令无需输入密码直接扫描资源,并使用<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># smbclient -L //服务器IP	             #查看smaba共享目录</span></span><br><span class="line"></span><br><span class="line">Enter SAMBA root s password:</span><br><span class="line"></span><br><span class="line">        Sharename       Type      Comment</span><br><span class="line">        ---------       ----      -------</span><br><span class="line">        <span class="built_in">print</span>$          Disk      Printer Drivers</span><br><span class="line">        smb_file        Disk      hello guest</span><br><span class="line">        IPC$            IPC       IPC Service (Samba 4.7.1)</span><br><span class="line">Reconnecting with SMB1 <span class="keyword">for</span> workgroup listing.</span><br><span class="line"></span><br><span class="line">        Server               Comment</span><br><span class="line">        ---------            -------</span><br><span class="line"></span><br><span class="line">        Workgroup            Master</span><br><span class="line">        ---------            -------</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># smbclient //服务器IP/共享名			#查看共享文件</span></span><br><span class="line"></span><br><span class="line">Enter SAMBA root s password:</span><br><span class="line">Try <span class="string">"help"</span> to get a list of possible commands.</span><br><span class="line">smb: \&gt; ls</span><br><span class="line">  .                                  DR        0  Mon Nov  5 04:53:30 2018</span><br><span class="line">  ..                                 DR        0  Mon Nov  5 04:45:11 2018</span><br><span class="line">                17811456 blocks of size 1024. 16582792 blocks available</span><br><span class="line">smb: \&gt;</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆配置Windows客户端◆"><a href="#◆配置Windows客户端◆" class="headerlink" title="◆配置Windows客户端◆"></a>◆配置Windows客户端◆</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">运行CMD(Win+R) &gt; 输入:\\服务器IP\	共享资源名			<span class="comment">#访问目录</span></span><br><span class="line"></span><br><span class="line">C:\Users\LyShark&gt;net use * /del               <span class="comment">#清理windows目录缓存</span></span><br><span class="line">你有以下的远程连接:</span><br><span class="line"></span><br><span class="line">                    \\192.168.1.20\smb_file</span><br><span class="line">继续运行会取消连接。</span><br><span class="line"></span><br><span class="line">你想继续此操作吗? (Y/N) [N]: y</span><br><span class="line">命令成功完成。</span><br></pre></td></tr></table></figure>
+<p><br></p>
+<h2 id="密码验证Samba配置"><a href="#密码验证Samba配置" class="headerlink" title="密码验证Samba配置"></a>密码验证Samba配置</h2><p>基于密码验证的Samba的常用作用是,在局域网内,实现加密访问,只有知道相应密码的人才能访问指定资源</p>
+<h3 id="◆配置服务端◆-1"><a href="#◆配置服务端◆-1" class="headerlink" title="◆配置服务端◆"></a>◆配置服务端◆</h3><p>1.首先通过yum,来安装samba服务程序,恰巧samba服务名也是samba<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y samba samba-client</span></span><br><span class="line">Loaded plugins: product-id, search-disabled-repos, subscription-manager</span><br><span class="line">This system is not registered with an entitlement server. You can use subscription-manager.</span><br><span class="line">Package samba-4.7.1-6.el7.x86_64 already installed and latest version</span><br><span class="line">Package samba-client-4.7.1-6.el7.x86_64 already installed and latest version</span><br><span class="line">Nothing to <span class="keyword">do</span></span><br></pre></td></tr></table></figure></p>
+<p>2.然后创建一个共享目录,这个目录主要用来存储一些文件,后期要共享出去<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mkdir /smb_file</span></span><br><span class="line">[root@localhost ~]<span class="comment">#</span></span><br><span class="line">[root@localhost ~]<span class="comment"># chmod 755 -R /smb_file/</span></span><br><span class="line">[root@localhost ~]<span class="comment">#</span></span><br></pre></td></tr></table></figure></p>
+<p>3.编辑Samba主配置文件,在配置文件最下面创建共享区域,如果有多个区域可以继续往下写配置<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/samba/smb.conf</span></span><br><span class="line"></span><br><span class="line"> 39 [smb_file]                       <span class="comment">#共享目录显示的名称</span></span><br><span class="line"> 40         comment=hello admin      <span class="comment">#描述信息(可以自定义)</span></span><br><span class="line"> 41         path=/smb_file           <span class="comment">#共享的目录</span></span><br><span class="line"> 42         browseable=yes           <span class="comment">#共享目录是否对所有人可见</span></span><br><span class="line"> 43         guest ok=no              <span class="comment">#允许匿名用户访问</span></span><br><span class="line"> 44         writable=yes             <span class="comment">#可写</span></span><br></pre></td></tr></table></figure></p>
+<p>4.通过命令管理,创建一个系统用户,并转换为Samba用户<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># useradd -M -s /sbin/nologin admin      #创建一个系统用户</span></span><br><span class="line">[root@localhost ~]<span class="comment"># smbpasswd -a admin                     #将系统用户转化成Samba用户</span></span><br><span class="line">-----------------------------------------------------------------</span><br><span class="line">[参数说明]</span><br><span class="line"></span><br><span class="line">smbpasswd [选项] 账户名称</span><br><span class="line"></span><br><span class="line">  -a        <span class="comment">#添加账户并设置密码</span></span><br><span class="line">  -x        <span class="comment">#删除SMB账户</span></span><br><span class="line">  -d        <span class="comment">#禁用SMB账户</span></span><br><span class="line">  -e        <span class="comment">#启用SMB账户</span></span><br><span class="line">-----------------------------------------------------------------</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># useradd -M -s /sbin/nologin guest      #创建一个系统用户</span></span><br><span class="line">[root@localhost ~]<span class="comment"># pdbedit -a guest                       #将系统用户转化成Samba用户</span></span><br><span class="line">new password:</span><br><span class="line">retype new password:</span><br><span class="line">Unix username:        guest</span><br><span class="line">NT username:</span><br><span class="line">Account Flags:        [U          ]</span><br><span class="line">User SID:             S-1-5-21-2500030998-3215874083-1041928306-1001</span><br><span class="line">Primary Group SID:    S-1-5-21-2500030998-3215874083-1041928306-513</span><br><span class="line">Full Name:</span><br><span class="line">Home Directory:       \\localhost\guest</span><br><span class="line">HomeDir Drive:</span><br><span class="line">Logon Script:</span><br><span class="line">Profile Path:         \\localhost\guest\profile</span><br><span class="line">Domain:               LOCALHOST</span><br><span class="line">Account desc:</span><br><span class="line">Workstations:</span><br><span class="line">Munged dial:</span><br><span class="line">Logon time:           0</span><br><span class="line">Logoff time:          Wed, 06 Feb 2036 10:06:39 EST</span><br><span class="line">Kickoff time:         Wed, 06 Feb 2036 10:06:39 EST</span><br><span class="line">Password last <span class="built_in">set</span>:    Mon, 05 Nov 2018 06:23:37 EST</span><br><span class="line">Password can change:  Mon, 05 Nov 2018 06:23:37 EST</span><br><span class="line">Password must change: never</span><br><span class="line">Last bad password   : 0</span><br><span class="line">Bad password count  : 0</span><br><span class="line">Logon hours         : FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># pdbedit -L                             #列出所有Samba用户</span></span><br><span class="line">admin:1001:</span><br><span class="line">guest:1002:</span><br></pre></td></tr></table></figure></p>
+<p>5.重启SMB服务,并设置开机自启动<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># systemctl restart smb</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl enable smb</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="◆配置Linux客户端◆-1"><a href="#◆配置Linux客户端◆-1" class="headerlink" title="◆配置Linux客户端◆"></a>◆配置Linux客户端◆</h3><p>1.首先想要使用Samba资源,需要在Linxu客户端安装一个Samba的客户端工具,下面就开始安装吧<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y samba-client</span></span><br><span class="line">Loaded plugins: product-id, search-disabled-repos, subscription-manager</span><br><span class="line">This system is not registered with an entitlement server. You can use subscription-manager.</span><br><span class="line">Package samba-client-4.7.1-6.el7.x86_64 already installed and latest version</span><br><span class="line">Nothing to <span class="keyword">do</span></span><br></pre></td></tr></table></figure></p>
+<p>2.用户访问,我们可以直接使用下面的命令输入密码扫描资源,并使用<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># smbclient -U 用户名 -L //服务器IP               #查看共享目录</span></span><br><span class="line">Enter SAMBA dmin s password:</span><br><span class="line"></span><br><span class="line">        Sharename       Type      Comment</span><br><span class="line">        ---------       ----      -------</span><br><span class="line">        <span class="built_in">print</span>$          Disk      Printer Drivers</span><br><span class="line">        smb_file        Disk      hello admin</span><br><span class="line">        IPC$            IPC       IPC Service (Samba 4.7.1)</span><br><span class="line">        admin           Disk      Home Directories</span><br><span class="line">Reconnecting with SMB1 <span class="keyword">for</span> workgroup listing.</span><br><span class="line"></span><br><span class="line">        Server               Comment</span><br><span class="line">        ---------            -------</span><br><span class="line"></span><br><span class="line">        Workgroup            Master</span><br><span class="line">        ---------            -------</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># smbclient -U 用户名 //服务器IP/共享文件名      #查看共享文件</span></span><br><span class="line">Enter SAMBA dmins password:</span><br><span class="line">Try <span class="string">"help"</span> to get a list of possible commands.</span><br><span class="line">smb: \&gt; ls</span><br><span class="line">  .                                   D        0  Mon Nov  5 06:30:02 2018</span><br><span class="line">  ..                                 DR        0  Mon Nov  5 06:17:37 2018</span><br><span class="line">  lyshark                             N      988  Mon Nov  5 06:23:28 2018</span><br><span class="line"></span><br><span class="line">                17811456 blocks of size 1024. 16584148 blocks available</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆Linux挂载Samba◆"><a href="#◆Linux挂载Samba◆" class="headerlink" title="◆Linux挂载Samba◆"></a>◆Linux挂载Samba◆</h3><p>1.将远程的smb_file共享目录,挂载到本地的/mnt下,我们可以执行以下命令<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[文件格式]  [/smb_file共享目录][挂载到/mnt] [username=smb用户名][password=smb密码]</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># mount -t cifs //192.168.1.20/smb_file /mnt -o username=admin,password=123123</span></span><br><span class="line">[root@localhost ~]<span class="comment">#</span></span><br><span class="line">[root@localhost ~]<span class="comment"># df -h</span></span><br><span class="line">Filesystem               Size  Used Avail Use% Mounted on</span><br><span class="line">/dev/mapper/rhel-root     17G  1.2G   16G   7% /</span><br><span class="line">//192.168.1.20/smb_file   17G  1.2G   16G   7% /mnt</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="Samba-ACL权限控制"><a href="#Samba-ACL权限控制" class="headerlink" title="Samba ACL权限控制"></a>Samba ACL权限控制</h2><p>允许单个IP拒绝所有<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[common]</span><br><span class="line"></span><br><span class="line">comment=Common Share </span><br><span class="line">hosts allow =  IP地址</span><br><span class="line">hosts deny =  IP地址</span><br></pre></td></tr></table></figure></p>
+<p>允许单个网段,拒绝所有<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[common]</span><br><span class="line"></span><br><span class="line">path =/common </span><br><span class="line">hosts allow =127.0.0.0/24  example</span><br><span class="line">hosts deny =127.0.0.0/24  example</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="Samba-给用户取别名"><a href="#Samba-给用户取别名" class="headerlink" title="Samba 给用户取别名"></a>Samba 给用户取别名</h2><p>1.修改主配置文件<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">vim /etc/samba/smbusers</span><br><span class="line"></span><br><span class="line">用户名=别名1 别名2</span><br><span class="line"></span><br><span class="line">lyshark= wang rui</span><br></pre></td></tr></table></figure></p>
+<p>2.主配置文件加入以下内容<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">vim /etc/samba/smb.conf</span><br><span class="line"></span><br><span class="line">username map = /etc/samba/smbusers</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/09/16/Linux 服务配置/使用Samba实现文件共享/">使用Samba实现文件共享</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年09月16日 - 23:09</p>
+  <p><span>最后更新:</span>2019年04月16日 - 20:04</p>
+  <p><span>原始链接:</span><a href="/2018/09/16/Linux 服务配置/使用Samba实现文件共享/" title="使用Samba实现文件共享">https://www.mkdirs.com/2018/09/16/Linux 服务配置/使用Samba实现文件共享/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux-服务配置/" rel="tag"> <i class="fa fa-tag"></i> Linux 服务配置</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/09/16/Linux 服务配置/配置VSFTP文件服务器/" rel="next" title="配置VSFTP文件服务器">
+                <i class="fa fa-chevron-left"></i> 配置VSFTP文件服务器
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/09/16/Linux 服务配置/Rsync+Inotify 实现数据同步/" rel="prev" title="Rsync+Inotify 实现数据同步">
+                Rsync+Inotify 实现数据同步 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#匿名验证Samba配置"><span class="nav-text">匿名验证Samba配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆配置服务端◆"><span class="nav-text">◆配置服务端◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆配置Linux客户端◆"><span class="nav-text">◆配置Linux客户端◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆配置Windows客户端◆"><span class="nav-text">◆配置Windows客户端◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#密码验证Samba配置"><span class="nav-text">密码验证Samba配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆配置服务端◆-1"><span class="nav-text">◆配置服务端◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆配置Linux客户端◆-1"><span class="nav-text">◆配置Linux客户端◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆Linux挂载Samba◆"><span class="nav-text">◆Linux挂载Samba◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Samba-ACL权限控制"><span class="nav-text">Samba ACL权限控制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Samba-给用户取别名"><span class="nav-text">Samba 给用户取别名</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

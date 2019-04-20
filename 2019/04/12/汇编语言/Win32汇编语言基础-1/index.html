@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="汇编语言(assembly language)是一种用于电子计算机、微处理器、微控制器或其他可编程器件的低级语言,亦称为符号语言.在汇编语言中,用助记符(Mnemonics)代替机器指令的操作码,用地址符号(Symbol)或标号(Label)代替指令或操作数的地址.在不同的设备中,汇编语言对应着不同的机器语言指令集,通过汇编过程转换成机器指令,普遍地说,特定的汇编语言和特定的机器语言指令集是相互对">
+<meta name="keywords" content="汇编语言">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Win32汇编语言基础(1)">
+<meta property="og:url" content="https://www.mkdirs.com/2019/04/12/汇编语言/Win32汇编语言基础-1/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="汇编语言(assembly language)是一种用于电子计算机、微处理器、微控制器或其他可编程器件的低级语言,亦称为符号语言.在汇编语言中,用助记符(Mnemonics)代替机器指令的操作码,用地址符号(Symbol)或标号(Label)代替指令或操作数的地址.在不同的设备中,汇编语言对应着不同的机器语言指令集,通过汇编过程转换成机器指令,普遍地说,特定的汇编语言和特定的机器语言指令集是相互对">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-04-18T12:28:44.260Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Win32汇编语言基础(1)">
+<meta name="twitter:description" content="汇编语言(assembly language)是一种用于电子计算机、微处理器、微控制器或其他可编程器件的低级语言,亦称为符号语言.在汇编语言中,用助记符(Mnemonics)代替机器指令的操作码,用地址符号(Symbol)或标号(Label)代替指令或操作数的地址.在不同的设备中,汇编语言对应着不同的机器语言指令集,通过汇编过程转换成机器指令,普遍地说,特定的汇编语言和特定的机器语言指令集是相互对">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2019/04/12/汇编语言/Win32汇编语言基础-1/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Win32汇编语言基础(1) | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2019/04/12/汇编语言/Win32汇编语言基础-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Win32汇编语言基础(1)
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-04-12 18:38:26" itemprop="dateCreated datePublished" datetime="2019-04-12T18:38:26+08:00">2019-04-12</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-18 20:28:44" itemprop="dateModified" datetime="2019-04-18T20:28:44+08:00">2019-04-18</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/汇编语言/" itemprop="url" rel="index"><span itemprop="name">汇编语言</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>汇编语言(assembly language)是一种用于电子计算机、微处理器、微控制器或其他可编程器件的低级语言,亦称为符号语言.在汇编语言中,用助记符(Mnemonics)代替机器指令的操作码,用地址符号(Symbol)或标号(Label)代替指令或操作数的地址.在不同的设备中,汇编语言对应着不同的机器语言指令集,通过汇编过程转换成机器指令,普遍地说,特定的汇编语言和特定的机器语言指令集是相互对应的,不同平台之间不可直接移植.</p>
+<a id="more"></a>
+<p>本文章主要是个人随笔,在这里跳过了很多计算机底层知识,想要学习的朋友本人推荐3本书<code>《Intel汇编语言程序设计》(第五版)</code>,<code>《汇编语言-王爽著》</code>,<code>《微型计算机组成原理》</code>,这几本书讲解的相当详细,这里我就只整理一些重要的概念.</p>
+<p>汇编语言一直被认为是<code>最难学的语言</code>之一,究其原因主要是因为汇编程序员在着眼于程序<code>逻辑实现</code>的同时还要注重太多的其他底层细节(例:是否会溢出,CPU是否支持寻址格式等),这些在学习高级语言可以不涉及的细节包括上百条机器指令,和一大堆的<code>系统中断</code>的用法,复杂的<code>寻址模式</code>以及很多<code>硬件和汇编器的相关知识</code>,学习汇编能够<code>更好的理解操作系统,内存,CPU的寻址方式</code>,帮助构建底层知识体系.</p>
+<p>汇编语言是所有程序设计语言中<code>最古老</code>的,它与计算机<code>机器语言</code>最为接近,通过汇编语言可以<code>直接访问计算机的硬件</code>,能够直接与CPU对话,可以说汇编语言是所有编程语言中<code>语法格式最自由的</code>,但自由的代价就是需要了解<code>计算机体系结构和操作系统的大量细节</code>,每编写一段程序都需要考虑各种硬件的状态,从而导致使用汇编写程序<code>效率非常低</code>.<br><br></p>
+<h2 id="微机体系概述"><a href="#微机体系概述" class="headerlink" title="微机体系概述"></a>微机体系概述</h2><blockquote>
+<p>在学习汇编语言之前,我们必须要了解一下处理器的发展历史.</p>
+</blockquote>
+<p>自1946年第一台计算机问世以来,在短短的60多年中,已经历了由<code>电子管计算机(1946年),晶体管计算机(1956年),集成电路计算机(1958年),超大规模集成电路计算机(1972年)</code>,这五代的更替,而且还在不断地向巨型化,微型化,网络化,智能化这四个方向不断发展.</p>
+<p>从当今的X86架构的CPU说起,<code>X86指令集</code>是Intel为其第一块<code>16位CPU(80x86)</code>专门开发的,IBM公司1981年推出的世界第一台PC机中的CPU—<code>i8088(i8086简化版)</code>使用的也是X86指令,同时电脑中为提高<code>浮点数据处理</code>能力而增加的<code>X87芯片</code>系列协处理器则另外使用X87指令,为了提高处理器性能,就将X86指令集和X87指令集统称为X86指令集.</p>
+<p>虽然随着CPU技术的不断发展,Intel公司陆续研制出更新型的<code>i80386、i80486、Pentium</code>直到今天,但为了保证电脑能继续运行以往开发的各类应用程序以保护和继承丰富的软件资源,所以Intel公司所生产的所有CPU仍然继续使用X86指令集,所以它的CPU仍属于<code>X86系列</code>,由于X86系列及其兼容CPU都使用X86指令集,所以就形成了今天庞大的X86系列及兼容CPU阵容.</p>
+<blockquote>
+<p>谈完了处理器的基本发展过程,再来了解一下CPU指令集的分类吧.</p>
+</blockquote>
+<p>处理器分为两大架构阵营,即<code>RISC(精简指令集计算机)</code>和<code>CISC(复杂指令集计算机)</code>是当前CPU的两种架构,它们的区别在于不同的CPU设计理念和方法,CPU架构是厂商给属于同一系列的CPU产品定的一个规范,主要目的是为了区分不同类型CPU的重要标示.</p>
+<p>早期的CPU全部是<code>CISC架构</code>,它的设计目的是要用最少的机器语言指令来完成所需的计算任务.比如对于乘法运算,在CISC架构的CPU上,您可能只需要一条指令就可以得到相应的结果,这些幕后的操作全部依赖于CPU中设计的逻辑电路来完成,这种架构会<code>增加</code>CPU结构的<code>复杂性</code>和对CPU制作工艺的要求,但对于编译器的开发却十分有利.</p>
+<p>相比CISC架构的系统,<code>RISC架构</code>则要求软件来指定各个操作步骤,上面的乘法运算如果要在RISC架构上实现,则你需要具体指定其特定的实现步骤,使用这种架构生产CPU,可以很大程度上降低CPU的复杂性以及允许在同样的工艺水平下生产出功能更强大的CPU,但对于编译器的设计有更高的要求.</p>
+<p>总结:当精简指令集出现后,所有人都说复杂指令集已经过时,英特尔密切关注,为了谨慎.英特尔同时开发复杂指令集CPU和精简指令集CPU.精简指令处理器上市后,复杂指令集CPU依旧热销.而精简指令集CPU因为无法兼容以前的软件,而销售量不好.英特尔得出复杂指令集生命依旧强大的结论,放弃在精简指令集方面的开发工作.</p>
+<blockquote>
+<p>机器语言汇编语言和高级语言的区别 —-&gt; (机器语言创作了汇编)-&gt;(汇编创作了C,C撑起了整个计算机世界)</p>
+</blockquote>
+<p><code>机器语言(machinelanguage)</code>是一种指令集的体系,这种指令集被称为<code>机器码(machinecode)</code>,它是电脑的CPU可<code>直接解读</code>的数据,机器码有时也被称为<code>原生码(NativeCode)</code>,它与系统运行平台相关联,机器语言是计算机的设计者通过计算机的硬件结构赋予计算机的操作功能,早期的机器语言程序员在编写程序时只需要使用两种符号<code>0或1</code>,这种编程方式太枯燥,并且需要记忆大量的0101这种二进制格式的排布方式,实在是一件很痛苦的事,就是在这种环境下汇编语言诞生了.</p>
+<p><code>汇编语言(assembly language)</code>是一种用于电子计算机、微处理器、微控制器或其他可编程器件的<code>低级语言</code>,亦称为符号语言,是机器语言的<code>符号化</code>,也就是说以往我们需要记忆大量的0101二进制,而现在则只需要记忆相应的符号,比如<code>mov eax,1</code>移动指令,人们很容易理解他的含义,尽管如此,操作汇编语言还是需要了解操作系统的大量底层实现,其在应对大型应用的开发上还是不够简单.</p>
+<p><code>高级语言(High-level programming language)</code>相对于汇编语言,它是较接近自然语言和数学公式的编程,基本脱离了机器的硬件系统,能够用人们更易理解的方式编写程序,高级语言高度封装了底层实现细节,其语法格式自然,简单易用,屏蔽了很多底层细节的实现,开发效率明显提高,这给人们能够开发出大型应用系统提供了可能性.</p>
+<p>总结:机器语言与汇编语言的关系属于一脉相承,指令是一对一的关系,这也给软件逆向提供了一种可能,而高级语言和汇编的关系属于一对多的关系,高级语言的一条代码,可能对应机器语言的数十条,甚至数百条.</p>
+<p>直到现在,CPU处理器也只能识别两种电位格式0或1,计算机不理解高级语言,我们必须通过编译器转成二进制代码才能运行<code>(c/c++,java...)</code>,只学会高级语言,并不等于理解计算机实际的运行步骤.</p>
+<hr>
+<blockquote>
+<p>80x86处理器的几种基本工作模式</p>
+</blockquote>
+<p>IA-32处理器有三种基本的工作模式:<code>实地址模式</code>,<code>系统管理模式</code>,<code>保护模式</code>,另外还有一种模式称为<code>虚拟80x86模式</code>,其实虚拟x86模式也是保护模式的一个特例,下面个将分别简要描述这几种系统模式:</p>
+<p><strong>实地址模式:</strong> 在该模式下,IA-32处理器使用20位地址线,可以访问<code>1048576(1MB)</code>字节的内存,其地址范围是<code>0-FFFFF</code>,但8086处理器的寄存器是16位的不能存放20位的地址,为了解决这个棘手的问题提出了一种称为<code>分段内存</code>的概念,所有内存被分为了多个64kb的区域,这些区域称为<code>段(segment)</code>,我们使用<code>段地址x16+偏移地址=绝对地址</code>来计算出绝对地址.</p>
+<p><strong>保护模式:</strong> 在该模式下,每个程序可寻址4GB的内存,地址范围是<code>0-FFFFFFFF</code>,在该模式下编程无需进行复杂的公式计算,只需要使用一个32位整数就可以存放任何指令和变量的地址,处理器会在后台进行地址的计算和转换,这些工作对于汇编程序员变得透明了起来,保护模式下有三个段:<code>CS:代码段</code>,<code>DS:数据段</code>,<code>SS:堆栈段</code>,其他的段操作系统负责维护.</p>
+<p><strong>虚拟x86模式:</strong> 在该模式下,实际上是处理器在保护模式下创建的一个具有1MB地址空间的虚拟机,虚拟机对运行于实地址模式下的<code>80x86计算机</code>进行了模拟,在<code>Windows NT</code>系统下,打开一个控制台窗口,就创建了一个8086虚拟机,当然你也可同时打开多个控制台,他们之间是隔离的并不互相影响.</p>
+<p><strong>平坦分段模式:</strong> 在该模式下,所有段都被映射到32位的物理地址空间中,一个程序至少需要2个段:<code>代码段(CS,数据段(DS)</code>,每个段都由一个段描述符定义,段描述符通常是一个存放在<code>全局描述符表(GDT)</code>中的一个64位地址.</p>
+<p><strong>内存分页机制:</strong> IA-32处理器支持一种称为<code>分页(paging)</code>的特性,允许一个段被分割成称为<code>页(page)</code>的4096字节的内存块,分页机制允许同时运行的程序使用总内存远大于计算机的物理内存,操作系统映射的所有页的集合称为<code>虚拟内存</code>,操作系统通常都会包含一个虚拟内存管理器的程序,分页机制会使人产生内存无限大的错觉,然而程序如果过度依赖于分页的话,其运行效率会非常低下.</p>
+<hr>
+<blockquote>
+<p>CPU内部的寄存器组,以及每个寄存器的作用</p>
+</blockquote>
+<p>寄存器是CPU内部的高速存储单元,由于是固化在CPU内部的组件,其访问速度快于内存,在当下的处理器中寄存器分为几种类型,其中8个通用寄存器<code>(EAX,EBX,ECX,EDX,EBP,ESP,ESI,EDI)</code>,6个段寄存器<code>(CS,SS,DS,ES,FS,GS)</code>,一个处理器状态标志寄存器<code>(EFLAGS)</code>,和一个指令指针寄存器<code>(EIP)</code>寄存器.</p>
+<p><strong>通用寄存器:</strong> CPU内部有<code>8个通用寄存器</code>主要用于算数运算和数据的传送,这8个寄存器都可以作为一个32位的值或两个16位的值来寻址使用,还可以按照8位寄存器来使用,比如通用寄存器都可以被拆分为高低寄存器来存储数据,例如:<code>EAX寄存器</code>,可被拆分为<code>(AX)16位</code>寄存器来使用,而<code>(AX)16位</code>寄存器还可拆分为<code>AH/AL(高低8位)</code>.</p>
+<p><strong>变址寄存器:</strong> CPU内部有2个通用寄存器<code>ESI和EDI</code>,寄存器ESI、EDI称为<code>变址寄存器(Index Register)</code>,它们主要用于存放存储单元在段内的偏移量,用它可实现多种存储器操作数的寻址方式,为以不同的地址形式访问存储单元提供方便.变址寄存器<code>不可分割</code>成8位寄存器,在字符串操作指令的执行过程中,对它们有特定的要求,而且还具有特殊的功能,该寄存器默认和<code>DS数据段</code>寄存器相关联.</p>
+<p><strong>堆栈指针寄存器:</strong> CPU内部有2个通用寄存器<code>EBP和ESP</code>,寄存器EBP、ESP称为<code>指针寄存器(Pointer Register)</code>,主要用于<code>存放堆栈</code>内存储单元的偏移量,它们主要用于访问堆栈内的存储单元并且规定,<code>EBP为基址指针寄存器</code>,<code>ESP为堆栈指针寄存器</code>,指针寄存器<code>不可分割</code>成8位寄存器,该寄存器默认和<code>SS堆栈段</code>寄存器相关联.</p>
+<p><strong>指令指针寄存器:</strong> CPU内部有1个指令指针寄存器<code>EIP</code>,该寄存器存放下一条要执行的指令的地址,下次要执行的指令通常已被预取到指令队列中,除非发生转移情况,所以在理解它们的功能时,不考虑存在指令队列的情况,默认情况下EIP不可手动修改,一般都是由特殊的指令<code>CALL,RET,PUSH</code>等间接性的修改.</p>
+<p><strong>段寄存器:</strong> 段寄存器是根据内存分段的管理模式而设置的,内存单元的物理地址由段寄存器的值和一个偏移量组合而成的,这样可用两个较少位数的值组合成一个可访问较大物理空间的内存地址,常规段寄存器包括<code>CS:代码段寄存器</code>,<code>DS:数据段寄存器</code>,<code>SS:堆栈段寄存器</code>,<code>ES:附加数据段寄存器</code>这些寄存器通常是由编译器或这是操作系统来维护的.</p>
+<p><strong>标志寄存器:</strong> 标志寄存器(EFLAGS),该寄存器用来控制CPU的操作流程,或者反应CPU某些运算的结果的独立二进制位构成,常用的标志位包括<code>CF(进位标志),ZF(零标志),PF(奇偶标志)</code>等.</p>
+<hr>
+<blockquote>
+<p>编译一段小程序</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">	.386p</span><br><span class="line">	.model flat,stdcall</span><br><span class="line">	option casemap:none</span><br><span class="line"></span><br><span class="line">include windows.inc</span><br><span class="line">include user32.inc</span><br><span class="line">include kernel32.inc</span><br><span class="line">includelib user32.lib</span><br><span class="line">includelib kernel32.lib</span><br><span class="line"></span><br><span class="line">.code</span><br><span class="line">	main PROC</span><br><span class="line">		mov eax,1000h</span><br><span class="line">		mov ebx,1000h</span><br><span class="line">		mov ecx,1000h</span><br><span class="line"></span><br><span class="line">		invoke ExitProcess,0</span><br><span class="line">	main ENDP</span><br><span class="line">END main</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ml /c /coff lyshark.asm</span><br><span class="line">link /subsystem:windows lyshark.obj</span><br></pre></td></tr></table></figure>
+<p><br></p>
+<h2 id="数据段的定义"><a href="#数据段的定义" class="headerlink" title="数据段的定义"></a>数据段的定义</h2><p>MASM 定义了多种内部数据类型,每种数据类型都描述了该类型的变量和表达式的取值集合,汇编语言中数据类型的基本特征是以数据位数为度量单位:<code>8,16,32,48,64,80位</code>,而除此之外其他的特征如<code>(符号,指针,浮点数)</code>主要是为了方便我们记忆变量中存储的数据类型.</p>
+<p>接下来看下表,表中是IEEE委员会发布的标准内部数据类型:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">数据类型</th>
+<th style="text-align:left">作用(无符号)</th>
+<th style="text-align:left">数据类型</th>
+<th style="text-align:left">作用(有符号)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">BYTE</td>
+<td style="text-align:left">8位无符号整数</td>
+<td style="text-align:left">SBYTE</td>
+<td style="text-align:left">8位有符号整数</td>
+</tr>
+<tr>
+<td style="text-align:left">WORD</td>
+<td style="text-align:left">16位无符号整数</td>
+<td style="text-align:left">SWORD</td>
+<td style="text-align:left">16位有符号整数</td>
+</tr>
+<tr>
+<td style="text-align:left">DWORD</td>
+<td style="text-align:left">32位无符号整数</td>
+<td style="text-align:left">SWORD</td>
+<td style="text-align:left">32位有符号整数</td>
+</tr>
+<tr>
+<td style="text-align:left">FWORD</td>
+<td style="text-align:left">48位整数(远指针)</td>
+<td style="text-align:left">QWORD</td>
+<td style="text-align:left">64位整数定义</td>
+</tr>
+<tr>
+<td style="text-align:left">REAL4</td>
+<td style="text-align:left">32位(4字节)短实数</td>
+<td style="text-align:left">REAL8</td>
+<td style="text-align:left">64位(8字节)长实数</td>
+</tr>
+</tbody>
+</table>
+<p>数据类型定义语句为变量在内存中保留存储空间,并且可以选择为变量指定一个名字,在汇编语言中所有的数据无非就是<code>BYTE</code>的集合,数据的定义语句格式如下:<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[变量名] 数据定义伪指令 初始值[....]</span><br></pre></td></tr></table></figure></p>
+<p>在数据定义语句中使用<code>BYTE(定义字节)</code>和<code>SBYTE(定义有符号字节)</code>伪指令,可以为每一个或多个有符号或无符号字节分配存储空间,每个<code>初始值必须是8位整数</code>表达式或字符常量,例如下面的定义:<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.data</span><br><span class="line">	var1 BYTE &apos;A&apos;      ; 定义字符常量</span><br><span class="line">	var2 BYTE ?        ; 定义未初始化变量</span><br><span class="line">	var3 BYTE 0        ; 最小的无符号字节常量</span><br><span class="line">	var4 BYTE 255      ; 最大的无符号字节常量</span><br><span class="line">	var5 SBYTE -128    ; 最小的有符号字节常量</span><br><span class="line">	var6 SBYTE +127    ; 最大的有符号字节常量</span><br></pre></td></tr></table></figure></p>
+<p>如果一条数据定义语句中有多个初始值,那么标号仅仅代表第一个初始值的偏移,如下我们首先定义一个BYTE数组,然后通过反汇编查看地址的偏移变化就能看到效果啦:<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.data</span><br><span class="line">	list BYTE 10,20,30,40,50</span><br><span class="line"></span><br><span class="line">00E71000 | B8 0030E700        | mov eax,main.E73000                 | E73000=10</span><br><span class="line">00E71005 | B8 0130E700        | mov eax,main.E73001                 | E73001=20</span><br><span class="line">00E7100A | B8 0230E700        | mov eax,main.E73002                 | E73002=30</span><br><span class="line">00E7100F | B8 0330E700        | mov eax,main.E73003                 | E73003=40</span><br><span class="line">00E71014 | B8 0430E700        | mov eax,main.E73004                 | E73004=50</span><br></pre></td></tr></table></figure></p>
+<p>并非所有的数据定义都需要标号,如果想继续定义以list开始的字节数组,可以在随后的行上接着上面的定义:<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.data</span><br><span class="line">	list BYTE 10,20,30,40,50</span><br><span class="line">	list BYTE 60,70,80,90,100</span><br></pre></td></tr></table></figure></p>
+<p>当然除了定义整数字符以外,还可以定义字符串,要想定义字符串应将一组字符用单引号或双引号括起来.最常见的字符串是以空格结尾<code>0h</code>,在C/C++,JAVA中定义字符串无需添加结尾0h,这是因为编译器会在编译的时候自动的在字符串后面填充了0h,在汇编语言中我们需要手动添加字符串结尾的标志:<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.data</span><br><span class="line">	string1 BYTE &quot;hello lyshark&quot;,0h</span><br><span class="line">	string2 BYTE &quot;good night&quot;,0h</span><br><span class="line"></span><br><span class="line">00F23000  68 65 6C 6C 6F 20 6C 79 73 68 61 72 6B 00 67 6F hello lyshark.go </span><br><span class="line">00F23010  6F 64 20 6E 69 67 68 74 00 00 00 00 00 00 00 00 od night........</span><br></pre></td></tr></table></figure></p>
+<p>字符串也可以占用多行,而无须为每行都提供一个编号,如下代码也是合法的:<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.data</span><br><span class="line">	string1 BYTE &quot;welcom to the Demo program&quot;</span><br><span class="line">			BYTE &quot;created by lyshark&quot;,0dh,0ah,</span><br><span class="line">			BYTE &quot;url:lyshark&quot;</span><br><span class="line">			BYTE &quot;send me a copy&quot;,0dh,0ah,0</span><br></pre></td></tr></table></figure></p>
+<p>十六进制<code>0dh,0ah</code>也称为<code>CR/LF(回车换行符)</code>,或者是行结束的字符,在向标准输出设备上写的时候,回车换行符可以将光标移动到下一行的开头位置,从而继续填充新的字符串.</p>
+<p>有时我们需要初始化一些空值的内存空间,在为内存地址分配空间的时候,DUP伪指令就显得尤为重要,初始化和未初始化数据均可使用DUP指令定义,其定义语法如下:<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.data</span><br><span class="line">	string1 BYTE 20 DUP(0)       ; 分配20字节,全部填充0</span><br><span class="line">		BYTE 20 DUP(?)       ; 分配20字节,且未初始化</span><br><span class="line">		BYTE 50 DUP(&quot;stack&quot;) ; 分配50字节,&quot;stackstack...&quot;</span><br><span class="line"></span><br><span class="line">.data</span><br><span class="line">	smallArray DOWRD 10 DUP(0) ; 分配40字节</span><br><span class="line">	bigArray DOWOR 5000 DUP(?) ; 分配20000字节</span><br></pre></td></tr></table></figure></p>
+<p>有时我们需要计算数组的大小,但手动计算显得特别麻烦,此时我们可以使用MASM提供的$符号来进行数组大小的计算过程,如下.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">; 计算字节数据的大小.</span><br><span class="line">.data</span><br><span class="line">	list BYTE 10,20,30,40,50</span><br><span class="line">	listsize = ($ - list)</span><br><span class="line"></span><br><span class="line">; 计算字或双字数组,需要除以2或4才能得到字节单位.</span><br><span class="line">.data</span><br><span class="line">	list WORD 1000h,2000h,3000h,4000h</span><br><span class="line">	listsize = ($ - list) /2</span><br><span class="line"></span><br><span class="line">.data</span><br><span class="line">	list DWORD 100000h,200000h,300000h,400000h</span><br><span class="line">	listsize = ($ - list)/4</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="常用汇编指令"><a href="#常用汇编指令" class="headerlink" title="常用汇编指令"></a>常用汇编指令</h2><p><strong>MOV指令:</strong> 从源操作数向目标操作数之间复制数据.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">00A41000 | B8 24100000        | mov eax,1024                        |</span><br><span class="line">00A41005 | 8BD8               | mov ebx,eax                         |</span><br><span class="line">00A41007 | 66:B9 0010         | mov cx,1000                         |</span><br></pre></td></tr></table></figure></p>
+<p><strong>MOVZX指令:</strong> 零扩展传送,该指令将源操作数的内容复制到目标操作数中,并将该值<code>零扩展(zero-extend)</code>至16位或者32位,该指令适用于<code>无符号整数</code>,其基本格式如下:<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">01301000 | 66:BB 9BA6         | mov bx,A69B                         | BX = 0A69B</span><br><span class="line">01301004 | 0FB7C3             | movzx eax,bx                        | EAX = 0000A69B</span><br><span class="line">01301007 | 0FB6D3             | movzx edx,bl                        | EDX = 0000009B</span><br><span class="line">0130100A | 66:0FB6CB          | movzx cx,bl                         | CX = 009B</span><br></pre></td></tr></table></figure></p>
+<p><strong>MOVSX指令:</strong> 符号扩展传送,该指令将源操作数的内容复制到目标操作数中,并将该值<code>符号扩展(sign-extend)</code>至16位或者是32位,该指令只能用于<code>有符号整数</code>,其基本格式如下:<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">00FD1000 | 66:BB 9BA6         | mov bx,A69B                         | BX = 0A69B</span><br><span class="line">00FD1004 | 0FBFC3             | movsx eax,bx                        | EAX = FFFFA69B</span><br><span class="line">00FD1007 | 0FBED3             | movsx edx,bl                        | EDX = FFFFFF0B</span><br><span class="line">00FD100A | 66:0FBECB          | movsx cx,bl                         | CX = FF9B</span><br></pre></td></tr></table></figure></p>
+<p><strong>XCHG指令:</strong> 数据交换指令,该指令用于交换两个操作数中的内容,但该指令不接受立即数操作数.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">00D71000 | B8 00100000        | mov eax,1000                        | EAX = 1000h</span><br><span class="line">00D71005 | BB 00200000        | mov ebx,2000                        | EBX = 2000h</span><br><span class="line">00D7100A | 93                 | xchg ebx,eax                        | EAX = 2000h;EBX = 1000h</span><br></pre></td></tr></table></figure></p>
+<p><strong>INC/DEC指令:</strong> 数据递增与递减,<code>INC指令</code>用于对寄存器或内存数据的递增,<code>DEC指令</code>用于对寄存器或内存数据递减.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">00881000 | B8 00100000        | mov eax,1000                        | EAX = 1000h</span><br><span class="line">00881005 | 40                 | inc eax                             | EAX = 1001h</span><br><span class="line">00881006 | 40                 | inc eax                             | EAX = 1002h</span><br><span class="line">00881007 | BB 00200000        | mov ebx,2000                        | EBX = 2000h</span><br><span class="line">0088100C | 4B                 | dec ebx                             | EBX = 1FFFF</span><br><span class="line">0088100D | 4B                 | dec ebx                             | EBX = 1FFFE</span><br><span class="line">0088100E | 4B                 | dec ebx                             | EBX = 1FFFD</span><br></pre></td></tr></table></figure></p>
+<p><strong>ADD指令:</strong> 操作数增加,该指令用于将<code>源操作数和目的操作数相加</code>,且不影响源操作数的值,而是改变目的操作数.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">00BC1000 | B8 00100000        | mov eax,1000                        | EAX = 1000</span><br><span class="line">00BC1005 | BB 00200000        | mov ebx,2000                        | EBX = 2000</span><br><span class="line">00BC100A | 03D8               | add ebx,eax                         | EBX = EBX+EAX = 3000</span><br></pre></td></tr></table></figure></p>
+<p><strong>SUB指令:</strong> 操作数减少,该指令用于将<code>源操作数和目的操作数相减</code>,且不影响源操作数的值,而是改变目的操作数.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">00811000 | B8 00200000        | mov eax,2000                        | EAX = 2000</span><br><span class="line">00811005 | BB 00100000        | mov ebx,1000                        | EBX = 1000</span><br><span class="line">0081100A | 2BC3               | sub eax,ebx                         | EAX = EAX-EBX = 1000</span><br></pre></td></tr></table></figure></p>
+<p><strong>AND/OR/XOR指令:</strong> 逻辑与/逻辑或/逻辑异或.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">00DD100E | B8 01000000        | mov eax,1                              |</span><br><span class="line">00DD1013 | BB 01000000        | mov ebx,1                              |</span><br><span class="line">00DD1018 | B9 00000000        | mov ecx,0                              |</span><br><span class="line">00DD101D | 21D8               | and eax,ebx                            |</span><br><span class="line">00DD101F | 09CB               | or ebx,ecx                             |</span><br><span class="line">00DD1021 | 31C0               | xor eax,eax                            |</span><br></pre></td></tr></table></figure></p>
+<p><strong>LOOP指令:</strong> 循环计数指令,该指令检测<code>ECX</code>寄存器的变化,每次循环寄存器<code>自动减1</code>,当<code>ECX=0</code>循环结束,否则继续循环.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># ----普通循环结构---------------------------------</span><br><span class="line">.code</span><br><span class="line">	main PROC</span><br><span class="line">		mov ecx,10      ; 计数循环寄存器初始化为10</span><br><span class="line">	top:                    ; 循环标号,编译器会将其转换成一个地址</span><br><span class="line">		xor eax,eax</span><br><span class="line">		mov eax,ecx</span><br><span class="line">		loop top        ; loop跳转到指定地址,此处为top</span><br><span class="line"></span><br><span class="line">		push 0</span><br><span class="line">		call ExitProcess</span><br><span class="line">	main ENDP</span><br><span class="line">END main</span><br><span class="line"></span><br><span class="line"># ----循环中使用ECX寄存器--------------------------</span><br><span class="line"># 如果用光了所有寄存器,但又必须要使用ECX的话,可以在循环开始将ECX保存</span><br><span class="line"># 或者使用push指令将其压入堆栈,等循环结束后弹出即可实现复用ECX的目的</span><br><span class="line"></span><br><span class="line">.data</span><br><span class="line">	count DWORD ?</span><br><span class="line">.code</span><br><span class="line">	main PROC</span><br><span class="line"></span><br><span class="line">		mov ecx,10</span><br><span class="line">	top:</span><br><span class="line">		mov count,ecx       ; 将ecx寄存器放入count变量</span><br><span class="line">		xor ecx,ecx</span><br><span class="line">		mov ecx,1000        ; 重置ecx寄存器的数值</span><br><span class="line">		add eax,ecx</span><br><span class="line"></span><br><span class="line">		mov ecx,count       ; 处理完成后,恢复ECX寄存器</span><br><span class="line">		loop top            ; 继续循环</span><br><span class="line">		</span><br><span class="line">		push 0</span><br><span class="line">		call ExitProcess</span><br><span class="line">	main ENDP</span><br><span class="line">END main</span><br><span class="line"></span><br><span class="line"># ----使用ECX寄存器,创建嵌套循环------------------------</span><br><span class="line"># 在循环内部创建另一个循环的时候,必须考虑外层ECX中的外层循环计数该如何处理</span><br><span class="line"># 一个较好的例子,把外层循环计数保存在内存中,或者压栈保存,是非常的理想的</span><br><span class="line"></span><br><span class="line">.data</span><br><span class="line">	count DWORD ?</span><br><span class="line">.code</span><br><span class="line">	main PROC</span><br><span class="line"></span><br><span class="line">		mov ecx,10        ; 设置外层循环计数</span><br><span class="line">	L1:</span><br><span class="line">		mov count,ecx     ; 保存外层循环计数</span><br><span class="line">			mov ecx,20    ; 设置内层循环计数</span><br><span class="line">		L2:</span><br><span class="line">			xor eax,eax</span><br><span class="line">			xor ebx,ebx</span><br><span class="line">			xor edx,edx</span><br><span class="line">			loop L2      ; 重复内层循环计数</span><br><span class="line"></span><br><span class="line">		mov ecx,count    ; 恢复外层循环计数器</span><br><span class="line">		loop L1          ; 执行外层循环跳转</span><br><span class="line">		push 0</span><br><span class="line">		call ExitProcess</span><br><span class="line">	main ENDP</span><br><span class="line">END main</span><br></pre></td></tr></table></figure></p>
+<p><strong>OFFSET操作符:</strong> 返回数据标号的偏移地址,偏移地址代表标号距数据基址的距离,单位是字节.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.data</span><br><span class="line">	var1 BYTE ?</span><br><span class="line">	var2 WORD ?</span><br><span class="line">	var3 DWORD ?</span><br><span class="line">	var4 DWORD ?</span><br><span class="line">.code</span><br><span class="line">	main PROC</span><br><span class="line">		mov esi,offset var1</span><br><span class="line">		mov esi,offset var2</span><br><span class="line">		mov esi,offset var3</span><br><span class="line">		mov esi,offset var4</span><br><span class="line">	main ENDP</span><br><span class="line">END main</span><br></pre></td></tr></table></figure></p>
+<p><strong>PTR操作符:</strong> 用来重载声明操作数的默认尺寸,这在试图以不同与变量声明时所使用的尺寸来访问变量时很有用.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.data</span><br><span class="line">	temp DWORD 12345678h</span><br><span class="line"></span><br><span class="line">.code</span><br><span class="line">	main PROC</span><br><span class="line">	mov eax,DWORD PTR [temp]  ; 将temp以双字取值并存储到eax</span><br><span class="line">	mov ax,WORD PTR [temp]    ; 将temp以字为单位取值并存储到ax</span><br><span class="line">	mov bx,WORD PTR [temp+2]  ; 在偏移基础上+2</span><br><span class="line">	main ENDP</span><br><span class="line">END main</span><br><span class="line"></span><br><span class="line">00C11000 | A1 0030C100        | mov eax,dword ptr ds:[C13000]       | EAX = 12345678</span><br><span class="line">00C11005 | 66:A1 0030C100     | mov ax,word ptr ds:[C13000]         | AX = 5678</span><br><span class="line">00C1100B | 66:8B1D 0230C100   | mov bx,word ptr ds:[C13002]         | BX = 1234</span><br></pre></td></tr></table></figure></p>
+<p><strong>LENGTHOF操作符:</strong> 计算数组元素的数目,元素由出现在的同一行的值定义.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.data</span><br><span class="line">	ArrayDW DWORD 1000,2000,3000,4000,5000,6000,7000,8000,9000,0h</span><br><span class="line">	ArrayBT BYTE 1,2,3,4,5,6,7,8,9,0h</span><br><span class="line">.code</span><br><span class="line">	main PROC</span><br><span class="line"></span><br><span class="line">		mov eax,lengthof ArrayDW</span><br><span class="line">		mov eax,lengthof ArrayBT</span><br><span class="line"></span><br><span class="line">		push 0</span><br><span class="line">		call ExitProcess</span><br><span class="line">	main ENDP</span><br><span class="line">END main</span><br></pre></td></tr></table></figure></p>
+<p><strong>TYPE操作符:</strong> 返回按照字节计算的单个元素的大小.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.data</span><br><span class="line">	var1 BYTE ?</span><br><span class="line">	var2 WORD ?</span><br><span class="line">	var3 DWORD ?</span><br><span class="line">	var4 QWORD ?</span><br><span class="line">.code</span><br><span class="line">	main PROC</span><br><span class="line">		mov eax,TYPE var1       ; 1</span><br><span class="line">		mov ebx,TYPE var2       ; 2</span><br><span class="line">		mov ecx,TYPE var3       ; 4</span><br><span class="line">		mov edx,TYPE var4       ; 8</span><br><span class="line"></span><br><span class="line">		push 0</span><br><span class="line">		call ExitProcess</span><br><span class="line">	main ENDP</span><br><span class="line">END main</span><br></pre></td></tr></table></figure></p>
+<p><strong>SIZEOF操作符:</strong> 返回等于<code>LENGTHOF(总元素数)和TYPE(每个元素占用字节)</code>返回值的乘基.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.data</span><br><span class="line">	var1 WORD 32 DUP(0)        ; 32*2</span><br><span class="line">	var2 BYTE 10,20,30,40      ; 3</span><br><span class="line">	var3 WORD 30 DUP(?),0,0    ; 30+2</span><br><span class="line">	var4 DWORD 1,2,3,4         ; 4</span><br><span class="line"></span><br><span class="line">.code</span><br><span class="line">	main PROC</span><br><span class="line">		mov eax,SIZEOF var1</span><br><span class="line">		mov eax,SIZEOF var2</span><br><span class="line">		mov eax,SIZEOF var3</span><br><span class="line">		mov eax,SIZEOF var4</span><br><span class="line">	main ENDP</span><br><span class="line">END main</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="内存寻址方式"><a href="#内存寻址方式" class="headerlink" title="内存寻址方式"></a>内存寻址方式</h2><p>Windows系统默认运行于保护模式下,当处理器运行于保护模式下时,每个程序可以寻址4GB的内存范围,地址范围是从十六进制数的<code>0-FFFFFFFF</code>,微软汇编器的平坦模式,适用于保护模式编程,在平坦模式下其内存寻址的方式包括,<code>直接寻址</code>,<code>间接寻址</code>,<code>基址变址寻址</code>,<code>比例因子寻址</code>等,接下来将分别来演示.</p>
+<h3 id="◆直接寻址◆"><a href="#◆直接寻址◆" class="headerlink" title="◆直接寻址◆"></a>◆直接寻址◆</h3><p>在声明变量名称的后面加上一个偏移地址,可以创建<code>直接偏移(direct-offset)</code>操作数,可以通过它来访问没有显示标号的内存地址,接下来看一个实验例子:<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.data</span><br><span class="line">	ArrayB BYTE 10h,20h,30h,40h,50h</span><br><span class="line">	ArrayW WORD 100h,200h,300h,400h</span><br><span class="line">	ArrayDW DWORD 1h,2h,3h,4h</span><br><span class="line"></span><br><span class="line">.code</span><br><span class="line">	main PROC</span><br><span class="line">	; 针对字节的寻址操作</span><br><span class="line">		mov al,[ArrayB]           ; al=10</span><br><span class="line">		mov al,[ArrayB+1]         ; al=20</span><br><span class="line">		mov al,[ArrayB+2]         ; al=30</span><br><span class="line">	; 针对内存单元字存储操作</span><br><span class="line">		mov bx,[ArrayW]           ; bx=100</span><br><span class="line">		mov bx,[ArrayW+2]         ; bx=200</span><br><span class="line">		mov bx,[ArrayW+4]         ; bx=300</span><br><span class="line">	; 针对内存单元双字存储操作</span><br><span class="line">		mov eax,[ArrayDW]         ; eax=00000001</span><br><span class="line">		mov eax,[ArrayDW+4]       ; eax=00000002</span><br><span class="line">		mov eax,[ArrayDW+8]       ; eax=00000003</span><br><span class="line">	main ENDP</span><br><span class="line">END main</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆间接寻址◆"><a href="#◆间接寻址◆" class="headerlink" title="◆间接寻址◆"></a>◆间接寻址◆</h3><p>在处理数组操作时完全使用直接寻址是不切实际的,我们不大可能为数组的每个元素都提供一个不同的标号,也不太可能使用非常多的常量偏移地址去寻址数组的各个元素,处理数组唯一可行的方法是用寄存器作为指针并操作寄存器的值,这种方法称为<code>间接寻址(indirect addressing)</code>,操作数使用间接寻址时,就称为<code>间接操作数(indirect operand)</code>.</p>
+<p><strong>通过ESI内存寻址:</strong> 通过使用ESI寄存器,外加偏移地址<code>(此处DWORD=4字节)</code>,实现寻址.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.data</span><br><span class="line">	ArrayDW DWORD 10000h,20000h,300000h</span><br><span class="line">.code</span><br><span class="line">	main PROC</span><br><span class="line">		mov esi,offset ArrayDW  ; 获取数据段的内存基址</span><br><span class="line">		mov eax,[esi]           ; 取出[esi]地址中的数据,并赋值给eax</span><br><span class="line">		add esi,4               ; 每次esi指针加4,因为数据格式为DWORD</span><br><span class="line">		mov eax,[esi]</span><br><span class="line">		add esi,4</span><br><span class="line">		mov eax,[esi]</span><br><span class="line">	main ENDP</span><br><span class="line">END main</span><br></pre></td></tr></table></figure></p>
+<p><strong>通过ESP堆栈寻址:</strong> 通过ESP堆栈寄存器,实现寻址.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.code</span><br><span class="line">	main PROC</span><br><span class="line">		mov eax,100                ; eax=1</span><br><span class="line">		mov ebx,200                ; ebx=2</span><br><span class="line">		mov ecx,300                ; ecx=3</span><br><span class="line">		push eax                   ; push 1</span><br><span class="line">		push ebx                   ; push 2</span><br><span class="line">		push ecx                   ; push 3</span><br><span class="line"></span><br><span class="line">		mov edx,[esp + 8]          ; EDX = [ESP+8]=1</span><br><span class="line">		mov edx,[esp + 4]          ; EDX = [ESP+4]=2 </span><br><span class="line">		mov edx,[esp]              ; EDX = [ESP]=3</span><br><span class="line">	main ENDP</span><br><span class="line">END main</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆变址寻址◆"><a href="#◆变址寻址◆" class="headerlink" title="◆变址寻址◆"></a>◆变址寻址◆</h3><p>变址寻址,<code>变址操作数(indexed operand)</code>把常量和寄存器相加以得到一个有效地址,任何32位通用寄存器都可以作为<code>变址寄存器</code>,MASM允许使用两种不同的变址操作数据格式.</p>
+<p><strong>变量名+寄存器:</strong> 通过变量名和寄存器结合,变量名代表变量偏移地址的常量,通过变更<code>ESI寄存器</code>的值进行数据寻址.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.data</span><br><span class="line">	ArrayDW DWORD 10000h,20000h,300000h</span><br><span class="line">.code</span><br><span class="line">	main PROC</span><br><span class="line">		mov esi,0</span><br><span class="line">		mov eax,[ArrayDW + esi]     ; 通过变量名+esi寄存器寻址</span><br><span class="line"></span><br><span class="line">		mov ebx,8                   ; 增加8字节</span><br><span class="line">		mov eax,[ArrayDW + ebx]     ; 定位第三个DW数据内存</span><br><span class="line">	main ENDP</span><br><span class="line">END main</span><br></pre></td></tr></table></figure></p>
+<p><strong>基址+偏移:</strong> 通过把<code>变址寄存器</code>和<code>内存偏移常量</code>结合,用寄存器存放数组基址,用常量标识各个数组元素.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.data</span><br><span class="line">	ArrayW WORD 1000h,2000h,3000h,4000h</span><br><span class="line">.code</span><br><span class="line">	main PROC</span><br><span class="line">		mov esi,offset ArrayW    ; 获取基址</span><br><span class="line">		mov ax,[esi]             ; 显示第一个数据</span><br><span class="line">		mov ax,[esi + 2]         ; 显示第二个数据</span><br><span class="line">		mov ax,[esi + 4]         ; 最后一个</span><br><span class="line">	main ENDP</span><br><span class="line">END main</span><br></pre></td></tr></table></figure></p>
+<p><strong>基址变址寻址:</strong> 通过计算公式,这里数组中每个元素占用4字节,所以需要乘以4,寄存器ECX为需要定位的元素偏移.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.data</span><br><span class="line">	Array DWORD 1000h,2000h,3000h,4000h,0h</span><br><span class="line">.code</span><br><span class="line">	main PROC</span><br><span class="line">		lea eax,Array</span><br><span class="line">		mov ecx,2</span><br><span class="line">		mov edx,DWORD PTR [eax + ecx * 4]      ;edx=3000h</span><br><span class="line"></span><br><span class="line">		mov ecx,1</span><br><span class="line">		mov edx,DWORD PTR [eax + ecx * 4]      ;edx=2000h</span><br><span class="line">	main ENDP</span><br><span class="line">END main</span><br></pre></td></tr></table></figure></p>
+<p><strong>比例因子寻址:</strong> 通过使用比例因子,以下例子<code>每个DWORD=4字节</code>,且<code>总元素下标=0-3</code>,得出比例因子<code>3* type arrayDW</code>.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.data</span><br><span class="line">	ArrayDW DWORD 1000h,2000h,3000h,4000h</span><br><span class="line">.code</span><br><span class="line">	main PROC</span><br><span class="line"></span><br><span class="line">	; 第1种比例因子寻址</span><br><span class="line">		mov esi,3*type ArrayDW        ；总共3个下标x每个元素的类型</span><br><span class="line">		mov eax,ArrayDW[esi]</span><br><span class="line">	; 第2种比例因子寻址</span><br><span class="line">		mov esi,3                      ; 变更ESI下标,可实现定位不同的数据</span><br><span class="line">		mov eax,ArrayDW[esi*4]         ; 其中4代表每个数据类型4字节</span><br><span class="line">	; 第3种比例因子寻址</span><br><span class="line">		mov esi,3</span><br><span class="line">		mov eax,ArrayDW[esi*type ArrayDW]</span><br><span class="line">	main ENDP</span><br><span class="line">END main</span><br></pre></td></tr></table></figure></p>
+<p><strong>指针寻址:</strong> 变量地址的变量称为<code>指针变量(pointer variable)</code>,Intel处理器使用两种基本类型的指针,即<code>near(近指针)</code>和<code>far(远指针)</code>,保护模式下使用<code>Near指针</code>,所以它被存储在双字变量中.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.data</span><br><span class="line">	ArrayB BYTE 10,20,30,40,50</span><br><span class="line">	ArrayD DWORD 1,2,3,4,5</span><br><span class="line"></span><br><span class="line">	ptrB DWORD OFFSET ArrayB    ; 指针ptrB --&gt; ArrayB</span><br><span class="line">	ptrD DWORD OFFSET ArrayD    ; 指针ptrD --&gt; ArrayD</span><br><span class="line">.code</span><br><span class="line">	main PROC</span><br><span class="line">	mov esi,ptrB      ; 指向数组ArrayB</span><br><span class="line">	mov al,[esi]      ; 取出 10h</span><br><span class="line">	mov esi,ptrD      ; 指向数组ArrayD</span><br><span class="line">	mov eax,[esi]     ; 取出 1h</span><br><span class="line">	main ENDP</span><br><span class="line">END main</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="堆栈操作指令"><a href="#堆栈操作指令" class="headerlink" title="堆栈操作指令"></a>堆栈操作指令</h2><p>在计算机领域,堆栈是一个不容忽视的概念,堆栈是一种<code>后进先出(LIFO,Last-In,First-Out)</code>的数据结构,这是因为最后压入堆栈的值总是最先被取出,而新数值在执行PUSH压栈时总是被加到堆栈的最顶端,数据也总是从堆栈的最顶端被取出,堆栈是个<code>特殊的存储区</code>,主要功能是暂时存放数据和地址,通常用来保护断点和现场.</p>
+<p>当程序运行时,栈是由CPU<code>直接管理</code>的<code>线性</code>内存数组,它使用两个寄存器<code>(SS和ESP)</code>来保存堆栈的状态.在保护模式下,SS寄存器存放<code>段选择符(Segment Selector)</code>运行在保护模式下的程序不能对其进行修改,而<code>ESP寄存器</code>的值通常是指向特定位置的一个<code>32位偏移值</code>,我们很少需要直接操作ESP寄存器,相反的ESP寄存器总是由<code>CALL,RET,PUSH,POP</code>等这类指令间接性的修改.</p>
+<p>接着来简单介绍以下关于堆栈操作的两个寄存器,CPU系统提供了两个特殊的寄存器用于标识位于系统栈顶端的栈帧.</p>
+<p><strong>ESP 栈指针寄存器:</strong> 栈指针寄存器,其内存放着一个指针,该指针永远指向系统栈最上面一个栈帧的栈顶.<br><strong>EBP 基址指针寄存器:</strong> 基址指针寄存器,其内存放着一个指针,该指针永远指向系统栈最上面一个栈帧的底部.</p>
+<p>根据上述的定义,在通常情况下ESP是可变的,随着栈的生产而逐渐变小,而ESB寄存器是固定的,只有当函数的调用后,发生入栈操作而改变.</p>
+<blockquote>
+<p>1.在32位系统中,执行<code>PUSH压栈</code>时,<code>堆栈指针自动减4</code>,再将压栈的值复制到堆栈指针所指向的内存地址.<br>2.在32位系统中,执行<code>POP出栈</code>时,从栈顶移走一个值并将其复制给内存或寄存器,然后再将<code>堆栈指针自动加4</code>.<br>3.在32位系统中,执行<code>CALL调用</code>时,CPU会用堆栈保存当前被调用过程的返回地址,直到遇到RET指令再将其弹出.</p>
+</blockquote>
+<hr>
+<p><strong>PUSH/POP指令:</strong> 在32位环境下,分别将数组中的元素<code>100h-300h</code>压入堆栈,并且通过POP将元素反弹出来.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.data</span><br><span class="line">	Array DWORD 100h,200h,300h,400h</span><br><span class="line">.code</span><br><span class="line">	main PROC</span><br><span class="line">		xor eax,eax</span><br><span class="line">		push eax                      ; push 0</span><br><span class="line">		push DWORD PTR [Array]        ; push 100</span><br><span class="line">		push DWORD PTR [Array+4]      ; push 200</span><br><span class="line">		push DWORD PTR [Array+8]      ; push 300</span><br><span class="line">		pop eax                       ; pop 300</span><br><span class="line">		pop eax                       ; pop 200</span><br><span class="line">		pop eax                       ; pop 100</span><br><span class="line">		pop eax                       ; pop 0</span><br><span class="line"></span><br><span class="line">		push 0</span><br><span class="line">		call ExitProcess</span><br><span class="line">	main ENDP</span><br><span class="line">END main</span><br></pre></td></tr></table></figure></p>
+<p><strong>PUSHFD/POPFD指令:</strong> PUSHFD在堆栈上压入EFLAGS寄存器的值,POPFD将堆栈的值弹出并送至EFLAGS寄存器.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.data</span><br><span class="line">	SaveFlage DWORD ?</span><br><span class="line">.code</span><br><span class="line">	main PROC</span><br><span class="line">		pushfd            ; 标识入栈</span><br><span class="line">		pop SaveFlage     ; 弹出并保存到内存</span><br><span class="line"></span><br><span class="line">		push SaveFlage    ; 从内存取出,并入栈</span><br><span class="line">		popfd             ; 恢复到EFLAGS寄存器中</span><br><span class="line"></span><br><span class="line">		push 0</span><br><span class="line">		call ExitProcess</span><br><span class="line">	main ENDP</span><br><span class="line">END main</span><br></pre></td></tr></table></figure></p>
+<p><strong>PUSHAD/POPAD指令:</strong> 将通用寄存器按照EAX,ECX,EDX,EBX,ESP,EBP,ESI,EDI的顺序压栈保存.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.code</span><br><span class="line">	main PROC</span><br><span class="line">		pushad</span><br><span class="line">		mov eax,1000</span><br><span class="line">		mov ebx,2000</span><br><span class="line">		mov ecx,3000</span><br><span class="line">		mov edx,4000</span><br><span class="line">		popad</span><br><span class="line"></span><br><span class="line">		push 0</span><br><span class="line">		call ExitProcess</span><br><span class="line">	main ENDP</span><br><span class="line">END main</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="过程调用指令"><a href="#过程调用指令" class="headerlink" title="过程调用指令"></a>过程调用指令</h2><p>CALL指令指示处理器在新的内存地址执行指令,当用户调用CALL指令时,该指令会首先将CALL指令的下一条指令的内存地址压入堆栈保存,然后将EIP寄存器修改为CALL指令的调用处,等调用结束后返回从堆栈弹出CALL的下一条指令地址.</p>
+<blockquote>
+<p>1.当遇到CALL指令时,程序会经过计算得到CALL指令的下一条指令的地址,并将其压入堆栈.<br>2.接着会将EIP寄存器的地址指向被调用过程的地址,被调用过程被执行.<br>3.最后过程内部通过RET指令返回,将从堆栈中弹出EIP的地址,程序继续向下执行.</p>
+</blockquote>
+<p><strong>PROC/ENDP伪指令:</strong> 通过该语句块配合可以生成自定义过程,下面我们创建一个名为<code>Sum</code>的过程,实现<code>EBX+ECX</code>并将结果保存在<code>EAX</code>寄存器中.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.data</span><br><span class="line">	TheSum DWORD ?</span><br><span class="line">.code</span><br><span class="line">	main PROC</span><br><span class="line">		mov ebx,100     ; 传递ebx</span><br><span class="line">		mov ecx,100     ; 传递ecx</span><br><span class="line">		call Sum        ; 调用过程</span><br><span class="line">		mov TheSum,eax  ; 保存结果到TheSum</span><br><span class="line"></span><br><span class="line">		push 0</span><br><span class="line">		call ExitProcess</span><br><span class="line">	main ENDP</span><br><span class="line">	</span><br><span class="line">	Sum PROC</span><br><span class="line">		xor eax,eax</span><br><span class="line">		add eax,ebx</span><br><span class="line">		add eax,ecx</span><br><span class="line">		ret</span><br><span class="line">	Sum ENDP</span><br><span class="line">END main</span><br></pre></td></tr></table></figure></p>
+<p><strong>CALL/RET指令:</strong> 编写一个过程,实现对整数数组的求和,并将结果保存到EAX寄存器中.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.data</span><br><span class="line">	array DWORD 1000h,2000h,3000h,4000h,5000h</span><br><span class="line">	theSum DWORD ?</span><br><span class="line">.code</span><br><span class="line">	main PROC</span><br><span class="line">		mov esi,offset array          ; ESI指向array</span><br><span class="line">		mov ecx,lengthof array        ; ECX=array元素个数</span><br><span class="line">		call ArraySum                 ; 调用求和指令</span><br><span class="line">		mov theSum,eax                ; 将结果保存到内存</span><br><span class="line">		push 0</span><br><span class="line">		call ExitProcess</span><br><span class="line">	main ENDP</span><br><span class="line"></span><br><span class="line">	ArraySum PROC</span><br><span class="line">		push esi           ; 保存ESI,ECX</span><br><span class="line">		push ecx</span><br><span class="line">		mov eax,0          ; 初始化累加寄存器</span><br><span class="line">	L1:</span><br><span class="line">		add eax,[esi]      ; 每个整数都和EAX中的和相加</span><br><span class="line">		add esi,TYPE DWORD ; 递增指针,继续遍历</span><br><span class="line">		loop L1</span><br><span class="line">		pop ecx            ; 恢复寄存器</span><br><span class="line">		pop esi</span><br><span class="line">		ret</span><br><span class="line">	ArraySum ENDP</span><br><span class="line">END main</span><br></pre></td></tr></table></figure></p>
+<p><strong>USES操作符:</strong> 该操作符用于指定需要压栈的寄存器,其会自动生成压栈出栈代码无需手动添加.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.code</span><br><span class="line">	main PROC</span><br><span class="line">		mov eax,1</span><br><span class="line">		mov ebx,2</span><br><span class="line">		mov ecx,3</span><br><span class="line">		call mycall</span><br><span class="line">		push 0</span><br><span class="line">		call ExitProcess</span><br><span class="line">	main ENDP</span><br><span class="line"></span><br><span class="line">	mycall PROC USES eax ebx ecx ; 生成压栈代码,自动压eax,ebx,ecx</span><br><span class="line">		xor eax,eax              ; 压栈的寄存器可以随意修改</span><br><span class="line">		xor ebx,ebx              ; 过程结束后会自动恢复这些寄存器</span><br><span class="line">		ret</span><br><span class="line">	mycall ENDP</span><br><span class="line">END main</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="标志测试指令"><a href="#标志测试指令" class="headerlink" title="标志测试指令"></a>标志测试指令</h2><p>在学习数据比较指令之前,需要先来了解一下标识寄存器这个东西,<code>标志寄存器</code>又称程序状态寄存器(Program Status Word,PSW),这是一个存放条件码标志,控制标志和系统标志的寄存器.</p>
+<p>标志寄存器中存放的有条件标志,也有控制标志,它对于处理器的运行和整个过程的控制有着非常重要的作用.条件标志主要包括进位标志、奇偶标志、辅助进位标志、零标志、符号标志、溢出标志等,控制标志主要有跟踪标志,因为有标志寄存器的存在才能实现各种华丽的判断循环等,常用的标志有以下6个:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">标志位</th>
+<th style="text-align:left">标志全称</th>
+<th style="text-align:center">标志序号</th>
+<th style="text-align:left">标志位说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">CF(Carry Flag)</td>
+<td style="text-align:left">进位标志位</td>
+<td style="text-align:center">0</td>
+<td style="text-align:left">当执行一个加法(或减法)运算,使最高位产生进位(或借位)时,CF为1;否则为0</td>
+</tr>
+<tr>
+<td style="text-align:left">PF(Parity Flag)</td>
+<td style="text-align:left">奇偶标志位</td>
+<td style="text-align:center">2</td>
+<td style="text-align:left">当运算结果中,所有bit位(例:1001010)中1的个数为偶数时,则PF=1;为基数PF=0</td>
+</tr>
+<tr>
+<td style="text-align:left">AF(Auxiliary Flag)</td>
+<td style="text-align:left">辅助进位标志</td>
+<td style="text-align:center">4</td>
+<td style="text-align:left">执行加法(减法)运算,结果的低4位向高4位有进位(借位)时,则AF=1;否则AF=0</td>
+</tr>
+<tr>
+<td style="text-align:left">ZF(Zero Flag)</td>
+<td style="text-align:left">零标志位</td>
+<td style="text-align:center">6</td>
+<td style="text-align:left">若当前的运算结果为零,则ZF=1;否则ZF=0</td>
+</tr>
+<tr>
+<td style="text-align:left">SF(Sign Flag)</td>
+<td style="text-align:left">符号标志位</td>
+<td style="text-align:center">7</td>
+<td style="text-align:left">若运算结果为负数,则SF=1;若为非负数则SF=0</td>
+</tr>
+<tr>
+<td style="text-align:left">TF(Trap Flag)</td>
+<td style="text-align:left">陷阱标志位</td>
+<td style="text-align:center">8</td>
+<td style="text-align:left">为方便程序调试而设计的,TF=1单步执行指令,TF=0则CPU正常执行程序</td>
+</tr>
+<tr>
+<td style="text-align:left">IF(Interrupt)</td>
+<td style="text-align:left">中断允许标志</td>
+<td style="text-align:center">9</td>
+<td style="text-align:left">当IF=1CPU可响应可屏蔽中断请求,当设置IF=0则CPU不响应可屏蔽中断请求</td>
+</tr>
+<tr>
+<td style="text-align:left">DF(Direction)</td>
+<td style="text-align:left">方向标志位</td>
+<td style="text-align:center">10</td>
+<td style="text-align:left">当DF=0时为正向传送数据(cld),否则为逆向传送数据(std)</td>
+</tr>
+<tr>
+<td style="text-align:left">OF(Overflow)</td>
+<td style="text-align:left">溢出标志位</td>
+<td style="text-align:center">11</td>
+<td style="text-align:left">记录是否产生了溢出,当补码运算有溢出时OF=1;否则OF=0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>ZF零标志位:</strong> ZF标志相关指令执行后,结果为0则ZF=1;若结果不为0则ZF=0.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">00C31000 | 90                   | nop                                              | ZF = 0</span><br><span class="line">00C31001 | B8 01000000          | mov eax,1                                        | ZF = 0</span><br><span class="line">00C31006 | 83E8 01              | sub eax,1                                        | ZF = 1</span><br><span class="line"></span><br><span class="line">00C31000 | 90                   | nop                                              | ZF = 0</span><br><span class="line">00C31001 | B8 02000000          | mov eax,2                                        | ZF = 0</span><br><span class="line">00C31006 | 83E8 01              | sub eax,1                                        | ZF = 0</span><br></pre></td></tr></table></figure></p>
+<p><strong>PF奇偶标志位:</strong> PF标志相关指令执行后,其结果所有bit位中的1若为偶数,则PF=1;若为奇数PF=0.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">00C31000 | 90                   | nop                                              | PF = 0</span><br><span class="line">00C31001 | B8 00000000          | mov eax,00000000                                 | PF = 0</span><br><span class="line">00C31006 | 83C0 6F              | add eax,00000111                                 | PF = 1</span><br><span class="line"></span><br><span class="line">00C31000 | 90                   | nop                                              | PF = 0</span><br><span class="line">00C31001 | B8 00000000          | mov eax,00000000                                 | PF = 0</span><br><span class="line">00C31006 | 83C0 6F              | add eax,00000011                                 | PF = 0</span><br></pre></td></tr></table></figure></p>
+<p><strong>SF符号标志位:</strong> SF标志相关指令执行后,其结果是否为负,若为负则SF=1;若为非负SF=0.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">00C3100B | 90                   | nop                                              | SF = 0</span><br><span class="line">00C3100C | B8 E8030000          | mov eax,3E8                                      | SF = 0</span><br><span class="line">00C31011 | 2D E9030000          | sub eax,3E9                                      | SF = 1</span><br><span class="line"></span><br><span class="line">00C3100B | 90                   | nop                                              | SF = 0</span><br><span class="line">00C3100C | B8 E8030000          | mov eax,3E8                                      | SF = 0</span><br><span class="line">00C31011 | 2D E9030000          | sub eax,3E8                                      | SF = 0</span><br></pre></td></tr></table></figure></p>
+<p><strong>CF进位标志位:</strong> CF标志相关指令执行后,在进行无符号运算时,如果表达式发生进位或借位则CF=1.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">00C31016 | 90                   | nop                                              | CF = 0</span><br><span class="line">00C31017 | 66:B8 FFFF           | mov ax,FFFF                                      | CF = 0</span><br><span class="line">00C3101B | 66:83C0 01           | add ax,1                                         | CF = 1</span><br><span class="line"></span><br><span class="line">00C31016 | 90                   | nop                                              | CF = 0</span><br><span class="line">00C31017 | 66:B8 FFFF           | mov ax,FFFF                                      | CF = 0</span><br><span class="line">00C3101B | 66:83C0 01           | sub ax,1                                         | CF = 0</span><br></pre></td></tr></table></figure></p>
+<p><strong>OF溢出标志位:</strong> OF标志相关指令执行后,超出机器所能表示的范围称为溢出若发生了溢出OF=1;否则OF=0.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">00C3101B | 90                   | nop                                              | OF = 0</span><br><span class="line">00C3101C | B0 40                | mov al,64                                        | OF = 0</span><br><span class="line">00C3101E | 04 40                | add al,64                                        | OF = 1</span><br><span class="line"></span><br><span class="line">00C31020 | 90                   | nop                                              | OF = 0</span><br><span class="line">00C31021 | B0 3F                | mov al,63                                        | OF = 0</span><br><span class="line">00C31023 | 04 40                | add al,64                                        | OF = 0</span><br></pre></td></tr></table></figure></p>
+<p><strong>TEST指令:</strong> 该操作与AND指令类似,唯一不同的是它不保存结果,常用来测试标志位状态.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">00DD103B | B8 01000000        | mov eax,1                              | EAX = 1</span><br><span class="line">00DD1040 | BB 00000000        | mov ebx,0                              | EBX = 0</span><br><span class="line">00DD1045 | 85D8               | test eax,ebx                           | ZF = 1</span><br><span class="line"></span><br><span class="line">00DD1051 | B8 01000000        | mov eax,1                              |</span><br><span class="line">00DD1056 | A9 00000000        | test eax,0                             | ZF = 1</span><br><span class="line">00DD105B | 83E0 00            | and eax,0                              | ZF = 1</span><br><span class="line">00DD1062 | 83C8 01            | or eax,1                               | ZF = 0</span><br></pre></td></tr></table></figure></p>
+<p><strong>CMP指令:</strong> 在源操作数和目标操作数进行减法操作,只影响标志位.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">00DD1001 | B8 00010000        | mov eax,100                            | EAX = 100</span><br><span class="line">00DD1006 | BB 50000000        | mov ebx,50                             | EBX = 50</span><br><span class="line">00DD100B | 39D8               | cmp eax,ebx                            | eax - ebx</span><br><span class="line">00DD100D | 0F87 EDFF62FF      | ja 401000                              | jump</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="条件跳转指令"><a href="#条件跳转指令" class="headerlink" title="条件跳转指令"></a>条件跳转指令</h2><table>
+<thead>
+<tr>
+<th style="text-align:left">注记符</th>
+<th style="text-align:left">跳转条件</th>
+<th style="text-align:left">描述信息</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">JZ/JE</td>
+<td style="text-align:left">ZF=1</td>
+<td style="text-align:left">为零则跳转,(leftOp - rightOp = 0)</td>
+</tr>
+<tr>
+<td style="text-align:left">JNZ/JNE</td>
+<td style="text-align:left">ZF=0</td>
+<td style="text-align:left">不为零则跳转,(leftOp - rightOp != 0)</td>
+</tr>
+<tr>
+<td style="text-align:left">JC/JNC</td>
+<td style="text-align:left">CF=1/0</td>
+<td style="text-align:left">设置进位标志则跳/未设置进位标志则跳</td>
+</tr>
+<tr>
+<td style="text-align:left">JO/JNO</td>
+<td style="text-align:left">OF=1/0</td>
+<td style="text-align:left">设置溢出标志则跳/未设置溢出标志则跳</td>
+</tr>
+<tr>
+<td style="text-align:left">JS/JNS</td>
+<td style="text-align:left">SF=1/0</td>
+<td style="text-align:left">设置符号标志则跳/未设置符号标志则跳</td>
+</tr>
+<tr>
+<td style="text-align:left">JP/JNP</td>
+<td style="text-align:left">PF=1/0</td>
+<td style="text-align:left">设置奇偶标志则跳(偶)/未设置奇偶标志则跳(基)</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">无符号模式</th>
+<th style="text-align:left">有符号模式</th>
+<th style="text-align:left">跳转条件</th>
+<th style="text-align:left">描述信息</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">JA</td>
+<td style="text-align:left">JG</td>
+<td style="text-align:left">(left &gt; right)</td>
+<td style="text-align:left">大于则跳转</td>
+</tr>
+<tr>
+<td style="text-align:left">JAE</td>
+<td style="text-align:left">JGE</td>
+<td style="text-align:left">(left &gt;= right)</td>
+<td style="text-align:left">大于或等于则跳转</td>
+</tr>
+<tr>
+<td style="text-align:left">JB</td>
+<td style="text-align:left">JL</td>
+<td style="text-align:left">(left &lt; right)</td>
+<td style="text-align:left">小于则跳转</td>
+</tr>
+<tr>
+<td style="text-align:left">JBE</td>
+<td style="text-align:left">JLE</td>
+<td style="text-align:left">(left &lt;= right)</td>
+<td style="text-align:left">小于或等于则跳转</td>
+</tr>
+</tbody>
+</table>
+<p><strong>JZ/JE通用跳转:</strong> 检测到<code>ZF=1</code>也就说明表达式返回了0,则程序跳转,否则不跳转.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">01031001 | B8 00010000        | mov eax,64                      | eax=100</span><br><span class="line">01031006 | BB 00010000        | mov ebx,64                      | ebx=100</span><br><span class="line">0103100B | 39D8               | cmp eax,ebx                     | eax-ebx </span><br><span class="line">0103100D | 0F84 EDFF3CFF      | je 401000                       | jump</span><br><span class="line">01031013 | 0F84 E7FF3CFF      | jz 401000                       | jump</span><br></pre></td></tr></table></figure></p>
+<p><strong>JNZ/JNE通用跳转:</strong> 检测到<code>ZF=0</code>也就说明表达式返回了1,则程序跳转,否则不跳转.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">01031001 | B8 00010000        | mov eax,65                      | eax=101</span><br><span class="line">01031006 | BB 00010000        | mov ebx,64                      | ebx=100</span><br><span class="line">0103100B | 39D8               | cmp eax,ebx                     | eax-ebx </span><br><span class="line">0103100D | 0F84 EDFF3CFF      | jne 401000                      | not jump</span><br><span class="line">01031013 | 0F84 E7FF3CFF      | jnz 401000                      | not jump</span><br></pre></td></tr></table></figure></p>
+<p><strong>JA/JB无符号跳转:</strong> 基于<code>无符号</code>数的<code>跳转</code>指令,<code>JA大于则跳转</code>或<code>JB小于则跳转</code>.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">01031001 | B8 64000000        | mov eax,64                      | eax=100</span><br><span class="line">01031006 | BB C8000000        | mov ebx,C8                      | ebx=200</span><br><span class="line">0103100B | 3BD8               | cmp ebx,eax                     | ebx-eax</span><br><span class="line">0103100D | 0F87 EDFF3CFF      | ja 401000                       | ebx&gt;eax jump</span><br><span class="line"></span><br><span class="line">0103100F | B8 64000000        | mov eax,64                      | eax=100</span><br><span class="line">01031014 | BB 32000000        | mov ebx,32                      | ebx=50</span><br><span class="line">01031019 | 3BD8               | cmp ebx,eax                     | ebx-eax</span><br><span class="line">0103101B | 0F82 DFFF3CFF      | jb 401000                       | ebx&lt;eax jump</span><br><span class="line"></span><br><span class="line">01031001 | B8 64000000        | mov eax,64                      | eax=100</span><br><span class="line">01031006 | BB 64000000        | mov ebx,64                      | ebx=100</span><br><span class="line">0103100B | 3BC3               | cmp eax,ebx                     | eax-ebx</span><br><span class="line">0103100D | 0F87 EDFF3CFF      | ja 401000                       | eax=ebx not jump</span><br><span class="line">01031013 | 0F82 E7FF3CFF      | jb 401000                       | eax=ebx not jump</span><br></pre></td></tr></table></figure></p>
+<p><strong>JAE/JBE无符号跳转:</strong> 基于<code>无符号</code>数的<code>跳转</code>指令,<code>JAE大于等于则跳转</code>或<code>JBE小于等于则跳转</code>.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">01031001 | B8 64000000        | mov eax,64                      | eax=100</span><br><span class="line">01031006 | BB 64000000        | mov ebx,64                      | ebx=100</span><br><span class="line">01031010 | 3BC3               | cmp eax,ebx                     | eax-ebx</span><br><span class="line">01031012 | 0F83 E8FF3CFF      | jae 401000                      | eax&gt;=ebx jump</span><br><span class="line"></span><br><span class="line">01031001 | B8 64000000        | mov eax,64                      | eax=100</span><br><span class="line">01031006 | BB C8000000        | mov ebx,C8                      | ebx=200</span><br><span class="line">0103100B | 3BD8               | cmp ebx,eax                     | ebx-eax</span><br><span class="line">0103100D | 0F83 EDFF3CFF      | jae 401000                      | ebx&gt;=eax jump</span><br><span class="line"></span><br><span class="line">01031001 | B8 C8000000        | mov eax,C8                      | eax=200</span><br><span class="line">01031006 | BB 64000000        | mov ebx,64                      | ebx=100</span><br><span class="line">0103100B | 3BD8               | cmp ebx,eax                     | ebx-eax</span><br><span class="line">0103100D | 0F86 EDFF3CFF      | jbe 401000                      | ebx&lt;=eax jump</span><br></pre></td></tr></table></figure></p>
+<p><strong>JG/JL有符号跳转:</strong> 基于<code>有符号</code>数的<code>跳转</code>指令,<code>JG大于则跳转</code>或<code>JL小于则跳转</code>.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">01031001 | B0 7F              | mov al,7F                       | al=0x7F(+127)</span><br><span class="line">01031003 | B3 80              | mov bl,80                       | bl=0x80(-128)</span><br><span class="line">01031005 | 3AC3               | cmp al,bl                       | (+128)-(-127)</span><br><span class="line">01031007 | 0F87 F3FF3CFF      | ja 401000                       | 不跳转,因为7Fh不大于80h</span><br><span class="line">0103100D | 0F8F EDFF3CFF      | jg 401000                       | 跳转,因为(+128)大于(-127)</span><br><span class="line"></span><br><span class="line">01031001 | B0 9C              | mov al,9C                       | al=(-100)</span><br><span class="line">01031003 | B3 32              | mov bl,32                       | bl=(50)</span><br><span class="line">01031005 | 3AC3               | cmp al,bl                       | (-100)-(50)</span><br><span class="line">01031007 | 0F82 F3FF3CFF      | jb 401000                       | 不跳转,因为9ch不小于32h</span><br><span class="line">0103100D | 0F8C EDFF3CFF      | jl 401000                       | 跳转,因为(-100)小于(32)</span><br></pre></td></tr></table></figure></p>
+<p><strong>JGE/JLE有符号跳转:</strong> 基于<code>有符号</code>数的<code>跳转</code>指令,<code>JGE大于等于则跳转</code>或<code>JLE小于等于则跳转</code>.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">01031001 | B8 64000000        | mov eax,64                      | eax=100</span><br><span class="line">01031006 | BB 64000000        | mov ebx,64                      | ebx=100</span><br><span class="line">0103100B | 3BC3               | cmp eax,ebx                     | eax-ebx</span><br><span class="line">0103100D | 0F83 EDFF3CFF      | jae 401000                      | 跳转,无符号100=100</span><br><span class="line">01031013 | 0F8D E7FF3CFF      | jge 401000                      | 跳转,有符号100=100</span><br><span class="line"></span><br><span class="line">01031001 | B8 64000000        | mov eax,64                      | eax=100</span><br><span class="line">01031006 | BB 9CFFFFFF        | mov ebx,FFFFFF9C                | ebx=(-100)</span><br><span class="line">0103100B | 3BD8               | cmp ebx,eax                     | ebx-eax</span><br><span class="line">0103100D | 0F8E EDFF3CFF      | jle 401000                      | 跳转,有符号数(-100)&lt;(100)</span><br></pre></td></tr></table></figure></p>
+<p><strong>JCXZ/JECXZ跳转指令:</strong> <code>检测ECX</code>寄存器的值,如果<code>等于零则执行跳转</code>,否则跳过执行.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">01031001 | B9 01000000        | mov ecx,1                       | ecx=1</span><br><span class="line">01031006 | E3 F8              | jecxz &lt;a.EntryPoint&gt;            | not jump</span><br><span class="line"></span><br><span class="line">0103100A | B9 00000000        | mov ecx,0                       | ecx=0</span><br><span class="line">0103100F | E3 EF              | jecxz &lt;a.EntryPoint&gt;            | jump</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="决策伪指令"><a href="#决策伪指令" class="headerlink" title="决策伪指令"></a>决策伪指令</h2><p>MASM的决策伪指令(.IF,.WHILE)使得在编写涉及到多路分支逻辑的代码是更加容易,汇编器会在幕后为这些指令自动生成CMP和条件跳转指令代码,这里你必须清楚,决策伪指令并不是汇编语言的一部分,而是编译器提供的一种编写捷径,在使用决策伪指令之前,请确保你已经彻底理解了条件分支与符号标志位的使用,否则还不如直接使用C语言来的容易.</p>
+<p><strong>IF-ENDIF:</strong> 相当于C中的IF-ELSE<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.code</span><br><span class="line">	main PROC</span><br><span class="line">		mov eax,100</span><br><span class="line">		mov ebx,200</span><br><span class="line">		.IF (eax == ebx) &amp;&amp; (ebx == ebx)</span><br><span class="line">			xor eax,eax</span><br><span class="line">			xor ebx,ebx</span><br><span class="line">		.ELSEIF (eax &gt;= 100) || (ebx == ebx)</span><br><span class="line">			add eax,100</span><br><span class="line">			add ebx,100</span><br><span class="line">		.ENDIF</span><br><span class="line">	main ENDP</span><br><span class="line">END main</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">011B1000 | B8 64000000        | mov eax,64                             | </span><br><span class="line">011B1005 | BB C8000000        | mov ebx,C8                             |</span><br><span class="line">011B100A | 3BC3               | cmp eax,ebx                            |</span><br><span class="line">011B100C | 75 0A              | jne &lt;main.sub_11B1018&gt;                 |</span><br><span class="line">011B100E | 3BDB               | cmp ebx,ebx                            |</span><br><span class="line">011B1010 | 75 06              | jne &lt;main.sub_11B1018&gt;                 |</span><br><span class="line">011B1012 | 33C0               | xor eax,eax                            |</span><br><span class="line">011B1014 | 33DB               | xor ebx,ebx                            |</span><br><span class="line">011B1016 | EB 0F              | jmp main.11B1027                       |</span><br><span class="line">011B1018 | 83F8 64            | cmp eax,64                             | </span><br><span class="line">011B101B | 73 04              | jae main.11B1021                       |</span><br><span class="line">011B101D | 3BDB               | cmp ebx,ebx                            |</span><br><span class="line">011B101F | 75 06              | jne main.11B1027                       |</span><br><span class="line">011B1021 | 83C0 64            | add eax,64                             |</span><br><span class="line">011B1024 | 83C3 64            | add ebx,64                             |</span><br></pre></td></tr></table></figure>
+<p><strong>WHILE-ENDW:</strong> 相当于C中的WHILE<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.data</span><br><span class="line">	Count DWORD 10</span><br><span class="line">	SumNum DWORD 0</span><br><span class="line"></span><br><span class="line">.code</span><br><span class="line">	main PROC</span><br><span class="line">		xor eax,eax</span><br><span class="line">		.WHILE (eax &lt; Count)</span><br><span class="line">			add SumNum,1</span><br><span class="line">			inc eax</span><br><span class="line">		.ENDW</span><br><span class="line">	main ENDP</span><br><span class="line">END main</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">010B1000 | 33C0               | xor eax,eax                            |</span><br><span class="line">010B1002 | EB 08              | jmp &lt;main.sub_10B100C&gt;                 |</span><br><span class="line">010B1004 | 8305 04200B01 01   | add dword ptr ds:[10B2004],1           |</span><br><span class="line">010B100B | 40                 | inc eax                                |</span><br><span class="line">010B100C | 3B05 00200B01      | cmp eax,dword ptr ds:[10B2000]         |</span><br><span class="line">010B1012 | 72 F0              | jb main.10B1004                        |</span><br></pre></td></tr></table></figure>
+<p><strong>REPEAT-UNTIL:</strong> 相当于C中的DO-WHILE<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.data</span><br><span class="line">	Count DWORD 10</span><br><span class="line">	SumNum DWORD 0</span><br><span class="line">.code</span><br><span class="line">	main PROC</span><br><span class="line">		xor eax,eax</span><br><span class="line">		.REPEAT</span><br><span class="line">			inc eax</span><br><span class="line">			add SumNum,1</span><br><span class="line">		.UNTIL (eax &gt;= Count)</span><br><span class="line">	main ENDP</span><br><span class="line">END main</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">011D1000 | 33C0               | xor eax,eax                            |</span><br><span class="line">011D1002 | 40                 | inc eax                                |</span><br><span class="line">011D1003 | 8305 04201D01 01   | add dword ptr ds:[11D2004],1           |</span><br><span class="line">011D100A | 3B05 00201D01      | cmp eax,dword ptr ds:[11D2000]         |</span><br><span class="line">011D1010 | 72 F0              | jb main.11D1002                        |</span><br></pre></td></tr></table></figure>
+<p><br></p>
+<h2 id="一些过程小例子"><a href="#一些过程小例子" class="headerlink" title="一些过程小例子"></a>一些过程小例子</h2><p><strong>整数求和:</strong> 通过使用汇编语言实现一个整数求和的小例子.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.data</span><br><span class="line">	String WORD 100h,200h,300h,400h,500h</span><br><span class="line">.code</span><br><span class="line">	main PROC</span><br><span class="line">		;lea edi,String           ; 取String数组的基址</span><br><span class="line">		mov edi,offset String     ; 同上,两种方式均可</span><br><span class="line">		mov ecx,lengthof String   ; 取数组中的数据个数</span><br><span class="line">		mov ax,0                  ; 累加器清零</span><br><span class="line">	L1:</span><br><span class="line">		add ax,[edi]              ; 加上一个整数</span><br><span class="line">		add edi,TYPE String       ; 指向下一个数组元素,type(2byte)</span><br><span class="line">		loop L1</span><br><span class="line"></span><br><span class="line">		push 0</span><br><span class="line">		call ExitProcess</span><br><span class="line">	main ENDP</span><br><span class="line">END main</span><br></pre></td></tr></table></figure></p>
+<p><strong>正向复制字符串:</strong> 使用汇编语言实现字符串的复制,将数据从<code>source</code>复制到<code>target</code>内存中.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.data</span><br><span class="line">	source BYTE &quot;hello lyshark welcome&quot;,0h</span><br><span class="line">	target BYTE SIZEOF source DUP(0),0h       ; 取源地址数据大小</span><br><span class="line">.code</span><br><span class="line">	main PROC</span><br><span class="line">		mov esi,0                  ; 使用变址寄存器</span><br><span class="line">		mov ecx,sizeof source      ; 循环计数器</span><br><span class="line">	L1:</span><br><span class="line">		mov al,source[esi]         ; 从源地址中取一个字符</span><br><span class="line">		mov target[esi],al         ; 将该字符存储在目标地址中</span><br><span class="line">		inc esi                    ; 递增,将指针移动到下一个字符</span><br><span class="line">		loop L1</span><br><span class="line"></span><br><span class="line">		push 0</span><br><span class="line">		call ExitProcess</span><br><span class="line">	main ENDP</span><br><span class="line">END main</span><br></pre></td></tr></table></figure></p>
+<p><strong>反向复制字符串:</strong> 使用汇编语言实现字符串的复制,将数据从<code>source</code>复制到<code>target</code>内存中且反向存储数据.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.data</span><br><span class="line">	source BYTE &quot;hello lyshark welcome&quot;,0h</span><br><span class="line">	target BYTE SIZEOF source DUP(0),0h</span><br><span class="line">.code</span><br><span class="line">	main PROC</span><br><span class="line">		mov esi,sizeof source</span><br><span class="line">		mov ecx,sizeof source</span><br><span class="line">		mov ebx,0</span><br><span class="line">	L1:</span><br><span class="line">		mov al,source[esi]</span><br><span class="line">		mov target[ebx],al</span><br><span class="line">		dec esi</span><br><span class="line">		inc ebx</span><br><span class="line">		loop L1</span><br><span class="line">		push 0</span><br><span class="line">		call ExitProcess</span><br><span class="line">	main ENDP</span><br><span class="line">END main</span><br></pre></td></tr></table></figure></p>
+<p><strong>查看内存与寄存器:</strong> 通过调用<code>DumpMem/DumpRegs</code>显示内存与寄存器的快照.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.data</span><br><span class="line">	array DWORD 1,2,3,4,5,6,7,8,9,0ah,0bh</span><br><span class="line">.code</span><br><span class="line">	main PROC</span><br><span class="line">		mov esi,offset array       ; 设置内存起始地址</span><br><span class="line">		mov ecx,lengthof array     ; 设置元素数据,偏移</span><br><span class="line">		mov ebx,type array         ; 设置元素尺寸(1=byte,2=word,4=dword)</span><br><span class="line">		call DumpMem               ; 调用内存查询子过程</span><br><span class="line">		call DumpRegs              ; 调用查询寄存器子过程</span><br><span class="line"></span><br><span class="line">		push 0</span><br><span class="line">		call ExitProcess</span><br><span class="line">	main ENDP</span><br><span class="line">END main</span><br></pre></td></tr></table></figure></p>
+<p><strong>汇编实现性能度量:</strong> 通过调用库函数,实现对指定代码执行的性能度量.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.data</span><br><span class="line">	StartTime DWORD ?</span><br><span class="line">.code</span><br><span class="line">	main PROC</span><br><span class="line"></span><br><span class="line">		call GetMseconds       ; 调用区本地时间过程</span><br><span class="line">		mov StartTime,eax      ; 将返回值赋值给StartTime</span><br><span class="line"></span><br><span class="line">		mov ecx,10             ; 通过调用延时过程,模拟程序的执行</span><br><span class="line">	L1:</span><br><span class="line">		mov eax,1000           ; 指定延时1s=1000ms</span><br><span class="line">		call Delay             ; 调用延时过程</span><br><span class="line">		loop L1</span><br><span class="line"></span><br><span class="line">		call GetMseconds       ; 再次调用本地时间过程</span><br><span class="line">		sub eax,StartTime      ; 结束时间减去开始时间</span><br><span class="line">		call WriteDec          ; 以十进制形式输出eax寄存器的值</span><br><span class="line"></span><br><span class="line">		push 0</span><br><span class="line">		call ExitProcess</span><br><span class="line">	main ENDP</span><br><span class="line">END main</span><br></pre></td></tr></table></figure></p>
+<p><strong>字符输出:</strong> <code>WriteString(字符串)</code>,<code>WriteInt(整数)</code>,<code>WriteHex(16进制)</code>,<code>WriteChar(字符)</code>,<code>WriteDec(10进制)</code>.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.data</span><br><span class="line">	Message BYTE &quot;Input String:&quot;,0h</span><br><span class="line">	String DWORD ?</span><br><span class="line"></span><br><span class="line">.code</span><br><span class="line">	main PROC</span><br><span class="line">		; 设置控制台背景颜色</span><br><span class="line">		mov eax,yellow +(blue*16)     ; 设置为蓝底黄字</span><br><span class="line">		call SetTextColor             ; 调用设置过程</span><br><span class="line">		call Clrscr                   ; 清除屏幕,clear</span><br><span class="line"></span><br><span class="line">		; 提示用户一段话</span><br><span class="line">		mov edx,offset Message        ; 指定输出的文字</span><br><span class="line">		call WriteString              ; 调用回写过程</span><br><span class="line">		call Crlf                     ; 调用回车</span><br><span class="line"></span><br><span class="line">		push 0</span><br><span class="line">		call ExitProcess</span><br><span class="line">	main ENDP</span><br><span class="line">END main</span><br></pre></td></tr></table></figure></p>
+<p><strong>字符输入:</strong> <code>ReadString(字符串)</code>,<code>ReadInt(整数)</code>,<code>ReadHex(16进制)</code>,<code>ReadChar(字符)</code>,<code>ReadDec(10进制)</code>.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.data</span><br><span class="line">	Buffer BYTE 21 DUP(0)          ; 输入缓冲区</span><br><span class="line">	ByteCount DWORD ?              ; 存放计数器      </span><br><span class="line">.code</span><br><span class="line">	main PROC</span><br><span class="line">		mov edx,offset Buffer      ; 指向缓冲区指针</span><br><span class="line">		mov ecx,sizeof Buffer      ; 指定最多读取的字符数</span><br><span class="line">		call ReadString            ; 读取输入字符串</span><br><span class="line">		mov ByteCount,eax          ; 保存读取的字符数</span><br><span class="line"></span><br><span class="line">		push 0</span><br><span class="line">		call ExitProcess</span><br><span class="line">	main ENDP</span><br><span class="line">END main</span><br></pre></td></tr></table></figure></p>
+<p><strong>生成伪随机数:</strong><br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.code</span><br><span class="line">	main PROC</span><br><span class="line">		mov ecx,5           ; 循环生成5个随机数</span><br><span class="line">	L1:</span><br><span class="line">		call Random32       ; 生成随机数</span><br><span class="line">		call WriteDec       ; 以十进制显示</span><br><span class="line">		mov al,TAB          ; 水平制表符</span><br><span class="line">		call WriteChar      ; 显示水平制表符</span><br><span class="line">		loop L1</span><br><span class="line">		call Crlf           ; 回车</span><br><span class="line"></span><br><span class="line">		push 0</span><br><span class="line">		call ExitProcess</span><br><span class="line">	main ENDP</span><br><span class="line">END main</span><br></pre></td></tr></table></figure></p>
+<p><strong>生成自定义随机数:</strong><br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.code</span><br><span class="line">	main PROC</span><br><span class="line">		mov ecx,5           ; 循环生成5个随机数</span><br><span class="line">	L1:</span><br><span class="line">		mov eax,100         ; 0-99之间</span><br><span class="line">		call RandomRange    ; 生成随机数</span><br><span class="line">		sub eax,50          ; 范围在-50-49</span><br><span class="line">		call WriteInt       ; 十进制输出</span><br><span class="line">		mov al,TAB</span><br><span class="line">		call WriteChar      ; 输出制表符</span><br><span class="line">		loop L1</span><br><span class="line">		call Crlf           ; 回车</span><br><span class="line"></span><br><span class="line">		push 0</span><br><span class="line">		call ExitProcess</span><br><span class="line">	main ENDP</span><br><span class="line">END main</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2019/04/12/汇编语言/Win32汇编语言基础-1/">Win32汇编语言基础(1)</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2019年04月12日 - 18:04</p>
+  <p><span>最后更新:</span>2019年04月18日 - 20:04</p>
+  <p><span>原始链接:</span><a href="/2019/04/12/汇编语言/Win32汇编语言基础-1/" title="Win32汇编语言基础(1)">https://www.mkdirs.com/2019/04/12/汇编语言/Win32汇编语言基础-1/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/汇编语言/" rel="tag"> <i class="fa fa-tag"></i> 汇编语言</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/10/网络设备配置/华为设备ACL与NAT技术/" rel="next" title="华为设备ACL与NAT技术">
+                <i class="fa fa-chevron-left"></i> 华为设备ACL与NAT技术
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/20/渗透测试/Windows 远程栈溢出挖掘/" rel="prev" title="Windows 远程栈溢出挖掘">
+                Windows 远程栈溢出挖掘 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#微机体系概述"><span class="nav-text">微机体系概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据段的定义"><span class="nav-text">数据段的定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常用汇编指令"><span class="nav-text">常用汇编指令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#内存寻址方式"><span class="nav-text">内存寻址方式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆直接寻址◆"><span class="nav-text">◆直接寻址◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆间接寻址◆"><span class="nav-text">◆间接寻址◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆变址寻址◆"><span class="nav-text">◆变址寻址◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#堆栈操作指令"><span class="nav-text">堆栈操作指令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#过程调用指令"><span class="nav-text">过程调用指令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#标志测试指令"><span class="nav-text">标志测试指令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#条件跳转指令"><span class="nav-text">条件跳转指令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#决策伪指令"><span class="nav-text">决策伪指令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一些过程小例子"><span class="nav-text">一些过程小例子</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

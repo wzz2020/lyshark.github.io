@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="DNS (Domain Name System，域名系统),万维网上作为域名和IP地址相互映射的一个分布式数据库,能够使用户更方便的访问互联网,而不用去记住能够被机器直接读取的IP数串.通过域名,最终得到该域名对应的IP地址的过程叫做域名解析 (或主机名解析),DNS协议运行在UDP协议之上,使用端口号UDP 53号端口作为数据通信端口(域名解析),使用TCP53号端口实现数据同步(主从同步).">
+<meta name="keywords" content="Linux 服务配置">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用Bind提供域名解析服务">
+<meta property="og:url" content="https://www.mkdirs.com/2018/09/16/Linux 服务配置/使用Bind提供域名解析服务/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="DNS (Domain Name System，域名系统),万维网上作为域名和IP地址相互映射的一个分布式数据库,能够使用户更方便的访问互联网,而不用去记住能够被机器直接读取的IP数串.通过域名,最终得到该域名对应的IP地址的过程叫做域名解析 (或主机名解析),DNS协议运行在UDP协议之上,使用端口号UDP 53号端口作为数据通信端口(域名解析),使用TCP53号端口实现数据同步(主从同步).">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-04-16T12:39:09.177Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用Bind提供域名解析服务">
+<meta name="twitter:description" content="DNS (Domain Name System，域名系统),万维网上作为域名和IP地址相互映射的一个分布式数据库,能够使用户更方便的访问互联网,而不用去记住能够被机器直接读取的IP数串.通过域名,最终得到该域名对应的IP地址的过程叫做域名解析 (或主机名解析),DNS协议运行在UDP协议之上,使用端口号UDP 53号端口作为数据通信端口(域名解析),使用TCP53号端口实现数据同步(主从同步).">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/09/16/Linux 服务配置/使用Bind提供域名解析服务/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>使用Bind提供域名解析服务 | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/09/16/Linux 服务配置/使用Bind提供域名解析服务/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">使用Bind提供域名解析服务
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-09-16 01:28:08" itemprop="dateCreated datePublished" datetime="2018-09-16T01:28:08+08:00">2018-09-16</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-16 20:39:09" itemprop="dateModified" datetime="2019-04-16T20:39:09+08:00">2019-04-16</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Linux-服务配置/" itemprop="url" rel="index"><span itemprop="name">Linux 服务配置</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>DNS (Domain Name System，域名系统),万维网上作为域名和IP地址相互映射的一个分布式数据库,能够使用户更方便的访问互联网,而不用去记住能够被机器直接读取的IP数串.通过域名,最终得到该域名对应的IP地址的过程叫做域名解析 (或主机名解析),DNS协议运行在UDP协议之上,使用端口号UDP 53号端口作为数据通信端口(域名解析),使用TCP53号端口实现数据同步(主从同步).</p>
+<a id="more"></a>
+<p><b>DNS工作过程：</b></p>
+<p>1.客户机首先会查看本地的hosts文件,如果有记录则返回,无则继续.<br>2.客户端查看本地缓存,如果有记录则返回,无则继续.<br>3.客户端将请求转发给本地DNS服务器,请求解析.<br>4.本地DNS服务器,查看域名是否有记录,有则本地解析返回,否则进行下一步.<br>5.本地DNS服务器首先在缓存中查找,有则返回,无则进行下一步.<br>6.本地DNS服务器,向全球13个根域服务器发起DNS请求,根域返回对应的地址列表.<br>7.使用某一个域的IP地址,发起DNS请求,域返回kernel域服务器地址列表.<br>8.使用某一个kernel域IP地,发起DNS请求,kernel域返回本地DNS服务收到后,返回给客户机.</p>
+<p><b>客户端(Web浏览器)访问网页的全过程：</b></p>
+<p>1.首先客户端向DNS服务器请求解析域名.<br>2.DNS收到请求后相应,或者迭代或者递归,当查询到服务器IP后,返回给客户.<br>3.客户端取得IP地址后,向网页服务器发送请求.</p>
+<p><b>DNS递归与迭代查询：</b></p>
+<p>递归查询: 是客户端与服务器之间的查询过程,压力在服务器端<br>迭代查询: 是服务器与服务器之间的查询过程,压力在客户端</p>
+<p><b>DNS的资源记录类型：</b></p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th style="text-align:center">说明</th>
+<th style="text-align:center">解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SOA</td>
+<td style="text-align:center">起始授权机构</td>
+<td style="text-align:center">这里记录时间等信息</td>
+</tr>
+<tr>
+<td>NS</td>
+<td style="text-align:center">名称服务器</td>
+<td style="text-align:center">只记录了完全合格域名(FQDN)</td>
+</tr>
+<tr>
+<td>A</td>
+<td style="text-align:center">主机</td>
+<td style="text-align:center">正向解析(域名到IP的解析)</td>
+</tr>
+<tr>
+<td>PTR</td>
+<td style="text-align:center">指针</td>
+<td style="text-align:center">反向解析(IP到域名的解析)</td>
+</tr>
+<tr>
+<td>MX</td>
+<td style="text-align:center">邮件交换记录</td>
+<td style="text-align:center">指定邮件优先级</td>
+</tr>
+<tr>
+<td>SRV</td>
+<td style="text-align:center">服务</td>
+<td style="text-align:center">列出提供特定服务的服务器</td>
+</tr>
+<tr>
+<td>CNAME</td>
+<td style="text-align:center">别名</td>
+<td style="text-align:center">将多个名字映射到同一台计算机</td>
+</tr>
+</tbody>
+</table>
+<h2 id="安装Bind服务程序"><a href="#安装Bind服务程序" class="headerlink" title="安装Bind服务程序"></a>安装Bind服务程序</h2><h3 id="◆编译安装Bind◆"><a href="#◆编译安装Bind◆" class="headerlink" title="◆编译安装Bind◆"></a>◆编译安装Bind◆</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># wget ftp://ftp.isc.org/isc/bind9/9.6.1/bind-9.6.1.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># tar -xzvf bind-9.6.1.tar.gz </span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd bind-9.6.1/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ./configure  --enable-largefile --enable-threads --prefix=/usr/local/named</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make &amp;&amp; make install</span></span><br></pre></td></tr></table></figure>
+<h3 id="◆Yum安装Bind◆"><a href="#◆Yum安装Bind◆" class="headerlink" title="◆Yum安装Bind◆"></a>◆Yum安装Bind◆</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y bind bind-chroot bind-libs</span></span><br><span class="line">Loaded plugins: product-id, search-disabled-repos, subscription-manager</span><br><span class="line">This system is not registered with an entitlement server. You can use subscription-manager.</span><br><span class="line">Package 32:<span class="built_in">bind</span>-9.9.4-61.el7.x86_64 already installed and latest version</span><br><span class="line">Package 32:<span class="built_in">bind</span>-chroot-9.9.4-61.el7.x86_64 already installed and latest version</span><br><span class="line">Package 32:<span class="built_in">bind</span>-libs-9.9.4-61.el7.x86_64 already installed and latest version</span><br><span class="line">Nothing to <span class="keyword">do</span></span><br></pre></td></tr></table></figure>
+<p><br></p>
+<h2 id="部署DNS实现解析"><a href="#部署DNS实现解析" class="headerlink" title="部署DNS实现解析"></a>部署DNS实现解析</h2><p>DNS正向解析是指根据域名(主机名),查找到对应的IP地址,也就是说,当用户输入一个域名后,Bind服务会自动进行查找,并将匹配到的IP地址返回给客户端,这也是最常用的DNS工作模式.</p>
+<p>DNS反向解析的作用是,将用户提交的IP地址解析为对应的域名信息,它也可以针对某个IP进行反向解析,大致判断有多少个网站运行在上面.</p>
+<p>以下实验,将配置一个DNS解析服务.(注意：192.168.1.20解析成lyshark.org 且 lyshark.org解析成192.168.1.20).</p>
+<p>1.首先通过yum仓库,安装bind域名解析系统,和bind-chroot禁锢模块<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y bind bind-chroot bind-libs</span></span><br><span class="line">Loaded plugins: product-id, search-disabled-repos, subscription-manager</span><br><span class="line">This system is not registered with an entitlement server. You can use subscription-manager.</span><br><span class="line">Package 32:<span class="built_in">bind</span>-9.9.4-61.el7.x86_64 already installed and latest version</span><br><span class="line">Package 32:<span class="built_in">bind</span>-chroot-9.9.4-61.el7.x86_64 already installed and latest version</span><br><span class="line">Package 32:<span class="built_in">bind</span>-libs-9.9.4-61.el7.x86_64 already installed and latest version</span><br><span class="line">Nothing to <span class="keyword">do</span></span><br></pre></td></tr></table></figure></p>
+<p>2.编辑bind主配置文件,修改前面标有星号的参数<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/named.conf</span></span><br><span class="line"></span><br><span class="line">options &#123;</span><br><span class="line">        ★listen-on port 53 &#123; any; &#125;;					<span class="comment">#侦听任何ipv4地址</span></span><br><span class="line">        ★listen-on-v6 port 53 &#123; ::any; &#125;;				<span class="comment">#侦听任何ipv6地址</span></span><br><span class="line">        directory       <span class="string">"/var/named"</span>;					<span class="comment">#设置工作目录</span></span><br><span class="line">        dump-file       <span class="string">"/var/named/data/cache_dump.db"</span>;		<span class="comment">#设置缓存转存目录</span></span><br><span class="line">        statistics-file <span class="string">"/var/named/data/named_stats.txt"</span>;		<span class="comment">#记录统计信息文件</span></span><br><span class="line">        memstatistics-file <span class="string">"/var/named/data/named_mem_stats.txt"</span>;	<span class="comment">#记录内存使用情况</span></span><br><span class="line">        ★allow-query     &#123; any; &#125;;					<span class="comment">#允许任何主机查询</span></span><br><span class="line">        recursion yes;							<span class="comment">#允许递归查询</span></span><br><span class="line">        dnssec-enable yes;						<span class="comment">#是否支持Dnssec</span></span><br><span class="line">        dnssec-validation yes;						<span class="comment">#Dnssec再次确认开关</span></span><br><span class="line">        bindkeys-file <span class="string">"/etc/named.iscdlv.key"</span>;				<span class="comment">#ISC DLV KEY 的路径</span></span><br><span class="line">        managed-keys-directory <span class="string">"/var/named/dynamic"</span>;			<span class="comment">#管理密钥路径</span></span><br><span class="line">        pid-file <span class="string">"/run/named/named.pid"</span>;				<span class="comment">#进程ID文件路径</span></span><br><span class="line">        session-keyfile <span class="string">"/run/named/session.key"</span>;			<span class="comment">#会话密钥文件</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>3.接着在bind的区域配置文件最底部,创建一个正向区域,和一个反向区域<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/named.rfc1912.zones</span></span><br><span class="line"></span><br><span class="line">zone <span class="string">"lyshark.org"</span> IN &#123;					<span class="comment">#正向区域名</span></span><br><span class="line">	<span class="built_in">type</span> master;					<span class="comment">#区域类型（master/slave）</span></span><br><span class="line">	file <span class="string">"lyshark.org.zone"</span>;			<span class="comment">#区域文件名（/usr/named/lyshark.org.zone）</span></span><br><span class="line">&#125;;</span><br><span class="line">zone <span class="string">"1.168.192.in-addr.arpa"</span> IN &#123;                      <span class="comment">#反向区域名（IP地址应反写）</span></span><br><span class="line">        <span class="built_in">type</span> master;                                    <span class="comment">#区域类型（master/slave）</span></span><br><span class="line">        file <span class="string">"lyshark.org.arpa"</span>;                        <span class="comment">#区域文件名（/var/named/lyshark.org.aone）</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>4.拷贝默认区域配置模板,分别拷贝正向和反向模板<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cp -a /var/named/named.localhost /var/named/lyshark.org.zone    #复制正向模板</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cp -a /var/named/named.loopback /var/named/lyshark.org.arpa     #复制反向模板</span></span><br></pre></td></tr></table></figure></p>
+<p>5.编辑正向模板的zone记录,修改正向解析<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /var/named/lyshark.org.zone</span></span><br><span class="line"></span><br><span class="line"><span class="variable">$TTL</span> 1D</span><br><span class="line">@       IN 		SOA                dns.lyshark.org. 		rname.invalid. 	(</span><br><span class="line"><span class="comment">#区域名			#SOA标识	   #主域名服务器(FQDN)		#管理员邮件地址</span></span><br><span class="line"></span><br><span class="line">                                        0       ; serial	<span class="comment">#序列号</span></span><br><span class="line">                                        1D      ; refresh	<span class="comment">#刷新间隔</span></span><br><span class="line">                                        1H      ; retry		<span class="comment">#重试间隔</span></span><br><span class="line">                                        1W      ; expire	<span class="comment">#过期间隔</span></span><br><span class="line">                                        3H )    ; minimum	<span class="comment">#TTL</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        	NS      dns.lyshark.org.					<span class="comment">#名称服务器</span></span><br><span class="line">dns     	A       127.0.0.1						<span class="comment">#A记录解析自身(必须存在)</span></span><br><span class="line">www     	A       192.168.1.20						<span class="comment">#解析记录</span></span><br></pre></td></tr></table></figure></p>
+<p>6.编辑反向模板的zone记录,修改反向解析<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /var/named/lyshark.org.arpa</span></span><br><span class="line"></span><br><span class="line"><span class="variable">$TTL</span> 1D</span><br><span class="line">@       IN 		SOA                dns.lyshark.org. 		rname.invalid. 	(</span><br><span class="line"><span class="comment">#区域名			#SOA标识	   #主域名服务器(FQDN)		#管理员邮件地址</span></span><br><span class="line"></span><br><span class="line">                                        0       ; serial	<span class="comment">#序列号</span></span><br><span class="line">                                        1D      ; refresh	<span class="comment">#刷新间隔</span></span><br><span class="line">                                        1H      ; retry		<span class="comment">#重试间隔</span></span><br><span class="line">                                        1W      ; expire	<span class="comment">#过期间隔</span></span><br><span class="line">                                        3H )    ; minimum	<span class="comment">#TTL</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        	NS      dns.lyshark.org.					<span class="comment">#名称服务器</span></span><br><span class="line">20           	PTR     dns.lyshark.org.					<span class="comment">#反向指针(IP最后位)</span></span><br></pre></td></tr></table></figure></p>
+<p>7.重启bind服务,并设置成开机自启动<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># systemctl restart named</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl enable named</span></span><br></pre></td></tr></table></figure></p>
+<p>8.在其他主机配置好网关,指向DNS服务器IP,通过nslookup测试查看效果,如果看到以下结果说明解析成功<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Microsoft Windows [版本 10.0]</span><br><span class="line">(c) 2018 Microsoft Corporation。保留所有权利。</span><br><span class="line"></span><br><span class="line">C:\Users\administrator&gt; nslookup 192.168.1.20</span><br><span class="line">服务器:  dns.lyshark.org</span><br><span class="line">Address:  192.168.1.20</span><br><span class="line"></span><br><span class="line">名称:    dns.lyshark.org</span><br><span class="line">Address:  192.168.1.20</span><br><span class="line"></span><br><span class="line">C:\Users\administrator&gt; nslookup www.lyshark.org</span><br><span class="line">服务器:  dns.lyshark.org</span><br><span class="line">Address:  192.168.1.20</span><br><span class="line"></span><br><span class="line">名称:    www.lyshark.org</span><br><span class="line">Address:  192.168.1.20</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="部署DNS主从同步"><a href="#部署DNS主从同步" class="headerlink" title="部署DNS主从同步"></a>部署DNS主从同步</h2><p>在DNS域名解析中,从服务器可以从主服务器上获取指定的区域数据文件,从而起到备份解析记录,与负载均衡的作用,因此通过部署从服务器,可以减轻主服务器负载压力,还可以提升用户的查询效率.</p>
+<p>以下实验,将实现主服务器启动后,从服务器自动同步主服务器的数据,实现主从同步.(注意：主DNS=192.168.1.20 从DNS=192.168.1.30)</p>
+<h3 id="◆配置主DNS服务◆"><a href="#◆配置主DNS服务◆" class="headerlink" title="◆配置主DNS服务◆"></a>◆配置主DNS服务◆</h3><p>1.首先通过yum仓库,安装bind域名解析系统,和bind-chroot<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y bind bind-chroot bind-libs</span></span><br><span class="line">Loaded plugins: product-id, search-disabled-repos, subscription-manager</span><br><span class="line">This system is not registered with an entitlement server. You can use subscription-manager.</span><br><span class="line">Package 32:<span class="built_in">bind</span>-9.9.4-61.el7.x86_64 already installed and latest version</span><br><span class="line">Package 32:<span class="built_in">bind</span>-chroot-9.9.4-61.el7.x86_64 already installed and latest version</span><br><span class="line">Package 32:<span class="built_in">bind</span>-libs-9.9.4-61.el7.x86_64 already installed and latest version</span><br><span class="line">Nothing to <span class="keyword">do</span></span><br></pre></td></tr></table></figure></p>
+<p>2.编辑bind主配置文件,修改以下几行配置<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/named.conf</span></span><br><span class="line"></span><br><span class="line">options &#123;</span><br><span class="line">        listen-on port 53 &#123; any; &#125;;                                    <span class="comment">#侦听任何ipv4地址</span></span><br><span class="line">        listen-on-v6 port 53 &#123; ::any; &#125;;                               <span class="comment">#侦听任何ipv6地址</span></span><br><span class="line">        allow-query     &#123; any; &#125;;                                      <span class="comment">#允许任何主机查询</span></span><br><span class="line">        .....</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>3.接着创建区域名称,配置允许解析的IP地址.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/named.rfc1912.zones</span></span><br><span class="line"></span><br><span class="line">zone <span class="string">"lyshark.org"</span> IN &#123;                                 <span class="comment">#正向区域名</span></span><br><span class="line">        <span class="built_in">type</span> master;                                    <span class="comment">#区域类型（master/slave）</span></span><br><span class="line">        file <span class="string">"lyshark.org.zone"</span>;                        <span class="comment">#区域文件名（/usr/named/lyshark.org.zone）</span></span><br><span class="line">        allow-update &#123; 192.168.1.30; &#125;;                 <span class="comment">#允许192.168.1.30过来缓存数据</span></span><br><span class="line">&#125;;</span><br><span class="line">zone <span class="string">"1.168.192.in-addr.arpa"</span> IN &#123;                      <span class="comment">#反向区域名（IP地址应反写）</span></span><br><span class="line">        <span class="built_in">type</span> master;                                    <span class="comment">#区域类型（master/slave）</span></span><br><span class="line">        file <span class="string">"lyshark.org.arpa"</span>;                        <span class="comment">#区域文件名（/var/named/lyshark.org.aone）</span></span><br><span class="line">        allow-update &#123; 192.168.1.30; &#125;;                 <span class="comment">#允许192.168.1.30过来缓存数据</span></span><br><span class="line"></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>4.拷贝默认区域配置模板,分别拷贝正向和反向模板<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cp -a /var/named/named.localhost /var/named/lyshark.org.zone    #复制正向模板</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cp -a /var/named/named.loopback /var/named/lyshark.org.arpa     #复制反向模板</span></span><br></pre></td></tr></table></figure></p>
+<p>5.编辑正向模板的zone记录,修改正向解析<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /var/named/lyshark.org.zone</span></span><br><span class="line"></span><br><span class="line"><span class="variable">$TTL</span> 1D</span><br><span class="line">@       IN              SOA                dns.lyshark.org.             rname.invalid.  (</span><br><span class="line"><span class="comment">#区域名                    #SOA标识     #主域名服务器(FQDN)                #管理员邮件地址</span></span><br><span class="line"></span><br><span class="line">                                        0       ; serial        <span class="comment">#序列号</span></span><br><span class="line">                                        1D      ; refresh       <span class="comment">#刷新间隔</span></span><br><span class="line">                                        1H      ; retry         <span class="comment">#重试间隔</span></span><br><span class="line">                                        1W      ; expire        <span class="comment">#过期间隔</span></span><br><span class="line">                                        3H )    ; minimum       <span class="comment">#TTL</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">                NS      dns.lyshark.org.                                        <span class="comment">#名称服务器</span></span><br><span class="line">dns             A       127.0.0.1                                               <span class="comment">#A记录解析自身(必须存在)</span></span><br><span class="line">www             A       192.168.1.20                                            <span class="comment">#解析记录</span></span><br></pre></td></tr></table></figure></p>
+<p>6.编辑反向模板的zone记录,修改反向解析<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /var/named/lyshark.org.arpa</span></span><br><span class="line"></span><br><span class="line"><span class="variable">$TTL</span> 1D</span><br><span class="line">@       IN              SOA                dns.lyshark.org.             rname.invalid.  (</span><br><span class="line"><span class="comment">#区域名                    #SOA标识     #主域名服务器(FQDN)                #管理员邮件地址</span></span><br><span class="line"></span><br><span class="line">                                        0       ; serial        <span class="comment">#序列号</span></span><br><span class="line">                                        1D      ; refresh       <span class="comment">#刷新间隔</span></span><br><span class="line">                                        1H      ; retry         <span class="comment">#重试间隔</span></span><br><span class="line">                                        1W      ; expire        <span class="comment">#过期间隔</span></span><br><span class="line">                                        3H )    ; minimum       <span class="comment">#TTL</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">                NS      dns.lyshark.org.                                        <span class="comment">#名称服务器</span></span><br><span class="line">20              PTR     dns.lyshark.org.                                        <span class="comment">#反向指针(IP最后位)</span></span><br></pre></td></tr></table></figure></p>
+<p>7.重启bind服务,并设置成开机自启动<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># systemctl restart named</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl enable named</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="◆配置从DNS服务◆"><a href="#◆配置从DNS服务◆" class="headerlink" title="◆配置从DNS服务◆"></a>◆配置从DNS服务◆</h3><p>1.首先通过yum仓库,安装bind域名解析系统,和bind-chroot<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y bind bind-chroot bind-libs</span></span><br><span class="line">Loaded plugins: product-id, search-disabled-repos, subscription-manager</span><br><span class="line">This system is not registered with an entitlement server. You can use subscription-manager.</span><br><span class="line">Package 32:<span class="built_in">bind</span>-9.9.4-61.el7.x86_64 already installed and latest version</span><br><span class="line">Package 32:<span class="built_in">bind</span>-chroot-9.9.4-61.el7.x86_64 already installed and latest version</span><br><span class="line">Package 32:<span class="built_in">bind</span>-libs-9.9.4-61.el7.x86_64 already installed and latest version</span><br><span class="line">Nothing to <span class="keyword">do</span></span><br></pre></td></tr></table></figure></p>
+<p>2.编辑bind主配置文件,修改以下几行配置<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/named.conf</span></span><br><span class="line"></span><br><span class="line">options &#123;</span><br><span class="line">        listen-on port 53 &#123; any; &#125;;                                    <span class="comment">#侦听任何ipv4地址</span></span><br><span class="line">        listen-on-v6 port 53 &#123; ::any; &#125;;                               <span class="comment">#侦听任何ipv6地址</span></span><br><span class="line">        allow-query     &#123; any; &#125;;                                      <span class="comment">#允许任何主机查询</span></span><br><span class="line">        .....</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>3.在从服务器中填写,需要同步的主服务器的IP地址,以及同步那个区域配置文件,其他无需修改,保存即可<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/named.rfc1912.zones</span></span><br><span class="line"></span><br><span class="line">zone <span class="string">"lyshark.org"</span> IN &#123;                                 <span class="comment">#正向区域名</span></span><br><span class="line">        <span class="built_in">type</span> slave;                                     <span class="comment">#指定为从服务器</span></span><br><span class="line">        masters &#123; 192.168.1.20; &#125;;                      <span class="comment">#指定主服务器IP</span></span><br><span class="line">        file <span class="string">"slaves/lyshark.org.zone"</span>;                 <span class="comment">#指定同步后的文件</span></span><br><span class="line">        allow-update &#123;  none;  &#125;;                       <span class="comment">#不允许动态更新</span></span><br><span class="line">&#125;;</span><br><span class="line">zone <span class="string">"1.168.192.in-addr.arpa"</span> IN &#123;                      <span class="comment">#反向区域名</span></span><br><span class="line">        <span class="built_in">type</span> slave;                                     <span class="comment">#指定为从服务器</span></span><br><span class="line">        masters &#123; 192.168.1.20; &#125;;                      <span class="comment">#指定主服务器IP</span></span><br><span class="line">        file <span class="string">"slaves/lyshark.org.arpa"</span>;                 <span class="comment">#指定同步后的文件</span></span><br><span class="line">        allow-update &#123;  none;  &#125;;                       <span class="comment">#不允许动态更新</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>4.重启bind服务,并设置成开机自启动<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># systemctl restart named</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl enable named</span></span><br></pre></td></tr></table></figure></p>
+<p>5.验证环节,如果在/var/named/slaves目录下出现了文件则说明同步成功啦<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost slaves]<span class="comment"># pwd</span></span><br><span class="line">/var/named/slaves</span><br><span class="line">[root@localhost slaves]<span class="comment"># ls -l</span></span><br><span class="line">total 8</span><br><span class="line">-rw-r--r--. 1 named named 251 Nov  6 04:12 lyshark.org.arpa</span><br><span class="line">-rw-r--r--. 1 named named 249 Nov  6 04:12 lyshark.org.zone</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="部署DNS缓存服务"><a href="#部署DNS缓存服务" class="headerlink" title="部署DNS缓存服务"></a>部署DNS缓存服务</h2><p>DNS缓存服务器(Caching DNS Server),是一种不负责域名数据维护的DNS服务器,简单来说,缓存服务器就是把用户经常使用到的,域名与IP地址的解析记录保存在本机,从而提升下次解析请求的效率.</p>
+<p>以下实验,将配置一台主DNS服务,再配置一台缓存服务器,加快DNS的解析速度.(注意：主DNS=192.168.1.20 缓存DNS=192.168.1.30).</p>
+<h3 id="◆配置解析DNS◆"><a href="#◆配置解析DNS◆" class="headerlink" title="◆配置解析DNS◆"></a>◆配置解析DNS◆</h3><p>1.首先通过yum仓库,安装bind域名解析系统,和bind-chroot<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y bind bind-chroot bind-libs</span></span><br><span class="line">Loaded plugins: product-id, search-disabled-repos, subscription-manager</span><br><span class="line">This system is not registered with an entitlement server. You can use subscription-manager.</span><br><span class="line">Package 32:<span class="built_in">bind</span>-9.9.4-61.el7.x86_64 already installed and latest version</span><br><span class="line">Package 32:<span class="built_in">bind</span>-chroot-9.9.4-61.el7.x86_64 already installed and latest version</span><br><span class="line">Package 32:<span class="built_in">bind</span>-libs-9.9.4-61.el7.x86_64 already installed and latest version</span><br><span class="line">Nothing to <span class="keyword">do</span></span><br></pre></td></tr></table></figure></p>
+<p>2.编辑bind主配置文件,修改以下几行配置<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/named.conf</span></span><br><span class="line"></span><br><span class="line">options &#123;</span><br><span class="line">        listen-on port 53 &#123; any; &#125;;                                    <span class="comment">#侦听任何ipv4地址</span></span><br><span class="line">        listen-on-v6 port 53 &#123; ::any; &#125;;                               <span class="comment">#侦听任何ipv6地址</span></span><br><span class="line">        allow-query     &#123; any; &#125;;                                      <span class="comment">#允许任何主机查询</span></span><br><span class="line">        .....</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>3.接着创建区域名称,配置允许解析的IP地址.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/named.rfc1912.zones</span></span><br><span class="line"></span><br><span class="line">zone <span class="string">"lyshark.com"</span> IN &#123;                                 <span class="comment">#正向区域名</span></span><br><span class="line">        <span class="built_in">type</span> master;                                    <span class="comment">#区域类型</span></span><br><span class="line">        file <span class="string">"lyshark.com.zone"</span>;                        <span class="comment">#区域文件名</span></span><br><span class="line">&#125;;</span><br><span class="line">zone <span class="string">"lyshark.org"</span> IN &#123;                                 <span class="comment">#正向区域名</span></span><br><span class="line">        <span class="built_in">type</span> master;                                    <span class="comment">#区域类型</span></span><br><span class="line">        file <span class="string">"lyshark.org.zone"</span>;                        <span class="comment">#区域文件名</span></span><br><span class="line">&#125;;</span><br><span class="line">zone <span class="string">"lyshark.net"</span> IN &#123;                                 <span class="comment">#正向区域名</span></span><br><span class="line">        <span class="built_in">type</span> master;                                    <span class="comment">#区域类型</span></span><br><span class="line">        file <span class="string">"lyshark.net.zone"</span>;                        <span class="comment">#区域文件名</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>4.拷贝默认区域配置模板,这里只做正向的拷贝即可<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cp -a /var/named/named.localhost /var/named/lyshark.com.zone</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cp -a /var/named/named.localhost /var/named/lyshark.org.zone</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cp -a /var/named/named.localhost /var/named/lyshark.net.zone</span></span><br></pre></td></tr></table></figure></p>
+<p>5.分别编辑正向模板的zone记录,修改正向解析,改为以下形式<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost named]<span class="comment"># cat lyshark.com.zone</span></span><br><span class="line"><span class="variable">$TTL</span> 1D</span><br><span class="line">@       IN SOA  dns.lyshark.com. rname.invalid. (</span><br><span class="line">                                        0       ; serial</span><br><span class="line">                                        1D      ; refresh</span><br><span class="line">                                        1H      ; retry</span><br><span class="line">                                        1W      ; expire</span><br><span class="line">                                        3H )    ; minimum</span><br><span class="line">        NS      dns.lyshark.com.</span><br><span class="line">dns     A       127.0.0.1</span><br><span class="line">www     A       192.168.1.20</span><br><span class="line"></span><br><span class="line">[root@localhost named]<span class="comment"># cat lyshark.org.zone</span></span><br><span class="line"><span class="variable">$TTL</span> 1D</span><br><span class="line">@       IN SOA  dns.lyshark.org. rname.invalid. (</span><br><span class="line">                                        0       ; serial</span><br><span class="line">                                        1D      ; refresh</span><br><span class="line">                                        1H      ; retry</span><br><span class="line">                                        1W      ; expire</span><br><span class="line">                                        3H )    ; minimum</span><br><span class="line">        NS      dns.lyshark.org.</span><br><span class="line">dns     A       127.0.0.1</span><br><span class="line">www     A       192.168.1.20</span><br><span class="line"></span><br><span class="line">[root@localhost named]<span class="comment"># cat lyshark.net.zone</span></span><br><span class="line"><span class="variable">$TTL</span> 1D</span><br><span class="line">@       IN SOA  dns.lyshark.net. rname.invalid. (</span><br><span class="line">                                        0       ; serial</span><br><span class="line">                                        1D      ; refresh</span><br><span class="line">                                        1H      ; retry</span><br><span class="line">                                        1W      ; expire</span><br><span class="line">                                        3H )    ; minimum</span><br><span class="line">        NS      dns.lyshark.net.</span><br><span class="line">dns     A       127.0.0.1</span><br><span class="line">www     A       192.168.1.20</span><br></pre></td></tr></table></figure></p>
+<p>6.重启bind服务,并设置成开机自启动<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># systemctl restart named</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl enable named</span></span><br></pre></td></tr></table></figure></p>
+<p>7.通过其他主机配置成本DNS地址,并测试,看到以下结果则说明成功<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Microsoft Windows [版本 10.0]</span><br><span class="line">(c) 2018 Microsoft Corporation。保留所有权利。</span><br><span class="line"></span><br><span class="line">C:\Users\administrator&gt; nslookup www.lyshark.com</span><br><span class="line">服务器:  UnKnown</span><br><span class="line">Address:  192.168.1.20</span><br><span class="line"></span><br><span class="line">名称:    www.lyshark.com</span><br><span class="line">Address:  192.168.1.20</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">C:\Users\administrator&gt; nslookup www.lyshark.org</span><br><span class="line">服务器:  UnKnown</span><br><span class="line">Address:  192.168.1.20</span><br><span class="line"></span><br><span class="line">名称:    www.lyshark.org</span><br><span class="line">Address:  192.168.1.20</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">C:\Users\administrator&gt; nslookup www.lyshark.net</span><br><span class="line">服务器:  UnKnown</span><br><span class="line">Address:  192.168.1.20</span><br><span class="line"></span><br><span class="line">名称:    www.lyshark.net</span><br><span class="line">Address:  192.168.1.20</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆配置缓存DNS◆"><a href="#◆配置缓存DNS◆" class="headerlink" title="◆配置缓存DNS◆"></a>◆配置缓存DNS◆</h3><p>1.缓存DNS服务器,安装dnsmasq缓存工具<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y dnsmasq</span></span><br><span class="line">Loaded plugins: product-id, search-disabled-repos, subscription-manager</span><br><span class="line">This system is not registered with an entitlement server. You can use subscription-manager.</span><br><span class="line">Package dnsmasq-2.76-5.el7.x86_64 already installed and latest version</span><br><span class="line">Nothing to <span class="keyword">do</span></span><br></pre></td></tr></table></figure></p>
+<p>2.打开dnsmasq的主配置文件,在配置文件底部写入要缓存的条目<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/dnsmasq.conf</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Include all files in /etc/dnsmasq.d except RPM backup files</span></span><br><span class="line">conf-dir=/etc/dnsmasq.d,.rpmnew,.rpmsave,.rpmorig</span><br><span class="line"></span><br><span class="line">server=192.168.1.20                             <span class="comment">#主DNS服务器IP地址</span></span><br><span class="line">cache-size=100                                  <span class="comment">#缓存数据的条数</span></span><br><span class="line"></span><br><span class="line">domain=lyshark.com                              <span class="comment">#需要解析的域名(如果解析多条应全部写上)</span></span><br><span class="line">domain=lyshark.org</span><br><span class="line">domain=lyshark.net</span><br></pre></td></tr></table></figure></p>
+<p>3.重启dnsmasq服务,并设置开机自启动<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># systemctl restart dnsmasq</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl enable dnsmasq</span></span><br></pre></td></tr></table></figure></p>
+<p>4.验证环节,将其他主机的网关,配置成缓存服务器的IP,并测试效果<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Microsoft Windows [版本 10.0]</span><br><span class="line">(c) 2018 Microsoft Corporation。保留所有权利。</span><br><span class="line"></span><br><span class="line">C:\Users\administrator&gt;nslookup www.lyshark.com</span><br><span class="line">服务器:  UnKnown</span><br><span class="line">Address:  192.168.1.30</span><br><span class="line"></span><br><span class="line">非权威应答:</span><br><span class="line">名称:    www.lyshark.com</span><br><span class="line">Address:  192.168.1.20</span><br><span class="line"></span><br><span class="line">C:\Users\administrator&gt;nslookup www.lyshark.org</span><br><span class="line">服务器:  UnKnown</span><br><span class="line">Address:  192.168.1.30</span><br><span class="line"></span><br><span class="line">非权威应答:</span><br><span class="line">名称:    www.lyshark.org</span><br><span class="line">Address:  192.168.1.20</span><br><span class="line"></span><br><span class="line">C:\Users\administrator&gt;nslookup www.lyshark.net</span><br><span class="line">服务器:  UnKnown</span><br><span class="line">Address:  192.168.1.30</span><br><span class="line"></span><br><span class="line">非权威应答:</span><br><span class="line">名称:    www.lyshark.net</span><br><span class="line">Address:  192.168.1.20</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="部署DNS加密同步"><a href="#部署DNS加密同步" class="headerlink" title="部署DNS加密同步"></a>部署DNS加密同步</h2><p>在如今的互联网中,绝大多数DNS服务器,都是靠Bind提供服务的,bind服务也为用户提供了一种加密措施,来保证数据在两台DNS服务器同步过程中的安全性,即TSIG加密机制,保证了DNS服务器之间区域数据传输的安全性,下面我们就开始配置一个加密的DNS服务器吧.</p>
+<h3 id="◆配置加密主DNS◆"><a href="#◆配置加密主DNS◆" class="headerlink" title="◆配置加密主DNS◆"></a>◆配置加密主DNS◆</h3><p>1.首先通过yum仓库,安装bind域名解析系统,和bind-chroot禁锢模块<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y bind bind-chroot bind-libs</span></span><br><span class="line">Loaded plugins: product-id, search-disabled-repos, subscription-manager</span><br><span class="line">This system is not registered with an entitlement server. You can use subscription-manager.</span><br><span class="line">Package 32:<span class="built_in">bind</span>-9.9.4-61.el7.x86_64 already installed and latest version</span><br><span class="line">Package 32:<span class="built_in">bind</span>-chroot-9.9.4-61.el7.x86_64 already installed and latest version</span><br><span class="line">Package 32:<span class="built_in">bind</span>-libs-9.9.4-61.el7.x86_64 already installed and latest version</span><br><span class="line">Nothing to <span class="keyword">do</span></span><br></pre></td></tr></table></figure></p>
+<p>2.在主服务器中通过以下命令生成一个名称为master-slave的128位HMAC-MD5算法的名称为master-slave的密钥文件,并记住Kmaster-slave.+157+24095.private里面的key后期要用到这个钥匙同步数据<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># dnssec-keygen -a HMAC-MD5 -b 128 -n HOST master-slave</span></span><br><span class="line">Kmaster-slave.+157+24095</span><br><span class="line">[root@localhost ~]<span class="comment"># ls -l</span></span><br><span class="line">total 12</span><br><span class="line">-rw-------. 1 root root   56 Nov  6 08:50 Kmaster-slave.+157+24095.key</span><br><span class="line">-rw-------. 1 root root  165 Nov  6 08:50 Kmaster-slave.+157+24095.private</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># cat Kmaster-slave.+157+24095.private</span></span><br><span class="line">Private-key-format: v1.3</span><br><span class="line">Algorithm: 157 (HMAC_MD5)</span><br><span class="line">Key: fj0q+jO5kwHCapwt/dKMJA==              <span class="comment">#记住这个Key</span></span><br><span class="line">Bits: AAA=</span><br><span class="line">Created: 20181106135031</span><br><span class="line">Publish: 20181106135031</span><br><span class="line">Activate: 20181106135031</span><br></pre></td></tr></table></figure></p>
+<p>3.在主服务器中创建密钥验证文件,并把刚刚创建的key写入到tansfer.key传输文件里面,并配置好相应的权限<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /var/named/chroot/etc/transfer.key</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cat /var/named/chroot/etc/transfer.key</span></span><br><span class="line">key <span class="string">"master-slave"</span> &#123;                           <span class="comment">#写上刚刚的密钥名称</span></span><br><span class="line">        algorithm hmac-md5;                    <span class="comment">#指定加密算法</span></span><br><span class="line">        secret <span class="string">"fj0q+jO5kwHCapwt/dKMJA=="</span>;     <span class="comment">#写上上面的key</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># chown root:named /var/named/chroot/etc/transfer.key</span></span><br><span class="line">[root@localhost ~]<span class="comment"># chmod 640 /var/named/chroot/etc/transfer.key</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ln /var/named/chroot/etc/transfer.key /etc/transfer.key</span></span><br></pre></td></tr></table></figure></p>
+<p>4.修改主DNS服务器的/etc/named.conf主配置文件,开启加密验证<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/named.conf</span></span><br><span class="line"></span><br><span class="line">  1 //</span><br><span class="line">  2 // named.conf</span><br><span class="line">  3 //</span><br><span class="line">  4 // Provided by Red Hat <span class="built_in">bind</span> package to configure the ISC BIND named(8) DNS</span><br><span class="line">  5 // server as a caching only nameserver (as a localhost DNS resolver only).</span><br><span class="line">  6 //</span><br><span class="line">  7 // See /usr/share/doc/<span class="built_in">bind</span>*/sample/ <span class="keyword">for</span> example named configuration files.</span><br><span class="line">  8 //</span><br><span class="line">  9 // See the BIND Administrator s Reference Manual (ARM) <span class="keyword">for</span> details about the</span><br><span class="line"> 10 // configuration located <span class="keyword">in</span> /usr/share/doc/<span class="built_in">bind</span>-&#123;version&#125;/Bv9ARM.html</span><br><span class="line"> 11</span><br><span class="line"> 12 include <span class="string">"/etc/transfer.key"</span>;                                  <span class="comment">#添加本行,导入密钥</span></span><br><span class="line"> 13</span><br><span class="line"> 14 options &#123;</span><br><span class="line"> 15         listen-on port 53 &#123; any; &#125;;                           <span class="comment">#改为any允许</span></span><br><span class="line"> 16         listen-on-v6 port 53 &#123; ::1; &#125;;</span><br><span class="line"> 17         directory       <span class="string">"/var/named"</span>;</span><br><span class="line"> 18         dump-file       <span class="string">"/var/named/data/cache_dump.db"</span>;</span><br><span class="line"> 19         statistics-file <span class="string">"/var/named/data/named_stats.txt"</span>;</span><br><span class="line"> 20         memstatistics-file <span class="string">"/var/named/data/named_mem_stats.txt"</span>;</span><br><span class="line"> 21         allow-query     &#123; any; &#125;;                             <span class="comment">#改为any</span></span><br><span class="line"> 22         allow-transfer &#123; key master-slave; &#125;;                 <span class="comment">#添加本行,允许加载key</span></span><br><span class="line"> 23         /*</span><br></pre></td></tr></table></figure></p>
+<p>5.重启bind服务,并设置成开机自启动<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># systemctl restart named</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl enable named</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="◆配置加密从DNS◆"><a href="#◆配置加密从DNS◆" class="headerlink" title="◆配置加密从DNS◆"></a>◆配置加密从DNS◆</h3><p>1.首先通过yum仓库,安装bind域名解析系统,和bind-chroot禁锢模块<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y bind bind-chroot bind-libs</span></span><br><span class="line">Loaded plugins: product-id, search-disabled-repos, subscription-manager</span><br><span class="line">This system is not registered with an entitlement server. You can use subscription-manager.</span><br><span class="line">Package 32:<span class="built_in">bind</span>-9.9.4-61.el7.x86_64 already installed and latest version</span><br><span class="line">Package 32:<span class="built_in">bind</span>-chroot-9.9.4-61.el7.x86_64 already installed and latest version</span><br><span class="line">Package 32:<span class="built_in">bind</span>-libs-9.9.4-61.el7.x86_64 already installed and latest version</span><br><span class="line">Nothing to <span class="keyword">do</span></span><br></pre></td></tr></table></figure></p>
+<p>2.进入从DNS服务器,在相应目录下创建密钥文件,文件内容与主DNS服务器应相同,并赋予相应权限<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /var/named/chroot/etc/transfer.key</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cat /var/named/chroot/etc/transfer.key</span></span><br><span class="line">key <span class="string">"master-slave"</span> &#123;                         <span class="comment">#内容必须和主DNS保持一致</span></span><br><span class="line">        algorithm hmac-md5;</span><br><span class="line">        secret <span class="string">"fj0q+jO5kwHCapwt/dKMJA=="</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># chown root:named /var/named/chroot/etc/transfer.key</span></span><br><span class="line">[root@localhost ~]<span class="comment"># chmod 640 /var/named/chroot/etc/transfer.key</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ln /var/named/chroot/etc/transfer.key /etc/transfer.key</span></span><br></pre></td></tr></table></figure></p>
+<p>4.修改从DNS服务器的/etc/named.conf主配置文件,开启加密验证,并指定服务器IP地址<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">  1 //</span><br><span class="line">  2 // named.conf</span><br><span class="line">  3 //</span><br><span class="line">  4 // Provided by Red Hat <span class="built_in">bind</span> package to configure the ISC BIND named(8) DNS</span><br><span class="line">  5 // server as a caching only nameserver (as a localhost DNS resolver only).</span><br><span class="line">  6 //</span><br><span class="line">  7 // See /usr/share/doc/<span class="built_in">bind</span>*/sample/ <span class="keyword">for</span> example named configuration files.</span><br><span class="line">  8 //</span><br><span class="line">  9 // See the BIND Administrator s Reference Manual (ARM) <span class="keyword">for</span> details about the</span><br><span class="line"> 10 // configuration located <span class="keyword">in</span> /usr/share/doc/<span class="built_in">bind</span>-&#123;version&#125;/Bv9ARM.html</span><br><span class="line"> 11</span><br><span class="line"> 12 include <span class="string">"/etc/transfer.key"</span>;            <span class="comment">#导入密钥对</span></span><br><span class="line"> 13</span><br><span class="line"> 14 options &#123;</span><br><span class="line"> 15         listen-on port 53 &#123; any; &#125;;</span><br><span class="line"> 16         listen-on-v6 port 53 &#123; ::1; &#125;;</span><br><span class="line"> 17         directory       <span class="string">"/var/named"</span>;</span><br><span class="line"> 18         dump-file       <span class="string">"/var/named/data/cache_dump.db"</span>;</span><br><span class="line"> 19         statistics-file <span class="string">"/var/named/data/named_stats.txt"</span>;</span><br><span class="line"> 20         memstatistics-file <span class="string">"/var/named/data/named_mem_stats.txt"</span>;</span><br><span class="line"> 21         allow-query     &#123; any; &#125;;</span><br><span class="line"> 22</span><br><span class="line"> 23         /*</span><br><span class="line">.....</span><br><span class="line"> 46</span><br><span class="line"> 47 server 192.168.1.20 &#123;                  <span class="comment">#指定主服务器IP</span></span><br><span class="line"> 48         keys &#123; master-slave; &#125;;        <span class="comment">#指定密钥对</span></span><br><span class="line"> 49 &#125;;</span><br><span class="line"> 50</span><br><span class="line"> 51 logging &#123;</span><br><span class="line"> 52         channel default_debug &#123;</span><br><span class="line"> 53                 file <span class="string">"data/named.run"</span>;</span><br><span class="line"> 54                 severity dynamic;</span><br><span class="line"> 55         &#125;;</span><br><span class="line"> 56 &#125;;</span><br></pre></td></tr></table></figure></p>
+<p>5.重启bind服务,并设置成开机自启动<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># systemctl restart named</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl enable named</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="部署DNS分离解析"><a href="#部署DNS分离解析" class="headerlink" title="部署DNS分离解析"></a>部署DNS分离解析</h2><p>通常利用DNS的分离解析来达到针对不同的客户端访问网站时,分别解析到不同的主机,以达到负载均衡的目的.<br>举例来说明,中国的访客和美国的访客,同时访问一个网站,如果是美国的访客我们将其解析到美国的机房,如果是中国的访客我们将其解析到中国的机房,从而实现了快速上网,快速访问资源的目的,这一点有点类似于CND内容分发网络.</p>
+<p>以下实验,将配置一台主DNS服务,通过使用view视图实现分离解析,中国的用户自动访问到中国的主机,美国的用户自动访问到美国的主机,由于没有合适的资源这里只做演示,(注意：假设(IP=10.10.10.0/24是中国区域),(IP=20.20.20.0/24是美国区域),(中国用户解析到IP=59.110.167.239),(美国用户解析到IP=55.125.212.110)).</p>
+<p>1.首先通过yum仓库,安装bind域名解析系统,和bind-chroot<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y bind bind-chroot bind-libs</span></span><br><span class="line">Loaded plugins: product-id, search-disabled-repos, subscription-manager</span><br><span class="line">This system is not registered with an entitlement server. You can use subscription-manager.</span><br><span class="line">Package 32:<span class="built_in">bind</span>-9.9.4-61.el7.x86_64 already installed and latest version</span><br><span class="line">Package 32:<span class="built_in">bind</span>-chroot-9.9.4-61.el7.x86_64 already installed and latest version</span><br><span class="line">Package 32:<span class="built_in">bind</span>-libs-9.9.4-61.el7.x86_64 already installed and latest version</span><br><span class="line">Nothing to <span class="keyword">do</span></span><br></pre></td></tr></table></figure></p>
+<p>2.修改主配置文件,把第13行和19行改为any,由于分离解析功能与DNS根域冲突,所以还要屏蔽掉(51-57)行的根域区域.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/named.conf</span></span><br><span class="line"></span><br><span class="line"> 12 options &#123;</span><br><span class="line"> 13         listen-on port 53 &#123; any; &#125;;</span><br><span class="line"> 14         listen-on-v6 port 53 &#123; ::1; &#125;;</span><br><span class="line"> 15         directory       <span class="string">"/var/named"</span>;</span><br><span class="line"> 16         dump-file       <span class="string">"/var/named/data/cache_dump.db"</span>;</span><br><span class="line"> 17         statistics-file <span class="string">"/var/named/data/named_stats.txt"</span>;</span><br><span class="line"> 18         memstatistics-file <span class="string">"/var/named/data/named_mem_stats.txt"</span>;</span><br><span class="line"> 19         allow-query     &#123; any; &#125;;</span><br><span class="line">.....</span><br><span class="line"> 52 <span class="comment">#zone "." IN &#123;                       #此处应屏蔽掉,防止冲突</span></span><br><span class="line"> 53 <span class="comment">#       type hint;</span></span><br><span class="line"> 54 <span class="comment">#       file "named.ca";</span></span><br><span class="line"> 55 <span class="comment">#&#125;;</span></span><br><span class="line"> 56</span><br><span class="line"> 57 include <span class="string">"/etc/named.rfc1912.zones"</span>;</span><br></pre></td></tr></table></figure></p>
+<p>3.编辑区域配置文件,把区域配置文件原有内容清空,然后根据以下格式写入内容<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/named.rfc1912.zones</span></span><br><span class="line"></span><br><span class="line">  4 //</span><br><span class="line">  5 // ISC BIND named zone configuration <span class="keyword">for</span> zones recommended by</span><br><span class="line">  6 // RFC 1912 section 4.1 : localhost TLDs and address zones</span><br><span class="line">  7 // and http://www.ietf.org/internet-drafts/draft-ietf-dnsop-default-local-zones-02.txt</span><br><span class="line">  8 // (c)2007 R W Franks</span><br><span class="line">  9 //</span><br><span class="line"> 10 // See /usr/share/doc/<span class="built_in">bind</span>*/sample/ <span class="keyword">for</span> example named configuration files.</span><br><span class="line"> 11 //</span><br><span class="line"> 12</span><br><span class="line"> 13 acl <span class="string">"china"</span> &#123; 10.10.10.0/24; &#125;;                  <span class="comment">#假设,这个网段属于中国区域</span></span><br><span class="line"> 14 acl <span class="string">"american"</span> &#123; 20.20.20.0/24; &#125;;               <span class="comment">#假设,这个网段属于美国区域</span></span><br><span class="line"> 15</span><br><span class="line"> 16 view <span class="string">"china"</span> &#123;</span><br><span class="line"> 17</span><br><span class="line"> 18         match-clients &#123; <span class="string">"china"</span>; &#125;;</span><br><span class="line"> 19         zone <span class="string">"lyshark.org"</span> &#123;</span><br><span class="line"> 20                 <span class="built_in">type</span> master;</span><br><span class="line"> 21                 file <span class="string">"lyshark.org.china"</span>;</span><br><span class="line"> 22         &#125;;</span><br><span class="line"> 23 &#125;;</span><br><span class="line"> 24</span><br><span class="line"> 25 view <span class="string">"american"</span> &#123;</span><br><span class="line"> 26</span><br><span class="line"> 27         match-clients &#123; <span class="string">"american"</span>; &#125;;</span><br><span class="line"> 28         zone <span class="string">"lyshark.org"</span> &#123;</span><br><span class="line"> 29                 <span class="built_in">type</span> master;</span><br><span class="line"> 30                 file <span class="string">"lyshark.org.american"</span>;</span><br><span class="line"> 31         &#125;;</span><br><span class="line"> 32 &#125;;</span><br></pre></td></tr></table></figure></p>
+<p>4.建立对应的区域配置文件,分别拷贝两个模板.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cp -a /var/named/named.localhost /var/named/lyshark.org.china</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cp -a /var/named/named.localhost /var/named/lyshark.org.american</span></span><br></pre></td></tr></table></figure></p>
+<p>5.分别修改两个配置模板,china解析成=59.110.167.239,american解析成=55.125.212.110<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cat /var/named/lyshark.org.china</span></span><br><span class="line"><span class="variable">$TTL</span> 1D</span><br><span class="line">@       IN SOA  lyshark.org. rname.invalid. (</span><br><span class="line">                                        0       ; serial</span><br><span class="line">                                        1D      ; refresh</span><br><span class="line">                                        1H      ; retry</span><br><span class="line">                                        1W      ; expire</span><br><span class="line">                                        3H )    ; minimum</span><br><span class="line">        NS      ns.lyshark.org.</span><br><span class="line">ns      A       127.0.0.1</span><br><span class="line">www     A       59.110.167.239                             <span class="comment">#中国用户解析到 59.110.167.239</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># cat /var/named/lyshark.org.american</span></span><br><span class="line"><span class="variable">$TTL</span> 1D</span><br><span class="line">@       IN SOA  lyshark.org. rname.invalid. (</span><br><span class="line">                                        0       ; serial</span><br><span class="line">                                        1D      ; refresh</span><br><span class="line">                                        1H      ; retry</span><br><span class="line">                                        1W      ; expire</span><br><span class="line">                                        3H )    ; minimum</span><br><span class="line">        NS      ns.lyshark.org.</span><br><span class="line">ns      A       127.0.0.1</span><br><span class="line">www     A       55.125.212.110                            <span class="comment">#美国用户解析到 55.125.212.110</span></span><br></pre></td></tr></table></figure></p>
+<p>6.重启bind服务,并设置成开机自启动<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># systemctl restart named</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl enable named</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="部署DNS负载均衡"><a href="#部署DNS负载均衡" class="headerlink" title="部署DNS负载均衡"></a>部署DNS负载均衡</h2><p>在日常的生产环境中,其实DNS也是可以作为一个负载均衡器使用的,下面我们将介绍通过配置DNS域名失效时间的方式,来实现一个负载调度器.</p>
+<p>以下实验,将配置一台主DNS服务,并实现负载均衡.(注意：请自行搭建3个Http服务,IP1=192.168.1.10,IP2=192.168.1.20,iP3=192.168.1.30)</p>
+<p>1.首先通过yum仓库,安装bind域名解析系统,和bind-chroot<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y bind bind-chroot bind-libs</span></span><br><span class="line">Loaded plugins: product-id, search-disabled-repos, subscription-manager</span><br><span class="line">This system is not registered with an entitlement server. You can use subscription-manager.</span><br><span class="line">Package 32:<span class="built_in">bind</span>-9.9.4-61.el7.x86_64 already installed and latest version</span><br><span class="line">Package 32:<span class="built_in">bind</span>-chroot-9.9.4-61.el7.x86_64 already installed and latest version</span><br><span class="line">Package 32:<span class="built_in">bind</span>-libs-9.9.4-61.el7.x86_64 already installed and latest version</span><br><span class="line">Nothing to <span class="keyword">do</span></span><br></pre></td></tr></table></figure></p>
+<p>2.编辑bind主配置文件,修改以下几行配置<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/named.conf</span></span><br><span class="line"></span><br><span class="line">options &#123;</span><br><span class="line">        listen-on port 53 &#123; any; &#125;;                                    <span class="comment">#侦听任何ipv4地址</span></span><br><span class="line">        listen-on-v6 port 53 &#123; ::any; &#125;;                               <span class="comment">#侦听任何ipv6地址</span></span><br><span class="line">        allow-query     &#123; any; &#125;;                                      <span class="comment">#允许任何主机查询</span></span><br><span class="line">        .....</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>3.接着创建区域名称,在配置文件底部<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/named.rfc1912.zones</span></span><br><span class="line"></span><br><span class="line">....</span><br><span class="line">zone <span class="string">"lyshark.org"</span> IN &#123;                                 <span class="comment">#正向区域名</span></span><br><span class="line">        <span class="built_in">type</span> master;                                    <span class="comment">#区域类型</span></span><br><span class="line">        file <span class="string">"lyshark.org.zone"</span>;                        <span class="comment">#区域文件名</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>4.拷贝默认区域配置模板,只拷贝正向区域即可<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cp -a /var/named/named.localhost /var/named/lyshark.org.zone    #复制正向模板</span></span><br></pre></td></tr></table></figure></p>
+<p>5.编辑正向模板的zone记录,修改正向解析,在正向解析记录的基础上简单修改即可实现<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /var/named/lyshark.org.zone</span></span><br><span class="line"></span><br><span class="line"><span class="variable">$TTL</span> 1D</span><br><span class="line">@       IN SOA  dns.lyshark.org. rname.invalid. (</span><br><span class="line">                                        0       ; serial</span><br><span class="line">                                        1D      ; refresh</span><br><span class="line">                                        1H      ; retry</span><br><span class="line">                                        1W      ; expire</span><br><span class="line">                                        3H )    ; minimum</span><br><span class="line">        NS      dns.lyshark.org.</span><br><span class="line">dns     A       127.0.0.1</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">www.lyshark.org.  1 IN  A       192.168.1.10            <span class="comment">#web1的IP地址</span></span><br><span class="line">www.lyshark.org.  2 IN  A       192.168.1.20            <span class="comment">#web2的IP地址</span></span><br><span class="line">www.lyshark.org.  3 IN  A       192.168.1.30            <span class="comment">#web3的IP地址</span></span><br></pre></td></tr></table></figure></p>
+<p>6.重启bind服务,并设置成开机自启动<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># systemctl restart named</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl enable named</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/09/16/Linux 服务配置/使用Bind提供域名解析服务/">使用Bind提供域名解析服务</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年09月16日 - 01:09</p>
+  <p><span>最后更新:</span>2019年04月16日 - 20:04</p>
+  <p><span>原始链接:</span><a href="/2018/09/16/Linux 服务配置/使用Bind提供域名解析服务/" title="使用Bind提供域名解析服务">https://www.mkdirs.com/2018/09/16/Linux 服务配置/使用Bind提供域名解析服务/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux-服务配置/" rel="tag"> <i class="fa fa-tag"></i> Linux 服务配置</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/09/15/Linux 服务配置/部署MooseFS分布式文件系统/" rel="next" title="部署MooseFS分布式文件系统">
+                <i class="fa fa-chevron-left"></i> 部署MooseFS分布式文件系统
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/09/16/Linux 服务配置/通过DHCP动态管理IP地址/" rel="prev" title="通过DHCP动态管理IP地址">
+                通过DHCP动态管理IP地址 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装Bind服务程序"><span class="nav-text">安装Bind服务程序</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆编译安装Bind◆"><span class="nav-text">◆编译安装Bind◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆Yum安装Bind◆"><span class="nav-text">◆Yum安装Bind◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#部署DNS实现解析"><span class="nav-text">部署DNS实现解析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#部署DNS主从同步"><span class="nav-text">部署DNS主从同步</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆配置主DNS服务◆"><span class="nav-text">◆配置主DNS服务◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆配置从DNS服务◆"><span class="nav-text">◆配置从DNS服务◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#部署DNS缓存服务"><span class="nav-text">部署DNS缓存服务</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆配置解析DNS◆"><span class="nav-text">◆配置解析DNS◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆配置缓存DNS◆"><span class="nav-text">◆配置缓存DNS◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#部署DNS加密同步"><span class="nav-text">部署DNS加密同步</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆配置加密主DNS◆"><span class="nav-text">◆配置加密主DNS◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆配置加密从DNS◆"><span class="nav-text">◆配置加密从DNS◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#部署DNS分离解析"><span class="nav-text">部署DNS分离解析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#部署DNS负载均衡"><span class="nav-text">部署DNS负载均衡</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

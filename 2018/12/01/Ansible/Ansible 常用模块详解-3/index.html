@@ -1,0 +1,1598 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Ansible是新出现的自动化运维工具,基于Python开发,集合了众多运维工具（puppet、cfengine、chef、func、fabric）的优点,实现了批量系统配置、批量程序部署、批量运行命令等功能,ansible是基于模块工作的,本身没有批量部署的能力,真正具有批量部署的是ansible所运行的模块,ansible只是提供一种框架. 经过前面的介绍,我们已经熟悉了 Ansible 的一">
+<meta name="keywords" content="Ansible">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ansible 常用模块详解(3)">
+<meta property="og:url" content="https://www.mkdirs.com/2018/12/01/Ansible/Ansible 常用模块详解-3/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="Ansible是新出现的自动化运维工具,基于Python开发,集合了众多运维工具（puppet、cfengine、chef、func、fabric）的优点,实现了批量系统配置、批量程序部署、批量运行命令等功能,ansible是基于模块工作的,本身没有批量部署的能力,真正具有批量部署的是ansible所运行的模块,ansible只是提供一种框架. 经过前面的介绍,我们已经熟悉了 Ansible 的一">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-12-09T01:26:22.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Ansible 常用模块详解(3)">
+<meta name="twitter:description" content="Ansible是新出现的自动化运维工具,基于Python开发,集合了众多运维工具（puppet、cfengine、chef、func、fabric）的优点,实现了批量系统配置、批量程序部署、批量运行命令等功能,ansible是基于模块工作的,本身没有批量部署的能力,真正具有批量部署的是ansible所运行的模块,ansible只是提供一种框架. 经过前面的介绍,我们已经熟悉了 Ansible 的一">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/12/01/Ansible/Ansible 常用模块详解-3/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Ansible 常用模块详解(3) | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/12/01/Ansible/Ansible 常用模块详解-3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Ansible 常用模块详解(3)
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-01 15:22:11" itemprop="dateCreated datePublished" datetime="2018-12-01T15:22:11+08:00">2018-12-01</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-12-09 09:26:22" itemprop="dateModified" datetime="2018-12-09T09:26:22+08:00">2018-12-09</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Ansible/" itemprop="url" rel="index"><span itemprop="name">Ansible</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Ansible是新出现的自动化运维工具,基于Python开发,集合了众多运维工具（puppet、cfengine、chef、func、fabric）的优点,实现了批量系统配置、批量程序部署、批量运行命令等功能,ansible是基于模块工作的,本身没有批量部署的能力,真正具有批量部署的是ansible所运行的模块,ansible只是提供一种框架.</p>
+<p>经过前面的介绍,我们已经熟悉了 Ansible 的一些常识性的东西和如何编译安装Ansible,从本章开始我们将全面介绍 Ansible 的各种生产常用模块,这些也是我们使用 Ansible 的过程中必须掌握的重点,本章将介绍和使用 Ansible 中经常使用的一些模块,大体模块分为: 文件操作类,命令执行类,系统管理类,等使我们能对 Ansible 有一个全面的了解.</p>
+<a id="more"></a>
+<h2 id="命令执行模块"><a href="#命令执行模块" class="headerlink" title="命令执行模块"></a>命令执行模块</h2><h3 id="◆Command◆"><a href="#◆Command◆" class="headerlink" title="◆Command◆"></a>◆Command◆</h3><p>Command模块是Ansible的默认调用模块,它可以帮助我们在远程主机上执行任意命令,但是需要注意的是,使用Command模块执行命令时,如果需要执行的命令是单一的命令那没什么,但如要需要使用含有管道符,重定向,等特殊字符,这些符号我们的Command是不能识别出来的,当你需要使用管道符的时候应该考虑shell模块来实现,如果远程节点是 windows 系统,则需要使用 win_command 模块.</p>
+<p>下面来看它的几个常用参数：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">命 令 参 数</th>
+<th style="text-align:left">参 数 解 释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">free_form</td>
+<td style="text-align:left">必要参数,默认会使用,无需手动添加</td>
+</tr>
+<tr>
+<td style="text-align:left">chdir</td>
+<td style="text-align:left">指定一个目录,在执行命令前首先会切换到指定目录中去</td>
+</tr>
+<tr>
+<td style="text-align:left">creates</td>
+<td style="text-align:left">当指定的文件存在时,就不执行对应命令,起到判断的作用</td>
+</tr>
+<tr>
+<td style="text-align:left">removes</td>
+<td style="text-align:left">与creates参数相反,当指定的文件不存在时,就不执行对应命令</td>
+</tr>
+</tbody>
+</table>
+<p>首先通过root用户执行一条ls命令,ls默认会打印出/root/家目录下的文件,这是因为ansible默认的执行路径就是自己的家目录.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m command -a "ls"</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS | rc=0 &gt;&gt;</span><br></pre></td></tr></table></figure></p>
+<p>接下来我们通过chdir选项改变一下工作目录的位置,并再次ls查询一下,你会发现目录变化了,chdir 参数在执行命令前,会先进入到指定的目录中然后执行后续的命令.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m command -a "chdir=/boot ls"</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS | rc=0 &gt;&gt;</span><br><span class="line">config-3.10.0-862.el7.x86_64</span><br><span class="line">efi</span><br><span class="line">grub2</span><br><span class="line">initramfs-3.10.0-862.el7.x86_64.img</span><br><span class="line">symvers-3.10.0-862.el7.x86_64.gz</span><br><span class="line">vmlinuz-3.10.0-862.el7.x86_64</span><br></pre></td></tr></table></figure></p>
+<p>接下来看一下下面的两个参数,creates参数当/root目录不存在则执行echo,而removes则是当文件存在则执行,两个可以形成鲜明的对比啊.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m command -a 'creates=/root echo "check ok"'</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS | rc=0 &gt;&gt;</span><br><span class="line">skipped, since /root exists</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ansible all -m command -a 'removes=/root echo "check ok"'</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS | rc=0 &gt;&gt;</span><br><span class="line">check ok</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆Shell◆"><a href="#◆Shell◆" class="headerlink" title="◆Shell◆"></a>◆Shell◆</h3><p>shell 模块可以帮助我们在远程主机上执行命令,它与 command 模块不同之处是 shell 模块在远程主机中执行命令时,会运行远程主机上的 /bin/sh 程序处理,也就是说它不是直接执行命令,而是交给了bash来托管执行,这样一来我们的管道符也就被支持了,笔者还是常用shell这个模块的,因为方便.</p>
+<p>下面来看它的几个常用参数： </p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">命 令 参 数</th>
+<th style="text-align:left">参 数 解 释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">free_form</td>
+<td style="text-align:left">必要参数,默认会使用,无需手动添加</td>
+</tr>
+<tr>
+<td style="text-align:left">chdir</td>
+<td style="text-align:left">指定一个目录,在执行命令前首先会切换到指定目录中去</td>
+</tr>
+<tr>
+<td style="text-align:left">creates</td>
+<td style="text-align:left">当指定的文件存在时,就不执行对应命令,起到判断的作用</td>
+</tr>
+<tr>
+<td style="text-align:left">removes</td>
+<td style="text-align:left">与creates参数相反,当指定的文件不存在时,就不执行对应命令</td>
+</tr>
+<tr>
+<td style="text-align:left">executable</td>
+<td style="text-align:left">默认系统会使用bash这个shell执行,如果要切换shell则使用这个选项</td>
+</tr>
+</tbody>
+</table>
+<p>shell 模块中 chdir、creates、removes参数的作用与 command 模块中的作用都是相同的,这里为了节约篇幅只举一个小例子,改变一下它的默认路径.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m shell -a "chdir=/boot ls"</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS | rc=0 &gt;&gt;</span><br><span class="line">config-3.10.0-862.el7.x86_64</span><br><span class="line">efi</span><br><span class="line">grub2</span><br><span class="line">initramfs-3.10.0-862.el7.x86_64.img</span><br><span class="line">symvers-3.10.0-862.el7.x86_64.gz</span><br><span class="line">vmlinuz-3.10.0-862.el7.x86_64</span><br></pre></td></tr></table></figure></p>
+<p>紧接着我们看一下executable这个参数来指定一个默认shell,由于这里没有其他shell我们就用bash来演示一下吧.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m shell -a "executable=/bin/bash uname -r"</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS | rc=0 &gt;&gt;</span><br><span class="line">3.10.0-862.el7.x86_64</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ansible all -m shell -a "executable=/bin/bash uname -r" -o</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS | rc=0 | (stdout) 3.10.0-862.el7.x86_64</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆Script◆"><a href="#◆Script◆" class="headerlink" title="◆Script◆"></a>◆Script◆</h3><p>script 模块可以帮助我们在远程主机上执行我们编写的管理主机的脚本,也就是说,脚本一直存在于你的管理主机本地,无需手动拷贝到远程主机,你当然也可以使用copy模块将你的脚本拷贝到远程主机,然后执行/bin/bash调用脚本执行,但是这样就太麻烦了,幸好Ansible为我们提供了script管理模块.</p>
+<p>下面来看它的几个常用参数： </p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">命 令 参 数</th>
+<th style="text-align:left">参 数 解 释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">free_form</td>
+<td style="text-align:left">必要参数,默认会使用,无需手动添加</td>
+</tr>
+<tr>
+<td style="text-align:left">chdir</td>
+<td style="text-align:left">指定一个目录,在执行命令前首先会切换到指定目录中去</td>
+</tr>
+<tr>
+<td style="text-align:left">creates</td>
+<td style="text-align:left">当指定的文件存在时,就不执行对应命令,起到判断的作用</td>
+</tr>
+<tr>
+<td style="text-align:left">removes</td>
+<td style="text-align:left">与creates参数相反,当指定的文件不存在时,就不执行对应命令</td>
+</tr>
+</tbody>
+</table>
+<p>我们来编写一个打印系统日期的脚本,然后在使用script模块执行,看一下远程主机的执行情况,这里需要注意的是<code>/root/data.sh</code>是本地路径下脚本的保存位置.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cat data.sh </span></span><br><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line">date</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ansible all -m script -a "/root/data.sh"</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">true</span>, </span><br><span class="line">    <span class="string">"rc"</span>: 0, </span><br><span class="line">    <span class="string">"stderr"</span>: <span class="string">"Shared connection to 192.168.10.20 closed.\r\n"</span>, </span><br><span class="line">    <span class="string">"stdout"</span>: <span class="string">"Tue Dec  4 14:11:34 EST 2018\r\n"</span>, </span><br><span class="line">    <span class="string">"stdout_lines"</span>: [</span><br><span class="line">        <span class="string">"Tue Dec  4 14:11:34 EST 2018"</span></span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>接下来,我们通过使用creates关键字,先判断<code>/etc/passwd</code>是否存在,如果存在则不执行data.sh这个脚本,否则执行.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m script -a "creates=/etc/passwd /root/data.sh"</span></span><br><span class="line">192.168.10.20 | SKIPPED</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ansible all -m script -a "removes=/etc/passwd /root/data.sh"</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">true</span>, </span><br><span class="line">    <span class="string">"rc"</span>: 0, </span><br><span class="line">    <span class="string">"stderr"</span>: <span class="string">"Shared connection to 192.168.10.20 closed.\r\n"</span>, </span><br><span class="line">    <span class="string">"stdout"</span>: <span class="string">"Tue Dec  4 14:15:13 EST 2018\r\n"</span>, </span><br><span class="line">    <span class="string">"stdout_lines"</span>: [</span><br><span class="line">        <span class="string">"Tue Dec  4 14:15:13 EST 2018"</span></span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="文件管理模块"><a href="#文件管理模块" class="headerlink" title="文件管理模块"></a>文件管理模块</h2><h3 id="◆File◆"><a href="#◆File◆" class="headerlink" title="◆File◆"></a>◆File◆</h3><p>file 模块可以帮助我们完成一些对文件的基本操作,比如,创建文件或目录、删除文件或目录、修改文件权限、修以及软硬链接的创建,文件操作File在实际环境中应用还是很广泛的.</p>
+<p>下面来看它的几个常用参数： </p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">命 令 参 数</th>
+<th style="text-align:left">参 数 解 释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">path</td>
+<td style="text-align:left">必选参数,用于指定文件或者目录的路径,使用dest或name也可以</td>
+</tr>
+<tr>
+<td style="text-align:left">state</td>
+<td style="text-align:left">用于指定一个文件的状态,比如state=directory代表针对目录操作</td>
+</tr>
+<tr>
+<td style="text-align:left">src</td>
+<td style="text-align:left">被链接源文件路径/只应用于state=link,只用于软连接或硬链接</td>
+</tr>
+<tr>
+<td style="text-align:left">dest</td>
+<td style="text-align:left">被链接到的路径/只应用于state=link,只用于软连接或硬链接</td>
+</tr>
+<tr>
+<td style="text-align:left">force</td>
+<td style="text-align:left">强制创建软连接/本选项只有两个属性 yes或no</td>
+</tr>
+<tr>
+<td style="text-align:left">owner</td>
+<td style="text-align:left">指定文件/目录的属主,也就是所有者</td>
+</tr>
+<tr>
+<td style="text-align:left">group</td>
+<td style="text-align:left">指定文件/目录的属组,也就是所属组</td>
+</tr>
+<tr>
+<td style="text-align:left">mode</td>
+<td style="text-align:left">指定文件/目录的权限,也就是chmod设置的权限</td>
+</tr>
+<tr>
+<td style="text-align:left">recurse</td>
+<td style="text-align:left">递归设置目录的属性,相当于chmod -R操作</td>
+</tr>
+<tr>
+<td style="text-align:left">directory</td>
+<td style="text-align:left">文件状态：如果目录不存在则创建</td>
+</tr>
+<tr>
+<td style="text-align:left">file</td>
+<td style="text-align:left">文件状态：即使目录不存在也不创建</td>
+</tr>
+<tr>
+<td style="text-align:left">link</td>
+<td style="text-align:left">文件状态：创建软链接选项</td>
+</tr>
+<tr>
+<td style="text-align:left">hard</td>
+<td style="text-align:left">文件状态：创建硬链接选项</td>
+</tr>
+<tr>
+<td style="text-align:left">touch</td>
+<td style="text-align:left">文件状态：文件不存在则创建</td>
+</tr>
+<tr>
+<td style="text-align:left">absent</td>
+<td style="text-align:left">文件状态：删除或取消一个链接</td>
+</tr>
+</tbody>
+</table>
+<p>1.通过命令给远程主机创建一个名为<code>lyshark.log</code>文件,如果<code>/tmp/lyshark.log</code>文件已存在则更新时间戳,否则创建这个文件.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m file -a "path=/tmp/lyshark.log state=touch"</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">true</span>, </span><br><span class="line">    <span class="string">"dest"</span>: <span class="string">"/tmp/lyshark.log"</span>, </span><br><span class="line">    <span class="string">"gid"</span>: 0, </span><br><span class="line">    <span class="string">"group"</span>: <span class="string">"root"</span>, </span><br><span class="line">    <span class="string">"mode"</span>: <span class="string">"0644"</span>, </span><br><span class="line">    <span class="string">"owner"</span>: <span class="string">"root"</span>, </span><br><span class="line">    <span class="string">"secontext"</span>: <span class="string">"unconfined_u:object_r:user_tmp_t:s0"</span>, </span><br><span class="line">    <span class="string">"size"</span>: 0, </span><br><span class="line">    <span class="string">"state"</span>: <span class="string">"file"</span>, </span><br><span class="line">    <span class="string">"uid"</span>: 0</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>2.在远程主机创建一个名为<code>lyshark</code>的目录,如果<code>/tmp/lyshark</code>这个目录存在,则不进行任何操作.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m file -a "path=/tmp/lyshark state=directory"</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">true</span>, </span><br><span class="line">    <span class="string">"gid"</span>: 0, </span><br><span class="line">    <span class="string">"group"</span>: <span class="string">"root"</span>, </span><br><span class="line">    <span class="string">"mode"</span>: <span class="string">"0755"</span>, </span><br><span class="line">    <span class="string">"owner"</span>: <span class="string">"root"</span>, </span><br><span class="line">    <span class="string">"path"</span>: <span class="string">"/tmp/lyshark"</span>, </span><br><span class="line">    <span class="string">"secontext"</span>: <span class="string">"unconfined_u:object_r:user_tmp_t:s0"</span>, </span><br><span class="line">    <span class="string">"size"</span>: 6, </span><br><span class="line">    <span class="string">"state"</span>: <span class="string">"directory"</span>, </span><br><span class="line">    <span class="string">"uid"</span>: 0</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>3.在远程主机给<code>/bin/bash</code>命令,创建一个名为<code>lyshark.link</code>的软链接,文件存在则不进行任何操作.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m file -a "src=/bin/bash path=/tmp/lyshark.link state=link"</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">true</span>, </span><br><span class="line">    <span class="string">"dest"</span>: <span class="string">"/tmp/lyshark.link"</span>, </span><br><span class="line">    <span class="string">"gid"</span>: 0, </span><br><span class="line">    <span class="string">"group"</span>: <span class="string">"root"</span>, </span><br><span class="line">    <span class="string">"mode"</span>: <span class="string">"0777"</span>, </span><br><span class="line">    <span class="string">"owner"</span>: <span class="string">"root"</span>, </span><br><span class="line">    <span class="string">"secontext"</span>: <span class="string">"unconfined_u:object_r:user_tmp_t:s0"</span>, </span><br><span class="line">    <span class="string">"size"</span>: 9, </span><br><span class="line">    <span class="string">"src"</span>: <span class="string">"/bin/bash"</span>, </span><br><span class="line">    <span class="string">"state"</span>: <span class="string">"link"</span>, </span><br><span class="line">    <span class="string">"uid"</span>: 0</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>3.在远程主机给<code>/bin/bash</code>命令,创建一个名为<code>lyshark.hard</code>的硬链接,文件存在则不进行任何操作.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m file -a "src=/bin/bash path=/tmp/lyshark.hard state=hard"</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">true</span>, </span><br><span class="line">    <span class="string">"dest"</span>: <span class="string">"/tmp/lyshark.hard"</span>, </span><br><span class="line">    <span class="string">"gid"</span>: 0, </span><br><span class="line">    <span class="string">"group"</span>: <span class="string">"root"</span>, </span><br><span class="line">    <span class="string">"mode"</span>: <span class="string">"0755"</span>, </span><br><span class="line">    <span class="string">"owner"</span>: <span class="string">"root"</span>, </span><br><span class="line">    <span class="string">"secontext"</span>: <span class="string">"system_u:object_r:shell_exec_t:s0"</span>, </span><br><span class="line">    <span class="string">"size"</span>: 964544, </span><br><span class="line">    <span class="string">"src"</span>: <span class="string">"/bin/bash"</span>, </span><br><span class="line">    <span class="string">"state"</span>: <span class="string">"hard"</span>, </span><br><span class="line">    <span class="string">"uid"</span>: 0</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>4.在远程主机给<code>/bin/bash</code>命令,创建一个名为<code>lyshark.hard</code>的硬链接,若文件存在则强制覆盖一遍.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m file -a "src=/bin/bash path=/tmp/lyshark.hard state=hard force=yes"</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">false</span>, </span><br><span class="line">    <span class="string">"dest"</span>: <span class="string">"/tmp/lyshark.hard"</span>, </span><br><span class="line">    <span class="string">"gid"</span>: 0, </span><br><span class="line">    <span class="string">"group"</span>: <span class="string">"root"</span>, </span><br><span class="line">    <span class="string">"mode"</span>: <span class="string">"0755"</span>, </span><br><span class="line">    <span class="string">"owner"</span>: <span class="string">"root"</span>, </span><br><span class="line">    <span class="string">"secontext"</span>: <span class="string">"system_u:object_r:shell_exec_t:s0"</span>, </span><br><span class="line">    <span class="string">"size"</span>: 964544, </span><br><span class="line">    <span class="string">"src"</span>: <span class="string">"/bin/bash"</span>, </span><br><span class="line">    <span class="string">"state"</span>: <span class="string">"hard"</span>, </span><br><span class="line">    <span class="string">"uid"</span>: 0</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>5.通过state=absent关键字,删除远程机器上的指定文件或目录,这里我们删除上面的<code>/tmp/lyshark.hard</code>这个硬链接.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m file -a "path=/tmp/lyshark.hard state=absent"</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">true</span>, </span><br><span class="line">    <span class="string">"path"</span>: <span class="string">"/tmp/lyshark.hard"</span>, </span><br><span class="line">    <span class="string">"state"</span>: <span class="string">"absent"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>6.在创建文件或目录的时候指定属主与属组,或直接修改远程主机上的文件或目录的属主与属组.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m shell -a "rm -fr /tmp/*" -o      #清空演示目录</span></span><br><span class="line">192.168.10.20 | SUCCESS | rc=0 | (stdout) </span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ansible all -m shell -a "useradd admin"         #创建一个用户与组</span></span><br><span class="line">192.168.10.20 | SUCCESS | rc=0 &gt;&gt;</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ansible all -m file -a "path=/tmp/lyshark state=directory owner=root group=admin"</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;                                        <span class="comment">#创建/tmp/lyshark目录</span></span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">true</span>, </span><br><span class="line">    <span class="string">"gid"</span>: 1001, </span><br><span class="line">    <span class="string">"group"</span>: <span class="string">"admin"</span>,                                               <span class="comment">#指定属组为admin</span></span><br><span class="line">    <span class="string">"mode"</span>: <span class="string">"0755"</span>, </span><br><span class="line">    <span class="string">"owner"</span>: <span class="string">"root"</span>,                                                <span class="comment">#指定属主为root</span></span><br><span class="line">    <span class="string">"path"</span>: <span class="string">"/tmp/lyshark"</span>, </span><br><span class="line">    <span class="string">"secontext"</span>: <span class="string">"unconfined_u:object_r:user_tmp_t:s0"</span>, </span><br><span class="line">    <span class="string">"size"</span>: 6, </span><br><span class="line">    <span class="string">"state"</span>: <span class="string">"directory"</span>, </span><br><span class="line">    <span class="string">"uid"</span>: 0</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ansible all -m file -a "path=/tmp/lyshark mode=777"</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">true</span>, </span><br><span class="line">    <span class="string">"gid"</span>: 1001, </span><br><span class="line">    <span class="string">"group"</span>: <span class="string">"admin"</span>, </span><br><span class="line">    <span class="string">"mode"</span>: <span class="string">"0777"</span>,                                                  <span class="comment">#修改目录权限为777</span></span><br><span class="line">    <span class="string">"owner"</span>: <span class="string">"root"</span>, </span><br><span class="line">    <span class="string">"path"</span>: <span class="string">"/tmp/lyshark"</span>, </span><br><span class="line">    <span class="string">"secontext"</span>: <span class="string">"unconfined_u:object_r:user_tmp_t:s0"</span>, </span><br><span class="line">    <span class="string">"size"</span>: 6, </span><br><span class="line">    <span class="string">"state"</span>: <span class="string">"directory"</span>, </span><br><span class="line">    <span class="string">"uid"</span>: 0</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>7.当操作远程主机中的目录时,同时递归的将<code>/tmp/lyshark</code>目录中的文件的属主属组都设置为admin.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m file -a "path=/tmp/lyshark state=directory owner=admin group=admin mode=777 recurse=yes"</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">true</span>, </span><br><span class="line">    <span class="string">"gid"</span>: 1001, </span><br><span class="line">    <span class="string">"group"</span>: <span class="string">"admin"</span>, </span><br><span class="line">    <span class="string">"mode"</span>: <span class="string">"0777"</span>, </span><br><span class="line">    <span class="string">"owner"</span>: <span class="string">"admin"</span>, </span><br><span class="line">    <span class="string">"path"</span>: <span class="string">"/tmp/lyshark"</span>, </span><br><span class="line">    <span class="string">"secontext"</span>: <span class="string">"unconfined_u:object_r:user_tmp_t:s0"</span>, </span><br><span class="line">    <span class="string">"size"</span>: 6, </span><br><span class="line">    <span class="string">"state"</span>: <span class="string">"directory"</span>, </span><br><span class="line">    <span class="string">"uid"</span>: 1001</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆Copy◆"><a href="#◆Copy◆" class="headerlink" title="◆Copy◆"></a>◆Copy◆</h3><p>文件的复制也是最常用的功能之一,在Ansible中我们可以使用copy模块本模块的作用就是拷贝文件它与fetch模块类似,不过fetch模块是从远程主机中拉取文件到 ansible 管理主机,而 copy 模块是将 ansible 管理主机上的文件拷贝到远程主机中,文件的变化是通过MD5值来判断的.</p>
+<p>下面来看它的几个常用参数： </p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">命 令 参 数</th>
+<th style="text-align:left">参 数 解 释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">src</td>
+<td style="text-align:left">用于指定本地文件的保存位置,也就是ansible管理主机的文件位置</td>
+</tr>
+<tr>
+<td style="text-align:left">dest</td>
+<td style="text-align:left">指定文件将被拷贝到远程主机的哪个目录中,此选项必选</td>
+</tr>
+<tr>
+<td style="text-align:left">content</td>
+<td style="text-align:left">用于替代src参数使用,可以直接设定指定文件的值</td>
+</tr>
+<tr>
+<td style="text-align:left">force</td>
+<td style="text-align:left">远程主机文件存在强制拷贝,默认两个选项yes/no</td>
+</tr>
+<tr>
+<td style="text-align:left">backup</td>
+<td style="text-align:left">在覆盖前是否备份,此参数有两个选项yes/no</td>
+</tr>
+<tr>
+<td style="text-align:left">owner</td>
+<td style="text-align:left">在拷贝到远程主机以后,设置属主,远程主机上必须有对应的用户</td>
+</tr>
+<tr>
+<td style="text-align:left">group</td>
+<td style="text-align:left">在拷贝到远程主机以后,设置属组,远程主机上必须有对应的用户</td>
+</tr>
+<tr>
+<td style="text-align:left">mode</td>
+<td style="text-align:left">在拷贝到远程主机以后,设置文件的权限信息</td>
+</tr>
+<tr>
+<td style="text-align:left">others</td>
+<td style="text-align:left">所有的file模块里的选项都可以在这里使用</td>
+</tr>
+<tr>
+<td style="text-align:left">directory_mode</td>
+<td style="text-align:left">递归设定目录的权限,默认为系统默认权限</td>
+</tr>
+</tbody>
+</table>
+<p>1.将 ansible 管理主机中 <code>/etc/passwd</code> 文件复制到远程主机的 <code>/tmp</code> 目录下.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m copy -a "src=/etc/passwd dest=/tmp"</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">true</span>, </span><br><span class="line">    <span class="string">"checksum"</span>: <span class="string">"368beabb02de303b193dbdc9c10daf8b6a3a8220"</span>, </span><br><span class="line">    <span class="string">"dest"</span>: <span class="string">"/tmp/passwd"</span>, </span><br><span class="line">    <span class="string">"gid"</span>: 0, </span><br><span class="line">    <span class="string">"group"</span>: <span class="string">"root"</span>, </span><br><span class="line">    <span class="string">"md5sum"</span>: <span class="string">"c4bb3905d05e0e1ebe4582afbd993c62"</span>, </span><br><span class="line">    <span class="string">"mode"</span>: <span class="string">"0644"</span>, </span><br><span class="line">    <span class="string">"owner"</span>: <span class="string">"root"</span>, </span><br><span class="line">    <span class="string">"secontext"</span>: <span class="string">"unconfined_u:object_r:admin_home_t:s0"</span>, </span><br><span class="line">    <span class="string">"size"</span>: 898, </span><br><span class="line">    <span class="string">"src"</span>: <span class="string">"/root/.ansible/tmp/ansible-tmp-1543954320.59-199213984528293/source"</span>, </span><br><span class="line">    <span class="string">"state"</span>: <span class="string">"file"</span>, </span><br><span class="line">    <span class="string">"uid"</span>: 0</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">#注:如果执行失败,请在被控机上安装 yum install libselinux-python -y</span></span><br></pre></td></tr></table></figure></p>
+<p>2.通过使用content指定文本数据,覆盖写入远程<code>/tmp/passwd</code>文件里,注意这里只能是目录.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m copy -a 'content="www.mkdirs.com\nby:LyShark\n" dest=/tmp/passwd'</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">true</span>, </span><br><span class="line">    <span class="string">"checksum"</span>: <span class="string">"de467565daf9f6c33a94b646df0e8c30776a565b"</span>, </span><br><span class="line">    <span class="string">"dest"</span>: <span class="string">"/tmp/passwd"</span>, </span><br><span class="line">    <span class="string">"gid"</span>: 0, </span><br><span class="line">    <span class="string">"group"</span>: <span class="string">"root"</span>, </span><br><span class="line">    <span class="string">"md5sum"</span>: <span class="string">"919b8b7a326ade5b2b12aba512234488"</span>, </span><br><span class="line">    <span class="string">"mode"</span>: <span class="string">"0644"</span>, </span><br><span class="line">    <span class="string">"owner"</span>: <span class="string">"root"</span>, </span><br><span class="line">    <span class="string">"secontext"</span>: <span class="string">"unconfined_u:object_r:admin_home_t:s0"</span>, </span><br><span class="line">    <span class="string">"size"</span>: 26, </span><br><span class="line">    <span class="string">"src"</span>: <span class="string">"/root/.ansible/tmp/ansible-tmp-1543954542.01-120613474339806/source"</span>, </span><br><span class="line">    <span class="string">"state"</span>: <span class="string">"file"</span>, </span><br><span class="line">    <span class="string">"uid"</span>: 0</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">[root@localhost tmp]<span class="comment"># cat passwd      ←远程主机文件内容已被更改.</span></span><br><span class="line">www.mkdirs.com</span><br><span class="line">by:LyShark</span><br></pre></td></tr></table></figure></p>
+<p>3.将ansible主机上的<code>/etc/shadow</code>文件拷贝到远程主机的<code>/tmp/</code>目录下,并指定文件的属组等信息,需要注意,远程主机上必须存在对应的组.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m copy -a 'src=/etc/shadow dest=/tmp/shadow owner=admin group=admin mode=777'</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">true</span>, </span><br><span class="line">    <span class="string">"checksum"</span>: <span class="string">"a343f7209f0243ff02c9ec9c7ede5d8470858de4"</span>, </span><br><span class="line">    <span class="string">"dest"</span>: <span class="string">"/tmp/shadow"</span>, </span><br><span class="line">    <span class="string">"gid"</span>: 1001, </span><br><span class="line">    <span class="string">"group"</span>: <span class="string">"admin"</span>, </span><br><span class="line">    <span class="string">"md5sum"</span>: <span class="string">"0ebfc482fbc77f326f46a97936b69a10"</span>, </span><br><span class="line">    <span class="string">"mode"</span>: <span class="string">"0777"</span>, </span><br><span class="line">    <span class="string">"owner"</span>: <span class="string">"admin"</span>, </span><br><span class="line">    <span class="string">"secontext"</span>: <span class="string">"unconfined_u:object_r:admin_home_t:s0"</span>, </span><br><span class="line">    <span class="string">"size"</span>: 714, </span><br><span class="line">    <span class="string">"src"</span>: <span class="string">"/root/.ansible/tmp/ansible-tmp-1543954764.54-185568488946158/source"</span>, </span><br><span class="line">    <span class="string">"state"</span>: <span class="string">"file"</span>, </span><br><span class="line">    <span class="string">"uid"</span>: 1001</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>4.将远程主机<code>/bin/bash</code>文件通过feth模块,拉取到本地<code>/root</code>目录下.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m fetch -a "src=/bin/bash dest=/root"</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">true</span>, </span><br><span class="line">    <span class="string">"checksum"</span>: <span class="string">"d4bd3ab2983b6cc0ecfe4391365924841f254b1d"</span>, </span><br><span class="line">    <span class="string">"dest"</span>: <span class="string">"/root/192.168.10.20/bin/bash"</span>, </span><br><span class="line">    <span class="string">"md5sum"</span>: <span class="string">"9127a3b202f7ad0cf4558d93ebb655ae"</span>, </span><br><span class="line">    <span class="string">"remote_checksum"</span>: <span class="string">"d4bd3ab2983b6cc0ecfe4391365924841f254b1d"</span>, </span><br><span class="line">    <span class="string">"remote_md5sum"</span>: null</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h3 id="◆Find◆"><a href="#◆Find◆" class="headerlink" title="◆Find◆"></a>◆Find◆</h3><p>find命令用来在指定目录下查找文件,任何位于参数之前的字符串都将被视为欲查找的目录名,如果使用该命令时,不设置任何参数,则find命令将在当前目录下查找子目录与文件,并且将查找到的子目录和文件全部进行显示,下面的find 模块也可以帮助我们在被管理主机中查找符合条件的文件,就像 find 命令一样.</p>
+<p>下面来看它的几个常用参数： </p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">命 令 参 数</th>
+<th style="text-align:left">参 数 解 释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">paths</td>
+<td style="text-align:left">指定在哪个目录中查找文件,可以指定多个路径用逗号隔开</td>
+</tr>
+<tr>
+<td style="text-align:left">recurse</td>
+<td style="text-align:left">是否为递归子目录查找文件,参数有两个选项yes/no</td>
+</tr>
+<tr>
+<td style="text-align:left">hidden</td>
+<td style="text-align:left">是否查找隐藏文件,当hidden=yes才会查找隐藏文件</td>
+</tr>
+<tr>
+<td style="text-align:left">file_type</td>
+<td style="text-align:left">指定查找文件的类型,可指定any、directory、file、link 四种</td>
+</tr>
+<tr>
+<td style="text-align:left">patterns</td>
+<td style="text-align:left">指定需要查找文件的名称,想要使用python正则去匹配文件需要使用use_regex=yes</td>
+</tr>
+<tr>
+<td style="text-align:left">use_regex</td>
+<td style="text-align:left">是否启用python正则来查找文件,两种选项yes/no</td>
+</tr>
+<tr>
+<td style="text-align:left">contains</td>
+<td style="text-align:left">根据文章内容查找文件,此参数的值为一个正则表达式</td>
+</tr>
+<tr>
+<td style="text-align:left">age</td>
+<td style="text-align:left">指定文件间隔时间,可使用单位有秒(s)、分(m)、时(h)、天(d)、星期(w)</td>
+</tr>
+<tr>
+<td style="text-align:left">age_stamp</td>
+<td style="text-align:left">根据时间范围查找文件,文件时间属性有三个时间种类，atime、ctime、mtime</td>
+</tr>
+<tr>
+<td style="text-align:left">size</td>
+<td style="text-align:left">根据文件的大小来查找,可以使用的单位有 t、g、m、k、b</td>
+</tr>
+<tr>
+<td style="text-align:left">get_checksum</td>
+<td style="text-align:left">当有符合查找条件的文件被找到时,会同时返回对应文件的sha1校验码</td>
+</tr>
+</tbody>
+</table>
+<p>1.查询远程主机中<code>/etc</code>目录下,包含 passwd 字符串的文件,隐藏文件会被忽略,不会进行递归查找.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m find -a 'paths=/etc contains="*passwd*"'</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">false</span>, </span><br><span class="line">    <span class="string">"examined"</span>: 180, </span><br><span class="line">    <span class="string">"files"</span>: [], </span><br><span class="line">    <span class="string">"matched"</span>: 0, </span><br><span class="line">    <span class="string">"msg"</span>: <span class="string">""</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>2.查询远程主机中<code>/etc</code>目录以及子目录中,查找文件内容中包含 passwd 字符串的文件,隐藏文件会被忽略.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m find -a 'paths=/etc contains="*passwd*" recurse=yes'</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">false</span>, </span><br><span class="line">    <span class="string">"examined"</span>: 2414, </span><br><span class="line">    <span class="string">"files"</span>: [], </span><br><span class="line">    <span class="string">"matched"</span>: 0, </span><br><span class="line">    <span class="string">"msg"</span>: <span class="string">""</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>3.查询远程主机中<code>/etc</code>目录下以 .sh 结尾的文件,包括隐藏文件,但是不包括目录或其他文件类型,不会进行递归查找.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m find -a 'paths=/etc patterns="*.sh" file_type=any hidden=yes'</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">false</span>, </span><br><span class="line">    <span class="string">"examined"</span>: 180, </span><br><span class="line">    <span class="string">"files"</span>: [], </span><br><span class="line">    <span class="string">"matched"</span>: 0, </span><br><span class="line">    <span class="string">"msg"</span>: <span class="string">""</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>4.查询远程主机中<code>/etc</code>目录下以 .sh 结尾的文件,包括隐藏文件,包括所有文件类型,比如文件、目录、或者软链接,但是不会进行递归查找.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m find -a 'paths=/etc patterns="*.sh" file_type=any hidden=yes'</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">false</span>, </span><br><span class="line">    <span class="string">"examined"</span>: 180, </span><br><span class="line">    <span class="string">"files"</span>: [], </span><br><span class="line">    <span class="string">"matched"</span>: 0, </span><br><span class="line">    <span class="string">"msg"</span>: <span class="string">""</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>5.查询远程主机中<code>/etc</code>目录中以及其子目录中查找 mtime 在1天以内的文件,不包含隐藏文件,不包含目录或软链接文件等文件类型.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m find -a 'paths=/etc age=-1d recurse=yes'</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">false</span>, </span><br><span class="line">    <span class="string">"examined"</span>: 2414, </span><br><span class="line">    <span class="string">"files"</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="string">"atime"</span>: 1544004010.3749297, </span><br><span class="line">            <span class="string">"ctime"</span>: 1544004009.4279296, </span><br><span class="line">            <span class="string">"dev"</span>: 64768, </span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br></pre></td></tr></table></figure></p>
+<p>6.查询远程主机中<code>/etc</code>目录中以及其子目录中查找大于 1m 的文件,不包含隐藏文件,不包含目录或软链接文件等文件类型.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m find -a 'paths=/etc size=1m recurse=yes'</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">false</span>, </span><br><span class="line">    <span class="string">"examined"</span>: 2414, </span><br><span class="line">    <span class="string">"files"</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="string">"atime"</span>: 1543948732.8400002, </span><br><span class="line">            <span class="string">"ctime"</span>: 1539448763.0409997, </span><br><span class="line">            <span class="string">"dev"</span>: 64768, </span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br></pre></td></tr></table></figure></p>
+<p>7.查询远程主机中<code>/etc</code>目录中以及其子目录中查找以 .sh 结尾的文件,并且返回符合条件文件的 sha1 校验码,包括隐藏文件.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m find -a 'paths=/etc patterns=*.sh get_checksum=yes hidden=yes recurse=yes'</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">false</span>, </span><br><span class="line">    <span class="string">"examined"</span>: 2414, </span><br><span class="line">    <span class="string">"files"</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="string">"atime"</span>: 1543948795.1880422, </span><br><span class="line">            <span class="string">"checksum"</span>: <span class="string">"1e39e9c628803da5b6f5a5d9e77fbe3cfefc996a"</span>, </span><br><span class="line">            <span class="string">"ctime"</span>: 1539448365.4729974, </span><br><span class="line">            <span class="string">"dev"</span>: 64768, </span><br><span class="line">            <span class="string">"gid"</span>: 0, </span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆Unarchive◆"><a href="#◆Unarchive◆" class="headerlink" title="◆Unarchive◆"></a>◆Unarchive◆</h3><p>unarchive模块的功能是,解压缩,这个模块有两种用法</p>
+<p>1.将ansible主机上的压缩包在本地解压缩后传到远程主机上,这种情况下copy=yes<br>2.将远程主机上的某个压缩包解压缩到指定路径下,这种情况下,需要设置copy=no</p>
+<p>下面来看它的几个常用参数： </p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">命 令 参 数</th>
+<th style="text-align:left">参 数 解 释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">copy</td>
+<td style="text-align:left">在解压文件之前,是否先将文件复制到远程主机,默认为yes</td>
+</tr>
+<tr>
+<td style="text-align:left">creates</td>
+<td style="text-align:left">指定一个文件名,当该文件存在时,则解压指令不执行</td>
+</tr>
+<tr>
+<td style="text-align:left">src</td>
+<td style="text-align:left">如果copy为yes,则需要指定压缩文件的源路径</td>
+</tr>
+<tr>
+<td style="text-align:left">dest</td>
+<td style="text-align:left">远程主机上的一个路径,即文件解压的路径</td>
+</tr>
+<tr>
+<td style="text-align:left">list_files</td>
+<td style="text-align:left">列出压缩包里的文件,默认两个参数yes/no</td>
+</tr>
+<tr>
+<td style="text-align:left">mode</td>
+<td style="text-align:left">解压后文件的权限设置</td>
+</tr>
+<tr>
+<td style="text-align:left">group</td>
+<td style="text-align:left">解压后的目录或文件的属组</td>
+</tr>
+<tr>
+<td style="text-align:left">owner</td>
+<td style="text-align:left">解压后文件或目录的属主</td>
+</tr>
+</tbody>
+</table>
+<p>将ansible控制主机上的<code>/root/lyshark.tar.gz</code>解压缩到远程主机的<code>/tmp/</code>目录下,并设置权限777.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m unarchive -a "src=/root/lyshark.tar.gz dest=/tmp/ mode=777"</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">true</span>, </span><br><span class="line">    <span class="string">"dest"</span>: <span class="string">"/tmp/"</span>, </span><br><span class="line">    <span class="string">"extract_results"</span>: &#123;</span><br><span class="line">        <span class="string">"cmd"</span>: [</span><br><span class="line">            <span class="string">"/usr/bin/gtar"</span>, </span><br><span class="line">            <span class="string">"--extract"</span>, </span><br><span class="line">            <span class="string">"-C"</span>, </span><br><span class="line">            <span class="string">"/tmp/"</span>, </span><br><span class="line">            <span class="string">"-z"</span>, </span><br><span class="line">            <span class="string">"-f"</span>, </span><br><span class="line">            <span class="string">"/root/.ansible/tmp/ansible-tmp-1544005363.57-45479136087498/source"</span></span><br><span class="line">        ]</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="文本修改模块"><a href="#文本修改模块" class="headerlink" title="文本修改模块"></a>文本修改模块</h2><h3 id="◆Replace◆"><a href="#◆Replace◆" class="headerlink" title="◆Replace◆"></a>◆Replace◆</h3><p>replace 模块可以根据我们指定的正则表达式替换文件中的字符串,文件中所有被匹配到的字符串都会被替换,也就是说它是一种全局替换的工具.</p>
+<p>下面来看它的几个常用参数： </p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">命 令 参 数</th>
+<th style="text-align:left">参 数 解 释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">path</td>
+<td style="text-align:left">必须参数,指定要操作的文件名称</td>
+</tr>
+<tr>
+<td style="text-align:left">regexp</td>
+<td style="text-align:left">必须参数,指定一个正则表达式</td>
+</tr>
+<tr>
+<td style="text-align:left">replace</td>
+<td style="text-align:left">指定最终要替换成的文本</td>
+</tr>
+<tr>
+<td style="text-align:left">backup</td>
+<td style="text-align:left">在修改文件之前对文件进行备份,yes/no</td>
+</tr>
+</tbody>
+</table>
+<p>1.首先我们创建一个文本文件并传输到远程主机上去.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim lyshark.log</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cat lyshark.log </span></span><br><span class="line">lyshark</span><br><span class="line">www.mkdirs.com</span><br><span class="line">www.wangrui.com</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ansible all -m copy -a "src=./lyshark.log dest=/tmp/"</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">true</span>, </span><br><span class="line">    <span class="string">"checksum"</span>: <span class="string">"8115005c643689fcde3cd1d317a27f75a5748f6f"</span>, </span><br><span class="line">    <span class="string">"dest"</span>: <span class="string">"/tmp/lyshark.log"</span>, </span><br><span class="line">    <span class="string">"gid"</span>: 0, </span><br><span class="line">    <span class="string">"group"</span>: <span class="string">"root"</span>, </span><br><span class="line">    <span class="string">"md5sum"</span>: <span class="string">"0e6401405e9ff1f17b02b483cb8e303c"</span>, </span><br><span class="line">    <span class="string">"mode"</span>: <span class="string">"0644"</span>, </span><br><span class="line">    <span class="string">"owner"</span>: <span class="string">"root"</span>, </span><br><span class="line">    <span class="string">"secontext"</span>: <span class="string">"unconfined_u:object_r:admin_home_t:s0"</span>, </span><br><span class="line">    <span class="string">"size"</span>: 39, </span><br><span class="line">    <span class="string">"src"</span>: <span class="string">"/root/.ansible/tmp/ansible-tmp-1544005922.28-230333570888422/source"</span>, </span><br><span class="line">    <span class="string">"state"</span>: <span class="string">"file"</span>, </span><br><span class="line">    <span class="string">"uid"</span>: 0</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>2.接着我们将远程文件的www字段全部替换成wangrui,并且在替换前做备份操作.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m replace -a 'path=/tmp/lyshark.log regexp="www" replace="wangrui" backup=yes'</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">true</span>, </span><br><span class="line">    <span class="string">"msg"</span>: <span class="string">"2 replacements made"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆Lineinfile◆"><a href="#◆Lineinfile◆" class="headerlink" title="◆Lineinfile◆"></a>◆Lineinfile◆</h3><p>lineinfile模块相当的重要,在自动化运维中起到了至关重要的目的,他可以通过正则表达式替换指定文本,例如开启一些配置选项等,还可以新加一行文本,或者是删除指定的行,本命令一定认证的掌握下来.</p>
+<p>下面来看它的几个常用参数： </p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">命 令 参 数</th>
+<th style="text-align:left">参 数 解 释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">path</td>
+<td style="text-align:left">必须参数,指定要操作的文件路径</td>
+</tr>
+<tr>
+<td style="text-align:left">line</td>
+<td style="text-align:left">必须参数,指定要替换的文本内容</td>
+</tr>
+<tr>
+<td style="text-align:left">regexp</td>
+<td style="text-align:left">匹配正则语句,与要过滤的关键字</td>
+</tr>
+<tr>
+<td style="text-align:left">state</td>
+<td style="text-align:left">状态语句：state=absent则是删除,state=present默认</td>
+</tr>
+<tr>
+<td style="text-align:left">backrefs</td>
+<td style="text-align:left">表示是否开启后向引用,默认no,yes/no</td>
+</tr>
+<tr>
+<td style="text-align:left">create</td>
+<td style="text-align:left">当文件不存在时,是否创建对应的文件,yes/no</td>
+</tr>
+<tr>
+<td style="text-align:left">backup</td>
+<td style="text-align:left">是否在修改文件之前对文件进行备份</td>
+</tr>
+<tr>
+<td style="text-align:left">insertafter</td>
+<td style="text-align:left">借助insertafter参数可以将文本插入到”指定的行”之后</td>
+</tr>
+<tr>
+<td style="text-align:left">insertbefore</td>
+<td style="text-align:left">借助insertafter参数可以将文本插入到”指定的行”之前</td>
+</tr>
+</tbody>
+</table>
+<p>1.通过正则匹配查找<code>/etc/selinux/config</code>文本中开头是<code>SELINUX=</code>的行,并替换成<code>SELINUX=disabled</code>.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m lineinfile -a 'path=/etc/selinux/config regexp="^SELINUX=" line="SELINUX=disabled"'</span></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">"backup"</span>: <span class="string">""</span>, </span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">true</span>, </span><br><span class="line">    <span class="string">"msg"</span>: <span class="string">"line replaced"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>2.通过正则匹配查找<code>/etc/selinux/config</code>文本,并在<code>文本末尾</code>插入一行<code>www.mkdirs.com</code><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m lineinfile -a 'path=/etc/selinux/config regexp="EOF" line="www.mkdirs.com"'</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">"backup"</span>: <span class="string">""</span>, </span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">true</span>, </span><br><span class="line">    <span class="string">"msg"</span>: <span class="string">"line added"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>3.通过正则匹配查找<code>/etc/selinux/config</code>文本,并在<code>文本行首</code>插入一行<code>www.mkdirs.com</code>.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m lineinfile -a 'path=/etc/selinux/config regexp="BOF" line="www.mkdirs.com"'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">"backup"</span>: <span class="string">""</span>, </span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">true</span>, </span><br><span class="line">    <span class="string">"msg"</span>: <span class="string">"line added"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>4.通过正则匹配查找<code>/etc/selinux/config</code>文本,删除所有的<code>www.mkdirs.com</code>字段.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m lineinfile -a 'path=/etc/selinux/config regexp="^www.mkdirs.com" state=absent'</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">"backup"</span>: <span class="string">""</span>, </span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">true</span>, </span><br><span class="line">    <span class="string">"found"</span>: 1, </span><br><span class="line">    <span class="string">"msg"</span>: <span class="string">"1 line(s) removed"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>5.通过正则匹配查找<code>/etc/selinux/config</code>文本中在开头是<code>SELINUX=disabled</code>行的<code>行后</code>插入一段话<code>www.mkdirs.com</code>.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m lineinfile -a 'path=/etc/selinux/config insertafter="^SELINUX=" line="www.mkdirs.com"'</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">"backup"</span>: <span class="string">""</span>, </span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">true</span>, </span><br><span class="line">    <span class="string">"msg"</span>: <span class="string">"line added"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>6.通过正则匹配查找<code>/etc/selinux/config</code>文本中在开头是<code>SELINUX=disabled</code>行的<code>行前</code>插入一段话<code>www.mkdirs.com</code>.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m lineinfile -a 'path=/etc/selinux/config insertbefore="^SELINUX=" line="www.mkdirs.com"'</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">"backup"</span>: <span class="string">""</span>, </span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">true</span>, </span><br><span class="line">    <span class="string">"msg"</span>: <span class="string">"line added"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="系统管理模块"><a href="#系统管理模块" class="headerlink" title="系统管理模块"></a>系统管理模块</h2><h3 id="◆Setup◆"><a href="#◆Setup◆" class="headerlink" title="◆Setup◆"></a>◆Setup◆</h3><p>setup 模块用于收集远程主机的一些基本信息,其可以收集几乎主机上的任何数据,方便我们后期的分析工作.</p>
+<p>下面来看它的几个常用参数： </p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">命 令 参 数</th>
+<th style="text-align:left">参 数 解 释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">ansible_all_ipv4_addresses</td>
+<td style="text-align:left">仅显示ipv4的信息</td>
+</tr>
+<tr>
+<td style="text-align:left">ansible_devices</td>
+<td style="text-align:left">仅显示磁盘设备信息</td>
+</tr>
+<tr>
+<td style="text-align:left">ansible_distribution</td>
+<td style="text-align:left">显示是什么系统,例：centos,suse等</td>
+</tr>
+<tr>
+<td style="text-align:left">ansible_distribution_major_version</td>
+<td style="text-align:left">显示是系统主版本</td>
+</tr>
+<tr>
+<td style="text-align:left">ansible_distribution_version</td>
+<td style="text-align:left">仅显示系统版本</td>
+</tr>
+<tr>
+<td style="text-align:left">ansible_machine</td>
+<td style="text-align:left">显示系统类型,例：32位还是64位</td>
+</tr>
+<tr>
+<td style="text-align:left">ansible_eth0</td>
+<td style="text-align:left">仅显示eth0的信息</td>
+</tr>
+<tr>
+<td style="text-align:left">ansible_hostname</td>
+<td style="text-align:left">仅显示主机名</td>
+</tr>
+<tr>
+<td style="text-align:left">ansible_kernel</td>
+<td style="text-align:left">仅显示内核版本</td>
+</tr>
+<tr>
+<td style="text-align:left">ansible_lvm</td>
+<td style="text-align:left">显示lvm相关信息</td>
+</tr>
+<tr>
+<td style="text-align:left">ansible_memtotal_mb</td>
+<td style="text-align:left">显示系统总内存</td>
+</tr>
+<tr>
+<td style="text-align:left">ansible_memfree_mb</td>
+<td style="text-align:left">显示可用系统内存</td>
+</tr>
+<tr>
+<td style="text-align:left">ansible_memory_mb</td>
+<td style="text-align:left">详细显示内存情况</td>
+</tr>
+<tr>
+<td style="text-align:left">ansible_swaptotal_mb</td>
+<td style="text-align:left">显示总的swap内存</td>
+</tr>
+<tr>
+<td style="text-align:left">ansible_swapfree_mb</td>
+<td style="text-align:left">显示swap内存的可用内存</td>
+</tr>
+<tr>
+<td style="text-align:left">ansible_mounts</td>
+<td style="text-align:left">显示系统磁盘挂载情况</td>
+</tr>
+<tr>
+<td style="text-align:left">ansible_processor</td>
+<td style="text-align:left">显示cpu个数(具体显示每个cpu的型号)</td>
+</tr>
+<tr>
+<td style="text-align:left">ansible_processor_vcpus</td>
+<td style="text-align:left">显示cpu个数(只显示总的个数)</td>
+</tr>
+</tbody>
+</table>
+<p>1.通过setup命令获取远程主机的主机信息.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m setup</span></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">"ansible_facts"</span>: &#123;</span><br><span class="line">        <span class="string">"ansible_all_ipv4_addresses"</span>: [</span><br><span class="line">            <span class="string">"192.168.10.20"</span></span><br><span class="line">        ], </span><br><span class="line">        <span class="string">"ansible_all_ipv6_addresses"</span>: [</span><br><span class="line">            <span class="string">"fe80::897c:d72d:cd95:b9ec"</span></span><br><span class="line">        ], </span><br><span class="line">        <span class="string">"ansible_apparmor"</span>: &#123;</span><br><span class="line">            <span class="string">"status"</span>: <span class="string">"disabled"</span></span><br><span class="line">        &#125;,</span><br><span class="line">    ].......</span><br></pre></td></tr></table></figure></p>
+<p>2.获取远程主机的 IPV4 地址,或者是IPV6地址.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m setup -a "filter=ansible_all_ipv4_addresses"</span></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">"ansible_facts"</span>: &#123;</span><br><span class="line">        <span class="string">"ansible_all_ipv4_addresses"</span>: [</span><br><span class="line">            <span class="string">"192.168.10.20"</span></span><br><span class="line">        ]</span><br><span class="line">    &#125;, </span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">false</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ansible all -m setup -a "filter=ansible_all_ipv6_addresses"</span></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">"ansible_facts"</span>: &#123;</span><br><span class="line">        <span class="string">"ansible_all_ipv6_addresses"</span>: [</span><br><span class="line">            <span class="string">"fe80::897c:d72d:cd95:b9ec"</span></span><br><span class="line">        ]</span><br><span class="line">    &#125;, </span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">false</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>3.获取远程主机的内存信息列表.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m setup -a "filter=ansible_memory_mb"</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">"ansible_facts"</span>: &#123;</span><br><span class="line">        <span class="string">"ansible_memory_mb"</span>: &#123;</span><br><span class="line">            <span class="string">"nocache"</span>: &#123;</span><br><span class="line">                <span class="string">"free"</span>: 41, </span><br><span class="line">                <span class="string">"used"</span>: 177</span><br><span class="line">            &#125;, </span><br><span class="line">            <span class="string">"real"</span>: &#123;</span><br><span class="line">                <span class="string">"free"</span>: 5, </span><br><span class="line">                <span class="string">"total"</span>: 218, </span><br><span class="line">                <span class="string">"used"</span>: 213</span><br><span class="line">            &#125;, </span><br><span class="line">            <span class="string">"swap"</span>: &#123;</span><br><span class="line">                <span class="string">"cached"</span>: 0, </span><br><span class="line">                <span class="string">"free"</span>: 2027, </span><br><span class="line">                <span class="string">"total"</span>: 2047, </span><br><span class="line">                <span class="string">"used"</span>: 20</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;, </span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">false</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>4.通过通配符实现模糊匹配，比如以”mb”关键字结尾的信息.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m setup -a "filter=*mb"</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">"ansible_facts"</span>: &#123;</span><br><span class="line">        <span class="string">"ansible_memfree_mb"</span>: 4, </span><br><span class="line">        <span class="string">"ansible_memory_mb"</span>: &#123;</span><br><span class="line">            <span class="string">"nocache"</span>: &#123;</span><br><span class="line">                <span class="string">"free"</span>: 41, </span><br><span class="line">                <span class="string">"used"</span>: 177</span><br><span class="line">            &#125;, </span><br><span class="line">            <span class="string">"real"</span>: &#123;</span><br><span class="line">                <span class="string">"free"</span>: 4, </span><br><span class="line">                <span class="string">"total"</span>: 218, </span><br><span class="line">                <span class="string">"used"</span>: 214</span><br><span class="line">            &#125;, </span><br><span class="line">            <span class="string">"swap"</span>: &#123;</span><br><span class="line">                <span class="string">"cached"</span>: 0, </span><br><span class="line">                <span class="string">"free"</span>: 2027, </span><br><span class="line">                <span class="string">"total"</span>: 2047, </span><br><span class="line">                <span class="string">"used"</span>: 20</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;, </span><br><span class="line">        <span class="string">"ansible_memtotal_mb"</span>: 218, </span><br><span class="line">        <span class="string">"ansible_swapfree_mb"</span>: 2027, </span><br><span class="line">        <span class="string">"ansible_swaptotal_mb"</span>: 2047</span><br><span class="line">    &#125;, </span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">false</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>5.查询系统eth0接口相关信息列表.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m setup -a "filter=ansible_ens32"</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">"ansible_facts"</span>: &#123;</span><br><span class="line">        <span class="string">"ansible_ens32"</span>: &#123;</span><br><span class="line">            <span class="string">"active"</span>: <span class="literal">true</span>, </span><br><span class="line">            <span class="string">"device"</span>: <span class="string">"ens32"</span>, </span><br><span class="line">            <span class="string">"features"</span>: &#123;</span><br><span class="line">                <span class="string">"busy_poll"</span>: <span class="string">"off [fixed]"</span>, </span><br><span class="line">                <span class="string">"vlan_challenged"</span>: <span class="string">"off [fixed]"</span></span><br><span class="line">            &#125;, </span><br><span class="line">            <span class="string">"hw_timestamp_filters"</span>: [], </span><br><span class="line">            <span class="string">"ipv4"</span>: &#123;</span><br><span class="line">                <span class="string">"address"</span>: <span class="string">"192.168.10.20"</span>, </span><br><span class="line">                <span class="string">"broadcast"</span>: <span class="string">"192.168.10.255"</span>, </span><br><span class="line">                <span class="string">"netmask"</span>: <span class="string">"255.255.255.0"</span>, </span><br><span class="line">                <span class="string">"network"</span>: <span class="string">"192.168.10.0"</span></span><br><span class="line">            &#125;, </span><br><span class="line">            <span class="string">"ipv6"</span>: [</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="string">"address"</span>: <span class="string">"fe80::897c:d72d:cd95:b9ec"</span>, </span><br><span class="line">                    <span class="string">"prefix"</span>: <span class="string">"64"</span>, </span><br><span class="line">                    <span class="string">"scope"</span>: <span class="string">"link"</span></span><br><span class="line">                &#125;</span><br><span class="line">            ], </span><br><span class="line">            <span class="string">"macaddress"</span>: <span class="string">"00:50:56:35:f2:62"</span>, </span><br><span class="line">            <span class="string">"speed"</span>: 1000, </span><br><span class="line">            <span class="string">"timestamping"</span>: [</span><br><span class="line">                <span class="string">"software"</span></span><br><span class="line">            ], </span><br><span class="line">            <span class="string">"type"</span>: <span class="string">"ether"</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;, </span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">false</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆Yum◆"><a href="#◆Yum◆" class="headerlink" title="◆Yum◆"></a>◆Yum◆</h3><p>yum 模块可以帮助我们在远程主机上通过yum源管理软件包,软件的安装也是至关重要的,这里我们介绍Yum模块,主要用户批量部署常用组件.yum 模块可以提供的status状态：latest,present,installed:这3个分别代表安装,后面2个是卸载.</p>
+<p>下面来看它的几个常用参数： </p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">命 令 参 数</th>
+<th style="text-align:left">参 数 解 释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">name</td>
+<td style="text-align:left">必须参数,用于指定需要管理的软件包</td>
+</tr>
+<tr>
+<td style="text-align:left">state</td>
+<td style="text-align:left">用于指定软件包的状态,默认值为present</td>
+</tr>
+<tr>
+<td style="text-align:left">disable_gpg_check</td>
+<td style="text-align:left">用于禁用对 rpm 包的公钥 gpg 验证,默认值为 no</td>
+</tr>
+<tr>
+<td style="text-align:left">enablerepo</td>
+<td style="text-align:left">用于指定安装软件包时临时启用的 yum 源</td>
+</tr>
+<tr>
+<td style="text-align:left">disablerepo</td>
+<td style="text-align:left">用于指定安装软件包时临时禁用的 yum 源</td>
+</tr>
+</tbody>
+</table>
+<p>1.安装软件：通过Yum模块批量的安装httpd服务到指定主机上.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m yum -a "name=httpd state=installed" -o</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;<span class="string">"changed"</span>: <span class="literal">true</span>, .....&#125;</span><br><span class="line">192.168.10.30 | SUCCESS =&gt; &#123;<span class="string">"changed"</span>: <span class="literal">true</span>, .....&#125;</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ansible all -m shell -a "rpm -qa httpd" -o</span></span><br><span class="line"></span><br><span class="line">192.168.10.30 | SUCCESS | rc=0 | (stdout) httpd-2.4.6-80.el7.x86_64</span><br><span class="line">192.168.10.20 | SUCCESS | rc=0 | (stdout) httpd-2.4.6-80.el7.x86_64</span><br></pre></td></tr></table></figure></p>
+<p>2.卸载软件：通过Yum模块批量的卸载httpd服务主机.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m yum -a "name=httpd state=removed" -o</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;<span class="string">"changed"</span>: <span class="literal">true</span>, .....&#125;</span><br><span class="line">192.168.10.30 | SUCCESS =&gt; &#123;<span class="string">"changed"</span>: <span class="literal">true</span>, .....&#125;</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ansible all -m shell -a "rpm -qa httpd" -o</span></span><br><span class="line"></span><br><span class="line">192.168.10.30 | SUCCESS | rc=0 | (stdout)</span><br><span class="line">192.168.10.20 | SUCCESS | rc=0 | (stdout)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆Cron◆"><a href="#◆Cron◆" class="headerlink" title="◆Cron◆"></a>◆Cron◆</h3><p>cron 模块可以帮助我们管理远程主机中的计划任务,功能相当于 crontab 命令.</p>
+<p>下面来看它的几个常用参数： </p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">命 令 参 数</th>
+<th style="text-align:left">参 数 解 释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">user</td>
+<td style="text-align:left">用于设置当前计划任务属于哪个用户,当不使用此参数时,默认为管理员用户</td>
+</tr>
+<tr>
+<td style="text-align:left">job</td>
+<td style="text-align:left">指定计划的任务中需要实际执行的命令或者脚本</td>
+</tr>
+<tr>
+<td style="text-align:left">name</td>
+<td style="text-align:left">用于设置计划任务的名称,计划任务的名称会在注释中显示</td>
+</tr>
+<tr>
+<td style="text-align:left">state</td>
+<td style="text-align:left">相关状态信息,当删除计划任务时,需要将 state 的值设置为 absent</td>
+</tr>
+<tr>
+<td style="text-align:left">disabled</td>
+<td style="text-align:left">当计划任务有名称时,我们可以根据名称使对应的任务失效</td>
+</tr>
+<tr>
+<td style="text-align:left">backup</td>
+<td style="text-align:left">此参数的值设置为yes,那么当修改或者删除对应的计划任务时,会对计划任务备份</td>
+</tr>
+<tr>
+<td style="text-align:left">$time</td>
+<td style="text-align:left">指定具体的执行时间,minute分,hour时,day天,month月,weekday 0-7 代表周</td>
+</tr>
+</tbody>
+</table>
+<p>1.创建计划任务,任务名称为<code>mkdirs test</code> 任务于每天1点5分,执行输出一段话<code>echo hello lyshark</code>.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m cron -a "name='mkdirs test' minute=5 hour=1 job='echo hello lyshark'"</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">true</span>, </span><br><span class="line">    <span class="string">"envs"</span>: [], </span><br><span class="line">    <span class="string">"jobs"</span>: [</span><br><span class="line">        <span class="string">"mkdirs test"</span></span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>2.创建计划任务任务名称为<code>mkdirs test1</code> 任务每3天执行一次,于执行当天的1点1分开始执行,任务内容为输出<code>wangrui</code>字符.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m cron -a "name='mkdirs test1' minute=1 hour=1 day=*/3 job='echo wangrui'"</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">true</span>, </span><br><span class="line">    <span class="string">"envs"</span>: [], </span><br><span class="line">    <span class="string">"jobs"</span>: [</span><br><span class="line">        <span class="string">"mkdirs test"</span>, </span><br><span class="line">        <span class="string">"mkdirs test1"</span></span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>3.删除计划任务<code>mkdirs test1</code>,删除前做好备份.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m cron -a "name='mkdirs test1' state=absent backup=yes"</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;</span><br><span class="line">    <span class="string">"backup_file"</span>: <span class="string">"/tmp/crontabqzSJZn"</span>, </span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">true</span>, </span><br><span class="line">    <span class="string">"envs"</span>: [], </span><br><span class="line">    <span class="string">"jobs"</span>: [</span><br><span class="line">        <span class="string">"mkdirs test"</span></span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>4.查询远程主机上的任务列表.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m shell -a "crontab -l" -o</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS | rc=0 | (stdout) <span class="comment">#Ansible: mkdirs test\n5 1 * * * echo hello lyshark</span></span><br></pre></td></tr></table></figure></p>
+<p>5.其他配置过程.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m cron -a "name='test cron' job='/bin/bash /tmp/lyshark.sh' weekday=6"</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ansible all -m cron -a "name='test admin' job='/bin/bash /tmp/lyshark.sh' weekday=6 minute=30 hour='*/8'"</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ansible all -m cron -a "name='test cron' job='/bin/bash /tmp/lyshark.sh' minute=30 hour='*/8' day='1,10,20' weekday=6"</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="◆Service◆"><a href="#◆Service◆" class="headerlink" title="◆Service◆"></a>◆Service◆</h3><p>service 模块可以帮助我们管理远程主机上的服务,它完全可以替代Linux系统下的,相关操作比如启动服务,设置开机自启动.</p>
+<p>下面来看它的几个常用参数： </p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">命 令 参 数</th>
+<th style="text-align:left">参 数 解 释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">name</td>
+<td style="text-align:left">此参数用于指定需要操作的服务名称</td>
+</tr>
+<tr>
+<td style="text-align:left">state</td>
+<td style="text-align:left">此参数用于指定服务的状态,started、stopped、restarted、reloaded</td>
+</tr>
+<tr>
+<td style="text-align:left">enabled</td>
+<td style="text-align:left">此参数用于指定是否将服务设置为开机 启动项</td>
+</tr>
+</tbody>
+</table>
+<p>1.设置服务开机自启动,设置httpd服务开机自启动.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m service -a "name=httpd runlevel=3 state=started enabled=yes"</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;<span class="string">"changed"</span>: <span class="literal">true</span>, .....&#125;</span><br><span class="line">192.168.10.30 | SUCCESS =&gt; &#123;<span class="string">"changed"</span>: <span class="literal">true</span>, .....&#125;</span><br></pre></td></tr></table></figure></p>
+<p>2.关闭服务开机自启动,关闭httpd服务开机自启动.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m service -a "name=httpd runlevel=3 state=stopped enabled=no"</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | SUCCESS =&gt; &#123;<span class="string">"changed"</span>: <span class="literal">true</span>, .....&#125;</span><br><span class="line">192.168.10.30 | SUCCESS =&gt; &#123;<span class="string">"changed"</span>: <span class="literal">true</span>, .....&#125;</span><br></pre></td></tr></table></figure>
+<p><br></p>
+<h2 id="其他控制模块"><a href="#其他控制模块" class="headerlink" title="其他控制模块"></a>其他控制模块</h2><h3 id="◆Get-url◆"><a href="#◆Get-url◆" class="headerlink" title="◆Get_url◆"></a>◆Get_url◆</h3><p>get_url模块用于下载指定文件到本地,在生产环境中也是最常用的东西啦.</p>
+<p>下面来看它的几个常用参数： </p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">命 令 参 数</th>
+<th style="text-align:left">参 数 解 释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">dest</td>
+<td style="text-align:left">文件下载到远程的那个目录下</td>
+</tr>
+<tr>
+<td style="text-align:left">force</td>
+<td style="text-align:left">是否强制覆盖yes/no</td>
+</tr>
+<tr>
+<td style="text-align:left">url</td>
+<td style="text-align:left">指定一个URL地址</td>
+</tr>
+</tbody>
+</table>
+<p>1.下载一个指定文件到远程主机,我这里没有网络,这里只做演示吧.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m get_url -a "url=http://mirrors.aliyun.com/repo/Centos-7.repo dest=/root"</span></span><br><span class="line"></span><br><span class="line">192.168.10.20 | FAILED! =&gt; &#123;</span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">false</span>, </span><br><span class="line">    <span class="string">"dest"</span>: <span class="string">"/root"</span>, </span><br><span class="line">    <span class="string">"gid"</span>: 0, </span><br><span class="line">    <span class="string">"group"</span>: <span class="string">"root"</span>, </span><br><span class="line">    <span class="string">"mode"</span>: <span class="string">"0550"</span>, </span><br><span class="line">    <span class="string">"msg"</span>: <span class="string">"Request failed: &lt;urlopen error [Errno -2] Name or service not known&gt;"</span>, </span><br><span class="line">    <span class="string">"owner"</span>: <span class="string">"root"</span>, </span><br><span class="line">    <span class="string">"secontext"</span>: <span class="string">"system_u:object_r:admin_home_t:s0"</span>, </span><br><span class="line">    <span class="string">"size"</span>: 156, </span><br><span class="line">    <span class="string">"state"</span>: <span class="string">"directory"</span>, </span><br><span class="line">    <span class="string">"uid"</span>: 0, </span><br><span class="line">    <span class="string">"url"</span>: <span class="string">"http://mirrors.aliyun.com/repo/Centos-7.repo"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/12/01/Ansible/Ansible 常用模块详解-3/">Ansible 常用模块详解(3)</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年12月01日 - 15:12</p>
+  <p><span>最后更新:</span>2018年12月09日 - 09:12</p>
+  <p><span>原始链接:</span><a href="/2018/12/01/Ansible/Ansible 常用模块详解-3/" title="Ansible 常用模块详解(3)">https://www.mkdirs.com/2018/12/01/Ansible/Ansible 常用模块详解-3/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Ansible/" rel="tag"> <i class="fa fa-tag"></i> Ansible</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/01/Ansible/Ansible-清单与命令解析-2/" rel="next" title="Ansible 清单与命令解析(2)">
+                <i class="fa fa-chevron-left"></i> Ansible 清单与命令解析(2)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/02/Ansible/Ansible PlayBook语法-4/" rel="prev" title="Ansible PlayBook语法(4)">
+                Ansible PlayBook语法(4) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#命令执行模块"><span class="nav-text">命令执行模块</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆Command◆"><span class="nav-text">◆Command◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆Shell◆"><span class="nav-text">◆Shell◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆Script◆"><span class="nav-text">◆Script◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#文件管理模块"><span class="nav-text">文件管理模块</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆File◆"><span class="nav-text">◆File◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆Copy◆"><span class="nav-text">◆Copy◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆Find◆"><span class="nav-text">◆Find◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆Unarchive◆"><span class="nav-text">◆Unarchive◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#文本修改模块"><span class="nav-text">文本修改模块</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆Replace◆"><span class="nav-text">◆Replace◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆Lineinfile◆"><span class="nav-text">◆Lineinfile◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#系统管理模块"><span class="nav-text">系统管理模块</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆Setup◆"><span class="nav-text">◆Setup◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆Yum◆"><span class="nav-text">◆Yum◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆Cron◆"><span class="nav-text">◆Cron◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆Service◆"><span class="nav-text">◆Service◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他控制模块"><span class="nav-text">其他控制模块</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆Get-url◆"><span class="nav-text">◆Get_url◆</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

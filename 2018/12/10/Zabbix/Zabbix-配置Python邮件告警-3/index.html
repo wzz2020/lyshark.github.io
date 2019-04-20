@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Zabbix是一个非常强大的监控系统,是企业级的软件,来监控IT基础设施的可用性和性能.它是一个能够快速搭建起来的开源的监控系统,Zabbix能监视各种网络参数,保证服务器系统的安全运营,并提供灵活的通知机制以让系统管理员快速定位解决存在的各种问题,Zabbix系统几乎可用于任何系统的监控过程,它可以运行在Linux,Solaris,HP-UX,AIX,Free BSD,Open BSD,OS X">
+<meta name="keywords" content="Zabbix">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Zabbix 配置Python邮件告警(3)">
+<meta property="og:url" content="https://www.mkdirs.com/2018/12/10/Zabbix/Zabbix-配置Python邮件告警-3/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="Zabbix是一个非常强大的监控系统,是企业级的软件,来监控IT基础设施的可用性和性能.它是一个能够快速搭建起来的开源的监控系统,Zabbix能监视各种网络参数,保证服务器系统的安全运营,并提供灵活的通知机制以让系统管理员快速定位解决存在的各种问题,Zabbix系统几乎可用于任何系统的监控过程,它可以运行在Linux,Solaris,HP-UX,AIX,Free BSD,Open BSD,OS X">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20181210141755.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20181210112932.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20181210143559.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20181210143837.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20181210144115.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20181210144322.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20181210152759.jpg">
+<meta property="og:updated_time" content="2018-12-10T07:30:06.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Zabbix 配置Python邮件告警(3)">
+<meta name="twitter:description" content="Zabbix是一个非常强大的监控系统,是企业级的软件,来监控IT基础设施的可用性和性能.它是一个能够快速搭建起来的开源的监控系统,Zabbix能监视各种网络参数,保证服务器系统的安全运营,并提供灵活的通知机制以让系统管理员快速定位解决存在的各种问题,Zabbix系统几乎可用于任何系统的监控过程,它可以运行在Linux,Solaris,HP-UX,AIX,Free BSD,Open BSD,OS X">
+<meta name="twitter:image" content="https://www.mkdirs.com/picture/20181210141755.jpg">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/12/10/Zabbix/Zabbix-配置Python邮件告警-3/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Zabbix 配置Python邮件告警(3) | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/12/10/Zabbix/Zabbix-配置Python邮件告警-3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Zabbix 配置Python邮件告警(3)
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-10 09:34:07 / 修改时间：15:30:06" itemprop="dateCreated datePublished" datetime="2018-12-10T09:34:07+08:00">2018-12-10</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Zabbix/" itemprop="url" rel="index"><span itemprop="name">Zabbix</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Zabbix是一个非常强大的监控系统,是企业级的软件,来监控IT基础设施的可用性和性能.它是一个能够快速搭建起来的开源的监控系统,Zabbix能监视各种网络参数,保证服务器系统的安全运营,并提供灵活的通知机制以让系统管理员快速定位解决存在的各种问题,Zabbix系统几乎可用于任何系统的监控过程,它可以运行在Linux,Solaris,HP-UX,AIX,Free BSD,Open BSD,OS X,等平台上.</p>
+<a id="more"></a>
+<p><br><br>1.首先你应该注册一个163邮箱,用于发信,再注册时开启SMTP/POP3功能,使用加密密码认证.</p>
+<p><img src="/picture/20181210141755.jpg" alt="blockchain"></p>
+<p>2.在Zabbix主机上新建send.py文件,将以下代码复制编辑,设置发件用户、密码.<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim send.py</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#!/usr/bin/python</span></span><br><span class="line"><span class="comment">#coding:utf-8</span></span><br><span class="line"><span class="keyword">import</span> smtplib</span><br><span class="line"><span class="keyword">from</span> email.mime.text <span class="keyword">import</span> MIMEText</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line">mail_host = <span class="string">'smtp.163.com'</span>  </span><br><span class="line">mail_user = <span class="string">'smtpwho'</span></span><br><span class="line">mail_pass = <span class="string">'密码'</span></span><br><span class="line">mail_postfix = <span class="string">'163.com'</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">send_mail</span><span class="params">(to_list,subject,content)</span>:</span></span><br><span class="line">    me = <span class="string">"Zabbix 监控告警通知"</span>+<span class="string">"&lt;"</span>+mail_user+<span class="string">"@"</span>+mail_postfix+<span class="string">"&gt;"</span></span><br><span class="line">    msg = MIMEText(content, <span class="string">'plain'</span>, <span class="string">'utf-8'</span>)</span><br><span class="line">    msg[<span class="string">'Subject'</span>] = subject</span><br><span class="line">    msg[<span class="string">'From'</span>] = me</span><br><span class="line">    msg[<span class="string">'to'</span>] = to_list</span><br><span class="line"></span><br><span class="line">    s = smtplib.SMTP()</span><br><span class="line">    s.connect(mail_host)</span><br><span class="line">    s.login(mail_user,mail_pass)</span><br><span class="line">    s.sendmail(me,to_list,msg.as_string())</span><br><span class="line">    s.close()</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    send_mail(sys.argv[<span class="number">1</span>], sys.argv[<span class="number">2</span>], sys.argv[<span class="number">3</span>])</span><br></pre></td></tr></table></figure></p>
+<p>3.紧接着我们给脚本相应的权限测试是否能够发信成功,并拷贝到zabbix的默认脚本目中.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># chmod +x send.py</span></span><br><span class="line">[root@localhost ~]<span class="comment"># python send.py 1181506874@qq.com zabbix checkok</span></span><br><span class="line">[root@localhost ~]<span class="comment"># echo $?</span></span><br><span class="line">0</span><br><span class="line">[root@localhost ~]<span class="comment"># cp -a send.py /usr/lib/zabbix/alertscripts/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># chmod 755 -R /usr/lib/zabbix/alertscripts/</span></span><br></pre></td></tr></table></figure></p>
+<p>4.登录Zabbix主机,查看配置zabbix_server.conf,找到AlertScriptsPath取消注释.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/zabbix/zabbix_server.conf</span></span><br><span class="line">[root@localhost ~]<span class="comment"># vim /usr/local/zabbix/etc/zabbix_server.conf</span></span><br><span class="line"></span><br><span class="line"><span class="comment">### Option: AlertScriptsPath</span></span><br><span class="line"><span class="comment">#       Full path to location of custom alert scripts.</span></span><br><span class="line"><span class="comment">#       Default depends on compilation options.</span></span><br><span class="line"><span class="comment">#       To see the default path run command "zabbix_server --help".</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># Mandatory: no</span></span><br><span class="line"><span class="comment"># Default:</span></span><br><span class="line"><span class="comment"># AlertScriptsPath=$&#123;datadir&#125;/zabbix/alertscripts</span></span><br><span class="line"></span><br><span class="line">AlertScriptsPath=/usr/lib/zabbix/alertscripts     <span class="comment">#解除注释,找到配置项</span></span><br></pre></td></tr></table></figure></p>
+<p>5.点击图形界面,选择<code>管理-&gt;报警媒介</code>.<br>新增参数：{ALERT.SENDTO}{ALERT.SUBJECT}{ALERT.MESSAGE}分别依次加入,然后更新保存.</p>
+<p><img src="/picture/20181210112932.jpg" alt="blockchain"></p>
+<p>6.点击图形界面,选择<code>配置-&gt;动作-&gt;创建动作</code>,首先创建一个动作.</p>
+<p><img src="/picture/20181210143559.jpg" alt="blockchain"></p>
+<p>7.紧接着点击<code>操作-&gt;配置</code>一下故障报警消息格式.</p>
+<p>标题改为：<br>故障{TRIGGER.STATUS},服务器:{HOSTNAME1}发生: {TRIGGER.NAME}故障!</p>
+<p>信息改为：<br>告警主机:{HOSTNAME1}<br>告警地址:{HOST.IP}<br>告警时间:{EVENT.DATE} {EVENT.TIME}<br>告警等级:{TRIGGER.SEVERITY}<br>告警信息: {TRIGGER.NAME}<br>告警项目:{TRIGGER.KEY1}<br>问题详情:{ITEM.NAME}:{ITEM.VALUE}<br>当前状态:{TRIGGER.STATUS}:{ITEM.VALUE1}<br>事件 ID:{EVENT.ID}</p>
+<p><img src="/picture/20181210143837.jpg" alt="blockchain"></p>
+<p>8.当我们配置完成一个故障报警后,下面就继续配置一个恢复后的提示.</p>
+<p>标题改为：<br>恢复{TRIGGER.STATUS}, 服务器:{HOSTNAME1}: {TRIGGER.NAME}已恢复!</p>
+<p>信息改为：<br>告警主机:{HOSTNAME1}<br>告警地址:{HOST.IP}<br>告警时间:{EVENT.DATE} {EVENT.TIME}<br>告警等级:{TRIGGER.SEVERITY}<br>告警信息: {TRIGGER.NAME}<br>告警项目:{TRIGGER.KEY1}<br>问题详情:{ITEM.NAME}:{ITEM.VALUE}<br>当前状态:{TRIGGER.STATUS}:{ITEM.VALUE1}<br>事件 ID:{EVENT.ID}</p>
+<p><img src="/picture/20181210144115.jpg" alt="blockchain"></p>
+<p>最终点击<code>小add添加</code>选项,继续点击<code>大ADD完成动作</code>增加.</p>
+<p>9.配置告警用户,点击<code>管理-&gt;用户-&gt;Admin-&gt;报警媒介</code>,修改以下内容.</p>
+<p><img src="/picture/20181210144322.jpg" alt="blockchain"></p>
+<p>10.强制关闭虚拟机,测试是否有邮件报警即可.</p>
+<p><img src="/picture/20181210152759.jpg" alt="blockchain"><br><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/12/10/Zabbix/Zabbix-配置Python邮件告警-3/">Zabbix 配置Python邮件告警(3)</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年12月10日 - 09:12</p>
+  <p><span>最后更新:</span>2018年12月10日 - 15:12</p>
+  <p><span>原始链接:</span><a href="/2018/12/10/Zabbix/Zabbix-配置Python邮件告警-3/" title="Zabbix 配置Python邮件告警(3)">https://www.mkdirs.com/2018/12/10/Zabbix/Zabbix-配置Python邮件告警-3/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Zabbix/" rel="tag"> <i class="fa fa-tag"></i> Zabbix</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/10/Zabbix/Zabbix-自带监控项与Kye-2/" rel="next" title="Zabbix 自带监控项与Kye(2)">
+                <i class="fa fa-chevron-left"></i> Zabbix 自带监控项与Kye(2)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/10/Zabbix/Zabbix-配置钉钉脚本告警-4/" rel="prev" title="Zabbix 配置钉钉脚本告警(4)">
+                Zabbix 配置钉钉脚本告警(4) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Linux 是一套免费使用和自由传播的类Unix操作系统,是一个基于POSIX和UNIX的多用户、多任务、支持多线程和多CPU的操作系统.它能运行主要的UNIX工具软件、应用程序和网络协议.它支持32位和64位硬件.Linux继承了Unix以网络为核心的设计思想,是一个性能稳定的多用户网络操作系统. 在这个章节当中,我们就直接来进一步的操作与管理文件与目录吧,包括在不同的目录间变换、创建与删除目录">
+<meta name="keywords" content="Linux 系统管理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux系统文件与目录管理(1)">
+<meta property="og:url" content="https://www.mkdirs.com/2018/11/13/Linux 系统管理/Linux系统文件与目录管理-1/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="Linux 是一套免费使用和自由传播的类Unix操作系统,是一个基于POSIX和UNIX的多用户、多任务、支持多线程和多CPU的操作系统.它能运行主要的UNIX工具软件、应用程序和网络协议.它支持32位和64位硬件.Linux继承了Unix以网络为核心的设计思想,是一个性能稳定的多用户网络操作系统. 在这个章节当中,我们就直接来进一步的操作与管理文件与目录吧,包括在不同的目录间变换、创建与删除目录">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-04-16T12:34:39.380Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux系统文件与目录管理(1)">
+<meta name="twitter:description" content="Linux 是一套免费使用和自由传播的类Unix操作系统,是一个基于POSIX和UNIX的多用户、多任务、支持多线程和多CPU的操作系统.它能运行主要的UNIX工具软件、应用程序和网络协议.它支持32位和64位硬件.Linux继承了Unix以网络为核心的设计思想,是一个性能稳定的多用户网络操作系统. 在这个章节当中,我们就直接来进一步的操作与管理文件与目录吧,包括在不同的目录间变换、创建与删除目录">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/11/13/Linux 系统管理/Linux系统文件与目录管理-1/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Linux系统文件与目录管理(1) | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/11/13/Linux 系统管理/Linux系统文件与目录管理-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Linux系统文件与目录管理(1)
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-11-13 13:51:22" itemprop="dateCreated datePublished" datetime="2018-11-13T13:51:22+08:00">2018-11-13</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-16 20:34:39" itemprop="dateModified" datetime="2019-04-16T20:34:39+08:00">2019-04-16</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Linux-系统管理/" itemprop="url" rel="index"><span itemprop="name">Linux 系统管理</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Linux 是一套免费使用和自由传播的类Unix操作系统,是一个基于POSIX和UNIX的多用户、多任务、支持多线程和多CPU的操作系统.它能运行主要的UNIX工具软件、应用程序和网络协议.它支持32位和64位硬件.Linux继承了Unix以网络为核心的设计思想,是一个性能稳定的多用户网络操作系统.</p>
+<p>在这个章节当中,我们就直接来进一步的操作与管理文件与目录吧,包括在不同的目录间变换、创建与删除目录、创建与删除文件,还有寻找文件、查阅文件内容等,都会在这个章节作介绍.</p>
+<a id="more"></a>
+<p><br></p>
+<h2 id="文件与目录的操作"><a href="#文件与目录的操作" class="headerlink" title="文件与目录的操作"></a>文件与目录的操作</h2><p>在Linux系统的文件与目录的管理上,不外乎『显示属性』、『拷贝』、『删除文件』、『移动文件或目录』、『重命名』等常用操作,由于文件与目录的管理在 Linux当中是很重要的,尤其是每个人自己家目录的数据也都需要管理,所以我们来谈一谈有关文件与目录的一些基础管理部分吧.</p>
+<h3 id="◆ls-显示目录或文件◆"><a href="#◆ls-显示目录或文件◆" class="headerlink" title="◆ls 显示目录或文件◆"></a>◆ls 显示目录或文件◆</h3><p>ls命令用来显示目标列表,在Linux系统中是使用率较高的命令.ls命令的输出信息可以进行彩色加亮显示,以分区不同类型的文件,其参数我们会在下面进行说明.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ls --help</span></span><br><span class="line"></span><br><span class="line">命令语法：[ ls [选项] 文件或目录 ]</span><br><span class="line"></span><br><span class="line">        -a              <span class="comment">#显示所有文件,包括隐藏文件,连同.与..的文件也列出来</span></span><br><span class="line">        -A              <span class="comment">#显示所有文件,包括隐藏文件,但不列出.与..</span></span><br><span class="line">        -d              <span class="comment">#仅列出目录</span></span><br><span class="line">        -f              <span class="comment">#直接列出结果不排序</span></span><br><span class="line">        -h              <span class="comment">#文件大小显示为B KB MB</span></span><br><span class="line">        -i              <span class="comment">#列出文件的Inode号</span></span><br><span class="line">        -l              <span class="comment">#以长格式显示</span></span><br><span class="line">        -n              <span class="comment">#列出uid与gid</span></span><br><span class="line">        -S              <span class="comment">#以文件容量大小排序(大文件在前小文件在后)</span></span><br><span class="line">        -t              <span class="comment">#以时间大小排序(大日期在前小日期在后)</span></span><br><span class="line">        -r              <span class="comment">#将排序结果反向输出</span></span><br><span class="line">        -R              <span class="comment">#递归显示目录以及子目录</span></span><br><span class="line">        -Z              <span class="comment">#列出SELinux安全上下文</span></span><br><span class="line">        --full-time     <span class="comment">#列出文件详细时间</span></span><br><span class="line">        --time=atime/ctime/mtime        <span class="comment">#列出指定时间</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>实例1：</strong>使用 <code>ls -lh</code> 参数查询所在目录详细信息<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ls -lh</span></span><br><span class="line">total 0</span><br><span class="line">-rw-r--r--. 1 root root 0 Nov 13 09:36 admin</span><br><span class="line">drwxr-xr-x. 2 root root 6 Nov 13 09:36 lyshark</span><br><span class="line"></span><br><span class="line">第1项:          文件权限位</span><br><span class="line">第2项:          引用计数(文件:硬链接数 目录:目录下的子目录个数)</span><br><span class="line">第3项:          文件的所有者(属主-&gt;此处为root)</span><br><span class="line">第4项:          文件的所属组(属组-&gt;此处为root)</span><br><span class="line">第5项:          文件大小(默认单位字节byte)</span><br><span class="line">第6项:          最后一次修改时间</span><br><span class="line">第7项:          文件名</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例2：</strong>使用 <code>ls -lh --full-time</code> 显示文件创建的详细时间信息<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ls -h --full-time</span></span><br><span class="line">total 0</span><br><span class="line">-rw-r--r--. 1 root root 0 2018-11-13 09:36:25.172274787 -0500 admin</span><br><span class="line">drwxr-xr-x. 2 root root 6 2018-11-13 09:36:13.292275532 -0500 lyshark</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例3：</strong>使用 <code>ls -lhS</code> 显示文件,并按照文件由大到小打印<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ls -lhS</span></span><br><span class="line">total 0</span><br><span class="line">drwxr-xr-x. 2 root root 6 Nov 13 09:36 lyshark</span><br><span class="line">-rw-r--r--. 1 root root 0 Nov 13 09:36 admin</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例4：</strong>使用 <code>ls -lhrS</code> 显示文件,并按照文件由小到大打印<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ls -lhrS</span></span><br><span class="line">total 0</span><br><span class="line">-rw-r--r--. 1 root root 0 Nov 13 09:36 admin</span><br><span class="line">drwxr-xr-x. 2 root root 6 Nov 13 09:36 lyshark</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例5：</strong>使用 <code>ls -lZ</code> 显示文件,并显示SeLinux安全上下文<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ls -lZ </span></span><br><span class="line">-rw-r--r--. root root unconfined_u:object_r:admin_home_t:s0 admin</span><br><span class="line">drwxr-xr-x. root root unconfined_u:object_r:admin_home_t:s0 lyshark</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆cd-目录跳转与切换◆"><a href="#◆cd-目录跳转与切换◆" class="headerlink" title="◆cd 目录跳转与切换◆"></a>◆cd 目录跳转与切换◆</h3><p>cd命令用来切换工作目录至dirname,其中dirName表示法可为绝对路径或相对路径,若目录名称省略,则变换至使用者的home directory,.则是表示目前所在的目录,..则表示目前目录位置的上一层目录,其参数我们会在下面进行说明.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cd --help</span></span><br><span class="line"></span><br><span class="line">命令语法：[ <span class="built_in">cd</span> [选项] 目录 ]</span><br><span class="line"></span><br><span class="line">        <span class="built_in">cd</span>              <span class="comment">#进入用户主目录</span></span><br><span class="line">        <span class="built_in">cd</span> ~            <span class="comment">#进入用户主目录</span></span><br><span class="line">        <span class="built_in">cd</span> -            <span class="comment">#返回进入此目录之前所在的目录</span></span><br><span class="line">        <span class="built_in">cd</span> ..           <span class="comment">#返回上级目录</span></span><br><span class="line">        <span class="built_in">cd</span> ../..        <span class="comment">#返回上两级目录</span></span><br><span class="line">        <span class="built_in">cd</span> !$           <span class="comment">#把上个命令的参数作为cd参数使用</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>实例1：</strong>使用 <code>cd ~ or cd</code> 切换到用户家目录<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost etc]<span class="comment"># pwd</span></span><br><span class="line">/etc</span><br><span class="line"></span><br><span class="line">[root@localhost etc]<span class="comment"># cd</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># pwd</span></span><br><span class="line">/root</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例2：</strong>使用 <code>cd ..</code> 切换上一级目录里去<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># pwd</span></span><br><span class="line">/root</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># cd ..</span></span><br><span class="line"></span><br><span class="line">[root@localhost /]<span class="comment"># pwd</span></span><br><span class="line">/</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例3：</strong>使用 <code>cd ../..</code> 切换上两级目录里去<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost sysconfig]<span class="comment"># pwd</span></span><br><span class="line">/etc/sysconfig</span><br><span class="line"></span><br><span class="line">[root@localhost sysconfig]<span class="comment"># cd ../..</span></span><br><span class="line"></span><br><span class="line">[root@localhost /]<span class="comment"># pwd</span></span><br><span class="line">/</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆mkdir-创建新目录◆"><a href="#◆mkdir-创建新目录◆" class="headerlink" title="◆mkdir 创建新目录◆"></a>◆mkdir 创建新目录◆</h3><p>mkdir命令用来创建目录,该命令创建由dirname命名的目录,如果在目录名的前面没有加任何路径名,则在当前目录下创建由dirname指定的目录,如果给出了一个已经存在的路径,将会在该目录下创建一个指定的目录,在创建目录时,应保证新建的目录与它所在目录下的文件没有重名,其参数我们会在下面进行说明.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mkdir --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ mkdir [选项] 新目录名 ]</span><br><span class="line"></span><br><span class="line">        -v              <span class="comment">#显示创建过程</span></span><br><span class="line">        -p              <span class="comment">#递归创建目录</span></span><br><span class="line">        -Z              <span class="comment">#设置安全上下文</span></span><br><span class="line">        -m              <span class="comment">#建立目录时同时设置权限</span></span><br></pre></td></tr></table></figure>
+<p><strong>实例1：</strong>使用 <code>mkdir -p</code> 递归创建目录<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mkdir -p /tmp/lyshark/lyshark</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ls -lh /tmp/lyshark/</span></span><br><span class="line">total 0</span><br><span class="line">drwxr-xr-x. 2 root root 6 Nov 13 09:56 lyshark</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例2：</strong>使用 <code>mkdir -m</code> 建立目录时同时设置权限.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mkdir -m 000 lyshark</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ls -lh</span></span><br><span class="line">total 0</span><br><span class="line">d---------. 2 root root 6 Nov 13 10:02 lyshark</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆touch-创建空文件◆"><a href="#◆touch-创建空文件◆" class="headerlink" title="◆touch 创建空文件◆"></a>◆touch 创建空文件◆</h3><p>touch命令有两个功能,一是用于把已存在文件的时间标签更新为系统当前的时间,它们的数据将原封不动地保留下来,二是用来创建新的空文件,多数情况下我们只是用它来创建空文件,其参数我们会在下面进行说明.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># touch --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ touch [选项] 文件名 ]</span><br><span class="line"></span><br><span class="line">        -a              <span class="comment">#修改访问时间</span></span><br><span class="line">        -c              <span class="comment">#修改文件时间,若文件不存在则不创建新文件</span></span><br><span class="line">        -m              <span class="comment">#仅修改mtime</span></span><br><span class="line">        -t              <span class="comment">#修改文件时间(touch -t 1806101012)</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>实例1：</strong>使用 <code>touch</code> 命令在当前目录下创建一个空文件lyshark.txt.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ls -lh</span></span><br><span class="line">total 0</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># touch lyshark.txt</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ls -lh</span></span><br><span class="line">total 0</span><br><span class="line">-rw-r--r--. 1 root root 0 Nov 13 10:32 lyshark.txt</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例2：</strong>使用 <code>touch -t</code> 命令修改文件的时间改成15年11月03日11点59分.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ls -lh --full-time</span></span><br><span class="line">total 0</span><br><span class="line">-rw-r--r--. 1 root root 0 2018-11-13 10:35:50.639051120 -0500 lyshark.txt</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># touch -t 1511031159 lyshark.txt </span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ls -lh --full-time</span></span><br><span class="line">total 0</span><br><span class="line">-rw-r--r--. 1 root root 0 2015-11-03 11:59:00.000000000 -0500 lyshark.txt</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆cp-复制文件或目录◆"><a href="#◆cp-复制文件或目录◆" class="headerlink" title="◆cp 复制文件或目录◆"></a>◆cp 复制文件或目录◆</h3><p>cp命令用来将一个或多个源文件或者目录复制到指定的目的文件或目录,它可以将单个源文件复制成一个指定文件名的具体的文件或一个已经存在的目录下.cp命令还支持同时复制多个文件,当一次复制多个文件时,目标文件参数必须是一个已经存在的目录,否则将出现错误,其参数我们会在下面进行说明.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cp --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ cp [选项] 源文件或目录 目标目录 ]</span><br><span class="line"></span><br><span class="line">        -a              <span class="comment">#相当于pdr</span></span><br><span class="line">        -d              <span class="comment">#连同链接文件的属性一起复制</span></span><br><span class="line">        -f              <span class="comment">#强制复制</span></span><br><span class="line">        -i              <span class="comment">#如目标文件已存在,则覆盖时询问</span></span><br><span class="line">        -p              <span class="comment">#连同文件属性一起复制(备份常用)</span></span><br><span class="line">        -r              <span class="comment">#递归复制,用于目录的复制</span></span><br><span class="line">        -s              <span class="comment">#复制时创建软连接</span></span><br><span class="line">        -u              <span class="comment">#源文件更新时才会提示复制</span></span><br></pre></td></tr></table></figure>
+<p><strong>实例1：</strong>使用 <code>cp -a</code> 命令实现文件拷贝,将/etc/的文件拷贝到/tmp/目录下.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cp -a /etc/* /tmp/</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ls -lh /tmp/</span></span><br><span class="line">total 1.1M</span><br><span class="line">-rw-r--r--.  1 root root     16 Oct 13 12:37 adjtime</span><br><span class="line">-rw-r--r--.  1 root root   1.5K Jun  7  2013 aliases</span><br><span class="line">-rw-r--r--.  1 root root    12K Oct 13 12:39 aliases.db</span><br><span class="line">drwxr-xr-x.  2 root root    236 Oct 13 12:34 alternatives</span><br><span class="line">....省略....</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例2：</strong>使用 <code>cp -s</code> 命令实现拷贝文件,将/etc/passwd创建软链接到/tmp/目录下.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cp -s /etc/passwd /tmp/</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ls -lh /tmp/</span></span><br><span class="line">total 0</span><br><span class="line">lrwxrwxrwx. 1 root root 11 Nov 13 10:09 passwd -&gt; /etc/passwd</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例3：</strong>使用 <code>cp -a</code> 命令实现一次拷贝多个文件,到/tmp/目录下.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cp -a /etc/passwd /etc/shadow /tmp/</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ls -lh /tmp/</span></span><br><span class="line">total 8.0K</span><br><span class="line">-rw-r--r--. 1 root root 898 Oct 13 12:37 passwd</span><br><span class="line">----------. 1 root root 714 Oct 13 12:37 shadow</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆mv-移动文件或目录◆"><a href="#◆mv-移动文件或目录◆" class="headerlink" title="◆mv 移动文件或目录◆"></a>◆mv 移动文件或目录◆</h3><p>mv命令用来对文件或目录重新命名,或将文件从一个目录移到另一个目录中.source表示源文件或目录,target表示目标文件或目录.如果将一个文件移到一个已经存在的目标文件中,则目标文件的内容将被覆盖,其参数我们会在下面进行说明.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mv --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ mv [选项] 源文件或目录 目标目录 ]</span><br><span class="line"></span><br><span class="line">        -f              <span class="comment">#强制移动</span></span><br><span class="line">        -i              <span class="comment">#以互动方式移动</span></span><br><span class="line">        -u              <span class="comment">#源文件更新才会移动</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>实例1：</strong>使用 <code>mv</code> 命令实现将/etc/passwd移动到/tmp目录下.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mv /etc/passwd /tmp/</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ls -lh /tmp/</span></span><br><span class="line">total 4.0K</span><br><span class="line">-rw-r--r--. 1 0 root 898 Oct 13 12:37 passwd</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例2：</strong>使用 <code>mv</code> 命令实现一次移动多个文件,下面将/etc/passwd和/etc/shadow 移动到/tmp目录下.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mv /etc/passwd /etc/shadow /tmp/</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ls -lh /tmp/</span></span><br><span class="line">total 8.0K</span><br><span class="line">-rw-r--r--. 1 0 root 898 Oct 13 12:37 passwd</span><br><span class="line">----------. 1 0 root 714 Oct 13 12:37 shadow</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例3：</strong>使用 <code>mv</code> 命令实现重命名,将当前目录下的lyshark改名为linux.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ls -lh</span></span><br><span class="line">total 0</span><br><span class="line">drwxr-xr-x. 2 root root 6 Nov 13 10:19 lyshark</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># mv lyshark/ linux</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ls -lh</span></span><br><span class="line">total 0</span><br><span class="line">drwxr-xr-x. 2 root root 6 Nov 13 10:19 linux</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆rm-删除文件或目录◆"><a href="#◆rm-删除文件或目录◆" class="headerlink" title="◆rm 删除文件或目录◆"></a>◆rm 删除文件或目录◆</h3><p>rm命令可以删除一个目录中的一个或多个文件或目录,也可以将某个目录及其下属的所有文件及其子目录均删除掉.对于链接文件,只是删除整个链接文件,而原有文件保持不变,使用rm命令要格外小心,因为一旦删除了一个文件,就无法再恢复它,其参数我们会在下面进行说明.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># rm --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ rm [选项] 文件或目录 ]</span><br><span class="line"></span><br><span class="line">        -f              <span class="comment">#不提示警告信息,直接删除</span></span><br><span class="line">        -r              <span class="comment">#递归删除</span></span><br><span class="line">        -i              <span class="comment">#删除前提示</span></span><br><span class="line">        -fr             <span class="comment">#常用搭配</span></span><br></pre></td></tr></table></figure>
+<p><strong>实例1：</strong>使用 <code>rm -fr</code> 命令删除当前目录下的linux目录.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ls</span></span><br><span class="line">linux</span><br><span class="line">[root@localhost ~]<span class="comment"># rm -fr linux/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ls</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>实例2：</strong>使用 <code>rm -fr *</code> 命令使用通配符,删除指定文件夹内的所有文件.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost lyshark]<span class="comment"># ls</span></span><br><span class="line">1  10  2  3  4  5  6  7  8  9</span><br><span class="line"></span><br><span class="line">[root@localhost lyshark]<span class="comment"># rm -fr *</span></span><br><span class="line">[root@localhost lyshark]<span class="comment"># ls</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="◆file-判断文件的类型◆"><a href="#◆file-判断文件的类型◆" class="headerlink" title="◆file 判断文件的类型◆"></a>◆file 判断文件的类型◆</h3><p>file命令用来检测给定文件的类型,file命令对文件的检查分为文件系统、魔法幻数检查和语言检查3个过程,其参数我们会在下面进行说明.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># file --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ file [选项] 文件或目录 ]</span><br><span class="line"></span><br><span class="line">        -b              <span class="comment">#列出辨识结果时,不显示文件名称</span></span><br><span class="line">        -c              <span class="comment">#详细显示指令执行过程</span></span><br><span class="line">        -f 文件名        <span class="comment">#在文件中一次读取并判断格式</span></span><br><span class="line">        -z              <span class="comment">#查询压缩包信息</span></span><br></pre></td></tr></table></figure>
+<p><strong>实例1：</strong>使用 <code>file</code> 命令判断/etc/passwd 和 /bin/bash 文件的格式.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># file /etc/passwd</span></span><br><span class="line">/etc/passwd: ASCII text</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># file /bin/bash</span></span><br><span class="line">/bin/bash: ELF 64-bit LSB executable, x86-64, version 1 (SYSV),</span><br><span class="line">dynamically linked (uses shared libs), <span class="keyword">for</span> GNU/Linux 2.6.32,</span><br><span class="line">BuildID[sha1]=9a57e086388119ecd285c4d5c66823f3f3b68ab5, stripped</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例2：</strong>使用 <code>file -z</code> 命令读取lyshark.tar.gz压缩包文件属性.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ls -lh</span></span><br><span class="line">total 9.4M</span><br><span class="line">-rw-r--r--. 1 root root 9.4M Nov 13 10:51 lyshark.tar.gz</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># file -z lyshark.tar.gz </span></span><br><span class="line">lyshark.tar.gz: POSIX tar archive (GNU) ,</span><br><span class="line">(gzip compressed data, from Unix, last modified: Tue Nov 13 10:51:13 2018)</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例3：</strong>使用 <code>file -f</code> 命令在文件中读取指定行,并依次判断文件.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cat temp </span></span><br><span class="line">/etc/passwd</span><br><span class="line">/etc/shadow</span><br><span class="line">/bin/bash</span><br><span class="line">/bin/ls</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># file -f temp </span></span><br><span class="line">/etc/passwd: ASCII text</span><br><span class="line">/etc/shadow: ASCII text</span><br><span class="line"></span><br><span class="line">/bin/bash:   ELF 64-bit LSB executable, x86-64, version 1 (SYSV), </span><br><span class="line">dynamically linked (uses shared libs), <span class="keyword">for</span> GNU/Linux 2.6.32, </span><br><span class="line">BuildID[sha1]=9a57e086388119ecd285c4d5c66823f3f3b68ab5, stripped</span><br><span class="line"></span><br><span class="line">/bin/ls:     ELF 64-bit LSB executable, x86-64, version 1 (SYSV), </span><br><span class="line">dynamically linked (uses shared libs), <span class="keyword">for</span> GNU/Linux 2.6.32, </span><br><span class="line">BuildID[sha1]=ec3f3e5e8160c9917e8a4b896fe9044748472991, stripped</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆stat-查询文件状态◆"><a href="#◆stat-查询文件状态◆" class="headerlink" title="◆stat 查询文件状态◆"></a>◆stat 查询文件状态◆</h3><p>stat命令用于显示文件的状态信息,stat命令的输出信息比ls命令的输出信息要更详细,其参数我们会在下面进行说明.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># stat --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ <span class="built_in">stat</span> [选项] 文件或目录 ]</span><br><span class="line"></span><br><span class="line">        -L              <span class="comment">#支持符号连接</span></span><br><span class="line">        -f              <span class="comment">#显示文件系统状态而非文件状态</span></span><br><span class="line">        -t              <span class="comment">#以简洁方式输出信息</span></span><br></pre></td></tr></table></figure>
+<p><strong>实例1：</strong>使用 <code>stat</code> 命令查询/bin/bash和/etc/passwd的相信信息.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># stat /bin/bash</span></span><br><span class="line">  File: ‘/bin/bash’</span><br><span class="line">  Size: 964544    	Blocks: 1888       IO Block: 4096   regular file</span><br><span class="line">Device: fd00h/64768d	Inode: 50340311    Links: 1</span><br><span class="line">Access: (0755/-rwxr-xr-x)  Uid: (    0/    root)   Gid: (    0/    root)</span><br><span class="line">Context: system_u:object_r:shell_exec_t:s0</span><br><span class="line">Access: 2018-11-13 09:33:12.197999579 -0500</span><br><span class="line">Modify: 2017-09-26 09:14:20.000000000 -0400</span><br><span class="line">Change: 2018-10-13 12:32:43.377997461 -0400</span><br><span class="line"> Birth: -</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># stat /etc/passwd</span></span><br><span class="line">  File: ‘/etc/passwd’</span><br><span class="line">  Size: 898       	Blocks: 8          IO Block: 4096   regular file</span><br><span class="line">Device: fd00h/64768d	Inode: 17175992    Links: 1</span><br><span class="line">Access: (0644/-rw-r--r--)  Uid: (    0/    root)   Gid: (    0/    root)</span><br><span class="line">Context: system_u:object_r:passwd_file_t:s0</span><br><span class="line">Access: 2018-11-13 10:19:51.777111271 -0500</span><br><span class="line">Modify: 2018-10-13 12:37:59.147984612 -0400</span><br><span class="line">Change: 2018-11-13 10:19:05.849114152 -0500</span><br><span class="line"> Birth: -</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例2：</strong>使用 <code>stat -f</code> 命令显示系统的状态信息.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># stat -f /bin/bash</span></span><br><span class="line">  File: <span class="string">"/bin/bash"</span></span><br><span class="line">    ID: fd0000000000 Namelen: 255     Type: xfs</span><br><span class="line">Block size: 4096       Fundamental block size: 4096</span><br><span class="line">Blocks: Total: 4452864    Free: 4155020    Available: 4155020</span><br><span class="line">Inodes: Total: 8910848    Free: 8877953</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆ln-创建链接文件◆"><a href="#◆ln-创建链接文件◆" class="headerlink" title="◆ln 创建链接文件◆"></a>◆ln 创建链接文件◆</h3><p>ln命令用来为文件创件连接,连接类型分为硬连接和符号连接两种,默认的连接类型是硬连接,如果要创建符号连接必须使用”-s”选项,符号链接文件不是一个独立的文件,它的许多属性依赖于源文件,所以给符号链接文件设置存取权限是没有意义的,其参数我们会在下面进行说明.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ln --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ <span class="built_in">stat</span> [选项] 文件或目录 ]</span><br><span class="line"></span><br><span class="line">        -L              <span class="comment">#支持符号连接</span></span><br><span class="line">        -d              <span class="comment">#建立目录的硬链接</span></span><br><span class="line">        -f              <span class="comment">#强制建立链接</span></span><br><span class="line">        -i              <span class="comment">#覆盖前询问</span></span><br><span class="line">        -s              <span class="comment">#建立一个软链接</span></span><br></pre></td></tr></table></figure>
+<p><strong>实例1：</strong>使用 <code>ln</code> 命令建立一个硬链接.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ls -lhi</span></span><br><span class="line">total 944K</span><br><span class="line">33844798 -rwxr-xr-x. 1 root root 942K Sep 26  2017 bash</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ln bash bash_ln</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ls -lhi</span></span><br><span class="line">total 1.9M</span><br><span class="line">33844798 -rwxr-xr-x. 2 root root 942K Sep 26  2017 bash</span><br><span class="line">33844798 -rwxr-xr-x. 2 root root 942K Sep 26  2017 bash_ln</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例2：</strong>使用 <code>ln -s</code> 命令建立一个软链接.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ls -lhi</span></span><br><span class="line">total 944K</span><br><span class="line">33844798 -rwxr-xr-x. 1 root root 942K Sep 26  2017 bash</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ln -s bash bash_link</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ls -lhi</span></span><br><span class="line">total 944K</span><br><span class="line">33844798 -rwxr-xr-x. 1 root root 942K Sep 26  2017 bash</span><br><span class="line">33959316 lrwxrwxrwx. 1 root root    4 Nov 13 11:06 bash_link -&gt; bash</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="文件内容查阅命令"><a href="#文件内容查阅命令" class="headerlink" title="文件内容查阅命令"></a>文件内容查阅命令</h2><p>如果我们要查阅一个文件的内容时,这里有相当多有趣的命令可以来分享一下,最常使用的显示文件内容的命令可以说是 cat 与 more 及 less 了,此外如果我们要查看一个很大型的文件(好几百MB时),但是我们只需要后端的几行字而已,此时我们可以使用tail命令查看后面的行,当然是用tac命令也可以达到相应效果,下面开始说说各个命令的用途吧.</p>
+<h3 id="◆cat-文本打印命令◆"><a href="#◆cat-文本打印命令◆" class="headerlink" title="◆cat 文本打印命令◆"></a>◆cat 文本打印命令◆</h3><p>cat命令连接文件并打印到标准输出设备上,cat经常用来显示文件的内容,当文件较大时,文本在屏幕上迅速闪过(滚屏),用户往往看不清所显示的内容,为了控制滚屏,可以按Ctrl+S键停止滚屏,按Ctrl+Q键可以恢复滚屏,按Ctrl+C(中断)键可以终止该命令的执行,并且返回Shell提示符状态,其参数我们会在下面进行说明.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cat --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ cat [选项] 文件名 ]</span><br><span class="line"></span><br><span class="line">        -b              <span class="comment">#列出行号,空白行不标号</span></span><br><span class="line">        -E              <span class="comment">#将结尾段行符$显示出来</span></span><br><span class="line">        -T              <span class="comment">#将Tab键以^I显示出来</span></span><br><span class="line">        -n              <span class="comment">#打印出行号</span></span><br></pre></td></tr></table></figure>
+<p><strong>实例1：</strong>使用 <code>cat -n</code> 命令给指定文本标号并打印.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cat -n /etc/passwd</span></span><br><span class="line">     1	root:x:0:0:root:/root:/bin/bash</span><br><span class="line">     2	bin:x:1:1:bin:/bin:/sbin/nologin</span><br><span class="line">     3	daemon:x:2:2:daemon:/sbin:/sbin/nologin</span><br><span class="line">     4	adm:x:3:4:adm:/var/adm:/sbin/nologin</span><br><span class="line">     5	lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin</span><br><span class="line">     6	sync:x:5:0:sync:/sbin:/bin/sync</span><br><span class="line">....省略....</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例2：</strong>使用 <code>cat -E</code> 命令显示文本结束符$.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cat -E /etc/passwd</span></span><br><span class="line">root:x:0:0:root:/root:/bin/bash$</span><br><span class="line">bin:x:1:1:bin:/bin:/sbin/nologin$</span><br><span class="line">daemon:x:2:2:daemon:/sbin:/sbin/nologin$</span><br><span class="line">adm:x:3:4:adm:/var/adm:/sbin/nologin$</span><br><span class="line">lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin$</span><br><span class="line">sync:x:5:0:sync:/sbin:/bin/sync$</span><br><span class="line">shutdown:x:6:0:shutdown:/sbin:/sbin/shutdown$</span><br><span class="line">....省略....</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆head-显示开头文本◆"><a href="#◆head-显示开头文本◆" class="headerlink" title="◆head 显示开头文本◆"></a>◆head 显示开头文本◆</h3><p>head命令用于显示文件的开头的内容,在默认情况下,head命令显示文件的头10行内容,其参数我们会在下面进行说明.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># head --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ head [选项] 文件名 ]</span><br><span class="line"></span><br><span class="line">        -c 10           <span class="comment">#显示前10个字符</span></span><br><span class="line">        -n 10           <span class="comment">#显示前10行</span></span><br><span class="line">        -v              <span class="comment">#总是显示文件名的头信息</span></span><br><span class="line">        -q              <span class="comment">#不显示文件名的头信息</span></span><br></pre></td></tr></table></figure>
+<p><strong>实例1：</strong>使用 <code>head -c</code> 命令显示文本的前20个字符.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># head -c 20 /etc/passwd</span></span><br><span class="line">root:x:0:0:root:/roo</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment">#</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>实例2：</strong>使用 <code>head -n</code> 命令显示文本前3行.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># head -n 3 /etc/passwd</span></span><br><span class="line">root:x:0:0:root:/root:/bin/bash</span><br><span class="line">bin:x:1:1:bin:/bin:/sbin/nologin</span><br><span class="line">daemon:x:2:2:daemon:/sbin:/sbin/nologin</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆tail-显示结尾文本◆"><a href="#◆tail-显示结尾文本◆" class="headerlink" title="◆tail 显示结尾文本◆"></a>◆tail 显示结尾文本◆</h3><p>tail命令用于输入文件中的尾部内容,tail命令默认在屏幕上显示指定文件的末尾10行,如果给定的文件不止一个,则在显示的每个文件前面加一个文件名标题,如果没有指定文件或者文件名为”-“,则读取标准输入,如果表示字节或行数的N值之前有一个”+”号,则从文件开头的第N项开始显示,而不是显示文件的最后N项.N值后面可以有后缀：b表示512,k表示1024,m表示1048576(1M),其参数我们会在下面进行说明.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># tail --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ tail [选项] 文件名 ]</span><br><span class="line"></span><br><span class="line">        -c 10           <span class="comment">#显示后10个字符</span></span><br><span class="line">        -n 10           <span class="comment">#显示文件后10行</span></span><br><span class="line">        -f              <span class="comment">#持续监测文件后面的变化</span></span><br><span class="line">        --pid=PID       <span class="comment">#与-f合用,表示在进程ID,死掉之后结束</span></span><br></pre></td></tr></table></figure>
+<p><strong>实例1：</strong>使用 <code>tail -n</code> 命令显示文本后3行.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># tail -n 3 /etc/passwd</span></span><br><span class="line">postfix:x:89:89::/var/spool/postfix:/sbin/nologin</span><br><span class="line">chrony:x:998:996::/var/lib/chrony:/sbin/nologin</span><br><span class="line">lyshark:x:1000:1000:lyshark:/home/lyshark:/bin/bash</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例2：</strong>使用 <code>tail -f</code> 命令动态监控一个文件.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># tail -f /var/log/messages </span></span><br><span class="line">Nov 13 10:01:01 localhost systemd: Starting Session 3 of user root.</span><br><span class="line">Nov 13 10:10:54 localhost kernel: e1000: ens32 NIC Link is Down</span><br><span class="line">Nov 13 10:10:58 localhost kernel: e1000: ens32 NIC Link is Up </span><br><span class="line">Nov 13 10:10:58 localhost NetworkManager[772]: &lt;info&gt;  </span><br><span class="line">....省略....</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例3：</strong>使用 <code>tail --pid=PID</code> 命令监视一个进程.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ps</span></span><br><span class="line">   PID TTY          TIME CMD</span><br><span class="line">  1404 pts/0    00:00:00 bash</span><br><span class="line"> 11441 pts/0    00:00:00 ps</span><br><span class="line">[root@localhost ~]<span class="comment"># </span></span><br><span class="line">[root@localhost ~]<span class="comment"># tail --pid=1401</span></span><br><span class="line">tail: warning: PID ignored; --pid=PID is useful only when following</span><br><span class="line">....省略....</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例4：</strong>使用 <code>tail -n +5</code> 命令从第五行以后开始打印.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># tail -n +5 /etc/passwd</span></span><br><span class="line">lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin</span><br><span class="line">sync:x:5:0:sync:/sbin:/bin/sync</span><br><span class="line">shutdown:x:6:0:shutdown:/sbin:/sbin/shutdown</span><br><span class="line">halt:x:7:0:halt:/sbin:/sbin/halt</span><br><span class="line">mail:x:8:12:mail:/var/spool/mail:/sbin/nologin</span><br><span class="line">operator:x:11:0:operator:/root:/sbin/nologin</span><br><span class="line">....省略....</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例5：</strong>使用 <code>tail -n +5 | head -n 3</code> 命令从第五行开始打印,向下打印2行内容.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># tail -n +5 /etc/passwd |head -n 3</span></span><br><span class="line">lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin</span><br><span class="line">sync:x:5:0:sync:/sbin:/bin/sync</span><br><span class="line">shutdown:x:6:0:shutdown:/sbin:/sbin/shutdown</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆nl-指定格式输出文本◆"><a href="#◆nl-指定格式输出文本◆" class="headerlink" title="◆nl 指定格式输出文本◆"></a>◆nl 指定格式输出文本◆</h3><p>nl命令读取file参数(缺省情况下标准输入),计算输入中的行号,将计算过的行号写入标准输出.在输出中,nl命令根据您在命令行中指定的标志来计算左边的行,输入文本必须写在逻辑页中,每个逻辑页有头、主体和页脚节(可以有空节),除非使用-p选项,nl命令在每个逻辑页开始的地方重新设置行号.可以单独为头、主体和页脚节设置行计算标志其默认的结果与cat -n有点不太一样,nl可以将行号做比较多的显示设计,包括位数与是否自动补齐0等等的功能,其参数我们会在下面进行说明.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># nl --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ nl [选项] 文件名 ]</span><br><span class="line"></span><br><span class="line">        -c 10           <span class="comment">#显示后10个字符</span></span><br><span class="line">        -b a            <span class="comment">#列出行号,包括空格(类似 cat -n)</span></span><br><span class="line">        -b t            <span class="comment">#列出行号,不包括空格(类似 cat -n)</span></span><br><span class="line">        -n ln           <span class="comment">#行号显示在最左边</span></span><br><span class="line">        -n rn           <span class="comment">#行号显示在最右边</span></span><br><span class="line">        -n rz           <span class="comment">#行号显示在最右边,并加0补齐</span></span><br><span class="line">        -w              <span class="comment">#指定补齐0的个数</span></span><br></pre></td></tr></table></figure>
+<p><strong>实例1：</strong>使用 <code>nl -b a</code> 命令给文本标号打印(类似于cat -n).<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># nl -b a /etc/passwd</span></span><br><span class="line">     1	root:x:0:0:root:/root:/bin/bash</span><br><span class="line">     2	bin:x:1:1:bin:/bin:/sbin/nologin</span><br><span class="line">     3	daemon:x:2:2:daemon:/sbin:/sbin/nologin</span><br><span class="line">     4	adm:x:3:4:adm:/var/adm:/sbin/nologin</span><br><span class="line">     5	lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin</span><br><span class="line">     6	sync:x:5:0:sync:/sbin:/bin/sync</span><br><span class="line">....省略....</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例2：</strong>使用 <code>nl -b a -n rz</code> 命令列出文本并给予编号,空格0填充.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># nl -b a -n rz /etc/passwd</span></span><br><span class="line">000001	root:x:0:0:root:/root:/bin/bash</span><br><span class="line">000002	bin:x:1:1:bin:/bin:/sbin/nologin</span><br><span class="line">000003	daemon:x:2:2:daemon:/sbin:/sbin/nologin</span><br><span class="line">000004	adm:x:3:4:adm:/var/adm:/sbin/nologin</span><br><span class="line">000005	lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin</span><br><span class="line">....省略....</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例3：</strong>使用 <code>nl -b a -n rz -w 3</code> 命令列出文本并给予编号,编号填充2行0.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># nl -b a -n rz -w 3 /etc/passwd</span></span><br><span class="line">001	root:x:0:0:root:/root:/bin/bash</span><br><span class="line">002	bin:x:1:1:bin:/bin:/sbin/nologin</span><br><span class="line">003	daemon:x:2:2:daemon:/sbin:/sbin/nologin</span><br><span class="line">004	adm:x:3:4:adm:/var/adm:/sbin/nologin</span><br><span class="line">005	lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin</span><br><span class="line">....省略....</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆od-非纯文本文件打印◆"><a href="#◆od-非纯文本文件打印◆" class="headerlink" title="◆od 非纯文本文件打印◆"></a>◆od 非纯文本文件打印◆</h3><p>od命令用于输出文件的八进制、十六进制或其它格式编码的字节,通常用于显示或查看文件中不能直接显示在终端的字符,常见的文件为文本文件和二进制文件,此命令主要用来查看保存在二进制文件中的值,其参数我们会在下面进行说明.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># od --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ od [选项] 文件名 ]</span><br><span class="line"></span><br><span class="line">        -t a            <span class="comment">#利用默认字符来输出</span></span><br><span class="line">        -t c            <span class="comment">#使用ASCII字符输出</span></span><br><span class="line">        -t d            <span class="comment">#使用十进制输出</span></span><br><span class="line">        -t f            <span class="comment">#使用浮点数输出</span></span><br><span class="line">        -t o            <span class="comment">#使用八进制输出</span></span><br><span class="line">        -t x            <span class="comment">#使用十六进制输出</span></span><br></pre></td></tr></table></figure>
+<p><strong>实例3：</strong>使用 <code>od -t a</code> 命令使用默认格式输出.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># od -t a /bin/cd </span></span><br><span class="line">0000000   <span class="comment">#   !   /   b   i   n   /   s   h  nl   b   u   i   l   t   i</span></span><br><span class="line">0000020   n  sp   c   d  sp   <span class="string">"   $   @   "</span>  nl</span><br><span class="line">0000032</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例3：</strong>使用 <code>od -t c</code> 命令使用ASCII输出.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># od -t c /bin/cd </span></span><br><span class="line">0000000   <span class="comment">#   !   /   b   i   n   /   s   h  \n   b   u   i   l   t   i</span></span><br><span class="line">0000020   n       c   d       <span class="string">"   $   @   "</span>  \n</span><br><span class="line">0000032</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆more-翻页浏览文本◆"><a href="#◆more-翻页浏览文本◆" class="headerlink" title="◆more 翻页浏览文本◆"></a>◆more 翻页浏览文本◆</h3><p>more命令是一个基于vi编辑器文本过滤器,它以全屏幕的方式按页显示文本文件的内容,支持vi中的关键字定位操作,more名单中内置了若干快捷键,常用的有H(获得帮助信息),Enter(向下翻滚一行),空格(向下滚动一屏),Q(退出命令),其参数我们会在下面进行说明.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># more --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ more 文件名 ]</span><br><span class="line"></span><br><span class="line">        空格            <span class="comment">#像下翻一页</span></span><br><span class="line">        B               <span class="comment">#向上翻一页</span></span><br><span class="line">        Enter           <span class="comment">#向下滚动一行</span></span><br><span class="line">        /字符串          <span class="comment">#向下查找字符串</span></span><br><span class="line">        :f              <span class="comment">#立即显示行号</span></span><br><span class="line">        q或Q            <span class="comment">#退出</span></span><br></pre></td></tr></table></figure>
+<p><strong>实例1：</strong>使用 <code>more</code> 命令打开一个文本.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># more /var/log/messages </span></span><br><span class="line">Oct 13 12:39:15 localhost journal: Runtime journal is using 6.0M (max allowed 48.7M, tryi</span><br><span class="line">ng to leave 73.0M free of 481.1M available → current <span class="built_in">limit</span> 48.7M).</span><br><span class="line">Oct 13 12:39:15 localhost kernel: Initializing cgroup subsys cpuset</span><br><span class="line">Oct 13 12:39:15 localhost kernel: Initializing cgroup subsys cpu</span><br><span class="line">Oct 13 12:39:15 localhost kernel: Initializing cgroup subsys cpuacct</span><br><span class="line">Oct 13 12:39:15 localhost kernel: Linux version 3.10.0-862.el7.x86_64 (mockbuild@x86-034.</span><br><span class="line">build.eng.bos.redhat.com) (gcc version 4.8.5 20150623 (Red Hat 4.8.5-28) (GCC) ) <span class="comment">#1 SMP W</span></span><br><span class="line"></span><br><span class="line">--More--(0%)</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆less-可控翻页浏览◆"><a href="#◆less-可控翻页浏览◆" class="headerlink" title="◆less 可控翻页浏览◆"></a>◆less 可控翻页浏览◆</h3><p>less命令的作用与more十分相似,都可以用来浏览文字档案的内容,不同的是less命令允许用户向前或向后浏览文件,而more命令只能向前浏览.用less命令显示文件时,用PageUp键向上翻页,用PageDown键向下翻页,要退出less程序,应按Q键,其参数我们会在下面进行说明.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># less --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ less [选项] 文件名 ]</span><br><span class="line"></span><br><span class="line">        -e              <span class="comment">#文件显示完成后自动退出</span></span><br><span class="line">        -f              <span class="comment">#强制显示文件</span></span><br><span class="line">        -l              <span class="comment">#搜索时忽略大小写的差异</span></span><br><span class="line">        -N              <span class="comment">#每一行行首显示行号</span></span><br><span class="line"></span><br><span class="line">        空格             <span class="comment">#向下翻动一页</span></span><br><span class="line">        [pageup]        <span class="comment">#向上翻动一页</span></span><br><span class="line">        /字符串          <span class="comment">#向下查找字符串</span></span><br><span class="line">        ?字符串          <span class="comment">#向上查找字符串</span></span><br><span class="line">        q               <span class="comment">#退出</span></span><br></pre></td></tr></table></figure>
+<p><strong>实例1：</strong>使用 <code>less</code> 命令打开一个文本.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># less -e /var/log/messages</span></span><br><span class="line"></span><br><span class="line">Oct 13 12:39:15 localhost journal: Runtime journal is using 6.0M (max allowed 48.7M, tryi</span><br><span class="line">ng to leave 73.0M free of 481.1M available → current <span class="built_in">limit</span> 48.7M).</span><br><span class="line">Oct 13 12:39:15 localhost kernel: Initializing cgroup subsys cpuset</span><br><span class="line">Oct 13 12:39:15 localhost kernel: Initializing cgroup subsys cpu</span><br><span class="line">Oct 13 12:39:15 localhost kernel: Initializing cgroup subsys cpuacct</span><br><span class="line">Oct 13 12:39:15 localhost kernel: Linux version 3.10.0-862.el7.x86_64 (mockbuild@x86-034.</span><br><span class="line">build.eng.bos.redhat.com) (gcc version 4.8.5 20150623 (Red Hat 4.8.5-28) (GCC) ) <span class="comment">#1 SMP W</span></span><br><span class="line"></span><br><span class="line">/var/<span class="built_in">log</span>/messages</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="命令与文件的查找"><a href="#命令与文件的查找" class="headerlink" title="命令与文件的查找"></a>命令与文件的查找</h2><p>文件的搜寻可就厉害了,因为我们常常需要知道那个文件放在哪里,才能够对该文件进行一些修改或维护等动作,有些时候某些软件配置档的档名是不变的,但是各Linux发行版,放置的目录则不同.此时就得要利用一些搜寻命令将该配置档的完整档名捉出来,这样才能修改嘛.下面我们将介绍这些常用查找命令.</p>
+<h3 id="◆which-查命令绝对路径◆"><a href="#◆which-查命令绝对路径◆" class="headerlink" title="◆which 查命令绝对路径◆"></a>◆which 查命令绝对路径◆</h3><p>which命令用于查找并显示给定命令的绝对路径,环境变量PATH中保存了查找命令时需要遍历的目录,which指令会在环境变量$PATH设置的目录里查找符合条件的文件,也就是说,使用which命令,就可以看到某个系统命令是否存在,以及执行的到底是哪一个位置的命令,其参数我们会在下面进行说明.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># which --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ <span class="built_in">which</span> [选项] 命令名 ]</span><br><span class="line"></span><br><span class="line">        -n 长度      <span class="comment">#指定文件名长度</span></span><br><span class="line">        -p 长度      <span class="comment">#指定文件名长度</span></span><br><span class="line">        -w          <span class="comment">#指定输出时栏位的宽度</span></span><br></pre></td></tr></table></figure>
+<p><strong>实例1：</strong>使用 <code>which</code> 命令查看一个命令是在那个目录里.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># which bash</span></span><br><span class="line">/usr/bin/bash</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># which ls</span></span><br><span class="line"><span class="built_in">alias</span> ls=<span class="string">'ls --color=auto'</span></span><br><span class="line">	/usr/bin/ls</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆whereis-寻找特定文件◆"><a href="#◆whereis-寻找特定文件◆" class="headerlink" title="◆whereis 寻找特定文件◆"></a>◆whereis 寻找特定文件◆</h3><p>whereis命令用来定位指令的二进制程序、源代码文件和man手册页等相关文件的路径,该命令只能用于程序名的搜索,而且只搜索二进制文件(参数-b)、man说明文件(参数-m)和源代码文件(参数-s),如果省略参数,则返回所有信息,其参数我们会在下面进行说明.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># whereis --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ whereis [选项] 文件名 ]</span><br><span class="line"></span><br><span class="line">        -b              <span class="comment">#只找二进制文件</span></span><br><span class="line">        -m              <span class="comment">#只找man文档</span></span><br><span class="line">        -s              <span class="comment">#只找源代码</span></span><br></pre></td></tr></table></figure>
+<p><strong>实例1：</strong>使用 <code>where -b</code> 命令只找二进制文件.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># whereis -b ifconfig</span></span><br><span class="line">ifconfig: /usr/sbin/ifconfig</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># whereis -m ifconfig</span></span><br><span class="line">ifconfig: /usr/share/man/man8/ifconfig.8.gz</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆locate-缓存查找文件◆"><a href="#◆locate-缓存查找文件◆" class="headerlink" title="◆locate 缓存查找文件◆"></a>◆locate 缓存查找文件◆</h3><p>locate命令其实是find -name的另一种写法,但是要比后者快得多,原因在于它不搜索具体目录,而是搜索一个数据库/var/lib/mlocatedb,这个数据库中含有本地所有文件信息,Linux系统自动创建这个数据库,并且每天自动更新一次,所以使用locate命令查不到最新变动过的文件,为了避免这种情况,可以在使用locate之前,先使用updatedb命令,,手动更新数据库,updatedb命令会根据/etc/updatedb.conf来更新文件,其参数我们会在下面进行说明.</p>
+<p>注意：这里需要注意的是,locate这个命令默认是不安装的,我们可以执行 <code>yum install -y mlocate</code> 来安装它.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># locate --help</span></span><br><span class="line"></span><br><span class="line">语法格式：[ locate [选项] 文件名 ]</span><br><span class="line"></span><br><span class="line">        -d 目录        <span class="comment">#指定数据库所在的目录</span></span><br><span class="line">        -i             <span class="comment">#忽略大小写差异</span></span><br><span class="line">        -r             <span class="comment">#后面接正则表达式</span></span><br></pre></td></tr></table></figure>
+<p><strong>实例1：</strong>使用 <code>locate</code> 命令查询一个文件.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># updatedb </span></span><br><span class="line">[root@localhost ~]<span class="comment"># locate /etc/passwd</span></span><br><span class="line">/etc/passwd</span><br><span class="line">/etc/passwd-</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆find-遍历文件查找◆"><a href="#◆find-遍历文件查找◆" class="headerlink" title="◆find 遍历文件查找◆"></a>◆find 遍历文件查找◆</h3><h4 id="name-按文件名查找"><a href="#name-按文件名查找" class="headerlink" title="-name 按文件名查找"></a>-name 按文件名查找</h4><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">常用查询通配符</span><br><span class="line"></span><br><span class="line">\*     <span class="comment">#匹配任意一个或多个字符</span></span><br><span class="line">？     <span class="comment">#匹配任意一个字符</span></span><br><span class="line">[]     <span class="comment">#指定范围,外侧加引号</span></span><br></pre></td></tr></table></figure>
+<p><strong>实例1：</strong>查找/var/目录下,以.log结尾的文件.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># find /var/ -name "*.log"</span></span><br><span class="line">/var/<span class="built_in">log</span>/tuned/tuned.log</span><br><span class="line">/var/<span class="built_in">log</span>/audit/audit.log</span><br><span class="line">/var/<span class="built_in">log</span>/anaconda/X.log</span><br><span class="line">/var/<span class="built_in">log</span>/anaconda/program.log</span><br><span class="line">....省略....</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例2：</strong>查找/root/目录下,以[1-3之间],结尾是.txt的文件<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ls</span></span><br><span class="line">1.txt  2.txt  3.txt  Catalog  File</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># find /root/ -name "[1-3].txt"</span></span><br><span class="line">/root/1.txt</span><br><span class="line">/root/2.txt</span><br><span class="line">/root/3.txt</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例3：</strong>查找/etc/目录下,开头是6个任意字符的文件<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># find /etc/ -name "??????"</span></span><br><span class="line">/etc/grub.d</span><br><span class="line">/etc/grub.d/README</span><br><span class="line">/etc/shells</span><br><span class="line">/etc/init.d</span><br><span class="line">....省略....</span><br></pre></td></tr></table></figure></p>
+<h4 id="size-根据大小查找"><a href="#size-根据大小查找" class="headerlink" title="-size 根据大小查找"></a>-size 根据大小查找</h4><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">单位是 block 数据块  一块是512字节</span><br><span class="line"></span><br><span class="line">1M -&gt; 1024k -&gt; 2048 块  (1块是0.5k 也就是512字节)</span><br><span class="line"></span><br><span class="line">100M -&gt; 102400k -&gt; 204800块</span><br></pre></td></tr></table></figure>
+<p><strong>实例1：</strong>查找/etc/目录下,小于10k的文件<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">root@localhost ~]<span class="comment"># find /etc/ -size -10k</span></span><br><span class="line">/etc/crypttab</span><br><span class="line">/etc/.pwd.lock</span><br><span class="line">/etc/environment</span><br><span class="line">....省略....</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例2：</strong>查找/etc/目录下,大于1M的文件<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># find /etc/ -size +1M   #查询大于1M的文件</span></span><br><span class="line">/etc/udev/hwdb.bin</span><br><span class="line">/etc/selinux/targeted/active/policy.kern</span><br><span class="line">/etc/selinux/targeted/contexts/files/file_contexts.bin</span><br><span class="line">/etc/selinux/targeted/policy/policy.31</span><br><span class="line">....省略....</span><br><span class="line"></span><br><span class="line"><span class="comment">#注意：+-号如果没有,是精确到这么大,通常都会带上+或-号表示一个范围.</span></span><br></pre></td></tr></table></figure></p>
+<h4 id="user-根据属主查找"><a href="#user-根据属主查找" class="headerlink" title="-user 根据属主查找"></a>-user 根据属主查找</h4><p><strong>实例1：</strong>在/root目录中查找属于wang用户的文件<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># find /root/ -user wang</span></span><br><span class="line">/root/1.txt</span><br><span class="line">/root/2.txt</span><br><span class="line">/root/3.txt</span><br><span class="line"><span class="comment">#注意：系统中要存在该用户,否则会报错误.</span></span><br></pre></td></tr></table></figure></p>
+<h4 id="perm-根据权限查找"><a href="#perm-根据权限查找" class="headerlink" title="-perm 根据权限查找"></a>-perm 根据权限查找</h4><p><strong>实例1：</strong>查找/boot/目录中权限是644的文件<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># find /boot/ -perm 0644</span></span><br><span class="line">/boot/grub2/device.map</span><br><span class="line">/boot/grub2/i386-pc/gcry_rmd160.mod</span><br><span class="line">/boot/grub2/i386-pc/acpi.mod</span><br><span class="line">/boot/grub2/i386-pc/gcry_rsa.mod</span><br><span class="line">....省略....</span><br></pre></td></tr></table></figure></p>
+<h4 id="type-根据类型查找"><a href="#type-根据类型查找" class="headerlink" title="-type 根据类型查找"></a>-type 根据类型查找</h4><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">-<span class="built_in">type</span> f 二进制文件（普通文件）</span><br><span class="line">-<span class="built_in">type</span> l 软链接文件</span><br><span class="line">-<span class="built_in">type</span> d 目录</span><br></pre></td></tr></table></figure>
+<p><strong>实例1：</strong>查找/usr/bin/目录下,类型是二进制文件.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># find /usr/bin/ -type f</span></span><br><span class="line">/usr/bin/cp</span><br><span class="line">/usr/bin/gzip</span><br><span class="line">/usr/bin/<span class="built_in">alias</span></span><br><span class="line">/usr/bin/csplit</span><br><span class="line">/usr/bin/bash</span><br><span class="line">....省略....</span><br></pre></td></tr></table></figure></p>
+<h4 id="time-按时间查找"><a href="#time-按时间查找" class="headerlink" title="-time 按时间查找"></a>-time 按时间查找</h4><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">按天数   ctime  atime  mtime</span><br><span class="line">按分钟   cmin   amin     mmin</span><br><span class="line"></span><br><span class="line">  c  change   <span class="comment">#表示属性被修改过：所有者、所属组、权限</span></span><br><span class="line">  a  access   <span class="comment">#被访问过(被查看过)</span></span><br><span class="line">  m  modify   <span class="comment">#表示内容被修改过</span></span><br></pre></td></tr></table></figure>
+<p><strong>实例1：</strong>查找/etc/目录下,在120分钟以内,内容被修改过的文件<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># find /etc/ -mmin -120</span></span><br><span class="line">/etc/</span><br><span class="line">/etc/resolv.conf</span><br><span class="line">/etc/group-</span><br><span class="line">/etc/gshadow-</span><br><span class="line">/etc/group</span><br><span class="line">/etc/gshadow</span><br><span class="line">....省略....</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例2：</strong>查找/etc/目录下,在7天之前,属性被修改过的文件<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># find /etc/ -ctime +7</span></span><br><span class="line">/etc/resolv.conf</span><br><span class="line">/etc/group-</span><br><span class="line">/etc/gshadow-</span><br><span class="line">....省略....</span><br></pre></td></tr></table></figure></p>
+<h4 id="inum-根据i节点查询"><a href="#inum-根据i节点查询" class="headerlink" title="-inum 根据i节点查询"></a>-inum 根据i节点查询</h4><p><strong>实例1：</strong>有一些文件的硬链接数量很多，有相同的i节点，查找其中一个文件的i节点号，一次性删除。<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># find ./ -inum 1024 -exec rm&#123;&#125; \;   #删除相同I节点的数据</span></span><br></pre></td></tr></table></figure></p>
+<h4 id="and-or-逻辑连接符"><a href="#and-or-逻辑连接符" class="headerlink" title="-and or 逻辑连接符"></a>-and or 逻辑连接符</h4><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">-a    （and 逻辑与）     </span><br><span class="line">-o    （or  逻辑或)</span><br></pre></td></tr></table></figure>
+<p><strong>实例1：</strong>在/etc/目录下,查找大于1k,并且小于10k的文件<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># find /etc/ -size +1k -a -size -10k</span></span><br><span class="line">/etc/</span><br><span class="line">/etc/grub.d/00_header</span><br><span class="line">/etc/grub.d/20_ppc_terminfo</span><br><span class="line">/etc/grub.d/00_tuned</span><br><span class="line">/etc/rc.d/init.d/README</span><br><span class="line">/etc/rc.d/init.d/netconsole</span><br><span class="line">/etc/rc.d/init.d/network</span><br><span class="line">/etc/pam.d</span><br><span class="line">....省略....</span><br></pre></td></tr></table></figure></p>
+<h4 id="exec-命令执行连接符"><a href="#exec-命令执行连接符" class="headerlink" title="-exec 命令执行连接符"></a>-exec 命令执行连接符</h4><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[查询格式] find  ...  -<span class="built_in">exec</span> 命令 &#123;&#125;  \;</span><br><span class="line"></span><br><span class="line">&#123;&#125;        <span class="comment">#表示find查询的结果集</span></span><br><span class="line">\         <span class="comment">#是转义符,不使用命令别名,直接使用命令本身</span></span><br><span class="line">;         <span class="comment">#分号是表示语句的结束.</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#注意：固定格式,只能这样写.注意中间的空格.</span></span><br><span class="line"></span><br><span class="line">-----------------------------------------------------------------</span><br><span class="line">说明： 转义符的作用是什么？</span><br><span class="line"></span><br><span class="line">在linux中有一个别名机制，如rm删除文件，执行的却是rm -i(用<span class="built_in">which</span> rm 可以查看命令别名)，</span><br><span class="line">使用rm删除文件前会提示，就是因为rm -i这个参数。如果想使用命令原意，可以在加\转义，</span><br><span class="line">如：\rm test.txt   则不会提示，直接删除</span><br></pre></td></tr></table></figure>
+<p><strong>实例1：</strong>查找/var/log/目录下名字以.log结尾的文件,找到后执行 ls -l 显示详细信息.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># find /var/log/ *.log -exec ls -l &#123;&#125; \;</span></span><br><span class="line">total 1176</span><br><span class="line">drwxr-xr-x. 2 root   root      204 Sep 18 09:12 anaconda</span><br><span class="line">drwx------. 2 root   root       23 Sep 18 09:12 audit</span><br><span class="line">-rw-------. 1 root   root    53001 Sep 19 00:57 boot.log</span><br><span class="line">-rw-------. 1 root   utmp      384 Sep 18 09:22 btmp</span><br><span class="line">drwxr-xr-x. 2 chrony chrony      6 Apr 12 13:37 chrony</span><br><span class="line">-rw-------. 1 root   root     3523 Sep 19 01:01 cron</span><br><span class="line">-rw-r--r--  1 root   root   119414 Sep 19 00:57 dmesg</span><br><span class="line">-rw-r--r--  1 root   root   119599 Sep 18 23:35 dmesg.old</span><br><span class="line">-rw-r--r--. 1 root   root     1320 Sep 19 00:23 firewalld</span><br><span class="line">-rw-r--r--. 1 root   root      193 Sep 18 09:05 grubby_prune_debug</span><br><span class="line">....</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例2：</strong>查找/etc/目录下名字以”init*“开头的文件,找到后,只列出文件,过滤掉目录,并执行 ls -l 显示详细信息.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># find /etc/ -name "init*" -a -type f -exec ls -l &#123;&#125; \;</span></span><br><span class="line"></span><br><span class="line">-rw-r--r--. 1 root root 511 Apr 11 01:09 /etc/inittab</span><br><span class="line">-rw-r--r--. 1 root root 798 Apr 11 01:09 /etc/sysconfig/init</span><br><span class="line">-rwxr-xr-x. 1 root root 5419 Jan  2  2018 /etc/sysconfig/network-scripts/init.ipv6-global</span><br><span class="line">-rw-r--r--. 1 root root 30 Apr 11 14:12 /etc/selinux/targeted/contexts/initrc_context</span><br></pre></td></tr></table></figure></p>
+<p><strong>实例3：</strong>查找/tmp/下,的yum.log文件,找到后直接删除.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost tmp]<span class="comment"># find /tmp/ -name yum.log -exec rm &#123;&#125; \;</span></span><br><span class="line">[root@localhost tmp]<span class="comment">#</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>实例4：</strong>查找根下,找关于lyshark用户的所有文件,找到后直接删除.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># find / -user lyshark -exec rm -r &#123;&#125; \;</span></span><br><span class="line"></span><br><span class="line">find: ‘/proc/1465/task/1465/fd/6’: No such file or directory</span><br><span class="line">find: ‘/proc/1465/task/1465/fdinfo/6’: No such file or directory</span><br><span class="line">find: ‘/proc/1465/fd/5’: No such file or directory</span><br><span class="line">find: ‘/proc/1465/fdinfo/5’: No such file or directory</span><br><span class="line">find: ‘/root/Catalog’: No such file or directory</span><br><span class="line">find: ‘/home/lyshark’: No such file or directory</span><br><span class="line"></span><br><span class="line"><span class="comment">#rm -r 连带目录一起删除.报错原因：-exec 不适合大量传输,速率慢导致.</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>实例5：</strong>在根下,查找lyshark用户的文件,找到后删除,删除前会提示是否删除.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># find / -user lyshark -ok rm -r &#123;&#125; \;</span></span><br><span class="line">find: ‘/proc/1777/task/1777/fd/6’: No such file or directory</span><br><span class="line">find: ‘/proc/1777/task/1777/fdinfo/6’: No such file or directory</span><br><span class="line"></span><br><span class="line">&lt; rm ... /root/LyShark &gt; ? y</span><br><span class="line"></span><br><span class="line"><span class="comment"># -ok的使用和-exec是一样的,区别是-ok,执行时会提示你是否进行下一步操作.</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/11/13/Linux 系统管理/Linux系统文件与目录管理-1/">Linux系统文件与目录管理(1)</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年11月13日 - 13:11</p>
+  <p><span>最后更新:</span>2019年04月16日 - 20:04</p>
+  <p><span>原始链接:</span><a href="/2018/11/13/Linux 系统管理/Linux系统文件与目录管理-1/" title="Linux系统文件与目录管理(1)">https://www.mkdirs.com/2018/11/13/Linux 系统管理/Linux系统文件与目录管理-1/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux-系统管理/" rel="tag"> <i class="fa fa-tag"></i> Linux 系统管理</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/13/Linux 服务配置/NFS实现Unix-like文件共享/" rel="next" title="NFS实现Unix-like文件共享">
+                <i class="fa fa-chevron-left"></i> NFS实现Unix-like文件共享
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/11/14/Linux 系统管理/Linux系统VIM编辑器管理-2/" rel="prev" title="Linux系统VIM编辑器管理(2)">
+                Linux系统VIM编辑器管理(2) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#文件与目录的操作"><span class="nav-text">文件与目录的操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆ls-显示目录或文件◆"><span class="nav-text">◆ls 显示目录或文件◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆cd-目录跳转与切换◆"><span class="nav-text">◆cd 目录跳转与切换◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆mkdir-创建新目录◆"><span class="nav-text">◆mkdir 创建新目录◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆touch-创建空文件◆"><span class="nav-text">◆touch 创建空文件◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆cp-复制文件或目录◆"><span class="nav-text">◆cp 复制文件或目录◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆mv-移动文件或目录◆"><span class="nav-text">◆mv 移动文件或目录◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆rm-删除文件或目录◆"><span class="nav-text">◆rm 删除文件或目录◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆file-判断文件的类型◆"><span class="nav-text">◆file 判断文件的类型◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆stat-查询文件状态◆"><span class="nav-text">◆stat 查询文件状态◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆ln-创建链接文件◆"><span class="nav-text">◆ln 创建链接文件◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#文件内容查阅命令"><span class="nav-text">文件内容查阅命令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆cat-文本打印命令◆"><span class="nav-text">◆cat 文本打印命令◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆head-显示开头文本◆"><span class="nav-text">◆head 显示开头文本◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆tail-显示结尾文本◆"><span class="nav-text">◆tail 显示结尾文本◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆nl-指定格式输出文本◆"><span class="nav-text">◆nl 指定格式输出文本◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆od-非纯文本文件打印◆"><span class="nav-text">◆od 非纯文本文件打印◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆more-翻页浏览文本◆"><span class="nav-text">◆more 翻页浏览文本◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆less-可控翻页浏览◆"><span class="nav-text">◆less 可控翻页浏览◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#命令与文件的查找"><span class="nav-text">命令与文件的查找</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆which-查命令绝对路径◆"><span class="nav-text">◆which 查命令绝对路径◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆whereis-寻找特定文件◆"><span class="nav-text">◆whereis 寻找特定文件◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆locate-缓存查找文件◆"><span class="nav-text">◆locate 缓存查找文件◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆find-遍历文件查找◆"><span class="nav-text">◆find 遍历文件查找◆</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#name-按文件名查找"><span class="nav-text">-name 按文件名查找</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#size-根据大小查找"><span class="nav-text">-size 根据大小查找</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#user-根据属主查找"><span class="nav-text">-user 根据属主查找</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#perm-根据权限查找"><span class="nav-text">-perm 根据权限查找</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#type-根据类型查找"><span class="nav-text">-type 根据类型查找</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#time-按时间查找"><span class="nav-text">-time 按时间查找</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#inum-根据i节点查询"><span class="nav-text">-inum 根据i节点查询</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#and-or-逻辑连接符"><span class="nav-text">-and or 逻辑连接符</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#exec-命令执行连接符"><span class="nav-text">-exec 命令执行连接符</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

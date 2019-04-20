@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Ansible是新出现的自动化运维工具,基于Python开发,集合了众多运维工具（puppet、cfengine、chef、func、fabric）的优点,实现了批量系统配置、批量程序部署、批量运行命令等功能,ansible是基于模块工作的,本身没有批量部署的能力,真正具有批量部署的是ansible所运行的模块,ansible只是提供一种框架. Zabbix 是目前最流行的一款企业级别的监控软件,">
+<meta name="keywords" content="Ansible">
+<meta property="og:type" content="article">
+<meta property="og:title" content="通过PlayBook部署Zabbix(6)">
+<meta property="og:url" content="https://www.mkdirs.com/2018/12/03/Ansible/通过PlayBook部署Zabbix-6/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="Ansible是新出现的自动化运维工具,基于Python开发,集合了众多运维工具（puppet、cfengine、chef、func、fabric）的优点,实现了批量系统配置、批量程序部署、批量运行命令等功能,ansible是基于模块工作的,本身没有批量部署的能力,真正具有批量部署的是ansible所运行的模块,ansible只是提供一种框架. Zabbix 是目前最流行的一款企业级别的监控软件,">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-12-09T01:27:14.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="通过PlayBook部署Zabbix(6)">
+<meta name="twitter:description" content="Ansible是新出现的自动化运维工具,基于Python开发,集合了众多运维工具（puppet、cfengine、chef、func、fabric）的优点,实现了批量系统配置、批量程序部署、批量运行命令等功能,ansible是基于模块工作的,本身没有批量部署的能力,真正具有批量部署的是ansible所运行的模块,ansible只是提供一种框架. Zabbix 是目前最流行的一款企业级别的监控软件,">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/12/03/Ansible/通过PlayBook部署Zabbix-6/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>通过PlayBook部署Zabbix(6) | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/12/03/Ansible/通过PlayBook部署Zabbix-6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">通过PlayBook部署Zabbix(6)
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-03 19:33:24" itemprop="dateCreated datePublished" datetime="2018-12-03T19:33:24+08:00">2018-12-03</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-12-09 09:27:14" itemprop="dateModified" datetime="2018-12-09T09:27:14+08:00">2018-12-09</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Ansible/" itemprop="url" rel="index"><span itemprop="name">Ansible</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Ansible是新出现的自动化运维工具,基于Python开发,集合了众多运维工具（puppet、cfengine、chef、func、fabric）的优点,实现了批量系统配置、批量程序部署、批量运行命令等功能,ansible是基于模块工作的,本身没有批量部署的能力,真正具有批量部署的是ansible所运行的模块,ansible只是提供一种框架.</p>
+<p>Zabbix 是目前最流行的一款企业级别的监控软件,它的易用性以及扩展性非常强大,加上自带丰富的 API 功能,使得它儿乎成为每个互联网公司的标配运维组件. Zabbix 的默认架构是 C/S 架构,当然 zabbix 也支持 Proxy 代理,本篇文章将介绍如何使用PlayBook剧本的方式部署Zabbix组件.</p>
+<a id="more"></a>
+<p><br></p>
+<h2 id="编写Linux初始化剧本"><a href="#编写Linux初始化剧本" class="headerlink" title="编写Linux初始化剧本"></a>编写Linux初始化剧本</h2><p>初始化剧本环节,主要用户实现关闭Selinux关闭防火墙,一起配置一下阿里云的YUM源地址,和安装EPEL源,为后期的zabbix安装做好铺垫工作.</p>
+<p>1.在安装Zabbix之前,我们需要创建一些东西,也就是一些初始化工作,首先我们先来同步一下密钥对.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ssh-keygen -t rsa </span></span><br><span class="line">Generating public/private rsa key pair.</span><br><span class="line">Enter file <span class="keyword">in</span> <span class="built_in">which</span> to save the key (/root/.ssh/id_rsa): </span><br><span class="line">Created directory <span class="string">'/root/.ssh'</span>.</span><br><span class="line">Enter passphrase (empty <span class="keyword">for</span> no passphrase): </span><br><span class="line">Enter same passphrase again: </span><br><span class="line">Your identification has been saved <span class="keyword">in</span> /root/.ssh/id_rsa.</span><br><span class="line">Your public key has been saved <span class="keyword">in</span> /root/.ssh/id_rsa.pub.</span><br><span class="line">The key fingerprint is:</span><br><span class="line">SHA256:xZxM9bunwBsS03gGT5HGT4LvOnJHdr5Bwl/Iit7qQN8 root@localhost.localdomain</span><br><span class="line">The keys randomart image is:</span><br><span class="line">+---[RSA 2048]----+</span><br><span class="line">|          .+o.   |</span><br><span class="line">|         =..=o.  |</span><br><span class="line">|          Bo.+.  |</span><br><span class="line">|         . B...o |</span><br><span class="line">|        S +.B = .|</span><br><span class="line">|       . . O+=.o |</span><br><span class="line">|        . ++Eo+ .|</span><br><span class="line">|        .o+o.+.+ |</span><br><span class="line">|         +++o o. |</span><br><span class="line">+----[SHA256]-----+</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ssh-copy-id root@192.168.10.20</span></span><br><span class="line">/usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed: <span class="string">"/root/.ssh/id_rsa.pub"</span></span><br><span class="line">The authenticity of host 192.168.10.20 (192.168.10.20) can t be established.</span><br><span class="line">ECDSA key fingerprint is SHA256:2kWFaV72YVvAl2EU2Zop4uAjP3Gy2jW92d0Va/HrSMM.</span><br><span class="line">ECDSA key fingerprint is MD5:<span class="built_in">fc</span>:6c:91:b0:02:e6:7e:98:52:af:0d:b3:47:d4:69:ef.</span><br><span class="line">Are you sure you want to <span class="built_in">continue</span> connecting (yes/no)? yes</span><br><span class="line">root@192.168.10.20 s password: </span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ssh-copy-id root@192.168.10.30</span></span><br><span class="line">/usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed: <span class="string">"/root/.ssh/id_rsa.pub"</span></span><br><span class="line">The authenticity of host 192.168.10.30 (192.168.10.30) cant be established.</span><br><span class="line">ECDSA key fingerprint is SHA256:2kWFaV72YVvAl2EU2Zop4uAjP3Gy2jW92d0Va/HrSMM.</span><br><span class="line">ECDSA key fingerprint is MD5:<span class="built_in">fc</span>:6c:91:b0:02:e6:7e:98:52:af:0d:b3:47:d4:69:ef.</span><br><span class="line">Are you sure you want to <span class="built_in">continue</span> connecting (yes/no)? yes</span><br><span class="line">root@192.168.10.30<span class="string">'s password:</span></span><br></pre></td></tr></table></figure></p>
+<p>2.其次创建一个目录用于存放剧本中需要用到的数据文件等,如果你有一些配置文件需要拷贝,此时应该放在本目录下方便剧本调用.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mkdir playbook</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd playbook/</span></span><br><span class="line"></span><br><span class="line">[root@localhost playbook]<span class="comment"># ls -lh</span></span><br><span class="line">total 8.0K</span><br><span class="line">-rw-r--r--. 1 root root 30 Dec  3 10:45 hosts</span><br><span class="line">-rw-r--r--. 1 root root 30 Dec  3 10:45 main.yml</span><br></pre></td></tr></table></figure></p>
+<p>3.接着创建一个用户主机列表,这里我们就在当前目录下创建一个Hosts文件即可,如果有很多太主机可以使用简写.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost playbook]<span class="comment"># vim hosts</span></span><br><span class="line">[root@localhost playbook]<span class="comment"># cat hosts </span></span><br><span class="line"></span><br><span class="line">[zabbix_server]</span><br><span class="line">192.168.10.20</span><br><span class="line">192.168.10.30</span><br><span class="line"></span><br><span class="line"><span class="comment">#[test]               #此处注释,只做说明,定义从20-100网段的主机</span></span><br><span class="line"><span class="comment">#192.168.10.2[0:100]</span></span><br></pre></td></tr></table></figure></p>
+<p>4.其次我们开始编写一个剧本,用户给目标主机初始化工作,下面我们来看一下代码片段：<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">---</span><br><span class="line"><span class="comment">#----------------------------------------------------------</span></span><br><span class="line"><span class="comment"># 初始化,关闭防火墙,和SELinux</span></span><br><span class="line"> - hosts: zabbix_server</span><br><span class="line">   tasks:</span><br><span class="line">     - name: off selinux</span><br><span class="line">       shell: setenforce 0</span><br><span class="line">     - name: seline modify enforcing</span><br><span class="line">       lineinfile:</span><br><span class="line">           dest: /etc/selinux/config</span><br><span class="line">           regexp: <span class="string">'^SELINUX='</span></span><br><span class="line">           line: <span class="string">'SELINUX=disabled'</span></span><br><span class="line">     - name: off iptables</span><br><span class="line">       shell: iptables -F</span><br><span class="line">     - name: off iptables</span><br><span class="line">       lineinfile:</span><br><span class="line">           dest: /etc/bashrc</span><br><span class="line">           line: <span class="string">'iptables -F'</span></span><br><span class="line"><span class="comment">#----------------------------------------------------------</span></span><br><span class="line"><span class="comment"># 安装部署LAMP环境,通过YUM模块快速安装</span></span><br><span class="line"> - hosts: zabbix_server</span><br><span class="line">   tasks:</span><br><span class="line">    - name: install LAMP</span><br><span class="line">      yum: name=&#123;&#123;item&#125;&#125; state=installed</span><br><span class="line">      with_items:</span><br><span class="line">          - httpd</span><br><span class="line">          - httpd-devel</span><br><span class="line">          - mariadb</span><br><span class="line">          - mariadb-server</span><br><span class="line">          - php</span><br><span class="line">          - php-mysql</span><br><span class="line">    - name: start httpd</span><br><span class="line">      shell: systemctl restart httpd</span><br><span class="line">    - name: start mariadb</span><br><span class="line">      shell: systemctl restart mariadb</span><br><span class="line"><span class="comment">#----------------------------------------------------------</span></span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>以上片段,有几个关键地方需要说明一下：</p>
+<blockquote>
+<p><code>name: seline modify enforcing</code>这个标签下方,lineinfile语句主要实现了,正则替换的目的,如果在/etc/selinux/config目录下搜索到开头是SELINUX=的字母,则自动替换成SELINUX=disabled<br><code>name: off iptables</code>这个标签下方,lineinfile语句主要实现了,在/etc/bashrc最下面添加一个新字段iptables -F,目的是开机后自动清除防火墙规则.</p>
+</blockquote>
+</blockquote>
+<p>好了,上方的剧本片段就可以实现初始化工作,关闭防火墙等,接着安装LAMP环境.<br><br></p>
+<h2 id="编写Zabbix服务端剧本"><a href="#编写Zabbix服务端剧本" class="headerlink" title="编写Zabbix服务端剧本"></a>编写Zabbix服务端剧本</h2><p>zabbix-Server 安装的 tasks 比较多,因为它涉及数据库的安装以及配置,这里就不介绍了,还有 MySQL 没有使用 Ansible 自带的模块进行 MySQL 数据库和用户的管理,建议编写 task 的时候尽量使用 Ansible 自带的模块进行配置管理,不仅仅是方便使用,而且 Ansible 官方的模块对整个状态管理做得很好.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 下载YUM源地址,更新EPEL源,安装Zabbix</span></span><br><span class="line"> - hosts: zabbix_server</span><br><span class="line">   tasks:</span><br><span class="line">     - name: clear YUM</span><br><span class="line">       shell: rm -fr /etc/yum.repos.d/*</span><br><span class="line">     - name: install YUM EPEL</span><br><span class="line">       get_url: <span class="string">'url=http://mirrors.aliyun.com/repo/Centos-7.repo dest=/etc/yum.repos.d/CentOS-Base.repo'</span></span><br><span class="line">     - name: yum install EPEL</span><br><span class="line">       yum: name=epel-release state=installed</span><br><span class="line">     - name: install zabbix.repo</span><br><span class="line">       shell: rpm -i http://repo.zabbix.com/zabbix/3.4/rhel/7/x86_64/zabbix-release-3.4-2.el7.noarch.rpm</span><br><span class="line">     - name: install zabbix</span><br><span class="line">       yum: name=&#123;&#123;item&#125;&#125; state=installed</span><br><span class="line">       with_items:</span><br><span class="line">           - zabbix-server-mysql</span><br><span class="line">           - zabbix-web-mysql</span><br><span class="line">           - zabbix-agent</span><br><span class="line">     - name: start zabbix-server</span><br><span class="line">       shell: systemctl restart zabbix-server</span><br><span class="line">     - name: start zabbix-agent</span><br><span class="line">       shell: systemctl restart zabbix-agent</span><br><span class="line"><span class="comment">#----------------------------------------------------------</span></span><br><span class="line"><span class="comment"># 安装配置数据库权限,导入zabbix数据库.</span></span><br><span class="line"> - hosts: zabbix_server</span><br><span class="line">   tasks:</span><br><span class="line">     - name: <span class="built_in">set</span> mariadb password</span><br><span class="line">       shell: mysqladmin -u root password <span class="string">'ansible'</span></span><br><span class="line">     - name: create zabbix master databases</span><br><span class="line">       shell: mysql -uroot -pansible -e <span class="string">'create database zabbix character set utf8 collate utf8_bin;'</span></span><br><span class="line">     - name: <span class="built_in">set</span> zabbix master databases grant</span><br><span class="line">       shell: mysql -uroot -pansible -e <span class="string">'grant all privileges on zabbix.* to zabbix@localhost identified by "zabbix";'</span></span><br><span class="line">     - name: import zabbix initial data SQL shell</span><br><span class="line">       shell: zcat /usr/share/doc/zabbix-server-mysql*/create.sql.gz | mysql -uzabbix -pzabbix zabbix</span><br></pre></td></tr></table></figure>
+<p>最后一部分内容,配置Zabbix配置文件,和配置相关的操作,比如PHP的调优等.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment">#----------------------------------------------------------</span></span><br><span class="line"><span class="comment"># 修改并拷贝配置文件,给予权限</span></span><br><span class="line"></span><br><span class="line">---</span><br><span class="line"> - hosts: zabbix_server</span><br><span class="line">   tasks:</span><br><span class="line">     - name: edit zabbix dbhost</span><br><span class="line">       lineinfile:</span><br><span class="line">          dest: /etc/zabbix/zabbix_server.conf</span><br><span class="line">          regexp: <span class="string">'# DBHost=localhost'</span></span><br><span class="line">          line: <span class="string">'DBHost=localhost'</span></span><br><span class="line">     - name: edit zabbix dbpasswd</span><br><span class="line">       lineinfile:</span><br><span class="line">           dest: /etc/zabbix/zabbix_server.conf</span><br><span class="line">           regexp: <span class="string">'# DBPassword='</span></span><br><span class="line">           line: <span class="string">'DBPassword=zabbix'</span></span><br><span class="line">     - name: cp zabbix web</span><br><span class="line">       shell: cp -a /usr/share/zabbix/* /var/www/html/</span><br><span class="line">     - name: chmod web</span><br><span class="line">       shell: chmod 755 -R /var/www/html/*</span><br><span class="line">     - name: chown web</span><br><span class="line">       shell: chown apache.apache -R /var/www/html/*</span><br><span class="line"></span><br><span class="line">     - name: <span class="built_in">set</span> php</span><br><span class="line">       shell: <span class="built_in">echo</span> <span class="string">"date.timezone = Asia/Shanghai"</span> &gt;&gt; /etc/php.ini</span><br><span class="line">     - name: <span class="built_in">set</span> php</span><br><span class="line">       shell: <span class="built_in">echo</span> <span class="string">"max_execution_time = 300"</span> &gt;&gt; /etc/php.ini</span><br><span class="line">     - name: <span class="built_in">set</span> php</span><br><span class="line">       shell: <span class="built_in">echo</span> <span class="string">"max_input_time = 300"</span> &gt;&gt; /etc/php.ini</span><br><span class="line">     - name: <span class="built_in">set</span> php</span><br><span class="line">       shell: <span class="built_in">echo</span> <span class="string">"post_max_size = 32M"</span> &gt;&gt; /etc/php.ini</span><br><span class="line">     - name: <span class="built_in">set</span> php</span><br><span class="line">       shell: <span class="built_in">echo</span> <span class="string">"memory_limit = 128M"</span> &gt;&gt; /etc/php.ini</span><br><span class="line">     - name: <span class="built_in">set</span> php</span><br><span class="line">       shell: <span class="built_in">echo</span> <span class="string">"mbstring.func_overload = 0"</span> &gt;&gt; /etc/php.ini</span><br><span class="line"></span><br><span class="line">     - name: start http mysql zabbix</span><br><span class="line">       shell: systemctl restart httpd ; systemctl restart mariadb </span><br><span class="line">     - name: start http mysql zabbix</span><br><span class="line">       shell: systemctl restart zabbix-server ; systemctl restart zabbix-agent</span><br><span class="line">     - name: enabled http mysql zabbix</span><br><span class="line">       shell: systemctl <span class="built_in">enable</span> httpd ; systemctl <span class="built_in">enable</span> mariadb</span><br><span class="line">     - name: start http mysql zabbix</span><br><span class="line">       shell: systemctl <span class="built_in">enable</span> zabbix-server ; systemctl <span class="built_in">enable</span> zabbix-agent</span><br></pre></td></tr></table></figure></p>
+<p>好了,最后我们把这三块内容整合到一起就是一个完整的剧本啦,这里需要说明的是,本人并没有按照标准化流程来编写剧本,因为如果那样的话看上去反而不容易入门,毕竟生产环境中,下面这些东西相信也足够使用啦.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">---</span><br><span class="line"><span class="comment">#----------------------------------------------------------</span></span><br><span class="line"><span class="comment"># 初始化,关闭防火墙,和SELinux</span></span><br><span class="line"> - hosts: zabbix_server</span><br><span class="line">   tasks:</span><br><span class="line">     - name: off selinux</span><br><span class="line">       shell: setenforce 0</span><br><span class="line">     - name: seline modify enforcing</span><br><span class="line">       lineinfile:</span><br><span class="line">           dest: /etc/selinux/config</span><br><span class="line">           regexp: <span class="string">'^SELINUX='</span></span><br><span class="line">           line: <span class="string">'SELINUX=enforcing'</span></span><br><span class="line">     - name: off iptables</span><br><span class="line">       shell: iptables -F</span><br><span class="line">     - name: off iptables</span><br><span class="line">       lineinfile:</span><br><span class="line">           dest: /etc/bashrc</span><br><span class="line">           line: <span class="string">'iptables -F'</span></span><br><span class="line"><span class="comment">#----------------------------------------------------------</span></span><br><span class="line"><span class="comment"># 安装部署LAMP环境,通过YUM模块快速安装</span></span><br><span class="line"> - hosts: zabbix_server</span><br><span class="line">   tasks:</span><br><span class="line">    - name: install LAMP</span><br><span class="line">      yum: name=&#123;&#123;item&#125;&#125; state=installed</span><br><span class="line">      with_items:</span><br><span class="line">          - httpd</span><br><span class="line">          - httpd-devel</span><br><span class="line">          - mariadb</span><br><span class="line">          - mariadb-server</span><br><span class="line">          - php</span><br><span class="line">          - php-mysql</span><br><span class="line">    - name: start httpd</span><br><span class="line">      shell: systemctl restart httpd</span><br><span class="line">    - name: start mariadb</span><br><span class="line">      shell: systemctl restart mariadb</span><br><span class="line"><span class="comment">#----------------------------------------------------------</span></span><br><span class="line"><span class="comment"># 下载YUM源地址,更新EPEL源,安装Zabbix</span></span><br><span class="line"> - hosts: zabbix_server</span><br><span class="line">   tasks:</span><br><span class="line">     - name: clear YUM</span><br><span class="line">       shell: rm -fr /etc/yum.repos.d/*</span><br><span class="line">     - name: install YUM EPEL</span><br><span class="line">       get_url: <span class="string">'url=http://mirrors.aliyun.com/repo/Centos-7.repo dest=/etc/yum.repos.d/CentOS-Base.repo'</span></span><br><span class="line">     - name: yum install EPEL</span><br><span class="line">       yum: name=epel-release state=installed</span><br><span class="line">     - name: install zabbix.repo</span><br><span class="line">       shell: rpm -i http://repo.zabbix.com/zabbix/3.4/rhel/7/x86_64/zabbix-release-3.4-2.el7.noarch.rpm</span><br><span class="line">     - name: install zabbix</span><br><span class="line">       yum: name=&#123;&#123;item&#125;&#125; state=installed</span><br><span class="line">       with_items:</span><br><span class="line">           - zabbix-server-mysql</span><br><span class="line">           - zabbix-web-mysql</span><br><span class="line">           - zabbix-agent</span><br><span class="line">     - name: start zabbix-server</span><br><span class="line">       shell: systemctl restart zabbix-server</span><br><span class="line">     - name: start zabbix-agent</span><br><span class="line">       shell: systemctl restart zabbix-agent</span><br><span class="line"><span class="comment">#----------------------------------------------------------</span></span><br><span class="line"><span class="comment"># 安装配置数据库权限,导入zabbix数据库.</span></span><br><span class="line"> - hosts: zabbix_server</span><br><span class="line">   tasks:</span><br><span class="line">     - name: <span class="built_in">set</span> mariadb password</span><br><span class="line">       shell: mysqladmin -u root password <span class="string">'ansible'</span></span><br><span class="line">     - name: create zabbix master databases</span><br><span class="line">       shell: mysql -uroot -pansible -e <span class="string">'create database zabbix character set utf8 collate utf8_bin;'</span></span><br><span class="line">     - name: <span class="built_in">set</span> zabbix master databases grant</span><br><span class="line">       shell: mysql -uroot -pansible -e <span class="string">'grant all privileges on zabbix.* to zabbix@localhost identified by "zabbix";'</span></span><br><span class="line">     - name: import zabbix initial data SQL shell</span><br><span class="line">       shell: zcat /usr/share/doc/zabbix-server-mysql*/create.sql.gz | mysql -uzabbix -pzabbix zabbix</span><br><span class="line"><span class="comment">#----------------------------------------------------------</span></span><br><span class="line"><span class="comment"># 修改并拷贝配置文件,给予权限</span></span><br><span class="line"></span><br><span class="line"> - hosts: zabbix_server</span><br><span class="line">   tasks:</span><br><span class="line">     - name: edit zabbix dbhost</span><br><span class="line">       lineinfile:</span><br><span class="line">          dest: /etc/zabbix/zabbix_server.conf</span><br><span class="line">          regexp: <span class="string">'# DBHost=localhost'</span></span><br><span class="line">          line: <span class="string">'DBHost=localhost'</span></span><br><span class="line">     - name: edit zabbix dbpasswd</span><br><span class="line">       lineinfile:</span><br><span class="line">           dest: /etc/zabbix/zabbix_server.conf</span><br><span class="line">           regexp: <span class="string">'# DBPassword='</span></span><br><span class="line">           line: <span class="string">'DBPassword=zabbix'</span></span><br><span class="line">     - name: cp zabbix web</span><br><span class="line">       shell: cp -a /usr/share/zabbix/* /var/www/html/</span><br><span class="line">     - name: chmod web</span><br><span class="line">       shell: chmod 755 -R /var/www/html/*</span><br><span class="line">     - name: chown web</span><br><span class="line">       shell: chown apache.apache -R /var/www/html/*</span><br><span class="line"></span><br><span class="line">     - name: <span class="built_in">set</span> php</span><br><span class="line">       shell: <span class="built_in">echo</span> <span class="string">"date.timezone = Asia/Shanghai"</span> &gt;&gt; /etc/php.ini</span><br><span class="line">     - name: <span class="built_in">set</span> php</span><br><span class="line">       shell: <span class="built_in">echo</span> <span class="string">"max_execution_time = 300"</span> &gt;&gt; /etc/php.ini</span><br><span class="line">     - name: <span class="built_in">set</span> php</span><br><span class="line">       shell: <span class="built_in">echo</span> <span class="string">"max_input_time = 300"</span> &gt;&gt; /etc/php.ini</span><br><span class="line">     - name: <span class="built_in">set</span> php</span><br><span class="line">       shell: <span class="built_in">echo</span> <span class="string">"post_max_size = 32M"</span> &gt;&gt; /etc/php.ini</span><br><span class="line">     - name: <span class="built_in">set</span> php</span><br><span class="line">       shell: <span class="built_in">echo</span> <span class="string">"memory_limit = 128M"</span> &gt;&gt; /etc/php.ini</span><br><span class="line">     - name: <span class="built_in">set</span> php</span><br><span class="line">       shell: <span class="built_in">echo</span> <span class="string">"mbstring.func_overload = 0"</span> &gt;&gt; /etc/php.ini</span><br><span class="line"></span><br><span class="line">     - name: start http mysql zabbix</span><br><span class="line">       shell: systemctl restart httpd ; systemctl restart mariadb </span><br><span class="line">     - name: start http mysql zabbix</span><br><span class="line">       shell: systemctl restart zabbix-server ; systemctl restart zabbix-agent</span><br><span class="line">     - name: enabled http mysql zabbix</span><br><span class="line">       shell: systemctl <span class="built_in">enable</span> httpd ; systemctl <span class="built_in">enable</span> mariadb</span><br><span class="line">     - name: start http mysql zabbix</span><br><span class="line">       shell: systemctl <span class="built_in">enable</span> zabbix-server ; systemctl <span class="built_in">enable</span> zabbix-agent</span><br></pre></td></tr></table></figure></p>
+<p>接着写完了这些配置以后,我们运行下面的几条命令,检查一下上面的文件是否有语法错误,和检查主机列表是否生效了.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost playbook]<span class="comment"># ansible-playbook -i hosts main.yml --syntax-check</span></span><br><span class="line"></span><br><span class="line">playbook: main.yml</span><br><span class="line"></span><br><span class="line">[root@localhost playbook]<span class="comment"># ansible-playbook -i hosts main.yml --list-task</span></span><br><span class="line"></span><br><span class="line">playbook: main.yml</span><br><span class="line"></span><br><span class="line">[root@localhost playbook]<span class="comment"># ansible-playbook -i hosts main.yml --list-hosts</span></span><br><span class="line"></span><br><span class="line">playbook: main.yml</span><br><span class="line"></span><br><span class="line">    pattern: [u<span class="string">'zabbix_server'</span>]</span><br><span class="line">    hosts (2):</span><br><span class="line">      192.168.10.20</span><br><span class="line">      192.168.10.30</span><br></pre></td></tr></table></figure></p>
+<p><strong>执行剧本：</strong> 确认过以后,直接使用下面的命令一键部署,我们写好的PlayBook剧本,此时我们等它一会.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost playbook]<span class="comment"># ansible-playbook -i hosts main.yml</span></span><br><span class="line"></span><br><span class="line">PLAY [zabbix_server] *********************************************************************</span><br><span class="line"></span><br><span class="line">TASK [Gathering Facts] *******************************************************************</span><br><span class="line">ok: [192.168.10.30]</span><br><span class="line">ok: [192.168.10.20]</span><br><span class="line">....省略....</span><br><span class="line">PLAY RECAP *******************************************************************************</span><br><span class="line">192.168.10.20              : ok=5    changed=4    unreachable=0    failed=0</span><br><span class="line">192.168.10.30              : ok=5    changed=4    unreachable=0    failed=0</span><br></pre></td></tr></table></figure></p>
+<p>本笔记介绍了如何使用 Ansible 去快速部署 Zabbix 监控系统,从中你是不是学到了很多部署方面的技巧了呢,其实ansible也就这样.<br><br></p>
+<h2 id="编写Zabbix被控端剧本"><a href="#编写Zabbix被控端剧本" class="headerlink" title="编写Zabbix被控端剧本"></a>编写Zabbix被控端剧本</h2><p>1.在安装Zabbix客户端之前,我们需要创建一些东西,也就是一些初始化工作,首先我们先来同步一下密钥对.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ssh-keygen -t rsa </span></span><br><span class="line">Generating public/private rsa key pair.</span><br><span class="line">Enter file <span class="keyword">in</span> <span class="built_in">which</span> to save the key (/root/.ssh/id_rsa): </span><br><span class="line">Created directory <span class="string">'/root/.ssh'</span>.</span><br><span class="line">Enter passphrase (empty <span class="keyword">for</span> no passphrase): </span><br><span class="line">Enter same passphrase again: </span><br><span class="line">Your identification has been saved <span class="keyword">in</span> /root/.ssh/id_rsa.</span><br><span class="line">Your public key has been saved <span class="keyword">in</span> /root/.ssh/id_rsa.pub.</span><br><span class="line">The key fingerprint is:</span><br><span class="line">SHA256:xZxM9bunwBsS03gGT5HGT4LvOnJHdr5Bwl/Iit7qQN8 root@localhost.localdomain</span><br><span class="line">The keys randomart image is:</span><br><span class="line">+---[RSA 2048]----+</span><br><span class="line">|          .+o.   |</span><br><span class="line">|         =..=o.  |</span><br><span class="line">|          Bo.+.  |</span><br><span class="line">|         . B...o |</span><br><span class="line">|        S +.B = .|</span><br><span class="line">|       . . O+=.o |</span><br><span class="line">|        . ++Eo+ .|</span><br><span class="line">|        .o+o.+.+ |</span><br><span class="line">|         +++o o. |</span><br><span class="line">+----[SHA256]-----+</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ssh-copy-id root@192.168.10.20</span></span><br><span class="line">/usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed: <span class="string">"/root/.ssh/id_rsa.pub"</span></span><br><span class="line">The authenticity of host 192.168.10.20 (192.168.10.20) can t be established.</span><br><span class="line">ECDSA key fingerprint is SHA256:2kWFaV72YVvAl2EU2Zop4uAjP3Gy2jW92d0Va/HrSMM.</span><br><span class="line">ECDSA key fingerprint is MD5:<span class="built_in">fc</span>:6c:91:b0:02:e6:7e:98:52:af:0d:b3:47:d4:69:ef.</span><br><span class="line">Are you sure you want to <span class="built_in">continue</span> connecting (yes/no)? yes</span><br><span class="line">root@192.168.10.20 s password: </span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ssh-copy-id root@192.168.10.30</span></span><br><span class="line">/usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed: <span class="string">"/root/.ssh/id_rsa.pub"</span></span><br><span class="line">The authenticity of host 192.168.10.30 (192.168.10.30) cant be established.</span><br><span class="line">ECDSA key fingerprint is SHA256:2kWFaV72YVvAl2EU2Zop4uAjP3Gy2jW92d0Va/HrSMM.</span><br><span class="line">ECDSA key fingerprint is MD5:<span class="built_in">fc</span>:6c:91:b0:02:e6:7e:98:52:af:0d:b3:47:d4:69:ef.</span><br><span class="line">Are you sure you want to <span class="built_in">continue</span> connecting (yes/no)? yes</span><br><span class="line">root@192.168.10.30<span class="string">'s password:</span></span><br></pre></td></tr></table></figure></p>
+<p>2.其次创建一个目录用于存放剧本中需要用到的数据文件等,如果你有一些配置文件需要拷贝,此时应该放在本目录下方便剧本调用.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mkdir playbook</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd playbook/</span></span><br><span class="line"></span><br><span class="line">[root@localhost playbook]<span class="comment"># ls -lh</span></span><br><span class="line">total 8.0K</span><br><span class="line">-rw-r--r--. 1 root root 30 Dec  3 10:45 hosts</span><br><span class="line">-rw-r--r--. 1 root root 30 Dec  3 10:45 main.yml</span><br><span class="line">-rw-r--r--. 1 root root 378908 Dec  4 07:04 zabbix-agent-4.0.0-1.1.el7.x86_64.rpm</span><br></pre></td></tr></table></figure></p>
+<p>3.接着创建一个用户主机列表,这里我们就在当前目录下创建一个Hosts文件即可,如果有很多太主机可以使用简写.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost playbook]<span class="comment"># vim hosts</span></span><br><span class="line">[root@localhost playbook]<span class="comment"># cat hosts </span></span><br><span class="line"></span><br><span class="line">[zabbix_client]</span><br><span class="line">192.168.10.20</span><br><span class="line">192.168.10.30</span><br><span class="line"></span><br><span class="line"><span class="comment">#[test]               #此处注释,只做说明,定义从20-100网段的主机</span></span><br><span class="line"><span class="comment">#192.168.10.2[0:100]</span></span><br></pre></td></tr></table></figure></p>
+<p>4.编写一个批量修改的PlayBook,这个剧本很小巧所以无需分开来介绍,直接一条道走到黑.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">---</span><br><span class="line"> - hosts: zabbix_client</span><br><span class="line"></span><br><span class="line">   vars:</span><br><span class="line">     - IP: 192.168.10.10</span><br><span class="line"></span><br><span class="line">   tasks:</span><br><span class="line">      - name: copy zabbix-agent-4.0.0-1.1.el7.x86_64.rpm</span><br><span class="line">        copy: src=./zabbix-agent-4.0.0-1.1.el7.x86_64.rpm dest=/tmp/zabbix-agent.rpm</span><br><span class="line">      - name: install zabbix-agent</span><br><span class="line">        shell: rpm -i /tmp/zabbix-agent.rpm</span><br><span class="line"></span><br><span class="line">      - name: edit zabbix_agentd.conf</span><br><span class="line">        lineinfile:</span><br><span class="line">           dest: /etc/zabbix/zabbix_agentd.conf</span><br><span class="line">           regexp: <span class="string">'Server=127.0.0.1'</span></span><br><span class="line">           line: <span class="string">'Server=&#123;&#123;IP&#125;&#125;'</span></span><br><span class="line">      - name: edit zabbix_agentd.conf</span><br><span class="line">        lineinfile:</span><br><span class="line">           dest: /etc/zabbix/zabbix_agentd.conf</span><br><span class="line">           regexp: <span class="string">'ServerActive=127.0.0.1'</span></span><br><span class="line">           line: <span class="string">'ServerActive=&#123;&#123;IP&#125;&#125;'</span></span><br><span class="line">      - name: edit zabbix_agentd.conf</span><br><span class="line">        lineinfile:</span><br><span class="line">           dest: /etc/zabbix/zabbix_agentd.conf</span><br><span class="line">           regexp: <span class="string">'Hostname=Zabbix server'</span></span><br><span class="line">           line: <span class="string">'Hostname=&#123;&#123;IP&#125;&#125;'</span></span><br><span class="line"></span><br><span class="line">      - name: start zabbix</span><br><span class="line">        shell: /usr/sbin/zabbix_agentd</span><br><span class="line">      - name: <span class="built_in">enable</span> zabbix</span><br><span class="line">        shell: <span class="built_in">echo</span> <span class="string">"/usr/sbin/zabbix_agentd"</span> &gt;&gt; /etc/bashrc</span><br></pre></td></tr></table></figure></p>
+<p>接着写完了这些配置以后,我们运行下面的几条命令,检查一下上面的文件是否有语法错误,和检查主机列表是否生效了.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost playbook]<span class="comment"># ansible-playbook -i hosts main.yml --syntax-check</span></span><br><span class="line"></span><br><span class="line">playbook: main.yml</span><br><span class="line"></span><br><span class="line">[root@localhost playbook]<span class="comment"># ansible-playbook -i hosts main.yml --list-task</span></span><br><span class="line"></span><br><span class="line">playbook: main.yml</span><br><span class="line"></span><br><span class="line">[root@localhost playbook]<span class="comment"># ansible-playbook -i hosts main.yml --list-hosts</span></span><br><span class="line"></span><br><span class="line">playbook: main.yml</span><br><span class="line"></span><br><span class="line">    pattern: [u<span class="string">'zabbix_client'</span>]</span><br><span class="line">    hosts (2):</span><br><span class="line">      192.168.10.20</span><br><span class="line">      192.168.10.30</span><br></pre></td></tr></table></figure></p>
+<p><strong>执行剧本：</strong> 确认过以后,直接使用下面的命令一键部署,我们写好的PlayBook剧本,此时我们等它一会.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost playbook]<span class="comment"># ansible-playbook -i hosts main.yml</span></span><br><span class="line"></span><br><span class="line">PLAY [zabbix_client] *********************************************************************</span><br><span class="line"></span><br><span class="line">TASK [Gathering Facts] *******************************************************************</span><br><span class="line">ok: [192.168.10.30]</span><br><span class="line">ok: [192.168.10.20]</span><br><span class="line">....省略....</span><br><span class="line">PLAY RECAP *******************************************************************************</span><br><span class="line">192.168.10.20              : ok=5    changed=4    unreachable=0    failed=0</span><br><span class="line">192.168.10.30              : ok=5    changed=4    unreachable=0    failed=0</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/12/03/Ansible/通过PlayBook部署Zabbix-6/">通过PlayBook部署Zabbix(6)</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年12月03日 - 19:12</p>
+  <p><span>最后更新:</span>2018年12月09日 - 09:12</p>
+  <p><span>原始链接:</span><a href="/2018/12/03/Ansible/通过PlayBook部署Zabbix-6/" title="通过PlayBook部署Zabbix(6)">https://www.mkdirs.com/2018/12/03/Ansible/通过PlayBook部署Zabbix-6/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Ansible/" rel="tag"> <i class="fa fa-tag"></i> Ansible</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/03/Ansible/通过Playbook部署LAMP-5/" rel="next" title="通过Playbook部署LAMP(5)">
+                <i class="fa fa-chevron-left"></i> 通过Playbook部署LAMP(5)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/09/Zabbix/Zabbix-系统概述与部署-1/" rel="prev" title="Zabbix 系统概述与部署(1)">
+                Zabbix 系统概述与部署(1) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#编写Linux初始化剧本"><span class="nav-text">编写Linux初始化剧本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编写Zabbix服务端剧本"><span class="nav-text">编写Zabbix服务端剧本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编写Zabbix被控端剧本"><span class="nav-text">编写Zabbix被控端剧本</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

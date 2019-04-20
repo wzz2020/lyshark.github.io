@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Ansible是新出现的自动化运维工具,基于Python开发,集合了众多运维工具（puppet、cfengine、chef、func、fabric）的优点,实现了批量系统配置、批量程序部署、批量运行命令等功能,ansible是基于模块工作的,本身没有批量部署的能力,真正具有批量部署的是ansible所运行的模块,ansible只是提供一种框架,在下面的章节中我你们先来熟悉一下Ansible的几个常">
+<meta name="keywords" content="Ansible">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ansible 系统概述与部署(1)">
+<meta property="og:url" content="https://www.mkdirs.com/2018/12/01/Ansible/Ansible 系统概述与部署-1/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="Ansible是新出现的自动化运维工具,基于Python开发,集合了众多运维工具（puppet、cfengine、chef、func、fabric）的优点,实现了批量系统配置、批量程序部署、批量运行命令等功能,ansible是基于模块工作的,本身没有批量部署的能力,真正具有批量部署的是ansible所运行的模块,ansible只是提供一种框架,在下面的章节中我你们先来熟悉一下Ansible的几个常">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20181201104145.jpg">
+<meta property="og:updated_time" content="2018-12-05T07:11:34.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Ansible 系统概述与部署(1)">
+<meta name="twitter:description" content="Ansible是新出现的自动化运维工具,基于Python开发,集合了众多运维工具（puppet、cfengine、chef、func、fabric）的优点,实现了批量系统配置、批量程序部署、批量运行命令等功能,ansible是基于模块工作的,本身没有批量部署的能力,真正具有批量部署的是ansible所运行的模块,ansible只是提供一种框架,在下面的章节中我你们先来熟悉一下Ansible的几个常">
+<meta name="twitter:image" content="https://www.mkdirs.com/picture/20181201104145.jpg">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/12/01/Ansible/Ansible 系统概述与部署-1/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Ansible 系统概述与部署(1) | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/12/01/Ansible/Ansible 系统概述与部署-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Ansible 系统概述与部署(1)
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-01 10:27:03" itemprop="dateCreated datePublished" datetime="2018-12-01T10:27:03+08:00">2018-12-01</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-12-05 15:11:34" itemprop="dateModified" datetime="2018-12-05T15:11:34+08:00">2018-12-05</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Ansible/" itemprop="url" rel="index"><span itemprop="name">Ansible</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Ansible是新出现的自动化运维工具,基于Python开发,集合了众多运维工具（puppet、cfengine、chef、func、fabric）的优点,实现了批量系统配置、批量程序部署、批量运行命令等功能,ansible是基于模块工作的,本身没有批量部署的能力,真正具有批量部署的是ansible所运行的模块,ansible只是提供一种框架,在下面的章节中我你们先来熟悉一下Ansible的几个常用的安装方式,包括源码安装,Yum仓库安装,然后我们会来解析一下Ansible的配置文件,以及管理两台主机小实验,在今后的章节中我们使用Yum安装的Ansible来讲解其内容.</p>
+<a id="more"></a>
+<p><strong>Ansible 系统概述</strong></p>
+<p>Ansible是一款为类Unix系统开发的自由开源的配置和自动化工具.它用Python写成,类似于saltstack和Puppet但是有一个不同和优点是我们不需要在节点中安装任何客户端.它使用SSH来和节点进行通信,Ansible基于 Python paramiko 开发,分布式,无需客户端,轻量级,配置语法使用 YMAL 及 Jinja2模板语言,更强的远程命令执行操作.</p>
+<p>IT自动化配置管理最近20年获得了迅猛的发展,特别最近几年在移动互联、云计算、大数据、互联网+等大规模应用平台的需求推动下,涌现出一批成熟的大规模自动化运维工具.维基百科里列出了二十多个,其中 Puppet、Chef和Salt,以及 CFEngine、agrant和NixOS,大家都可能耳熟能详了.不过后起之秀Ansible (<a href="http://www.ansible.com" target="_blank" rel="noopener">www.ansible.com</a>) 的人气更高,已经是当今最常用的管理基础架构的开源管理工具之一.</p>
+<p>Ansible使用Python语言作为开发语言,巧妙地设计,实现了简单易用,功能强大的自动化管理工具,Ansible由Michael DeHaan发起,开发,创建,他同时也是著名的工具软件Cobbler与Func的开发者,Ansible的第一个版本发布于2012年2月,目前的下载数量超过120万人,当前在GitHub上,它是排名前十的Python项目,可以预见Ansible的发展不可限量,Ansible已经广泛应用于各种规模的企业中,包括Rackspace,Twitter,Evernote,NASA,GoPro,等知名企业.</p>
+<p>2015年10月红帽（Red Hat）宣布收购软件开发公司 Ansible 消息称此次收购耗资逾 1亿美元,也有消息称接近 1.5亿美元.</p>
+<p><strong>Ansible 应用领域</strong></p>
+<p>Ansible的编排引擎可以出色地完成配置管理、流程控制、资源部署等多方面工作,与其他IT自动化产品相比较,Ansible为你提供一种不需要安装客户端软件、管理简便、功能强大的基础架构配置、维护工具,Ansible 基于 Python 语言实现,由 Paramiko 和 PyYAML 两个关键模块构建 </p>
+<blockquote>
+<p>Ansible独特的设计理念:</p>
+<blockquote>
+<p>● 安装部署过程简单,容易学习<br>● 管理主机方便,支持多主机并行管理<br>● 无需再客户端部署相应软件<br>● 安全性高,很容易对内容审计评估<br>● 非ROOT账户也可以使用</p>
+</blockquote>
+</blockquote>
+<p>Ansible 公司负责 Ansible 开源软件的维护、管理,是 Ansible 软件发展的最大贡献者 Ansible 开发团队非常高效,软件发布周期大约是 2 个月发布一个新版本.由于发布周期如此之短,轻微的 bug 通常是在下一个版本中得到修补,而不是对稳定版本发布新补丁.稍大的 bug 经评估后,如果确实需要将会发布对稳定版本的补丁,但这种情况很少出现.</p>
+<p><strong>Ansible 系统架构</strong></p>
+<p>Ansible 集合众多优秀运维工具 (Puppet、Cfengine、Chef、Func、Fabric) 的优点,实现了批量系统配置、批量程序部署、批量运行命令等功能, Ansible 是基于模块工作的,本身没有批量部署的能力.真正具有批量部署的是 Ansible 所运行的模块,Ansible 只是提供一种框架.Ansible 的基本架构见下图,用户通过 Ansible 编排引擎操作公有云／私有云或 CMDB (配置管理数据库)中的主机.</p>
+<p><img src="/picture/20181201104145.jpg" alt="blockchain"></p>
+<blockquote>
+<p>由上图可以看到 Ansible 由 5 个部分组成：</p>
+<blockquote>
+<p>● Ansible (Ansible的核心组件,负责执行命令的东西)<br>● Modules (Ansible 自带的核心模块及自定义模块)<br>● Plugins (完成模块功能的补充,包括连接插件、邮件插件等)<br>● Playbooks (剧本,定义 Ansible 多任务配置文件,由Ansible自动执行)<br>● Inventory (定义 Ansible 管理主机的清单)</p>
+</blockquote>
+</blockquote>
+<p>Ansible 采用 paramiko 协议库 (Fabric 也使用这个),通过 SSH 或者 zeroMQ 等连接主机 Ansible 在控制主机将 Ansible 模块通过 SSH 协议 (或者Kerberos、LDAP) 推送到被管节点执行,执行完之后自动删除,可以使用 SVN 等来管理自定义模块及编排.从上图可以了解到,控制主机与被管节点之间支持 ocal、SSH、ZeroMQ 三种连接方式,默认使用基于 SSH 的连接,在规模较大的情况下使用 ZeroMQ 连接方式会明显改善执行速度.</p>
+<p>接下来,来看一下几个小实验和配置参数的解析吧.<br><br></p>
+<h2 id="源码安装Ansible"><a href="#源码安装Ansible" class="headerlink" title="源码安装Ansible"></a>源码安装Ansible</h2><p>Ansible 的安装方式非常灵活满足各种环境部署的需求,一般可以直接用源码进行安装,也可用操作系统软件包管理工具进行安装,下面我们只介绍比较复杂的源码安装,但是我们后期的小实验会使用Yum安装的来进行讲解.</p>
+<p>1.首先安装gcc编译器,和Python的相关依赖包.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum -y install gcc zlib zlib-devel openssl openssl-devel libffi-devel</span></span><br><span class="line"></span><br><span class="line">Package gcc-4.8.5-36.el7.x86_64 already installed and latest version</span><br><span class="line">Package zlib-1.2.7-18.el7.x86_64 already installed and latest version</span><br><span class="line">Package zlib-devel-1.2.7-18.el7.x86_64 already installed and latest version</span><br><span class="line">Package 1:openssl-1.0.2k-16.el7.x86_64 already installed and latest version</span><br><span class="line">Package 1:openssl-devel-1.0.2k-16.el7.x86_64 already installed and latest version</span><br><span class="line">Package libffi-devel-3.0.13-18.el7.x86_64 already installed and latest version</span><br><span class="line">Nothing to <span class="keyword">do</span></span><br></pre></td></tr></table></figure></p>
+<p>2.由于Ansible是使用Python开发的,这里我们需要编译并安装Python解释器.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y readline</span></span><br><span class="line">[root@localhost ~]<span class="comment"># wget https://www.python.org/ftp/python/3.7.0/Python-3.7.0.tgz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># tar xvzf Python-3.7.0.tgz -C /usr/src/python3.7</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd /usr/src/Python-3.7.0/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ./configure --prefix=/usr/local/python3.7</span></span><br><span class="line">[root@localhost ~]<span class="comment"># make &amp;&amp; make altinstall</span></span><br></pre></td></tr></table></figure></p>
+<p>3.将python头文件拷贝到标准目录,以避免编译ansible时,找不到所需的头文件.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cd /usr/local/include/python3.7/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cp -a ./* /usr/local/include/</span></span><br></pre></td></tr></table></figure></p>
+<p>4.接着我们备份一下旧版本的Python,并创建符号链接链接到新版本的Python上面/<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cd /usr/bin/</span></span><br><span class="line">[root@localhost bin]<span class="comment"># mv python python.old</span></span><br><span class="line">[root@localhost bin]<span class="comment"># ln -s /usr/local/bin/python3.7 /usr/local/bin/python</span></span><br><span class="line">[root@localhost bin]<span class="comment"># rm -rf /usr/bin/python</span></span><br><span class="line">[root@localhost bin]<span class="comment"># cp /usr/local/bin/python3.7 /usr/bin/python</span></span><br></pre></td></tr></table></figure></p>
+<p>5.由于yum是用python开发的,这里为了避免冲突要改掉他的配置.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /usr/bin/yum</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#!/usr/bin/python2.7       ←此处将python改成python2.7</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># vim /usr/libexec/urlgrabber-ext-down</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#!/usr/bin/python2.7       ←此处将python改成python2.7</span></span><br></pre></td></tr></table></figure></p>
+<p>6.最后测试python新版本是否生效了.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># python</span></span><br><span class="line"></span><br><span class="line">Python 3.7.0 (default, Apr 17 2018, 11:03:21) </span><br><span class="line">[GCC 4.8.5 20150623 (Red Hat 4.8.5-11)] on linux</span><br><span class="line">Type <span class="string">"help"</span>, <span class="string">"copyright"</span>, <span class="string">"credits"</span> or <span class="string">"license"</span> <span class="keyword">for</span> more information.</span><br><span class="line">&gt;&gt;&gt; <span class="built_in">exit</span>()</span><br></pre></td></tr></table></figure></p>
+<p>7.安装setuptools模块.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># wget https://files.pythonhosted.org/packages/72/c2/c09362ab29338413ab687b47dab03bab4a792e2bbb727a1eb5e0a88e3b86/setuptools-39.0.1.zip</span></span><br><span class="line">[root@localhost ~]<span class="comment"># unzip setuptools-39.0.1.zip -d /usr/src/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd /usr/src/setuptools-39.0.1/</span></span><br><span class="line">[root@localhost setuptools-39.0.1]<span class="comment"># python setup.py install</span></span><br></pre></td></tr></table></figure></p>
+<p>8.pycrypto模块安装.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># wget https://pypi.python.org/packages/source/p/pycrypto/pycrypto-2.6.1.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># tar xvzf pycrypto-2.6.1.tar.gz -C /usr/src/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd /usr/src/pycrypto-2.6.1/</span></span><br><span class="line">[root@localhost pycrypto-2.6.1]<span class="comment"># python setup.py install</span></span><br></pre></td></tr></table></figure></p>
+<p>9.PyYAML模块安装.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># wget http://pyyaml.org/download/libyaml/yaml-0.1.7.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># tar xvzf yaml-0.1.7.tar.gz -C /usr/src/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd /usr/src/yaml-0.1.7/</span></span><br><span class="line">[root@localhost yaml-0.1.7]<span class="comment"># ./configure --prefix=/usr/local</span></span><br><span class="line">[root@localhost yaml-0.1.7]<span class="comment"># make --jobs=`grep processor /proc/cpuinfo | wc -l`</span></span><br><span class="line">[root@localhost yaml-0.1.7]<span class="comment"># make install</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># wget http://pyyaml.org/download/pyyaml/PyYAML-3.12.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># tar xvzf PyYAML-3.12.tar.gz -C /usr/src/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd /usr/src/PyYAML-3.12/</span></span><br><span class="line">[root@localhost PyYAML-3.12]<span class="comment"># python setup.py install</span></span><br></pre></td></tr></table></figure></p>
+<p>10.Jinja2模块安装<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># wget https://pypi.python.org/packages/source/M/MarkupSafe/MarkupSafe-0.9.3.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># tar xvzf MarkupSafe-0.9.3.tar.gz -C /usr/src/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd /usr/src/MarkupSafe-0.9.3/</span></span><br><span class="line">[root@localhost MarkupSafe-0.9.3]<span class="comment"># python setup.py install</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># wget https://files.pythonhosted.org/packages/56/e6/332789f295cf22308386cf5bbd1f4e00ed11484299c5d7383378cf48ba47/Jinja2-2.10.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># tar xvzf Jinja2-2.10.tar.gz -C /usr/src/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd /usr/src/Jinja2-2.10/</span></span><br><span class="line">[root@localhost Jinja2-2.10]<span class="comment"># python setup.py install</span></span><br></pre></td></tr></table></figure></p>
+<p>11.paramiko模块安装.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># wget https://files.pythonhosted.org/packages/f9/e5/99ebb176e47f150ac115ffeda5fedb6a3dbb3c00c74a59fd84ddf12f5857/ecdsa-0.13.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># tar xvzf ecdsa-0.13.tar.gz -C /usr/src/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd /usr/src/ecdsa-0.13/</span></span><br><span class="line">[root@localhost ecdsa-0.13]<span class="comment"># python setup.py install</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># https://files.pythonhosted.org/packages/29/65/83181630befb17cd1370a6abb9a87957947a43c2332216e5975353f61d64/paramiko-2.4.1.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># tar xvzf paramiko-2.4.1.tar.gz -C /usr/src/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd /usr/src/paramiko-2.4.1/</span></span><br><span class="line">[root@localhost paramiko-2.4.1]<span class="comment"># python setup.py install</span></span><br></pre></td></tr></table></figure></p>
+<p>12.simplejson模块安装.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># wget https://files.pythonhosted.org/packages/0d/3f/3a16847fe5c010110a8f54dd8fe7b091b4e22922def374fe1cce9c1cb7e9/simplejson-3.13.2.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># tar xvff simplejson-3.13.2.tar.gz -C /usr/src/</span></span><br><span class="line">[root@localhost src]<span class="comment"># cd /usr/src/simplejson-3.13.2/</span></span><br><span class="line">[root@localhost simplejson-3.13.2]<span class="comment"># python setup.py install</span></span><br></pre></td></tr></table></figure></p>
+<p>13.Ansible安装.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># wget https://files.pythonhosted.org/packages/4a/3b/9d98e132074bb6a3f18fd811db2819fbde6fc8a26fad9a40b49e53cb2455/ansible-2.5.0.tar.gz</span></span><br><span class="line">[root@localhost ~]<span class="comment"># tar xf ansible-2.5.0.tar.gz -C /usr/src/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># cd /usr/src/ansible-2.5.0/</span></span><br><span class="line">[root@localhost ansible-2.5.0]<span class="comment"># python setup.py install</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="Ansible管理小实验"><a href="#Ansible管理小实验" class="headerlink" title="Ansible管理小实验"></a>Ansible管理小实验</h2><p>下面的小实验,我们将采用以下的IP地址规划,请自行配置好.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[实验环境]</span><br><span class="line"></span><br><span class="line">[状态]    [主机列表]        [python版本]</span><br><span class="line"></span><br><span class="line">控制机 192.168.1.10        Python2.6/2.7</span><br><span class="line"></span><br><span class="line">被控机 192.168.1.20        Python2.4</span><br><span class="line">被控机 192.168.1.30        Python2.4</span><br></pre></td></tr></table></figure></p>
+<p>为了避免 Ansible 下发指令时输入目标主机密码,通过证书签名达到 SSH 无密码是一个好的方案,推荐使用 <code>ssh-keygen</code> 与 <code>ssh-copy-id</code> 来实现快速证书的生成及公钥下发.</p>
+<p>1.在控制主机创建密钥,执行 <code>ssh-keygen -t rsa</code> ,有询问直接按回车键即可,将在 /root/.ssh 下生成一对密钥,其中 id_rsa 为私钥,id_rsa.pub 为公钥,代码如下：<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ssh-keygen -t rsa</span></span><br><span class="line">Generating public/private rsa key pair.</span><br><span class="line">Enter file <span class="keyword">in</span> <span class="built_in">which</span> to save the key (/root/.ssh/id_rsa):</span><br><span class="line">Enter passphrase (empty <span class="keyword">for</span> no passphrase):</span><br><span class="line">Enter same passphrase again:</span><br><span class="line">Your identification has been saved <span class="keyword">in</span> /root/.ssh/id_rsa.</span><br><span class="line">Your public key has been saved <span class="keyword">in</span> /root/.ssh/id_rsa.pub.</span><br><span class="line">The key fingerprint is:</span><br><span class="line">SHA256:TbU6Vvtwf0SP/rFW3c6NTBHHwN/pADsJsIstP/4f96k root@localhost.localdomain</span><br><span class="line">The key s randomart image is:</span><br><span class="line">+---[RSA 2048]----+</span><br><span class="line">|       ..   ...o |</span><br><span class="line">|        .. o .o o|</span><br><span class="line">|       .  o *  ++|</span><br><span class="line">|      o .o * o.++|</span><br><span class="line">|     o oS = + =.=|</span><br><span class="line">|      o  . . =.++|</span><br><span class="line">|       o   . +o==|</span><br><span class="line">|      . .   o +oO|</span><br><span class="line">|       ..... Eo+.|</span><br><span class="line">+----[SHA256]-----+</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment">#</span></span><br></pre></td></tr></table></figure></p>
+<p>2.下发密钥就是控制主机把公钥id_rsa.pub下发到被管节点上用户下.ssh目录,并重命名成 authorized_keys 且权限值为 400,接下来推荐常用的密钥拷贝工具 <code>ssh-copy-id</code>把公钥文件id_rsa.pub公钥拷贝到被管节点,命令格式如下：<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ssh-copy-id root@192.168.1.20</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ssh-copy-id root@192.168.1.30</span></span><br></pre></td></tr></table></figure></p>
+<p>3.RHEL7.0安装Ansible后发现找不到ansible.cfg,配置文件的路径,我们需要手动将它的配置文件拷贝到/etc/目录下去.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cd /usr/src/ansible-2.5.0/examples</span></span><br><span class="line">[root@localhost exampless]<span class="comment"># mkdir /etc/ansible</span></span><br><span class="line">[root@localhost exampless]<span class="comment"># cp -a ansible.cfg hosts /etc/ansible</span></span><br></pre></td></tr></table></figure></p>
+<p>4.编辑Ansible,写入被控主机IP地址,如果要写入一组IP我们可以加中括号 <code>webserver</code>代表的含义就是,执行下面一组IP的操作,<code>admin</code> 组则代表指定一个范围.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/ansible/hosts</span></span><br><span class="line"> </span><br><span class="line">192.168.1.20      <span class="comment">#写入单个IP地址</span></span><br><span class="line">192.168.1.30</span><br><span class="line"></span><br><span class="line">[webserver]       <span class="comment">#指定一个组</span></span><br><span class="line">192.168.1.20</span><br><span class="line">192.168.1.30</span><br><span class="line"></span><br><span class="line">[admin]           <span class="comment">#指定一个范围</span></span><br><span class="line">192.168.1.[1:100]</span><br></pre></td></tr></table></figure></p>
+<p>5.修改Ansible主配置文件,修改两处位置即可,分别是禁用每次执行命令检查ssh,和开启日志记录功能,取消两处的注释即可.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/ansible/ansible.cfg</span></span><br><span class="line"></span><br><span class="line">61 <span class="comment"># uncomment this to disable SSH key host checking</span></span><br><span class="line">62 host_key_checking = False        <span class="comment">#禁用每次执行命令检查ssh,取消注释</span></span><br><span class="line"></span><br><span class="line">100 <span class="comment"># logging is off by default unless this path is defined</span></span><br><span class="line">101 <span class="comment"># if so defined, consider logrotate</span></span><br><span class="line">102 log_path = /var/<span class="built_in">log</span>/ansible.log  <span class="comment">#开启日志记录功能,取消注释</span></span><br></pre></td></tr></table></figure></p>
+<p>6.此时Ansible控制主机就配置完毕了,我们来执行以下命令,看一下它的连通性吧,一般我们Ping一下看到pong说明成功啦.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ansible all -m ping</span></span><br><span class="line"></span><br><span class="line">192.168.1.20 | SUCCESS =&gt; &#123;     <span class="comment">#说明成功</span></span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">false</span>, </span><br><span class="line">    <span class="string">"ping"</span>: <span class="string">"pong"</span></span><br><span class="line">&#125;</span><br><span class="line">192.168.1.30 | SUCCESS =&gt; &#123;     <span class="comment">#说明成功</span></span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">false</span>, </span><br><span class="line">    <span class="string">"ping"</span>: <span class="string">"pong"</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ansible webserver -m ping</span></span><br><span class="line"></span><br><span class="line">192.168.1.20 | SUCCESS =&gt; &#123;     <span class="comment">#说明成功</span></span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">false</span>, </span><br><span class="line">    <span class="string">"ping"</span>: <span class="string">"pong"</span></span><br><span class="line">&#125;</span><br><span class="line">192.168.1.30 | SUCCESS =&gt; &#123;     <span class="comment">#说明成功</span></span><br><span class="line">    <span class="string">"changed"</span>: <span class="literal">false</span>, </span><br><span class="line">    <span class="string">"ping"</span>: <span class="string">"pong"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这里测试时在控制主机与被管节点之间配置了 SSH 证书信任,如果没有用证书认证,则需要在执行 Ansible 命令时添加 -k 参数,在提示 “SSH password:”时输入 root 账号密码,实际生产环境中,大多数更倾向于使用 Linux 普通用户账户进行连接并通过 sudo 命令实现： root 权限,格式为： <code>ansible all -m ping -u ansible -sudo</code><br><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/12/01/Ansible/Ansible 系统概述与部署-1/">Ansible 系统概述与部署(1)</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年12月01日 - 10:12</p>
+  <p><span>最后更新:</span>2018年12月05日 - 15:12</p>
+  <p><span>原始链接:</span><a href="/2018/12/01/Ansible/Ansible 系统概述与部署-1/" title="Ansible 系统概述与部署(1)">https://www.mkdirs.com/2018/12/01/Ansible/Ansible 系统概述与部署-1/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Ansible/" rel="tag"> <i class="fa fa-tag"></i> Ansible</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/30/Linux 系统管理/Linux防火墙配置与管理-16/" rel="next" title="Linux防火墙配置与管理(16)">
+                <i class="fa fa-chevron-left"></i> Linux防火墙配置与管理(16)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/01/Ansible/Ansible-清单与命令解析-2/" rel="prev" title="Ansible 清单与命令解析(2)">
+                Ansible 清单与命令解析(2) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#源码安装Ansible"><span class="nav-text">源码安装Ansible</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Ansible管理小实验"><span class="nav-text">Ansible管理小实验</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="交换机(Switch)是一种用于电信号转发的网络设备,它可以为接入交换机的任意两个网络节点提供独享的电信号通路,最常见的交换机是以太网交换机,其他常见的还有电话语音交换机、光纤交换机等,交换机是集线器的升级替代产品,理论上讲交换机就是按照通信两端传输信息的需求,将需要的信息发送到目标设备上的网络组件.">
+<meta name="keywords" content="网络设备配置,huawei">
+<meta property="og:type" content="article">
+<meta property="og:title" content="华为交换机配置笔记">
+<meta property="og:url" content="https://www.mkdirs.com/2019/04/03/网络设备配置/华为交换机配置笔记/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="交换机(Switch)是一种用于电信号转发的网络设备,它可以为接入交换机的任意两个网络节点提供独享的电信号通路,最常见的交换机是以太网交换机,其他常见的还有电话语音交换机、光纤交换机等,交换机是集线器的升级替代产品,理论上讲交换机就是按照通信两端传输信息的需求,将需要的信息发送到目标设备上的网络组件.">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20190403094842.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20190403120149.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20190404105536.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20190404160800.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20190404140610.jpg">
+<meta property="og:updated_time" content="2019-04-16T06:12:40.276Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="华为交换机配置笔记">
+<meta name="twitter:description" content="交换机(Switch)是一种用于电信号转发的网络设备,它可以为接入交换机的任意两个网络节点提供独享的电信号通路,最常见的交换机是以太网交换机,其他常见的还有电话语音交换机、光纤交换机等,交换机是集线器的升级替代产品,理论上讲交换机就是按照通信两端传输信息的需求,将需要的信息发送到目标设备上的网络组件.">
+<meta name="twitter:image" content="https://www.mkdirs.com/picture/20190403094842.jpg">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2019/04/03/网络设备配置/华为交换机配置笔记/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>华为交换机配置笔记 | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2019/04/03/网络设备配置/华为交换机配置笔记/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">华为交换机配置笔记
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-04-03 08:28:37" itemprop="dateCreated datePublished" datetime="2019-04-03T08:28:37+08:00">2019-04-03</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-16 14:12:40" itemprop="dateModified" datetime="2019-04-16T14:12:40+08:00">2019-04-16</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/网络设备配置/" itemprop="url" rel="index"><span itemprop="name">网络设备配置</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>交换机(Switch)是一种用于电信号转发的网络设备,它可以为接入交换机的任意两个网络节点提供独享的电信号通路,最常见的交换机是以太网交换机,其他常见的还有电话语音交换机、光纤交换机等,交换机是集线器的升级替代产品,理论上讲交换机就是按照通信两端传输信息的需求,将需要的信息发送到目标设备上的网络组件.</p>
+<a id="more"></a>
+<p>交换机是一种交换式集线器,其基于MAC地址识别,能完成封装转发数据包功能的网络设备.交换机可以学习MAC地址,并把其存放在内部地址表中,通过在数据帧的始发者和目标接收者之间建立临时的交换路径,使数据帧直接由源地址到达目的地址.</p>
+<p>交换机内部拥有一条很高带宽的背板总线和内部交换矩阵所有的端口都挂接在这条背板总线上控制电路收到数据包以后,处理端口会查找内存中的地址对照表以确定目的MAC地址的网卡NIC挂接在哪个端口上,通过内部交换矩阵迅速将数据包传送到目的端口目的MAC若不存在才广播到所有的端口,接收端口回应后交换机会学习新的地址,并把它添加入内部MAC地址表中.</p>
+<blockquote>
+<p><i class="fa fa-plus" aria-hidden="true"></i> 关于交换机的分类:</p>
+<blockquote>
+<p>1.根据网络覆盖范围划分交换机:广域网交换机和局域网交换机<br>2.根据交换机端口结构划分交换机:固定端口交换机和模块化交换机<br>3.根据工作协议层划分交换机:二层交换机、三层交换机、四层交换机<br>4.根据支持网管功能划分交换机:网管型交换机和非网管理型交换机<br>5.根据传输介质划分交换机:以太网交换机、快速以太网交换机、ATM交换机、FDDI交换机、令牌环交换机<br>6.根据应用网络层次划分交换机:企业级交换机、校园网交换机、部门级交换机、工作组交换机、桌机交换机</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p><i class="fa fa-plus" aria-hidden="true"></i> 关于二层交换机:</p>
+<blockquote>
+<p>二层交换机是对应于OSI/RM的第二协议层来定义的,因为它只能工作在OSI/RM开放体系模型的第二层,即数据链路层.二层交换机依赖于链路层中的信息(如MAC地址)完成不同端口数据间的线速交换,一般应用于小型企业或中型以上企业网络的桌面层次.</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p><i class="fa fa-plus" aria-hidden="true"></i> 关于三层交换机:</p>
+<blockquote>
+<p>三层交换机是对应于OSI/RM开放体系模型的第三层,即网络层来定义的,也就是说这类交换机可以工作在网络层,它比第二层交换机更加高档,功能更加强.当网络规模较大时,可以根据特殊应用需求划分为小面独立的VLAN网段,以减小广播所造成的影响,通常这类交换机是采用模块化结构,以适应灵活配置的需要.<br><br></p>
+</blockquote>
+</blockquote>
+<h2 id="交换机的初始化"><a href="#交换机的初始化" class="headerlink" title="交换机的初始化"></a>交换机的初始化</h2><p><strong>Console密码认证:</strong> 配置与清除Console接口的登陆密码,<code>cipher/simple</code>分别为配置密文与明文密码.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># ----配置密码-------------------------------------------------------</span></span><br><span class="line">&lt;Huawei&gt; system-view                                           // 进入配置视图</span><br><span class="line">[Huawei] sysname switch1                                       // 配置主机名称</span><br><span class="line">[Huawei] user-interface console 0                              // 进入Console</span><br><span class="line">[Huawei-ui-console0] authentication-mode password              // 指定密码配置</span><br><span class="line">[Huawei-ui-console0] <span class="built_in">set</span> authentication password cipher 1233   // 配置密文密码</span><br><span class="line">[Huawei-ui-console0] <span class="built_in">set</span> authentication password simple 1233   // 配置明文密码</span><br><span class="line">[Huawei-ui-console0] display this                              // 显示查询结果</span><br><span class="line">[Huawei-ui-console0] <span class="built_in">return</span></span><br><span class="line">&lt;Huawei&gt; save</span><br><span class="line"></span><br><span class="line"><span class="comment"># ----清除密码-------------------------------------------------------</span></span><br><span class="line">&lt;Huawei&gt; system-view                                           // 进入配置视图</span><br><span class="line">[Huawei] user-interface console 0                              // 进入Console0</span><br><span class="line">[Huawei] undo authentication-mode                              // 清理用户配置密码</span><br><span class="line">[Huawei] undo <span class="built_in">set</span> authentication password                      // 清理用户配置密码</span><br><span class="line">[Huawei] display this                                          // 显示查询结果</span><br><span class="line">[Huawei] <span class="built_in">return</span></span><br><span class="line">&lt;Huawei&gt; save</span><br></pre></td></tr></table></figure></p>
+<p><strong>AAA账号密码认证:</strong> 启用用户名密码认证,用户名<code>lyshark</code>,密码是<code>1233</code>,下次登陆需要输入用户名与密码.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">&lt;Huawei&gt; system-view</span><br><span class="line">[Huawei] user-interface console 0</span><br><span class="line">[Huawei-ui-console0] authentication-mode aaa</span><br><span class="line">[Huawei-ui-console0] quit</span><br><span class="line">[Huawei] aaa</span><br><span class="line">[Huawei-aaa] <span class="built_in">local</span>-user lyshark password cipher 1233</span><br><span class="line">[Huawei-aaa] <span class="built_in">local</span>-user lyshark service-type terminal</span><br><span class="line">[Huawei-aaa] display this</span><br><span class="line">[Huawei-aaa] <span class="built_in">return</span></span><br><span class="line">&lt;Huawei&gt; save</span><br></pre></td></tr></table></figure></p>
+<p><strong>配置路由器远程登陆:</strong> 给路由器配置指定的IP地址,并能够通过Telnet远程连接到路由器.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># ----配置IP地址-------------------------------------------------------</span><br><span class="line">&lt;Huawei&gt; system-view</span><br><span class="line">[Huawei] interface Ethernet 0/0/0                      // 选择以太网接口</span><br><span class="line">[Huawei-Ethernet0/0/0]</span><br><span class="line">[Huawei-Ethernet0/0/0] ip address 192.168.10.10 24     // 配置IP地址</span><br><span class="line">[Huawei-Ethernet0/0/0] quit</span><br><span class="line"></span><br><span class="line"># ----配置密码认证-------------------------------------------------------</span><br><span class="line">[Huawei] aaa</span><br><span class="line">[Huawei-aaa] local-user lyshark password cipher 123123</span><br><span class="line">[Huawei-aaa] local-user lyshark privilege level 3</span><br><span class="line">[Huawei-aaa] qui</span><br><span class="line"></span><br><span class="line">[Huawei] user-interface maximum-vty 5            // 指定最大登陆用户</span><br><span class="line">[Huawei] user-interface vty 0 4                  // 指定编号0-4</span><br><span class="line">[Huawei-ui-vty0-4] authentication-mode aaa       // 启用AAA认证</span><br><span class="line">[Huawei-ui-vty0-4] protocol inbound telnet       // 配置telnet协议</span><br><span class="line">[Huawei-ui-vty0-4] quit</span><br><span class="line"></span><br><span class="line"># ----查询和保存-------------------------------------------------------</span><br><span class="line">&lt;Huawei&gt; display telnet server status　　　      // 查看telnet是否生效</span><br><span class="line">&lt;Huawei&gt; display ip interface brief             // 查看路由器端口情况</span><br><span class="line">&lt;Huawei&gt; display ip routing-table               // 查询路由信息</span><br><span class="line">&lt;Huawei&gt; display interface                      // 看有多少接口</span><br><span class="line">&lt;Huawei&gt; save                                   // 保存配置选项</span><br></pre></td></tr></table></figure></p>
+<p><strong>配置交换机远程登陆:</strong> 给交换机配置远程登陆地址,并能够通过Telnet连接到交换机.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;Huawei&gt; system-view</span><br><span class="line"></span><br><span class="line"># ----配置密码认证-------------------------------------------------------</span><br><span class="line">[Huawei] aaa</span><br><span class="line">[Huawei-aaa] local-user lyshark password cipher 123123</span><br><span class="line">[Huawei-aaa] local-user lyshark service-type telnet</span><br><span class="line">[Huawei-aaa] local-user lyshark privilege level 15</span><br><span class="line">[Huawei-aaa] display telnet server status</span><br><span class="line">[Huawei-aaa] quit</span><br><span class="line"></span><br><span class="line"># ----开启远程终端-------------------------------------------------------</span><br><span class="line">[Huawei] user-interface vty 0 4                // 进入vty0-4虚拟终端</span><br><span class="line">[Huawei-ui-vty0-4] authentication-mode aaa     // 配置AAA认证机制</span><br><span class="line">[Huawei-ui-vty0-4] user privilege level 15     // 配置认证级别</span><br><span class="line">[Huawei-ui-vty0-4] protocol inbound telnet     // 配置Telnet协议</span><br><span class="line">[Huawei-ui-vty0-4] quit                        // 退出系统视图</span><br><span class="line"></span><br><span class="line"># ----配置终端IP地址-----------------------------------------------------</span><br><span class="line">[Huawei] interface Vlanif 1</span><br><span class="line">[Huawei-Vlanif1] ip address 192.168.10.10 255.255.255.0</span><br><span class="line">[Huawei-Vlanif1] quit</span><br><span class="line">&lt;Huawei&gt; save</span><br></pre></td></tr></table></figure></p>
+<p>配置交换机远程登陆需要注意,交换机接口不允许配置IP地址,我们只能在虚拟VLAN接口中配置IP地址才可以使用远程登陆功能.<br><br></p>
+<h2 id="交换机常用参数"><a href="#交换机常用参数" class="headerlink" title="交换机常用参数"></a>交换机常用参数</h2><p><strong>基本配置命令:</strong> 交换机与路由器的基本查询指令.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[Huawei] display current-configuration              // 显示当前生效的配置</span><br><span class="line">[Huawei] display saved-configuration                // 显示flash中配置文件</span><br><span class="line">[Huawei] reset saved-configuration                  // 檫除旧的配置文件</span><br><span class="line">[Huawei] reboot                                     // 交换机重启</span><br><span class="line">[Huawei] display version                            // 显示系统版本信息</span><br><span class="line">[Huawei] sysname                                    // 交换机命名</span><br></pre></td></tr></table></figure></p>
+<p><strong>用户视图:</strong> 刚开始登入交换机时的视图,一般看到的是尖括号<code>&lt;&gt;</code>表示用户视图.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;Huawei&gt; save                               // 配置完成保存配置</span><br><span class="line">&lt;Huawei&gt; system-view                        // 进入系统视图的命令</span><br><span class="line">&lt;Huawei&gt; clock timezone                     // 设置时区</span><br><span class="line">&lt;Huawei&gt; clock datetime 22:12:00 2019-04-01 // 设置交换机的时间</span><br></pre></td></tr></table></figure></p>
+<p><strong>系统视图:</strong> 在用户视图下输入<code>system-view</code>后进入系统视图,一般为方括号<code>[]</code>表示系统视图.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[Huawei] display current-configuration      // 显示当前配置</span><br><span class="line">[Huawei] user-interface maximum-vty 15      // 配置vty最大连接数</span><br><span class="line">[Huawei] user-interface vty 0 14            // 进入vty用户界面视图</span><br><span class="line">[Huawei] user privilege level 2             // 设置vty登入的用户等级为2(配置用户级别)</span><br><span class="line">[Huawei] authentication-mode aaa            // 设置vty登入时的验证模式为用户名和密码验证</span><br></pre></td></tr></table></figure></p>
+<p><strong>端口配置:</strong> 常用的端口配置命令整理.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;Huawei&gt; system-view</span><br><span class="line">[Huawei] interface Gig</span><br><span class="line"></span><br><span class="line">[Huawei] interface GigabitEthernet 0/0/1        // 选择一个端口</span><br><span class="line">[Huawei] duplex &#123;half|full|auto&#125;                // 配置端口工作状态</span><br><span class="line">[Huawei] speed &#123;10|100|auto&#125;                    // 配置端口工作速率</span><br><span class="line">[Huawei] flow-control                           // 配置端口流控</span><br><span class="line">[Huawei] mdi &#123;across|auto|normal&#125;               // 配置端口平接扭接</span><br><span class="line">[Huawei] port link-type &#123;trunk|access|hybrid&#125;   // 设置端口工作模式</span><br><span class="line">[Huawei] undo shutdown                          // 激活端口</span><br><span class="line">[Huawei] quit                                   // 退出系统视图</span><br></pre></td></tr></table></figure></p>
+<p><strong>批量配置端口:</strong> 通过命令批量的选择一些交换机或路由器的接口.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[Huawei] vlan batch 10 20                                  // 创建vlan10和vlan20</span><br><span class="line">[Huawei] port-group group-member Gig0/0/1 to Gig0/0/10     // 选择1-10号端口</span><br><span class="line">[Huawei] port link-type access                             // 配置成access模式</span><br><span class="line">[Huawei] port default vlan 10                              // 应用到vlan10</span><br></pre></td></tr></table></figure></p>
+<p><strong>清除端口状态:</strong> 清除某个端口的配置,用于初始化端口.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[Huawei] interface Gigabitethernet 0/0/1</span><br><span class="line">[Huawei] clear configuration this</span><br><span class="line">[Huawei] undo shutdown</span><br><span class="line">[Huawei] interface gigabitethernet 0/0/3</span><br><span class="line">[Huawei] undo port default vlan                  //access 模式的端口</span><br><span class="line">[Huawei] undo port link-type </span><br><span class="line">[Huawei] undo port hybrid pvid vlan vlanid       //hybrid 模式的端口</span><br><span class="line">[Huawei] undo port hybrid untagged vlan vlanid</span><br><span class="line">[Huawei] undo port hybrid tagged vlan vlanid </span><br><span class="line">[Huawei] undo port trunk pvid vlan               //trunk 模式的端口</span><br><span class="line">[Huawei] undo port trunk allow-pass vlan vlanid </span><br><span class="line">[Huawei] undo port link-type</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="交换机实现VLAN"><a href="#交换机实现VLAN" class="headerlink" title="交换机实现VLAN"></a>交换机实现VLAN</h2><p>VLAN(Virtual Local Area Network),中文名为虚拟局域网,是一种使用交换机将局域网内的设备在逻辑上划分成一个个网段的技术,即在物理网络上进一步划分逻辑网络,VLAN可以突破地理位置的限制,完全基于实际管理需要来划分网络,例如在单个交换机内划分为不同的区域,不同区域之间无法互相通信,来实现相互隔离.</p>
+<p>VLAN具有与普通局域网相同的属性,第二层的单播,多播和广播帧只能在相同的VLAN内转发,扩散,而不会直接进入其他VLAN中,因此同一个VLAN内的主机即使位于不同的交换机上,也可以互相访问,而不是同一VLAN的主机,即使连接在同一交换机上,也无法通过数据链路层互相访问.如果一个VLAN内的主机想访问另一个VLAN内的主机,必须通过一个三层设备,如路由器或三层交换机实现通信.<br><br></p>
+<h3 id="◆单交换机实现VLAN◆"><a href="#◆单交换机实现VLAN◆" class="headerlink" title="◆单交换机实现VLAN◆"></a>◆单交换机实现VLAN◆</h3><p>如前所述,基于端口的VLAN属于静态VLAN,它是划分网络最简单,最有效和最常用的方法,下面将在单台交换机上配置静态VLAN,来实现两个网段的数据隔离,以下实验是一种网络拓扑中最简单的拓扑结构图,适合于小型办公网络,其实验拓扑图如下.</p>
+<p><img src="/picture/20190403094842.jpg" alt="blockchain"></p>
+<p><strong>创建VLAN区域:</strong> 创建两个VLAN区域,分别为<code>vlan10和vlan20</code>用来代表两个部门,命令如下.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;Huawei&gt;system-view              // 进入系统视图模式</span><br><span class="line"></span><br><span class="line">[Huawei] vlan 10                 // 创建VLAN10</span><br><span class="line">[Huawei-vlan10] quit</span><br><span class="line">[Huawei] vlan 20                 // 创建VLAN20</span><br><span class="line">[Huawei-vlan20] quit</span><br><span class="line"></span><br><span class="line">[Huawei] display vlan            // 显示当前VLAN情况</span><br><span class="line">VID  Status  Property      MAC-LRN Statistics Description      </span><br><span class="line">--------------------------------------------------------------------------------</span><br><span class="line"></span><br><span class="line">1    enable  default       enable  disable    VLAN 0001                         </span><br><span class="line">10   enable  default       enable  disable    VLAN 0010                         </span><br><span class="line">20   enable  default       enable  disable    VLAN 0020       </span><br><span class="line"></span><br><span class="line">[Huawei] quit</span><br><span class="line">&lt;Huawei&gt; save                     // 保存更改</span><br></pre></td></tr></table></figure></p>
+<p><strong>批量添加VLAN:</strong> 接着将<code>PC1-至-&gt;PC3</code>批量添加到<code>VLAN10</code>这个区域内.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;Huawei&gt; system-view</span><br><span class="line">[Huawei] port-group group-member GigabitEthernet 0/0/1 to GigabitEthernet 0/0/3</span><br><span class="line"></span><br><span class="line">[Huawei-port-group] port link-type access</span><br><span class="line">[Huawei-port-group] port default vlan 10</span><br><span class="line">[Huawei-port-group] display vlan</span><br><span class="line"></span><br><span class="line">VID  Type    Ports                                                          </span><br><span class="line">--------------------------------------------------------------------------------</span><br><span class="line">10   common  UT:GE0/0/1(U)      GE0/0/2(U)      GE0/0/3(U)</span><br><span class="line"></span><br><span class="line">20   common</span><br><span class="line">VID  Status  Property      MAC-LRN Statistics Description</span><br><span class="line">--------------------------------------------------------------------------------</span><br><span class="line">1    enable  default       enable  disable    VLAN 0001                         </span><br><span class="line">10   enable  default       enable  disable    VLAN 0010                         </span><br><span class="line">20   enable  default       enable  disable    VLAN 0020          </span><br><span class="line"></span><br><span class="line">undo port link-type </span><br><span class="line">undo port default vlan</span><br></pre></td></tr></table></figure></p>
+<p><strong>单独添加VLAN:</strong> 接着将<code>PC4-至-&gt;PC5</code>单独添加到<code>VLAN20</code>这个区域内.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">&lt;Huawei&gt; system-view</span><br><span class="line">[Huawei] interface GigabitEthernet 0/0/4</span><br><span class="line">[Huawei-GigabitEthernet0/0/4] port link-type access</span><br><span class="line">[Huawei-GigabitEthernet0/0/4] port default vlan 20</span><br><span class="line">[Huawei-GigabitEthernet0/0/4] quit</span><br><span class="line"></span><br><span class="line">[Huawei] interface GigabitEthernet 0/0/5</span><br><span class="line">[Huawei-GigabitEthernet0/0/5] port link-type access</span><br><span class="line">[Huawei-GigabitEthernet0/0/5] port default vlan 20</span><br><span class="line">[Huawei-GigabitEthernet0/0/5] quit</span><br><span class="line"></span><br><span class="line">[Huawei-port-group] display vlan</span><br><span class="line">10   common  UT:GE0/0/1(U)      GE0/0/2(U)      GE0/0/3(U)</span><br><span class="line">20   common  UT:GE0/0/4(U)      GE0/0/5(U)</span><br><span class="line"></span><br><span class="line">VID  Status  Property      MAC-LRN Statistics Description      </span><br><span class="line">--------------------------------------------------------------------------------</span><br><span class="line"></span><br><span class="line">1    <span class="built_in">enable</span>  default       <span class="built_in">enable</span>  <span class="built_in">disable</span>    VLAN 0001                         </span><br><span class="line">10   <span class="built_in">enable</span>  default       <span class="built_in">enable</span>  <span class="built_in">disable</span>    VLAN 0010                         </span><br><span class="line">20   <span class="built_in">enable</span>  default       <span class="built_in">enable</span>  <span class="built_in">disable</span>    VLAN 0020</span><br></pre></td></tr></table></figure></p>
+<p><strong>测试环节:</strong> 最后分别给五台设备配置好IP地址,并通过ping命令测试联通性.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#----设置客户主机IP地址+网关-------------------------</span><br><span class="line"></span><br><span class="line">[主机名]         [主机IP]     [子网]</span><br><span class="line">PC0           192.168.1.1      24</span><br><span class="line">PC1           192.168.1.2      24</span><br><span class="line">PC2           192.168.1.3      24</span><br><span class="line">PC3           192.168.1.4      24</span><br><span class="line">PC4           192.168.1.5      24</span><br><span class="line"></span><br><span class="line">#----设置好后测试网络连通性-------------------------</span><br><span class="line">C:\&gt;ping 192.168.1.1</span><br><span class="line">Reply from 192.168.20.1: bytes=32 time=1ms TTL=127</span><br><span class="line">C:\&gt;ping 192.168.1.2</span><br><span class="line">Reply from 192.168.20.1: bytes=32 time=1ms TTL=127</span><br><span class="line">C:\&gt;ping 192.168.1.4</span><br><span class="line">error</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆跨交换机实现VLAN◆"><a href="#◆跨交换机实现VLAN◆" class="headerlink" title="◆跨交换机实现VLAN◆"></a>◆跨交换机实现VLAN◆</h3><p>在实际的工作环境中,只在一台交换机上实现VLAN是远远不够的,通常需要跨越多台交换机实现VLAN划分网段,华为交换机通过使用Trunk干道端口的方式实现多台交换机数据共享,并实现跨交换机上的同一个VLAN之间的数据通信,其拓扑结构图如下.</p>
+<p><img src="/picture/20190403120149.jpg" alt="blockchain"></p>
+<p><strong>开启两台交换机:</strong> 分别开启两台交换机的端口,这里激活<code>git 0/0/1 - 0/0/3</code>端口.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;Huawei&gt; system-view</span><br><span class="line">[Huawei]sysname LSW1</span><br><span class="line">[LSW1] clear configuration int gi 0/0/1    // 清空接口配置</span><br><span class="line">[LSW1] port-group group-member Gig0/0/1 to Gig0/0/3      // 选择Gig1-Gig3号接口</span><br><span class="line">[LSW1-port-group] undo shutdown                          // 开启接口选项</span><br><span class="line"></span><br><span class="line">&lt;Huawei&gt; system-view</span><br><span class="line">[Huawei]sysname LSW2</span><br><span class="line">[LSW2] clear configuration int gi 0/0/1    // 清空接口配置</span><br><span class="line">[LSW2]port-group group-member Gig0/0/1 to Gig0/0/3      // 选择Gig1-Gig3号接口</span><br><span class="line">[LSW2-port-group]undo shutdown                          // 开启接口选项</span><br></pre></td></tr></table></figure></p>
+<p><strong>配置Trunk接口(两台):</strong> 接下来在交换机上配置<code>Gig0/0/1接口</code>为<code>Trunk干道</code>通信接口,这里两台都需要配置.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># ----配置交换机LSW1-------------------------------------------------------</span><br><span class="line">&lt;LSW1&gt; system-view</span><br><span class="line">[LSW1] interface GigabitEthernet 0/0/1                       // 选择一个接口</span><br><span class="line">[LSW1-GigabitEthernet0/0/1]port link-type trunk              // 将该接口配置为trunk口</span><br><span class="line">[LSW1-GigabitEthernet0/0/1]port trunk allow-pass vlan all    // 定义trunk允许vlan通过</span><br><span class="line">[LSW1-GigabitEthernet0/0/1]display this</span><br><span class="line"></span><br><span class="line"># ----配置交换机LSW2-------------------------------------------------------</span><br><span class="line">&lt;LSW2&gt; system-view</span><br><span class="line">[LSW2] interface GigabitEthernet 0/0/1                       // 选择一个接口</span><br><span class="line">[LSW2-GigabitEthernet0/0/1]port link-type trunk              // 将该接口配置为trunk口</span><br><span class="line">[LSW2-GigabitEthernet0/0/1]port trunk allow-pass vlan all    // 定义trunk允许vlan通过</span><br><span class="line">[LSW2-GigabitEthernet0/0/1]display this</span><br></pre></td></tr></table></figure></p>
+<p><strong>配置VLAN(两台):</strong> 分别配置两台交换机<code>VLAN10和VLAN20接口</code>,并将<code>PC1-PC2加入VLAN10</code>,<code>PC3-PC4加入VLAN20</code>.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># ----配置交换机LSW1-------------------------------------------------------</span><br><span class="line">&lt;LSW1&gt;system-view                                            // 进入系统视图模式</span><br><span class="line">[LSW1] vlan batch 10 20                                      // 创建vlan10,vlan20</span><br><span class="line">[LSW1] interface Gig0/0/2                                    // 进入第2个业务网口</span><br><span class="line">[LSW1-GigabitEthernet0/0/2] port link-type access            // 开启接口模式为access</span><br><span class="line">[LSW1-GigabitEthernet0/0/2] port default vlan 10             // 将以上接口加入到vlan10</span><br><span class="line">[LSW1-GigabitEthernet0/0/2] quit</span><br><span class="line">[LSW1] interface Gig0/0/3                                    //进入第3个业务网口</span><br><span class="line">[LSW1-GigabitEthernet0/0/3] port link-type access            // 开启接口模式为access</span><br><span class="line">[LSW1-GigabitEthernet0/0/3] port default vlan 20             // 将以上接口加入到vlan20</span><br><span class="line"></span><br><span class="line"># ----配置交换机LSW2-------------------------------------------------------</span><br><span class="line">&lt;LSW2&gt;system-view                                            // 进入系统视图模式</span><br><span class="line">[LSW2] vlan batch 10 20                                      // 创建vlan10,vlan20</span><br><span class="line">[LSW2] interface Gig0/0/2                                    // 进入第2个业务网口</span><br><span class="line">[LSW2-GigabitEthernet0/0/2] port link-type access            // 开启接口模式为access</span><br><span class="line">[LSW2-GigabitEthernet0/0/2] port default vlan 10             // 将以上接口加入到vlan10</span><br><span class="line">[LSW2-GigabitEthernet0/0/2] quit</span><br><span class="line">[LSW2] interface Gig0/0/3                                    //进入第3个业务网口</span><br><span class="line">[LSW2-GigabitEthernet0/0/3] port link-type access            // 开启接口模式为access</span><br><span class="line">[LSW2-GigabitEthernet0/0/3] port default vlan 20             // 将以上接口加入到vlan20</span><br></pre></td></tr></table></figure></p>
+<p><strong>测试环节:</strong> 最后分别给四台设备配置好IP地址,并通过ping命令测试联通性.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#----设置客户主机IP地址+网关-------------------------</span><br><span class="line"></span><br><span class="line">[主机名]         [主机IP]     [子网]</span><br><span class="line">PC1           192.168.10.1      24</span><br><span class="line">PC2           192.168.10.2      24</span><br><span class="line">PC3           192.168.20.1      24</span><br><span class="line">PC4           192.168.20.2      24</span><br><span class="line"></span><br><span class="line">#----设置好后测试网络连通性-------------------------</span><br><span class="line">C:\&gt;ping 192.168.10.1</span><br><span class="line">Reply from 192.168.20.1: bytes=32 time=1ms TTL=127</span><br><span class="line">C:\&gt;ping 192.168.20.1</span><br><span class="line">error</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆本征VLAN实现通信◆"><a href="#◆本征VLAN实现通信◆" class="headerlink" title="◆本征VLAN实现通信◆"></a>◆本征VLAN实现通信◆</h3><p>下面的实验用于理解<code>本征VLAN</code>的一些特性,并无实际作用,这里我们需要知道在<code>思科设备中</code>,默认规定的VLAN被称作<code>本征VLAN</code>,而在<code>华为设备中</code>叫做<code>默认VLAN(PIID)</code>,本征VLAN的作用是用来<code>给报文打标签</code>的,如果没有标签则说明默认就是<code>VLAN1</code>,默认的VLAN在发送数据包时是不需要打标签的,华为的设备如果不进行任何操作,则默认本征VLAN就是1号.</p>
+<p>这里有一道面试题,其目的是只给你两个交换机,且有两台跨网段的主机,这两台主机分别分布在<code>VLAN10</code>和<code>VLAN20</code>两个虚拟局域网中,在不加路由设备的情况下,通过其他的手段实现两台跨VLAN主机的通信,其实就用到了本征VLAN,拓扑结构图如下所示:</p>
+<p><img src="/picture/20190404105536.jpg" alt="blockchain"></p>
+<p><strong>配置交换机(两台):</strong> 分别配置两台交换机,将<code>Gig0/0/1</code>配置成<code>trunk接口</code>,将<code>Gig0/0/2</code>配置成<code>access接口</code>.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># ----配置交换机LSW1-------------------------------------------------------</span><br><span class="line">&lt;Huawei&gt; system-view</span><br><span class="line">[Huawei] sysname LSW1                                      // 将交换机命名为LSW1</span><br><span class="line">[LSW1] vlan 10                                             // 创建Vlan10接口</span><br><span class="line">[LSW1-vlan10] quit</span><br><span class="line"></span><br><span class="line">[LSW1] interface GigabitEthernet 0/0/1                     // 选择Gig0/0/1接口</span><br><span class="line">[LSW1-GigabitEthernet0/0/1] port link-type trunk           // 配置成trunk</span><br><span class="line">[LSW1-GigabitEthernet0/0/1] port trunk allow-pass vlan all // 对所有VLAN生效</span><br><span class="line">[LSW1-GigabitEthernet0/0/1] quit</span><br><span class="line"></span><br><span class="line">[LSW1] interface GigabitEthernet 0/0/2                      // 选择Gig0/0/2接口</span><br><span class="line">[LSW1-GigabitEthernet0/0/2] port link-type access           // 配置成access</span><br><span class="line">[LSW1-GigabitEthernet0/0/2] port default vlan 10            // 将此接口加入vlan10</span><br><span class="line">[LSW1-GigabitEthernet0/0/2] quit</span><br><span class="line"></span><br><span class="line">[LSW1] display port vlan active                             // 查询vlan接口配置情况</span><br><span class="line"># ----配置交换机LSW2-------------------------------------------------------</span><br><span class="line">&lt;Huawei&gt; system-view</span><br><span class="line">[Huawei] sysname LSW2</span><br><span class="line">[LSW2] vlan 20</span><br><span class="line">[LSW2-vlan20] quit</span><br><span class="line"></span><br><span class="line">[LSW2] interface GigabitEthernet 0/0/1</span><br><span class="line">[LSW2-GigabitEthernet0/0/1] port link-type trunk</span><br><span class="line">[LSW2-GigabitEthernet0/0/1] port trunk allow-pass vlan all</span><br><span class="line">[LSW2-GigabitEthernet0/0/1] quit</span><br><span class="line"></span><br><span class="line">[LSW2] interface GigabitEthernet 0/0/2	</span><br><span class="line">[LSW2-GigabitEthernet0/0/2] port link-type access </span><br><span class="line">[LSW2-GigabitEthernet0/0/2] port default vlan 20</span><br><span class="line">[LSW2-GigabitEthernet0/0/2] quit</span><br><span class="line"></span><br><span class="line">[LSW2] display port vlan active</span><br></pre></td></tr></table></figure></p>
+<p><strong>配置本征VLAN(两台):</strong> 最后分别在<code>LSW1和LSW2</code>两台交换机分别配置本征VLAN.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># ----配置交换机LSW1-------------------------------------------------------</span><br><span class="line">[LSW1] interface GigabitEthernet 0/0/1                 // 选择Gig0/0/1接口</span><br><span class="line">[LSW1-GigabitEthernet0/0/1] port trunk pvid vlan 10    // 配置本征vlan为vlan10</span><br><span class="line">[LSW1-GigabitEthernet0/0/1] quit</span><br><span class="line"></span><br><span class="line"># ----配置交换机LSW2-------------------------------------------------------</span><br><span class="line">[LSW2] interface GigabitEthernet 0/0/1</span><br><span class="line">[LSW2-GigabitEthernet0/0/1] port trunk pvid vlan 20    // 配置本征vlan为vlan20</span><br><span class="line">[LSW2-GigabitEthernet0/0/1] quit</span><br></pre></td></tr></table></figure></p>
+<p><strong>测试环节:</strong> 最后分别给四台设备配置好IP地址,并通过ping命令测试联通性.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#----设置客户主机IP地址+网关-------------------------</span><br><span class="line"></span><br><span class="line">[主机名]         [主机IP]     [子网]    [VLAN]</span><br><span class="line">PC1           192.168.10.1      24    VLAN 10</span><br><span class="line">PC2           192.168.10.2      24    VLAN 20</span><br><span class="line"></span><br><span class="line">#----设置好后测试网络连通性-------------------------</span><br><span class="line">C:\&gt;ping 192.168.10.1</span><br><span class="line">Reply from 192.168.20.1: bytes=32 time=1ms TTL=127</span><br><span class="line">C:\&gt;ping 192.168.10.2</span><br><span class="line">Reply from 192.168.20.1: bytes=32 time=1ms TTL=127</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆三层交换实现VLAN◆"><a href="#◆三层交换实现VLAN◆" class="headerlink" title="◆三层交换实现VLAN◆"></a>◆三层交换实现VLAN◆</h3><p>如果要在不同的VLAN之间进行数据通信,则必须利用一个具有三层(网络层)功能的设备来实现,目前常用的设备有三层交换机和路由器,在组建大型网络时出于安全考虑,必须把局域网按照功能划分为一个个小的局域网,来保证安全性,这就使得VLAN技术得以运用,但有时候我们还需要实现跨网段通信,则三层交换机可以实现我们的需求.</p>
+<p>虽然路由器可以完成不同网段之间跨网段通信,但是由于路由器端口数量有限,且路由速度慢,因此三层交换机就诞生了,三层交换机是指具有路由功能的交换机,也就是实现了二层的转发和三层的交换,其价格便宜性价比高,目前是组网的绝佳选择,以下是一个三层交换机组网小案例,不仅实现了VLAN的隔离,还可以实现跨网段通信.</p>
+<p><img src="/picture/20190404160800.jpg" alt="blockchain"></p>
+<p><strong>配置二层交换(两台):</strong> 首先配置2个二层交换机,将<code>Ethernet 0/0/1</code>配成<code>Trunk</code>接口,然后将<code>Ethernet 0/0/2</code>配成<code>vlan10</code>,<code>Ethernet 0/0/3</code>配成<code>vlan20</code>.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;Huawei&gt;system-view</span><br><span class="line"></span><br><span class="line">#----配置trunk------------------------------------------------------------</span><br><span class="line">[Huawei] interface Ethernet 0/0/1                         // 选择Eth0/0/1接口</span><br><span class="line">[Huawei-Ethernet0/0/1] port link-type trunk               // 配置成Trunk模式</span><br><span class="line">[Huawei-Ethernet0/0/1] port trunk allow-pass vlan all     // 针对所有VLAN</span><br><span class="line">[Huawei-Ethernet0/0/1] quit</span><br><span class="line"></span><br><span class="line">#----配置VLAN-------------------------------------------------------------</span><br><span class="line">[Huawei] vlan 10                                           // 创建VLAN10</span><br><span class="line">[Huawei-vlan10] quit</span><br><span class="line">[Huawei] vlan 20                                           // 创建VLAN20</span><br><span class="line">[Huawei-vlan20] quit</span><br><span class="line"></span><br><span class="line">#----加入VLAN组-----------------------------------------------------------</span><br><span class="line">[Huawei] interface Ethernet 0/0/2                          // 选择2号端口</span><br><span class="line">[Huawei-Ethernet0/0/2] port link-type access               // 配置成access模式</span><br><span class="line">[Huawei-Ethernet0/0/2] port default vlan 10                // 将其加入到vlan10</span><br><span class="line">[Huawei-Ethernet0/0/2] quit</span><br><span class="line"></span><br><span class="line">[Huawei] interface Ethernet 0/0/3</span><br><span class="line">[Huawei-Ethernet0/0/3] port link-type access</span><br><span class="line">[Huawei-Ethernet0/0/3] port default vlan 20</span><br><span class="line">[Huawei-Ethernet0/0/3] quit</span><br><span class="line"></span><br><span class="line">[Huawei]display vlan                                        // 显示VLAN端口配置情况</span><br><span class="line">The total number of vlans is : 3</span><br><span class="line">--------------------------------------------------------------------------------</span><br><span class="line">10   common  UT:Eth0/0/2(U)</span><br><span class="line">20   common  UT:Eth0/0/3(U)</span><br><span class="line"></span><br><span class="line">VID  Status  Property      MAC-LRN Statistics Description</span><br><span class="line">--------------------------------------------------------------------------------</span><br><span class="line"></span><br><span class="line">1    enable  default       enable  disable    VLAN 0001</span><br><span class="line">10   enable  default       enable  disable    VLAN 0010</span><br><span class="line">20   enable  default       enable  disable    VLAN 0020</span><br></pre></td></tr></table></figure></p>
+<p><strong>配置三层交换机:</strong> 添加<code>vlan10,20</code>端口,并将<code>Gig0/0/1到Gig0/0/2</code>设置为<code>trunk模式</code>,用于供二层交换机交换数据.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#----配置VLAN-------------------------------------------------------------</span><br><span class="line">&lt;Huawei&gt; system-view</span><br><span class="line">[Huawei] sysname LSW1</span><br><span class="line">[LSW1] vlan batch 10 20                                     // 分别创建 vlan 10,20</span><br><span class="line"></span><br><span class="line">#----配置端口-------------------------------------------------------------</span><br><span class="line">[LSW1] interface GigabitEthernet 0/0/1</span><br><span class="line">[LSW1-GigabitEthernet0/0/1] port link-type trunk</span><br><span class="line">[LSW1-GigabitEthernet0/0/1] port trunk allow-pass vlan all</span><br><span class="line"></span><br><span class="line">[LSW1]interface GigabitEthernet 0/0/2</span><br><span class="line">[LSW1-GigabitEthernet0/0/1] port link-type trunk</span><br><span class="line">[LSW1-GigabitEthernet0/0/1] port trunk allow-pass vlan all</span><br><span class="line"></span><br><span class="line">[LSW1] display vlan</span><br></pre></td></tr></table></figure></p>
+<p><strong>配置三层交换网关:</strong> 开启SVI路由功能,分别为<code>vlan 10 和 vlan 20</code> 配置好网关地址.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[LSW1] interface vlanif 10            // 创建交换机虚拟接口</span><br><span class="line">[LSW1] ip add 192.168.10.1 24         // 配置ip地址</span><br><span class="line"></span><br><span class="line">[LSW1] interface vlanif 20            // 创建交换机虚拟接口</span><br><span class="line">[LSW1] ip add 192.168.20.1 24         // 配置ip地址</span><br><span class="line"></span><br><span class="line">[LSW1] display ip interface brief     // 显示接口</span><br><span class="line">[LSW1] display ip routing-table       // 显示路由表</span><br></pre></td></tr></table></figure></p>
+<p><strong>客户机配置网关:</strong> 给每个客户机配置好IP地址和网关参数,并测试连通性,成功后则同VLAN四个IP都能互相PING通.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#----设置客户主机IP地址+网关------------------------------------------</span><br><span class="line"></span><br><span class="line">[主机名]         [主机IP]           [网关]</span><br><span class="line">PC1           192.168.10.2     192.168.10.1</span><br><span class="line">PC2           192.168.20.2     192.168.20.1</span><br><span class="line">PC3           192.168.10.3     192.168.10.1</span><br><span class="line">PC4           192.168.20.3     192.168.20.1</span><br><span class="line"></span><br><span class="line">#----设置好后测试网络连通性------------------------------------------</span><br><span class="line"></span><br><span class="line">C:\&gt;ping 192.168.10.1</span><br><span class="line">Reply from 192.168.20.1: bytes=32 time=1ms TTL=127</span><br><span class="line">C:\&gt;ping 192.168.10.2</span><br><span class="line">Reply from 192.168.10.2: bytes=32 time=1ms TTL=127</span><br><span class="line">C:\&gt;ping 192.168.10.3</span><br><span class="line">Reply from 192.168.10.3: bytes=32 time=1ms TTL=127</span><br></pre></td></tr></table></figure></p>
+<h3 id="◆单臂路由实现VLAN◆"><a href="#◆单臂路由实现VLAN◆" class="headerlink" title="◆单臂路由实现VLAN◆"></a>◆单臂路由实现VLAN◆</h3><p>单臂路由是指在路由器的一个物理接口上通过配置子接口的方式,实现原来相互隔离的不同VLAN之间的通信,子接口是在物理接口上衍生出来的逻辑接口,一个物理接口可以衍生出许多的逻辑接口.</p>
+<p>一般路由器的物理接口数量有限,如果每个VLAN都使用一个物理接口进行连接,在网络中VLAN数量较多的情况下需要使用多台路由器才能实现VLAN之间的通信,而通过使用子接口可以在一个物理接口上容纳更多的VLAN,从而很好的解决了此问题.</p>
+<p><img src="/picture/20190404140610.jpg" alt="blockchain"></p>
+<p><strong>配置交换机:</strong> 在交换机上创建虚拟局域网<code>vlan10和vlan20</code>,并将<code>Gig0/0/2至Gig0/0/3</code>端口加入到<code>vlan10</code>,然后将<code>Gig0/0/4至Gig0/0/5</code>端口加入到<code>vlan20</code>.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;Huawei&gt; system-view</span><br><span class="line">[Huawei] vlan batch 10 20                              // 创建VLAN10和VLAN20</span><br><span class="line"></span><br><span class="line">[Huawei] port-group group-member Gig0/0/2 to Gig0/0/3  // 选择Gig2-3端口</span><br><span class="line">[Huawei-port-group] undo shutdown                      // 开启端口</span><br><span class="line">[Huawei-port-group] port link-type access              // 配置成access模式</span><br><span class="line">[Huawei-port-group] port default vlan 10               // 将端口加入到vlan 10</span><br><span class="line"></span><br><span class="line">[Huawei] port-group group-member Gig0/0/4 to Gig0/0/5</span><br><span class="line">[Huawei-port-group] undo shutdown</span><br><span class="line">[Huawei-port-group] port link-type access</span><br><span class="line">[Huawei-port-group] port default vlan 20</span><br></pre></td></tr></table></figure></p>
+<p><strong>设置Trunk模式:</strong> 将<code>交换机</code>与路由器相连的端口设置为<code>Trunk模式</code>,此处设置交换机的<code>Gig0/0/1口</code>将其设置为Trunk干道模式.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;Huawei&gt; system-view</span><br><span class="line">[Huawei] interface GigabitEthernet 0/0/1                           // 选择Gig0/0/1接口</span><br><span class="line">[Huawei-GigabitEthernet0/0/1] port link-type trunk                 // 配置成trunk模式</span><br><span class="line">[Huawei-GigabitEthernet0/0/1] port trunk allow-pass vlan all       // 应用于所有接口</span><br><span class="line">[Huawei-GigabitEthernet0/0/1] display this                         // 显示配置结果</span><br><span class="line">#</span><br><span class="line">interface GigabitEthernet0/0/1</span><br><span class="line"> port link-type trunk</span><br><span class="line"> port trunk allow-pass vlan 2 to 4094</span><br><span class="line">#</span><br></pre></td></tr></table></figure></p>
+<p><strong>配置路由器子接口:</strong> 在路由器的<code>Ethernet0/0/0</code>接口上创建逻辑接口,并使用<code>IEEE802.1Q协议</code>封装,此处我们创建两个子接口即可.<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;Huawei&gt; system-view</span><br><span class="line">[Huawei] sysname R1</span><br><span class="line"></span><br><span class="line">[R1] interface Ethernet 0/0/0.1                    // 创建一个子接口</span><br><span class="line">[R1-Ethernet0/0/0.1] ip add 192.168.10.1 24        // 指定子接口ip地址</span><br><span class="line">[R1-Ethernet0/0/0.1] dot1q termination vid 10      // 和vlan10相关联</span><br><span class="line">[R1-Ethernet0/0/0.1] arp broadcast enable          // 开启arp广播包</span><br><span class="line"></span><br><span class="line">[R1] interface Ethernet 0/0/0.2                    // 创建一个子接口</span><br><span class="line">[R1-Ethernet0/0/0.1] ip add 192.168.20.1 24        // 指定子接口ip地址</span><br><span class="line">[R1-Ethernet0/0/0.1] dot1q termination vid 20      // 和vlan10相关联</span><br><span class="line">[R1-Ethernet0/0/0.1] arp broadcast enable          // 开启arp广播包</span><br><span class="line">[R1-Ethernet0/0/0.1] quit</span><br><span class="line"></span><br><span class="line">[R1] display ip routing-table                      // 查询路由记录</span><br></pre></td></tr></table></figure></p>
+<p><strong>客户机配置网关:</strong> 给每个客户机配置好IP地址和网关参数,并测试连通性.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment">#----设置客户主机IP地址+网关------------------------------------------</span></span><br><span class="line"></span><br><span class="line">[主机名]         [主机IP]           [网关]</span><br><span class="line">PC1           192.168.10.2     192.168.10.1</span><br><span class="line">PC2           192.168.10.3     192.168.10.1</span><br><span class="line">PC3           192.168.20.2     192.168.20.1</span><br><span class="line">PC4           192.168.20.3     192.168.20.1</span><br><span class="line"></span><br><span class="line"><span class="comment">#----设置好后测试网络连通性------------------------------------------</span></span><br><span class="line"></span><br><span class="line">C:\&gt;ping 192.168.10.2</span><br><span class="line">Reply from 192.168.10.2: bytes=32 time=1ms TTL=127</span><br><span class="line">C:\&gt;ping 192.168.10.3</span><br><span class="line">Reply from 192.168.10.3: bytes=32 time=1ms TTL=127</span><br><span class="line">C:\&gt;ping 192.168.20.2</span><br><span class="line">error</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2019/04/03/网络设备配置/华为交换机配置笔记/">华为交换机配置笔记</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2019年04月03日 - 08:04</p>
+  <p><span>最后更新:</span>2019年04月16日 - 14:04</p>
+  <p><span>原始链接:</span><a href="/2019/04/03/网络设备配置/华为交换机配置笔记/" title="华为交换机配置笔记">https://www.mkdirs.com/2019/04/03/网络设备配置/华为交换机配置笔记/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/网络设备配置/" rel="tag"> <i class="fa fa-tag"></i> 网络设备配置</a>
+          
+            <a href="/tags/huawei/" rel="tag"> <i class="fa fa-tag"></i> huawei</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/31/渗透测试/Nmap 网络扫描器笔记/" rel="next" title="Nmap 网络扫描器笔记">
+                <i class="fa fa-chevron-left"></i> Nmap 网络扫描器笔记
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/06/网络设备配置/华为生成树与端口聚合/" rel="prev" title="华为生成树与端口聚合">
+                华为生成树与端口聚合 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#交换机的初始化"><span class="nav-text">交换机的初始化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#交换机常用参数"><span class="nav-text">交换机常用参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#交换机实现VLAN"><span class="nav-text">交换机实现VLAN</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆单交换机实现VLAN◆"><span class="nav-text">◆单交换机实现VLAN◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆跨交换机实现VLAN◆"><span class="nav-text">◆跨交换机实现VLAN◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆本征VLAN实现通信◆"><span class="nav-text">◆本征VLAN实现通信◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆三层交换实现VLAN◆"><span class="nav-text">◆三层交换实现VLAN◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆单臂路由实现VLAN◆"><span class="nav-text">◆单臂路由实现VLAN◆</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

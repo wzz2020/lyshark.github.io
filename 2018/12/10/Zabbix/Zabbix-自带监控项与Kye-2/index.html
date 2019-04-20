@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Zabbix是一个非常强大的监控系统,是企业级的软件,来监控IT基础设施的可用性和性能.它是一个能够快速搭建起来的开源的监控系统,Zabbix能监视各种网络参数,保证服务器系统的安全运营,并提供灵活的通知机制以让系统管理员快速定位解决存在的各种问题,Zabbix系统几乎可用于任何系统的监控过程,它可以运行在Linux,Solaris,HP-UX,AIX,Free BSD,Open BSD,OS X">
+<meta name="keywords" content="Zabbix">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Zabbix 自带监控项与Kye(2)">
+<meta property="og:url" content="https://www.mkdirs.com/2018/12/10/Zabbix/Zabbix-自带监控项与Kye-2/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="Zabbix是一个非常强大的监控系统,是企业级的软件,来监控IT基础设施的可用性和性能.它是一个能够快速搭建起来的开源的监控系统,Zabbix能监视各种网络参数,保证服务器系统的安全运营,并提供灵活的通知机制以让系统管理员快速定位解决存在的各种问题,Zabbix系统几乎可用于任何系统的监控过程,它可以运行在Linux,Solaris,HP-UX,AIX,Free BSD,Open BSD,OS X">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20181212102420.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20181212103507.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20181212103958.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20181212104024.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20181212105527.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20181212110257.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20181212110428.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20181212155624.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20181212155719.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20181212155738.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20181212161149.jpg">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20181212161218.jpg">
+<meta property="og:updated_time" content="2018-12-12T08:14:22.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Zabbix 自带监控项与Kye(2)">
+<meta name="twitter:description" content="Zabbix是一个非常强大的监控系统,是企业级的软件,来监控IT基础设施的可用性和性能.它是一个能够快速搭建起来的开源的监控系统,Zabbix能监视各种网络参数,保证服务器系统的安全运营,并提供灵活的通知机制以让系统管理员快速定位解决存在的各种问题,Zabbix系统几乎可用于任何系统的监控过程,它可以运行在Linux,Solaris,HP-UX,AIX,Free BSD,Open BSD,OS X">
+<meta name="twitter:image" content="https://www.mkdirs.com/picture/20181212102420.jpg">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/12/10/Zabbix/Zabbix-自带监控项与Kye-2/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Zabbix 自带监控项与Kye(2) | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/12/10/Zabbix/Zabbix-自带监控项与Kye-2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Zabbix 自带监控项与Kye(2)
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-10 09:33:39" itemprop="dateCreated datePublished" datetime="2018-12-10T09:33:39+08:00">2018-12-10</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-12-12 16:14:22" itemprop="dateModified" datetime="2018-12-12T16:14:22+08:00">2018-12-12</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Zabbix/" itemprop="url" rel="index"><span itemprop="name">Zabbix</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Zabbix是一个非常强大的监控系统,是企业级的软件,来监控IT基础设施的可用性和性能.它是一个能够快速搭建起来的开源的监控系统,Zabbix能监视各种网络参数,保证服务器系统的安全运营,并提供灵活的通知机制以让系统管理员快速定位解决存在的各种问题,Zabbix系统几乎可用于任何系统的监控过程,它可以运行在Linux,Solaris,HP-UX,AIX,Free BSD,Open BSD,OS X,等平台上. </p>
+<a id="more"></a>
+<p><br></p>
+<h2 id="开启主机自动发现"><a href="#开启主机自动发现" class="headerlink" title="开启主机自动发现"></a>开启主机自动发现</h2><p>⦁选择配置 -&gt;自动发现 -&gt;创建自动发现-&gt;ip范围必须连续,不连续的话逗号分开<br>⦁更新间隔 -&gt; 2s -&gt;更新<br>⦁检查 -&gt; 选择新的 -&gt; ICMP ping -&gt;更新</p>
+<p><img src="/picture/20181212102420.jpg" alt="blockchain"></p>
+<p>⦁动作 -&gt;事件源(自动发现) –&gt;创建动作 -&gt;iP地址<br>⦁主机IP =192.168.1.1 192.168.1.254<br>⦁在线/不在线&gt;=1秒</p>
+<p><img src="/picture/20181212103507.jpg" alt="blockchain"></p>
+<p>操作(这里是否报警)-&gt;删除</p>
+<p>⦁点击操作-&gt;选择新的标签-&gt;操作类型-&gt;添加主机-&gt;添加<br>⦁点击操作-&gt;选择新的标签-&gt;操作类型-&gt;添加主机群组-&gt;选择一个群组-&gt;添加<br>⦁点击操作-&gt;选择新的标签-&gt;操作类型-&gt;与模板相关联-&gt;选择你要添加的模板-&gt;添加<br>⦁点击操作-&gt;选择新的标签-&gt;操作类型-&gt;启用主机-&gt;添加</p>
+<p><img src="/picture/20181212103958.jpg" alt="blockchain"></p>
+<p>⦁最后点击-&gt;自动发现-&gt;启用自动发现即可</p>
+<p><img src="/picture/20181212104024.jpg" alt="blockchain"><br><br></p>
+<h2 id="监控进程连接数"><a href="#监控进程连接数" class="headerlink" title="监控进程连接数"></a>监控进程连接数</h2><p>⦁首先,直接添加一个主机,我们不要选择模板,直接添加一个裸主机.</p>
+<p><img src="/picture/20181212105527.jpg" alt="blockchain"></p>
+<p>⦁其次我们的被控主机安装一下Apache软件,并能在控制端通过zabbix-get命令获取到Apache进程数.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># zabbix_get -s 192.168.1.25 -k proc.num[httpd]</span></span><br><span class="line">6</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># zabbix_get -s 192.168.1.25 -k proc.num[httpd,,,]</span></span><br><span class="line">6</span><br><span class="line"></span><br><span class="line"><span class="comment">#以上两种写法相同,具体命令参数应该看文档.</span></span><br></pre></td></tr></table></figure></p>
+<p>⦁在web界面上,选择监控项-&gt;创建监控项-&gt;选择键值-&gt;修改成<code>proc.num[httpd,,,]</code>-&gt;点击添加.</p>
+<p><img src="/picture/20181212110257.jpg" alt="blockchain"></p>
+<p>⦁接着点击图形-&gt;创建图形-&gt;选择创建的自定义key-&gt;保存即可.</p>
+<p><img src="/picture/20181212110428.jpg" alt="blockchain"><br><br></p>
+<h2 id="其他常用监控key"><a href="#其他常用监控key" class="headerlink" title="其他常用监控key"></a>其他常用监控key</h2><p>同理,我们就可以使用系统默认的监控key来监控内存,CPU以及网络等流量信息,配置过程同上一个案例相同,只是在配置中使用的配置参数略有区别罢了,此处就不再演示了.</p>
+<p><strong>监控CPU</strong><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">system.cpu.util[&lt;cpu&gt;,&lt;<span class="built_in">type</span>&gt;,&lt;mode&gt;]</span><br><span class="line"></span><br><span class="line">-CPU:  CPU数量(默认是所有CPU)</span><br><span class="line">-Type: 可用值,idle,nice,user,system,iowait,interrupt,sottrq,steal</span><br><span class="line">-Mode  可用值,avg1(一分钟负载),avg5,avg15</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># zabbix_get -s 192.168.1.25 -k system.cpu.util[,,avg1]</span></span><br><span class="line">0.016692</span><br></pre></td></tr></table></figure></p>
+<p><strong>监控内存</strong><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">proc.mem[&lt;name&gt;,&lt;user&gt;,&lt;mode&gt;,&lt;cmdline&gt;,&lt;memtype&gt;]</span><br><span class="line"></span><br><span class="line">-name    进程名(默认所有进程)</span><br><span class="line">-user    用户名(默认所有用户)</span><br><span class="line">-mode    可选值,avg,max,min,sum</span><br><span class="line">-cmdline 命令过滤</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># zabbix_get -s 192.168.1.25 -k proc.mem[httpd,,,]</span></span><br><span class="line">1376378880</span><br><span class="line">[root@localhost ~]<span class="comment"># zabbix_get -s 192.168.1.25 -k proc.mem[]</span></span><br><span class="line">6479925248</span><br></pre></td></tr></table></figure></p>
+<p><strong>监控网卡</strong><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">net.if.in [<span class="keyword">if</span>,&lt;mode&gt;]       <span class="comment">#网卡入口流量</span></span><br><span class="line">net.if.out [<span class="keyword">if</span>,&lt;mode&gt;]      <span class="comment">#网卡出口流量</span></span><br><span class="line">net.if.total [<span class="keyword">if</span>,&lt;mode&gt;]    <span class="comment">#网卡进/出流量总和</span></span><br><span class="line"></span><br><span class="line">-<span class="keyword">if</span>    网卡名称</span><br><span class="line">-mode  可用值(如下)</span><br><span class="line"></span><br><span class="line">       bytes    字节数</span><br><span class="line">       packets  包数量</span><br><span class="line">       errors   错误数量</span><br><span class="line">       droppend 丢包数量</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># zabbix_get -s 192.168.1.25 -k net.if.in[ens32,bytes]</span></span><br><span class="line">165983</span><br><span class="line">[root@localhost ~]<span class="comment"># zabbix_get -s 192.168.1.25 -k net.if.in[ens32,packets]</span></span><br><span class="line">2166</span><br><span class="line">[root@localhost ~]<span class="comment"># zabbix_get -s 192.168.1.25 -k net.if.out[ens32,packets]</span></span><br><span class="line">2067</span><br></pre></td></tr></table></figure></p>
+<p><strong>监控IO/读写</strong><br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">vfs.dev.read [&lt;device&gt;,&lt;<span class="built_in">type</span>&gt;,&lt;mode&gt;]    <span class="comment">#磁盘读取</span></span><br><span class="line">vfs.dev.write [&lt;device&gt;,&lt;<span class="built_in">type</span>&gt;,&lt;mode&gt;]   <span class="comment">#磁盘写入</span></span><br><span class="line"></span><br><span class="line">-device   磁盘设备(默认all)</span><br><span class="line">-<span class="built_in">type</span>     sectors,operations,bytes,sps,ops,hps</span><br><span class="line">-mode     默认有(avg1,avg5,avg15)</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># zabbix_get -s 192.168.1.25 -k vfs.dev.read[/dev/sda,,avg1]</span></span><br><span class="line">0.000000</span><br><span class="line">[root@localhost ~]<span class="comment"># zabbix_get -s 192.168.1.25 -k vfs.dev.read[all]</span></span><br><span class="line">195.200000</span><br><span class="line">[root@localhost ~]<span class="comment"># zabbix_get -s 192.168.1.25 -k vfs.dev.read[all,,avg1]</span></span><br><span class="line">195.200000</span><br><span class="line">[root@localhost ~]<span class="comment"># zabbix_get -s 192.168.1.25 -k vfs.dev.read[all,,avg5]</span></span><br><span class="line">177.758242</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># zabbix_get -s 192.168.1.25 -k vfs.dev.write[all,,avg5]</span></span><br><span class="line">465.284483</span><br><span class="line">[root@localhost ~]<span class="comment"># zabbix_get -s 192.168.1.25 -k vfs.dev.write[all,,avg1]</span></span><br><span class="line">877.200000</span><br><span class="line">[root@localhost ~]<span class="comment"># zabbix_get -s 192.168.1.25 -k vfs.dev.write[/dev/sda,,]</span></span><br><span class="line">374.800000</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="监控web页状态"><a href="#监控web页状态" class="headerlink" title="监控web页状态"></a>监控web页状态</h2><p>首先在被控主机安装httpd服务,并设置好一个页面.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y httpd</span></span><br><span class="line">Loaded plugins: fastestmirror</span><br><span class="line">Loading mirror speeds from cached hostfile</span><br><span class="line">Package httpd-2.4.6-88.el7.centos.x86_64 already installed and latest version</span><br><span class="line">Nothing to <span class="keyword">do</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># echo "hello world" &gt; /var/www/html/index.html</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl restart httpd</span></span><br></pre></td></tr></table></figure></p>
+<p>监控主机选择 <code>主机-&gt;web场景-&gt;创建web场景-&gt;步骤-&gt;网页状态</code>.</p>
+<p><img src="/picture/20181212155624.jpg" alt="blockchain"></p>
+<p><img src="/picture/20181212155719.jpg" alt="blockchain"></p>
+<p><img src="/picture/20181212155738.jpg" alt="blockchain"></p>
+<p>此时,配置web监控就完成啦,很简单吧,下面继续来看一下自定义key的使用步骤吧.<br><br></p>
+<h2 id="自定义一个Key"><a href="#自定义一个Key" class="headerlink" title="自定义一个Key"></a>自定义一个Key</h2><p>1.下面我们来自定义一个Key来实现监控两个服务,这里我们先写一个脚本,脚本有一个参数当传入http时,返回http的进程数量,当传入system参数时,显示系统的总进程数,此处实在客户端操作的.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line">num=<span class="variable">$1</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> [ <span class="variable">$num</span> == <span class="string">"http"</span> ]</span><br><span class="line"><span class="keyword">then</span></span><br><span class="line">        ps aux |grep -v <span class="string">"grep"</span> |grep <span class="string">"http"</span> |wc -l</span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"><span class="keyword">if</span> [ <span class="variable">$num</span> == <span class="string">"system"</span> ]</span><br><span class="line"><span class="keyword">then</span></span><br><span class="line">        ps aux |wc -l</span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># chmod 777 -R shell.sh</span></span><br><span class="line">[root@localhost ~]<span class="comment"># bash shell.sh http</span></span><br><span class="line">7</span><br><span class="line">[root@localhost ~]<span class="comment"># bash shell.sh system</span></span><br><span class="line">192</span><br></pre></td></tr></table></figure></p>
+<p>2.将我们的脚本放入自定义目录,并设置zabbix添加一个key.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cp -a shell.sh  /etc/shell.sh</span></span><br><span class="line">[root@localhost ~]<span class="comment"># vim /etc/zabbix/zabbix_agentd.conf</span></span><br><span class="line"></span><br><span class="line">UnsafeUserParameters=1</span><br><span class="line">UserParameter=shell.shell[*],/etc/shell.sh \<span class="variable">$1</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl restart zabbix-agent</span></span><br></pre></td></tr></table></figure></p>
+<p>3.在zabbix服务端通过zabbix-get命令测试一下效果.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># zabbix_get -s 192.168.1.25 -k shell.shell[http]</span></span><br><span class="line">7</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># zabbix_get -s 192.168.1.25 -k shell.shell[system]</span></span><br><span class="line">192</span><br></pre></td></tr></table></figure></p>
+<p>4.去web页面配置一下就可以了,很简单吧,嘿嘿.</p>
+<p>主机-&gt;监控项-&gt;创建监控项</p>
+<p><img src="/picture/20181212161149.jpg" alt="blockchain"></p>
+<p>主机-&gt;图形-&gt;创建图形</p>
+<p><img src="/picture/20181212161218.jpg" alt="blockchain"></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/12/10/Zabbix/Zabbix-自带监控项与Kye-2/">Zabbix 自带监控项与Kye(2)</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年12月10日 - 09:12</p>
+  <p><span>最后更新:</span>2018年12月12日 - 16:12</p>
+  <p><span>原始链接:</span><a href="/2018/12/10/Zabbix/Zabbix-自带监控项与Kye-2/" title="Zabbix 自带监控项与Kye(2)">https://www.mkdirs.com/2018/12/10/Zabbix/Zabbix-自带监控项与Kye-2/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Zabbix/" rel="tag"> <i class="fa fa-tag"></i> Zabbix</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/09/Zabbix/Zabbix-系统概述与部署-1/" rel="next" title="Zabbix 系统概述与部署(1)">
+                <i class="fa fa-chevron-left"></i> Zabbix 系统概述与部署(1)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/10/Zabbix/Zabbix-配置Python邮件告警-3/" rel="prev" title="Zabbix 配置Python邮件告警(3)">
+                Zabbix 配置Python邮件告警(3) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#开启主机自动发现"><span class="nav-text">开启主机自动发现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#监控进程连接数"><span class="nav-text">监控进程连接数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他常用监控key"><span class="nav-text">其他常用监控key</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#监控web页状态"><span class="nav-text">监控web页状态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#自定义一个Key"><span class="nav-text">自定义一个Key</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

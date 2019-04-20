@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Postfix 是一种电子邮件服务器,它是由任职于IBM华生研究中心 (T.J. Watson Research Center) 的荷兰籍研究员Wietse Venema为了改良sendmail邮件服务器而产生的.最早在1990年代晚期出现,是一个开放源代码的软件. Postfix 是Wietse Venema在IBM的GPL协议之下开发的MTA(邮件传输代理)软件.postfix是Wietse">
+<meta name="keywords" content="Linux 服务配置">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PostFix+Dovecot 部署邮件系统">
+<meta property="og:url" content="https://www.mkdirs.com/2018/09/17/Linux 服务配置/PostFix+Dovecot 部署邮件系统/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="Postfix 是一种电子邮件服务器,它是由任职于IBM华生研究中心 (T.J. Watson Research Center) 的荷兰籍研究员Wietse Venema为了改良sendmail邮件服务器而产生的.最早在1990年代晚期出现,是一个开放源代码的软件. Postfix 是Wietse Venema在IBM的GPL协议之下开发的MTA(邮件传输代理)软件.postfix是Wietse">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://www.mkdirs.com/picture/20180917214439.jpg">
+<meta property="og:updated_time" content="2019-04-16T12:37:53.256Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PostFix+Dovecot 部署邮件系统">
+<meta name="twitter:description" content="Postfix 是一种电子邮件服务器,它是由任职于IBM华生研究中心 (T.J. Watson Research Center) 的荷兰籍研究员Wietse Venema为了改良sendmail邮件服务器而产生的.最早在1990年代晚期出现,是一个开放源代码的软件. Postfix 是Wietse Venema在IBM的GPL协议之下开发的MTA(邮件传输代理)软件.postfix是Wietse">
+<meta name="twitter:image" content="https://www.mkdirs.com/picture/20180917214439.jpg">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/09/17/Linux 服务配置/PostFix+Dovecot 部署邮件系统/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>PostFix+Dovecot 部署邮件系统 | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/09/17/Linux 服务配置/PostFix+Dovecot 部署邮件系统/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">PostFix+Dovecot 部署邮件系统
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-09-17 21:19:40" itemprop="dateCreated datePublished" datetime="2018-09-17T21:19:40+08:00">2018-09-17</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-16 20:37:53" itemprop="dateModified" datetime="2019-04-16T20:37:53+08:00">2019-04-16</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Linux-服务配置/" itemprop="url" rel="index"><span itemprop="name">Linux 服务配置</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Postfix 是一种电子邮件服务器,它是由任职于IBM华生研究中心 (T.J. Watson Research Center) 的荷兰籍研究员Wietse Venema为了改良sendmail邮件服务器而产生的.最早在1990年代晚期出现,是一个开放源代码的软件.</p>
+<p>Postfix 是Wietse Venema在IBM的GPL协议之下开发的MTA(邮件传输代理)软件.postfix是Wietse Venema想要为使用最广泛的sendmail提供替代品的一个尝试,在Internet世界中,大部分的电子邮件都是通过sendmail来投递的,大约有100万用户使用sendmail,每天投递上亿封邮件.这真是一个让人吃惊的数字,Postfix试图更快、更容易管理、更安全,同时还与sendmail保持足够的兼容性.</p>
+<a id="more"></a>
+<p><strong>生活中常用的邮件服务器</strong></p>
+<p>Sendmail: 资格最古老,运行稳定,但安全性欠佳.<br>Postfix: 采用模块化设计,在投递效率、稳定性、性能及安全性方面表现优秀,与sendmail保持足够的兼容性.<br>Qmail: 采用模块化设计,速度快、执行效率高,配置稍微复杂点.<br>Outook：是一个客户端代理.<br>FoxMail：也是客户端代理.</p>
+<p><strong>PostFix的特点</strong></p>
+<p>1.PostFix是免费,开源的,并且兼容sendmail<br>2.性能好,大约比sendmail快三倍,一台运行postfix的台式pc每天可收发上百万邮件.<br>3.安全性,PostFix具有多层防御结构,可以有效地抵御恶意入侵者,可以运行在较低的权限之下.<br>4.灵活性好,postfix是由超过一打的小程序组成的,每个程序完成特定功能.可以通过配置设置每个程序的运行参数.<br>5.健壮稳定,postfix被设计成在重负荷之下仍然可以正常工作.当系统运行超出了可用的内存或磁盘空间时,postfix会自动减少运行进程的数目.当处理的邮件数目增长时,Postfix运行的进程不会跟着增加.</p>
+<p><strong>PostFix工作流程图解</strong></p>
+<p><img src="/picture/20180917214439.jpg" alt="blockchain"></p>
+<p>1.客户端通过Outlook或网页客户端软件，向邮件服务器发送一封邮件,首先邮件服务器会检查是发往本域,还是发往其他域.</p>
+<p>2.如果发送到本域直接存放到Mailbox中,另外一个用户上线,需要收取这封邮件,借助dovecot软件,通过dovecot进入数据库验证身份,验证通过以后,就可以通过MRA调用POP3或者IMAP4的协议,进入邮箱收取邮件,并且将邮件转发给用户.</p>
+<p>3.如果发送到其他域,转发之前验证用户身份,是否要为其转发邮件,验证的时候是用到了SASL函数库,用户的信息是放到了数据库中,此时我们需要一个中间层authlib,通过authlib替SASL函数库向数据库进行验证,做”发信认证”,认证通过允许转发,验证不通过拒绝转发.</p>
+<p>4.通过浏览器访问邮件服务器(EXtmall/FoxMali),转发到其他域,放到邮箱,到数据库验证.</p>
+<p><strong>关于邮件系统中的角色</strong></p>
+<p>MUA：邮件用户代理 (sendmail qmail postfix)<br>MTA：邮件传输代理 (outlook)<br>MDA：邮件分发代理 (maildrop)<br>MRA：邮件检索代理 (dovecot)</p>
+<p>postfix: 实现邮件发送服务器的角色.<br>dovecot: 作为邮件接收服务器的角色.<br>extmail: 实现利用web界面收发信件.<br>extman: 用户注册同个extman的页面.<br>mysql: 存放用户的账户信息.<br>cyrus-sasl,courier-authlib: 实现用户的身份验证.</p>
+<p><strong>邮件应用使用协议</strong></p>
+<p>1.SMTP,简单邮件传输协议,TCP 25端口,加密时使用TCP 465端口,(发送邮件),客户端向其他服务器发送邮件或者服务器向其他服务器转发邮件,发送方使用的都是SMTP协议.<br>2.POP3,第3版邮局协议,TCP 110端口,加密时使用TCP 995端口,(收邮件) 收取邮件的时候,先将服务器的邮件下载到本地,所有的操作都是在本地完成.<br>3.IMAP4,第4版互联网消息访问协议,TCP 143端口,加密时使用 993端口,(比POP3灵活)接收邮件,客户端和服务器端交互了以后,在服务器端处理,好处能实现更多的功能,例如查看邮件的信息,但是消耗的系统的资越高.</p>
+<p><strong>面试技巧</strong></p>
+<p>SMTP 简单邮件传输协议（发邮件）TCP 25端口，加密时使用TCP 465端口<br>POP3 第三版邮局协议（收邮件）TCP 110 端口，加密时使用 TCP 995端口<br>IMAP4 第四版互联网邮件访问协议（收邮件）TCP 143端口，加密时使用TCP 993端口<br><br></p>
+<h2 id="配置DNS域名解析"><a href="#配置DNS域名解析" class="headerlink" title="配置DNS域名解析"></a>配置DNS域名解析</h2><p>首先我们需要配置bind为客户端提供dns域名解析</p>
+<p>1.安装bind,为客户提供解析服务<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y bind</span></span><br><span class="line">Loaded plugins: product-id, search-disabled-repos, subscription-manager</span><br><span class="line">This system is not registered with an entitlement server. You can use subscription-manager.</span><br><span class="line">Server                                                                            00:00:00</span><br><span class="line">Resolving Dependencies</span><br><span class="line">--&gt; Running transaction check</span><br><span class="line">---&gt; Package bind.x86_64 32:9.9.4-61.el7 will be installed</span><br><span class="line">--&gt; Processing Dependency: <span class="built_in">bind</span>-libs = 32:9.9.4-61.el7</span><br><span class="line">......</span><br><span class="line">Installed:</span><br><span class="line">  bind.x86_64 32:9.9.4-61.el7</span><br><span class="line">Dependency Installed:</span><br><span class="line">  <span class="built_in">bind</span>-libs.x86_64 32:9.9.4-61.el7</span><br><span class="line">Complete!</span><br><span class="line">[root@localhost ~]<span class="comment">#</span></span><br></pre></td></tr></table></figure></p>
+<p>2.修改dns主配置文件,区域文件和域名配置文件等<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/named.conf</span></span><br><span class="line"></span><br><span class="line"> 12 options &#123;</span><br><span class="line"> 13         listen-on port 53 &#123; any; &#125;;                                  <span class="comment">#修改IPV4的侦听端口</span></span><br><span class="line"> 14         listen-on-v6 port 53 &#123; ::any; &#125;;                             <span class="comment">#修改IPV6的侦听端口</span></span><br><span class="line"> 15         directory       <span class="string">"/var/named"</span>;</span><br><span class="line"> 16         dump-file       <span class="string">"/var/named/data/cache_dump.db"</span>;</span><br><span class="line"> 17         statistics-file <span class="string">"/var/named/data/named_stats.txt"</span>;</span><br><span class="line"> 18         memstatistics-file <span class="string">"/var/named/data/named_mem_stats.txt"</span>;</span><br><span class="line"> 19         allow-query     &#123; any; &#125;;                                    <span class="comment">#允许迭代</span></span><br><span class="line"> 20</span><br><span class="line"> 21         /*</span><br></pre></td></tr></table></figure></p>
+<p>3.修改named.rfc1912.zones区域配置文件,或者写在named.conf的底部也可以<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/named.rfc1912.zones</span></span><br><span class="line"></span><br><span class="line"> 42</span><br><span class="line"> 43 zone <span class="string">"lyshark.com"</span> IN &#123;                                         <span class="comment">#添加此处区域文件</span></span><br><span class="line"> 44         <span class="built_in">type</span> master;                                            <span class="comment">#声明为主dns</span></span><br><span class="line"> 45         file <span class="string">"lyshark.com.zone"</span>;                                <span class="comment">#声明区域配置文件名称</span></span><br><span class="line"> 46         allow-update &#123;none;&#125;;                                   <span class="comment">#是否迭代</span></span><br><span class="line"> 47 &#125;;</span><br></pre></td></tr></table></figure></p>
+<p>4.拷贝默认区域配置文件,修改成lyshark.com.zone并做邮件交换记录配置<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cd /var/named/</span></span><br><span class="line">[root@localhost named]<span class="comment">#</span></span><br><span class="line">[root@localhost named]<span class="comment"># ls</span></span><br><span class="line">data  dynamic  named.ca  named.empty  named.localhost  named.loopback  slaves</span><br><span class="line">[root@localhost named]<span class="comment">#</span></span><br><span class="line">[root@localhost named]<span class="comment"># cp -a named.localhost lyshark.com.zone</span></span><br><span class="line">[root@localhost named]<span class="comment">#</span></span><br><span class="line">[root@localhost named]<span class="comment"># ls</span></span><br><span class="line">data  dynamic  lyshark.com.zone  named.ca  named.empty  named.localhost  named.loopback  slaves</span><br><span class="line">[root@localhost named]<span class="comment">#</span></span><br><span class="line">[root@localhost named]<span class="comment"># vim lyshark.com.zone</span></span><br><span class="line"></span><br><span class="line">  1 <span class="variable">$TTL</span> 1D</span><br><span class="line">  2 @       IN SOA  dns.lyshark.com. root.lyshark.com. (</span><br><span class="line">  3                                         0       ; serial</span><br><span class="line">  4                                         1D      ; refresh</span><br><span class="line">  5                                         1H      ; retry</span><br><span class="line">  6                                         1W      ; expire</span><br><span class="line">  7                                         3H )    ; minimum</span><br><span class="line">  8         NS      dns.lyshark.com.</span><br><span class="line">  9         MX 3    mail.lyshark.com.</span><br><span class="line"> 10 dns     A       127.0.0.1</span><br><span class="line"> 11 mail    A       192.168.1.20</span><br><span class="line"> 12         AAAA    ::1</span><br></pre></td></tr></table></figure></p>
+<p>5.重启named解析服务,并设置成开机自启动<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost named]<span class="comment"># systemctl restart named</span></span><br><span class="line">[root@localhost named]<span class="comment"># systemctl enable named</span></span><br></pre></td></tr></table></figure></p>
+<p>6.此处在其他电脑配置好,dns解析地址,解析到本机,并测试是否能解析<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">C:\Users\LyShark&gt;ping 192.168.1.20</span><br><span class="line"></span><br><span class="line">正在 Ping 192.168.1.20 具有 32 字节的数据:</span><br><span class="line">来自 192.168.1.20 的回复: 字节=32 时间&lt;1ms TTL=64</span><br><span class="line"></span><br><span class="line">C:\Users\LyShark&gt;nslookup mail.lyshark.com</span><br><span class="line">服务器:  UnKnown</span><br><span class="line">Address:  192.168.1.20</span><br><span class="line"></span><br><span class="line">名称:    mail.lyshark.com</span><br><span class="line">Addresses:  ::1</span><br><span class="line">          192.168.1.20</span><br><span class="line"></span><br><span class="line">C:\Users\LyShark&gt;</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="配置PostFix服务程序"><a href="#配置PostFix服务程序" class="headerlink" title="配置PostFix服务程序"></a>配置PostFix服务程序</h2><p>postfix是由IBM赞助研发的一款免费开源的电子邮件服务程序,它能够很好的兼容sendmail,可以很方便的将sendmail用户迁移到postfix服务上,postfix服务的收发邮件能力强于sendmail,而且能够自动,增加,减少进程的数量来保证邮件服务器的高性能运转,postfix有许多小模块组成,方便了功能的添加,拓展和删除,提高了可用性,用户可以灵活搭配使用.</p>
+<p>1.安装postfix服务程序,rhel7系统默认集成,这里只做演示<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y postfix</span></span><br><span class="line"></span><br><span class="line">Loaded plugins: product-id, search-disabled-repos, subscription-manager</span><br><span class="line">This system is not registered with an entitlement server. You can use subscription-manager.</span><br><span class="line">Package 2:postfix-2.10.1-6.el7.x86_64 already installed and latest version</span><br><span class="line">Nothing to <span class="keyword">do</span></span><br></pre></td></tr></table></figure></p>
+<p>2.配置邮局系统的主机名,在第76行,一个名为myhostname的变量,用来保存服务器主机名<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/postfix/main.cf</span></span><br><span class="line"></span><br><span class="line"> 68 <span class="comment"># INTERNET HOST AND DOMAIN NAMES</span></span><br><span class="line"> 69 <span class="comment">#</span></span><br><span class="line"> 70 <span class="comment"># The myhostname parameter specifies the internet hostname of this</span></span><br><span class="line"> 71 <span class="comment"># mail system. The default is to use the fully-qualified domain name</span></span><br><span class="line"> 72 <span class="comment"># from gethostname(). $myhostname is used as a default value for many</span></span><br><span class="line"> 73 <span class="comment"># other configuration parameters.</span></span><br><span class="line"> 74 <span class="comment">#</span></span><br><span class="line"> 75 <span class="comment">#myhostname = host.domain.tld</span></span><br><span class="line"> 76 myhostname = mail.lyshark.com                       <span class="comment">#解除注释,定义服务器主机名</span></span><br><span class="line"> 77</span><br></pre></td></tr></table></figure></p>
+<p>3.配置邮局系统的域名,在第83行,一个名为mydomain的变量,用来定义邮件域<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/postfix/main.cf</span></span><br><span class="line"></span><br><span class="line"> 78 <span class="comment"># The mydomain parameter specifies the local internet domain name.</span></span><br><span class="line"> 79 <span class="comment"># The default is to use $myhostname minus the first component.</span></span><br><span class="line"> 80 <span class="comment"># $mydomain is used as a default value for many other configuration</span></span><br><span class="line"> 81 <span class="comment"># parameters.</span></span><br><span class="line"> 82 <span class="comment">#</span></span><br><span class="line"> 83 mydomain = lyshark.com                              <span class="comment">#解除注释,指定邮件域</span></span><br><span class="line"> 84</span><br></pre></td></tr></table></figure></p>
+<p>4.配置本机发出的域名称,在第99行,一个名为myorigin的变量,用来定义邮件域<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/postfix/main.cf</span></span><br><span class="line"></span><br><span class="line"> 94 <span class="comment"># For the sake of consistency between sender and recipient addresses,</span></span><br><span class="line"> 95 <span class="comment"># myorigin also specifies the default domain name that is appended</span></span><br><span class="line"> 96 <span class="comment"># to recipient addresses that have no @domain part.</span></span><br><span class="line"> 97 <span class="comment">#</span></span><br><span class="line"> 98 myorigin = <span class="variable">$myhostname</span>                             <span class="comment">#解除注释,设置允许发信的用户的邮件域</span></span><br><span class="line"> 99 myorigin = <span class="variable">$mydomain</span>                               <span class="comment">#解除注释,例：admin@lyshark.com</span></span><br><span class="line">100</span><br></pre></td></tr></table></figure></p>
+<p>5.配置侦听网卡接口,在第116行,一个名为inet_interfaces的变量,用来定义网卡接口<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/postfix/main.cf</span></span><br><span class="line"></span><br><span class="line">108 <span class="comment"># See also the proxy_interfaces parameter, for network addresses that</span></span><br><span class="line">109 <span class="comment"># are forwarded to us via a proxy or network address translator.</span></span><br><span class="line">110 <span class="comment">#</span></span><br><span class="line">111 <span class="comment"># Note: you need to stop/start Postfix when this parameter changes.</span></span><br><span class="line">112 <span class="comment">#</span></span><br><span class="line">113 inet_interfaces = all                             <span class="comment">#解除注释,设置所有IP都提供邮件服务</span></span><br><span class="line">114 <span class="comment">#inet_interfaces = $myhostname</span></span><br><span class="line">115 <span class="comment">#inet_interfaces = $myhostname, localhost</span></span><br><span class="line">116 <span class="comment">#inet_interfaces = localhost                      #注释掉</span></span><br><span class="line">117</span><br></pre></td></tr></table></figure></p>
+<p>6.配置接收邮件的主机名或域名,在第164行,一个名为mydestination的变量,用来定义可接收邮件的主机名或域名列表,这里可以直接调用前面的两个变量myhostname和mydomain变量(如果不想调用变量,也可直接调用变量中的值)<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/postfix/main.cf</span></span><br><span class="line"></span><br><span class="line">156 <span class="comment"># Specify a list of host or domain names, /file/name or type:table</span></span><br><span class="line">157 <span class="comment"># patterns, separated by commas and/or whitespace. A /file/name</span></span><br><span class="line">158 <span class="comment"># pattern is replaced by its contents; a type:table is matched when</span></span><br><span class="line">159 <span class="comment"># a name matches a lookup key (the right-hand side is ignored).</span></span><br><span class="line">160 <span class="comment"># Continue long lines by starting the next line with whitespace.</span></span><br><span class="line">161 <span class="comment">#</span></span><br><span class="line">162 <span class="comment"># See also below, section "REJECTING MAIL FOR UNKNOWN LOCAL USERS".</span></span><br><span class="line">163 <span class="comment">#</span></span><br><span class="line">164 <span class="comment">#mydestination = $myhostname, localhost.$mydomain, localhost             #注释掉,设置取出那些邮件</span></span><br><span class="line">165 mydestination = <span class="variable">$myhostname</span>, localhost.<span class="variable">$mydomain</span>, localhost, <span class="variable">$mydomain</span>   <span class="comment">#解除注释</span></span><br><span class="line">166 <span class="comment">#mydestination = $myhostname, localhost.$mydomain, localhost, $mydomain,</span></span><br><span class="line">167 <span class="comment">#       mail.$mydomain, www.$mydomain, ftp.$mydomain</span></span><br></pre></td></tr></table></figure></p>
+<p>7.配置邮件存储位置,在第619行,一个名为home_mailbox的变量,用来定义邮件保存位置<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/postfix/main.cf</span></span><br><span class="line"></span><br><span class="line">413 <span class="comment"># The home_mailbox parameter specifies the optional pathname of a</span></span><br><span class="line">414 <span class="comment"># mailbox file relative to a user's home directory. The default</span></span><br><span class="line">415 <span class="comment"># mailbox file is /var/spool/mail/user or /var/mail/user.  Specify</span></span><br><span class="line">416 <span class="comment"># "Maildir/" for qmail-style delivery (the / is required).</span></span><br><span class="line">417 <span class="comment">#</span></span><br><span class="line">418 <span class="comment">#home_mailbox = Mailbox</span></span><br><span class="line">419 home_mailbox = Maildir/                            <span class="comment">#解除注释</span></span><br><span class="line">420</span><br></pre></td></tr></table></figure></p>
+<p>8.最后,创建一个邮件测试账号admin,重启postfix服务,并设置成开机自启动<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># useradd -s /sbin/nologin admin</span></span><br><span class="line">[root@localhost ~]<span class="comment"># passwd admin</span></span><br><span class="line">Changing password <span class="keyword">for</span> user admin.</span><br><span class="line">New password:</span><br><span class="line">BAD PASSWORD: The password is shorter than 8 characters</span><br><span class="line">Retype new password:</span><br><span class="line">passwd: all authentication tokens updated successfully.</span><br><span class="line">[root@localhost ~]<span class="comment">#</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl restart postfix</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl enable postfix</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="配置Dovecot服务程序"><a href="#配置Dovecot服务程序" class="headerlink" title="配置Dovecot服务程序"></a>配置Dovecot服务程序</h2><p>dovecot是一款能够为linux系统提供IMAP和POP3电子邮件服务的开源服务程序,安全性极高,配置简单,执行效率高,而且占用服务器资源极低,是一款很好的收件服务器.</p>
+<p>1.通过yum安装dovecot服务程序的软件包,和依赖<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y dovecot dovecot-devel clucene-core</span></span><br><span class="line">Loaded plugins: product-id, search-disabled-repos, subscription-manager</span><br><span class="line">This system is not registered with an entitlement server. You can use subscription-manager .</span><br><span class="line">Package 1:dovecot-2.2.10-8.el7.x86_64 already installed and latest version</span><br><span class="line">Package clucene-core-2.3.3.4-11.el7.x86_64 already installed and latest version</span><br><span class="line">Nothing to <span class="keyword">do</span></span><br></pre></td></tr></table></figure></p>
+<p>2.配置dovecot服务,在第24行,把服务的电子邮件协议改为 imap,pop3和lmtp,在这一行下面添加 disable_plaintext_auth 允许用户明文使用邮件系统.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/dovecot/dovecot.conf</span></span><br><span class="line"></span><br><span class="line"> 16 <span class="comment"># Default values are shown for each setting, it's not required to uncomment</span></span><br><span class="line"> 17 <span class="comment"># those. These are exceptions to this though: No sections (e.g. namespace &#123;&#125;)</span></span><br><span class="line"> 18 <span class="comment"># or plugin settings are added by default, they're listed only as examples.</span></span><br><span class="line"> 19 <span class="comment"># Paths are also just examples with the real defaults being based on configure</span></span><br><span class="line"> 20 <span class="comment"># options. The paths listed here are for configure --prefix=/usr</span></span><br><span class="line"> 21 <span class="comment"># --sysconfdir=/etc --localstatedir=/var</span></span><br><span class="line"> 22</span><br><span class="line"> 23 <span class="comment"># Protocols we want to be serving.</span></span><br><span class="line"> 24 protocols = imap pop3 lmtp                   <span class="comment">#取消注释,开启验证类型</span></span><br><span class="line"> 25 disable_plaintext_auth = no                  <span class="comment">#添加字段,开启允许使用明文传输</span></span><br></pre></td></tr></table></figure></p>
+<p>3.配置允许登陆的网段,在第48行,设置允许来自于指定网段的主机使用,如果想任何人则无需修改本参数<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/dovecot/dovecot.conf</span></span><br><span class="line"></span><br><span class="line"> 45 <span class="comment"># Space separated list of trusted network ranges. Connections from these</span></span><br><span class="line"> 46 <span class="comment"># IPs are allowed to override their IP addresses and ports (for logging and</span></span><br><span class="line"> 47 <span class="comment"># for authentication checks). disable_plaintext_auth is also ignored for</span></span><br><span class="line"> 48 <span class="comment"># these networks. Typically you'd specify your IMAP proxy servers here.</span></span><br><span class="line"> 49 login_trusted_networks = 192.168.1.0/24         <span class="comment">#允许指定网段使用,屏蔽掉默认all</span></span><br><span class="line"> 50</span><br></pre></td></tr></table></figure></p>
+<p>4.配置邮箱位置,子配置文件中,在第24行<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/dovecot/conf.d/10-mail.conf</span></span><br><span class="line"></span><br><span class="line"> 22 <span class="comment"># See doc/wiki/Variables.txt for full list. Some examples:</span></span><br><span class="line"> 23 <span class="comment">#</span></span><br><span class="line"> 24 mail_location = maildir:~/Maildir                         <span class="comment">#解除注释</span></span><br><span class="line"> 25 <span class="comment">#   mail_location = mbox:~/mail:INBOX=/var/mail/%u</span></span><br><span class="line"> 26 <span class="comment">#   mail_location = mbox:/var/mail/%d/%1n/%n:INDEX=/var/indexes/%d/%1n/%n</span></span><br></pre></td></tr></table></figure></p>
+<p>5.重启收件服务器,并设置开机自启动<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># systemctl restart dovecot</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl enable dovecot</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="配置SSL加密传输"><a href="#配置SSL加密传输" class="headerlink" title="配置SSL加密传输"></a>配置SSL加密传输</h2><p>由于上面的过程配置的邮件服务器使用的是明文传输,无法将其用于生产环境,下面的步骤将开启邮件服务器的SSL加密模式,让其可以在生产环境中使用</p>
+<p>1.生成SSL密钥文件,并自行放入合适的位置<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># openssl genrsa -des3 -out server.key 1024</span></span><br><span class="line">[root@localhost ~]<span class="comment"># openssl req -new -key server.key -out server.csr</span></span><br><span class="line">[root@localhost ~]<span class="comment"># openssl x509 -req -days 365 -sha256 -in server.csr -signkey server.key -out servernew.crt</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># ls</span></span><br><span class="line">server.csr  server.key  servernew.crt</span><br><span class="line">[root@localhost ~]<span class="comment"># cp -a * /etc/pki/CA/certs/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># ls /etc/pki/CA/certs/</span></span><br><span class="line">server.csr  server.key  servernew.crt</span><br></pre></td></tr></table></figure></p>
+<p>2.修改PostFix配置文件,在文件中修改以下几个位置,启用SSL加密参数<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/postfix/main.cf</span></span><br><span class="line"></span><br><span class="line">681 <span class="comment"># SSL CRT 添加如下配置到末尾</span></span><br><span class="line">682</span><br><span class="line">683 smtpd_use_tls = yes</span><br><span class="line">684 smtpd_tls_cert_file = /etc/pki/CA/certs/servernew.crt</span><br><span class="line">685 smtpd_tls_key_file = /etc/pki/CA/certs/server.key</span><br><span class="line">686 smtpd_tls_session_cache_database = btree:/etc/postfix/smtpd_scache</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># vim /etc/postfix/master.cf</span></span><br><span class="line"></span><br><span class="line"> 25 <span class="comment">#  -o milter_macro_daemon_name=ORIGINATING</span></span><br><span class="line"> 26 smtps     inet  n       -       n       -       -       smtpd</span><br><span class="line"> 27 <span class="comment">#  -o syslog_name=postfix/smtps</span></span><br><span class="line"> 28 -o smtpd_tls_wrappermode=yes</span><br></pre></td></tr></table></figure></p>
+<p> 3.接着修改dovecot额配置文件,指定开启SSL模式,并指定证书位置.<br> <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/dovecot/conf.d/10-ssl.conf</span></span><br><span class="line"></span><br><span class="line">  5 <span class="comment"># SSL/TLS support: yes, no, required. &lt;doc/wiki/SSL.txt&gt;</span></span><br><span class="line">  6 <span class="comment"># disable plain pop3 and imap, allowed are only pop3+TLS, pop3s, imap+TLS and imaps</span></span><br><span class="line">  7 <span class="comment"># plain imap and pop3 are still allowed for local connections</span></span><br><span class="line">  8 ssl = yes</span><br><span class="line">  9</span><br><span class="line"> 10 <span class="comment"># PEM encoded X.509 SSL/TLS certificate and private key. They're opened before</span></span><br><span class="line"> 11 <span class="comment"># dropping root privileges, so keep the key file unreadable by anyone but</span></span><br><span class="line"> 12 <span class="comment"># root. Included doc/mkcert.sh can be used to easily generate self-signed</span></span><br><span class="line"> 13 <span class="comment"># certificate, just make sure to update the domains in dovecot-openssl.cnf</span></span><br><span class="line"> 14 ssl_cert = &lt;/etc/pki/CA/certs/dovecot.pem</span><br><span class="line"> 15 ssl_key = &lt;/etc/pki/CA/private/dovecot.pem</span><br></pre></td></tr></table></figure></p>
+<p>4.重启PostFix和Dovecot服务,并设置开机自启动.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># systemctl restart postfix</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl restart dovecot</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl enable postfix</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl enable dovecot</span></span><br></pre></td></tr></table></figure></p>
+<p>5.如果iptables在开启状态,那么设置iptables开放SMTPS/POP3S/IMAPS的端口.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># iptables -I INPUT 1 -p tcp -m state --state NEW -m tcp --dport 465 -j ACCEPT </span></span><br><span class="line">[root@localhost ~]<span class="comment"># iptables -I INPUT 2 -p tcp -m state --state NEW -m tcp --dport 993 -j ACCEPT </span></span><br><span class="line">[root@localhost ~]<span class="comment"># iptables -I INPUT 3 -p tcp -m state --state NEW -m tcp --dport 995 -j ACCEPT</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/09/17/Linux 服务配置/PostFix+Dovecot 部署邮件系统/">PostFix+Dovecot 部署邮件系统</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年09月17日 - 21:09</p>
+  <p><span>最后更新:</span>2019年04月16日 - 20:04</p>
+  <p><span>原始链接:</span><a href="/2018/09/17/Linux 服务配置/PostFix+Dovecot 部署邮件系统/" title="PostFix+Dovecot 部署邮件系统">https://www.mkdirs.com/2018/09/17/Linux 服务配置/PostFix+Dovecot 部署邮件系统/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux-服务配置/" rel="tag"> <i class="fa fa-tag"></i> Linux 服务配置</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/09/17/Linux 服务配置/OpenSSH 服务配置与管理/" rel="next" title="OpenSSH 服务配置与管理">
+                <i class="fa fa-chevron-left"></i> OpenSSH 服务配置与管理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/09/17/Linux 服务配置/PXE+Kickstart 自动化部署系统/" rel="prev" title="PXE+Kickstart 自动化部署系统">
+                PXE+Kickstart 自动化部署系统 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#配置DNS域名解析"><span class="nav-text">配置DNS域名解析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置PostFix服务程序"><span class="nav-text">配置PostFix服务程序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置Dovecot服务程序"><span class="nav-text">配置Dovecot服务程序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置SSL加密传输"><span class="nav-text">配置SSL加密传输</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

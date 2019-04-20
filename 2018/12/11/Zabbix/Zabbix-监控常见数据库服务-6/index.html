@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Zabbix是一个非常强大的监控系统,是企业级的软件,来监控IT基础设施的可用性和性能.它是一个能够快速搭建起来的开源的监控系统,Zabbix能监视各种网络参数,保证服务器系统的安全运营,并提供灵活的通知机制以让系统管理员快速定位解决存在的各种问题,Zabbix系统几乎可用于任何系统的监控过程,它可以运行在Linux,Solaris,HP-UX,AIX,Free BSD,Open BSD,OS X">
+<meta name="keywords" content="Zabbix">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Zabbix 监控常见数据库服务(6)">
+<meta property="og:url" content="https://www.mkdirs.com/2018/12/11/Zabbix/Zabbix-监控常见数据库服务-6/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="Zabbix是一个非常强大的监控系统,是企业级的软件,来监控IT基础设施的可用性和性能.它是一个能够快速搭建起来的开源的监控系统,Zabbix能监视各种网络参数,保证服务器系统的安全运营,并提供灵活的通知机制以让系统管理员快速定位解决存在的各种问题,Zabbix系统几乎可用于任何系统的监控过程,它可以运行在Linux,Solaris,HP-UX,AIX,Free BSD,Open BSD,OS X">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-12-11T09:58:58.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Zabbix 监控常见数据库服务(6)">
+<meta name="twitter:description" content="Zabbix是一个非常强大的监控系统,是企业级的软件,来监控IT基础设施的可用性和性能.它是一个能够快速搭建起来的开源的监控系统,Zabbix能监视各种网络参数,保证服务器系统的安全运营,并提供灵活的通知机制以让系统管理员快速定位解决存在的各种问题,Zabbix系统几乎可用于任何系统的监控过程,它可以运行在Linux,Solaris,HP-UX,AIX,Free BSD,Open BSD,OS X">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/12/11/Zabbix/Zabbix-监控常见数据库服务-6/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Zabbix 监控常见数据库服务(6) | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/12/11/Zabbix/Zabbix-监控常见数据库服务-6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Zabbix 监控常见数据库服务(6)
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-11 12:04:42 / 修改时间：17:58:58" itemprop="dateCreated datePublished" datetime="2018-12-11T12:04:42+08:00">2018-12-11</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Zabbix/" itemprop="url" rel="index"><span itemprop="name">Zabbix</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Zabbix是一个非常强大的监控系统,是企业级的软件,来监控IT基础设施的可用性和性能.它是一个能够快速搭建起来的开源的监控系统,Zabbix能监视各种网络参数,保证服务器系统的安全运营,并提供灵活的通知机制以让系统管理员快速定位解决存在的各种问题,Zabbix系统几乎可用于任何系统的监控过程,它可以运行在Linux,Solaris,HP-UX,AIX,Free BSD,Open BSD,OS X,等平台上. </p>
+<a id="more"></a>
+<p><br></p>
+<h2 id="Zabbix监控MariaDB"><a href="#Zabbix监控MariaDB" class="headerlink" title="Zabbix监控MariaDB"></a>Zabbix监控MariaDB</h2><p>1.首先在被控主机上,通过Yum方式安装一个MariaDB数据库.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y mariadb mariadb-server</span></span><br><span class="line">Loaded plugins: fastestmirror</span><br><span class="line">Loading mirror speeds from cached hostfile</span><br><span class="line">Package 1:mariadb-5.5.60-1.el7_5.x86_64 already installed and latest version</span><br><span class="line">Package 1:mariadb-server-5.5.60-1.el7_5.x86_64 already installed and latest version</span><br><span class="line">Nothing to <span class="keyword">do</span></span><br></pre></td></tr></table></figure></p>
+<p>2.配置数据库的一个guest的用户,用来监控状态.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># systemctl restart mariadb</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl enable mariadb</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># mysql</span></span><br><span class="line">Welcome to the MariaDB monitor.  Commands end with ; or \g.</span><br><span class="line">Your MariaDB connection id is 2</span><br><span class="line">Server version: 5.5.60-MariaDB MariaDB Server</span><br><span class="line"></span><br><span class="line">Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.</span><br><span class="line"></span><br><span class="line">MariaDB [(none)]&gt; grant select on *.* to guest@localhost identified by <span class="string">"guest"</span>;</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br></pre></td></tr></table></figure></p>
+<p>3.配置一个MariaDB脚本文件用来获取用户信息.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/mysql_status.sh</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"> </span><br><span class="line">MYSQL_USER=<span class="string">"guest"</span></span><br><span class="line">MYSQL_PWD=<span class="string">"guest"</span></span><br><span class="line">MYSQL_HOST=<span class="string">"localhost"</span></span><br><span class="line">MYSQL_PORT=<span class="string">"3306"</span></span><br><span class="line">	 </span><br><span class="line"><span class="comment"># 数据连接</span></span><br><span class="line">MYSQL_CONN=<span class="string">"/usr/bin/mysqladmin -u<span class="variable">$&#123;MYSQL_USER&#125;</span> -p<span class="variable">$&#123;MYSQL_PWD&#125;</span> -h<span class="variable">$&#123;MYSQL_HOST&#125;</span> -P<span class="variable">$&#123;MYSQL_PORT&#125;</span>"</span></span><br><span class="line">	 </span><br><span class="line"><span class="comment"># 参数是否正确</span></span><br><span class="line"><span class="keyword">if</span> [ <span class="variable">$#</span> -ne <span class="string">"1"</span> ]</span><br><span class="line"><span class="keyword">then</span> </span><br><span class="line">	<span class="built_in">echo</span> <span class="string">"arg error!"</span> </span><br><span class="line"><span class="keyword">fi</span> </span><br><span class="line">	 </span><br><span class="line"><span class="comment"># 获取数据</span></span><br><span class="line"><span class="keyword">case</span> <span class="variable">$1</span> <span class="keyword">in</span> </span><br><span class="line">	Uptime) </span><br><span class="line">			result=`<span class="variable">$&#123;MYSQL_CONN&#125;</span> status|cut -f2 -d<span class="string">":"</span>|cut -f1 -d<span class="string">"T"</span>` </span><br><span class="line">			<span class="built_in">echo</span> <span class="variable">$result</span> </span><br><span class="line">		;; </span><br><span class="line">	Com_update) </span><br><span class="line">			result=`<span class="variable">$&#123;MYSQL_CONN&#125;</span> extended-status |grep -w <span class="string">"Com_update"</span>|cut -d<span class="string">"|"</span> -f3` </span><br><span class="line">			<span class="built_in">echo</span> <span class="variable">$result</span> </span><br><span class="line">		;; </span><br><span class="line">	Slow_queries) </span><br><span class="line">			result=`<span class="variable">$&#123;MYSQL_CONN&#125;</span> status |cut -f5 -d<span class="string">":"</span>|cut -f1 -d<span class="string">"O"</span>` </span><br><span class="line">			<span class="built_in">echo</span> <span class="variable">$result</span> </span><br><span class="line">		;; </span><br><span class="line">	Com_select) </span><br><span class="line">			result=`<span class="variable">$&#123;MYSQL_CONN&#125;</span> extended-status |grep -w <span class="string">"Com_select"</span>|cut -d<span class="string">"|"</span> -f3` </span><br><span class="line">			<span class="built_in">echo</span> <span class="variable">$result</span> </span><br><span class="line">		;; </span><br><span class="line">	Com_rollback) </span><br><span class="line">			result=`<span class="variable">$&#123;MYSQL_CONN&#125;</span> extended-status |grep -w <span class="string">"Com_rollback"</span>|cut -d<span class="string">"|"</span> -f3` </span><br><span class="line">			<span class="built_in">echo</span> <span class="variable">$result</span> </span><br><span class="line">		;; </span><br><span class="line">	Questions) </span><br><span class="line">			result=`<span class="variable">$&#123;MYSQL_CONN&#125;</span> status|cut -f4 -d<span class="string">":"</span>|cut -f1 -d<span class="string">"S"</span>` </span><br><span class="line">			<span class="built_in">echo</span> <span class="variable">$result</span> </span><br><span class="line">		;; </span><br><span class="line">	Com_insert) </span><br><span class="line">			result=`<span class="variable">$&#123;MYSQL_CONN&#125;</span> extended-status |grep -w <span class="string">"Com_insert"</span>|cut -d<span class="string">"|"</span> -f3` </span><br><span class="line">			<span class="built_in">echo</span> <span class="variable">$result</span> </span><br><span class="line">		;; </span><br><span class="line">	Com_delete) </span><br><span class="line">			result=`<span class="variable">$&#123;MYSQL_CONN&#125;</span> extended-status |grep -w <span class="string">"Com_delete"</span>|cut -d<span class="string">"|"</span> -f3` </span><br><span class="line">			<span class="built_in">echo</span> <span class="variable">$result</span> </span><br><span class="line">		;; </span><br><span class="line">	Com_commit) </span><br><span class="line">			result=`<span class="variable">$&#123;MYSQL_CONN&#125;</span> extended-status |grep -w <span class="string">"Com_commit"</span>|cut -d<span class="string">"|"</span> -f3` </span><br><span class="line">			<span class="built_in">echo</span> <span class="variable">$result</span> </span><br><span class="line">		;; </span><br><span class="line">	Bytes_sent) </span><br><span class="line">			result=`<span class="variable">$&#123;MYSQL_CONN&#125;</span> extended-status |grep -w <span class="string">"Bytes_sent"</span> |cut -d<span class="string">"|"</span> -f3` </span><br><span class="line">			<span class="built_in">echo</span> <span class="variable">$result</span> </span><br><span class="line">		;; </span><br><span class="line">	Bytes_received) </span><br><span class="line">			result=`<span class="variable">$&#123;MYSQL_CONN&#125;</span> extended-status |grep -w <span class="string">"Bytes_received"</span> |cut -d<span class="string">"|"</span> -f3` </span><br><span class="line">			<span class="built_in">echo</span> <span class="variable">$result</span> </span><br><span class="line">		;; </span><br><span class="line">	Com_begin) </span><br><span class="line">			result=`<span class="variable">$&#123;MYSQL_CONN&#125;</span> extended-status |grep -w <span class="string">"Com_begin"</span>|cut -d<span class="string">"|"</span> -f3` </span><br><span class="line">			<span class="built_in">echo</span> <span class="variable">$result</span> </span><br><span class="line">		;; 			</span><br><span class="line">		*) </span><br><span class="line">			<span class="built_in">echo</span> <span class="string">"Usage:<span class="variable">$0</span>(Uptime|Com_update|Slow_queries|Com_select|Com_rollback|Questions|Com_insert|Com_delete|Com_commit|Bytes_sent|Bytes_received|Com_begin)"</span> </span><br><span class="line">		;; </span><br><span class="line">	<span class="keyword">esac</span></span><br></pre></td></tr></table></figure></p>
+<p>4.将自定义的UserParameter加入配置文件,然后重启agentd<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># chmod 755 -R /etc/mysql_status.sh</span></span><br><span class="line">[root@localhost ~]<span class="comment"># vim /etc/zabbix/zabbix_agentd.conf</span></span><br><span class="line"></span><br><span class="line">UnsafeUserParameters=1</span><br><span class="line">UserParameter=mysql.status[*],/etc/mysql_status.sh \<span class="variable">$1</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># rm -fr /etc/zabbix/zabbix_agentd.d/userparameter_mysql.conf</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl restart zabbix-agent</span></span><br></pre></td></tr></table></figure></p>
+<p>5.服务端使用zabbix_get获取数据,并在Web主机配置好模板.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y zabbix-get</span></span><br><span class="line">[root@localhost ~]<span class="comment"># zabbix_get -s 192.168.1.10 -k "mysql.status[Uptime]"</span></span><br><span class="line"></span><br><span class="line">配置 -&gt; 主机 -&gt; 模板 -&gt; 链接模板 -&gt; 选择 -&gt; Template DB MySQL -&gt;添加 -&gt; 更新</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/12/11/Zabbix/Zabbix-监控常见数据库服务-6/">Zabbix 监控常见数据库服务(6)</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年12月11日 - 12:12</p>
+  <p><span>最后更新:</span>2018年12月11日 - 17:12</p>
+  <p><span>原始链接:</span><a href="/2018/12/11/Zabbix/Zabbix-监控常见数据库服务-6/" title="Zabbix 监控常见数据库服务(6)">https://www.mkdirs.com/2018/12/11/Zabbix/Zabbix-监控常见数据库服务-6/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Zabbix/" rel="tag"> <i class="fa fa-tag"></i> Zabbix</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/11/Zabbix/Zabbix-监控常见Web服务-5/" rel="next" title="Zabbix 监控常见Web服务(5)">
+                <i class="fa fa-chevron-left"></i> Zabbix 监控常见Web服务(5)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/14/Docker/Docker-容器简介与部署-1/" rel="prev" title="Docker 容器简介与部署(1)">
+                Docker 容器简介与部署(1) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Zabbix监控MariaDB"><span class="nav-text">Zabbix监控MariaDB</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

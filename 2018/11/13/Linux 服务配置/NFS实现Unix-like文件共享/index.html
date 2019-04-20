@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html class="theme-next gemini" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"hide","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: true,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"expandIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="NFS(Network File System)即网络文件系统,是一种使用于分布式文件系统的协议,由Sun公司开发,于1984年向外公布,功能是通过网络让不同的机器,不同的操作系统能够彼此分享各自的数据,让应用程序在客户端通过网络访问位于服务器磁盘中的数据,是在类Unix系统间实现磁盘文件共享的一种方法.">
+<meta name="keywords" content="Linux 服务配置">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NFS实现Unix-like文件共享">
+<meta property="og:url" content="https://www.mkdirs.com/2018/11/13/Linux 服务配置/NFS实现Unix-like文件共享/index.html">
+<meta property="og:site_name" content="我的个人博客">
+<meta property="og:description" content="NFS(Network File System)即网络文件系统,是一种使用于分布式文件系统的协议,由Sun公司开发,于1984年向外公布,功能是通过网络让不同的机器,不同的操作系统能够彼此分享各自的数据,让应用程序在客户端通过网络访问位于服务器磁盘中的数据,是在类Unix系统间实现磁盘文件共享的一种方法.">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-04-16T12:37:44.611Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="NFS实现Unix-like文件共享">
+<meta name="twitter:description" content="NFS(Network File System)即网络文件系统,是一种使用于分布式文件系统的协议,由Sun公司开发,于1984年向外公布,功能是通过网络让不同的机器,不同的操作系统能够彼此分享各自的数据,让应用程序在客户端通过网络访问位于服务器磁盘中的数据,是在类Unix系统间实现磁盘文件共享的一种方法.">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="我的个人博客" type="application/atom+xml">
+
+
+
+
+  <link rel="canonical" href="https://www.mkdirs.com/2018/11/13/Linux 服务配置/NFS实现Unix-like文件共享/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>NFS实现Unix-like文件共享 | 我的个人博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">我的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.mkdirs.com/2018/11/13/Linux 服务配置/NFS实现Unix-like文件共享/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="王瑞">
+      <meta itemprop="description" content="记录点滴技术成长之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="我的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">NFS实现Unix-like文件共享
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-11-13 11:11:30" itemprop="dateCreated datePublished" datetime="2018-11-13T11:11:30+08:00">2018-11-13</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-16 20:37:44" itemprop="dateModified" datetime="2019-04-16T20:37:44+08:00">2019-04-16</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Linux-服务配置/" itemprop="url" rel="index"><span itemprop="name">Linux 服务配置</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>NFS(Network File System)即网络文件系统,是一种使用于分布式文件系统的协议,由Sun公司开发,于1984年向外公布,功能是通过网络让不同的机器,不同的操作系统能够彼此分享各自的数据,让应用程序在客户端通过网络访问位于服务器磁盘中的数据,是在类Unix系统间实现磁盘文件共享的一种方法.</p>
+<a id="more"></a>
+<p>NFS服务器可以允许NFS客户端将远端NFS服务器端的共享目录挂载到本地的NFS客户端中,在本地的NFS客户端的机器看来,NFS服务器端共享的目录就好像自己的磁盘分区和目录一样.</p>
+<blockquote>
+<p>目前NFS有三个版本,分别是<code>NFSv2,NFSv3,NFSv4</code>,以下是其常用的版本解析:</p>
+<blockquote>
+<p>● NFSv2:是一个古老的版本,但却被众多的操作系统所支持,这样兼容性更好.<br>● NFSv3:拥有更多的特点,包括更快的速度,更大的单个文件大小,对TCP的支持.<br>● NFSv4:提供有状态连接,共容易追踪,安全性增强,RHEL7上默认4版本协议.</p>
+</blockquote>
+</blockquote>
+<p>当2台主机通过网络建立连接时,双方主机就需要提供基本信息,如IP地址、服务端口号等,当有 100 台客户端需要访问某台服务器时,服务器就需要记住这些客户端的IP地址以及相应的端口号等信息,而这些信息是需要程序来管理的.</p>
+<p>在 Linux 中,这样的信息可以由某个特定服务自己来管理,也可以委托给 <code>RPC(Remote Procedure Call)</code>来管理,RPC是远程过程调用协议,RPC协议为远程通信程序管理维护基本配置信息,这样 NFS 服务就可以专注于如何共享数据,至于通信的连接以及连接的基本信息,则全权委托给RPC服务来完成管理,RPC所需要的两个软件包分别是<code>nfs-utils,rpcbind</code>你可以通过YUM来快速安装.</p>
+<p><strong>了解NFS的分配流程:</strong></p>
+<p>NFS是通过网络来进行服务端和客户端之间的数据传输,两者之间要传输数据就要有相对应的网络端口来进行传输,NFS服务器端其实是随机选择端口来进行数据传输.</p>
+<p>RPC服务会统一管理NFS的端口,客户端和服务端通过RPC来先沟通NFS使用了哪些端口,之后再利用这些端口(小于1024)来进行数据的传输.</p>
+<p>RPC管理服务端的NFS端口分配,客户端要传数据,那客户端的RPC会先跟服务端的RPC去要服务器的端口,要到端口后再建立连接,然后传输数据.</p>
+<p>当NFS启动后,就会随机的分配端口,然后NFS就会向RPC去注册这些端口,RPC就会记录下这些端口并且RPC会开启111端口,等待客户端RPC的请求,如果客户端有请求,那服务端的RPC就会将记录的NFS端口信息告知客户端.</p>
+<p><strong>NFS服务配置说明:</strong></p>
+<p>在启动NFS Server之前,首先要启动RPC服务否则NFS Server就无法向RPC服务区注册,另外如果RPC服务重新启动,原来已经注册好的NFS端口数据就会全部丢失.因此此时RPC服务管理的NFS程序也要重新启动以重新向RPC注册.</p>
+<blockquote>
+<p>NFS系统的守护进程介绍</p>
+<blockquote>
+<p>● RPC:(Remote Procedure Call Protocol),远程过程调用协议<br>● NFS:它是基本的NFS守护进程,主要功能是管理客户端是否能够登录服务器<br>● RPCbind:主要功能是进行端口映射工作,和端口代理分配等</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>客户端NFS和服务端NFS通讯过程</p>
+<blockquote>
+<p>● 首先服务器端启动RPC服务,并开启111端口<br>● 启动NFS服务,并向RPC注册端口信息<br>● 客户端启动RPC,向服务端的RPC服务请求服务端的NFS端口<br>● 服务端的RPC服务,反馈NFS端口信息给客户端<br>● 客户端通过获取的NFS端口来建立和服务端的NFS连接并进行数据的传输</p>
+</blockquote>
+</blockquote>
+<p>NFS服务器是通过读取<code>/etc/exports</code>配置文件设定那个客户端可以访问那些NFS共享文件系统,该文件书写原则有如下几条.</p>
+<blockquote>
+<p>● 空白行的内容将被忽略<br>● 以#号开头的内容是注释<br>● 可以通过\转义字符换行<br>● 每个共享文件系统需要独立一行条目<br>● 客户端的主机列表需要使用空格隔开</p>
+</blockquote>
+<p>接下来我们来看一下一条完整的规则条目是如何书写的吧,需要注意的是客户端主机可以是一个网段,单台主机或者是主机名称,在使用时应该灵活运用.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[共享目录]	[允许谁来访问][权限]	[可用主机名][权限]	[其他主机权限]</span><br><span class="line"></span><br><span class="line">/nfs		192.168.1.1(rw)		localhost(rw)		*(ro,sync)</span><br><span class="line">/nfs		192.168.1.0/24(rw)	localhost(rw)		*(ro,sync)</span><br><span class="line">/nfs		192.168.1.1(rw) 192.168.1.2(ro) 192.168.1.3(ro,sync)</span><br></pre></td></tr></table></figure>
+<p>如上所示,有个权限列表,NFS配置中可以给一个共享路径指定相关权限,NFS的默认属性为<code>ro,sync,wdelay,root_squash</code>,具体的NFS属性列表,我们可以参考一下列表.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">NFS权限选项</th>
+<th style="text-align:left">功能描述信息</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">ro</td>
+<td style="text-align:left">以只读方式共享</td>
+</tr>
+<tr>
+<td style="text-align:left">rw</td>
+<td style="text-align:left">以读写方式共享</td>
+</tr>
+<tr>
+<td style="text-align:left">sync</td>
+<td style="text-align:left">同步写入磁盘</td>
+</tr>
+<tr>
+<td style="text-align:left">async</td>
+<td style="text-align:left">异步写入磁盘</td>
+</tr>
+<tr>
+<td style="text-align:left">wdelay</td>
+<td style="text-align:left">延迟写入操作</td>
+</tr>
+<tr>
+<td style="text-align:left">root_squash</td>
+<td style="text-align:left">屏蔽远程root权限</td>
+</tr>
+<tr>
+<td style="text-align:left">no_root_squash</td>
+<td style="text-align:left">不屏蔽远程root权限</td>
+</tr>
+<tr>
+<td style="text-align:left">all_squash</td>
+<td style="text-align:left">屏蔽所有远程用户权限</td>
+</tr>
+</tbody>
+</table>
+<p>以上的几个说明信息,是我们最常用的几个,当然还有很多这样的配置选项,这里就不依次列举了,更多内容请百度了解.<br><br></p>
+<h2 id="NFS-普通配置实例"><a href="#NFS-普通配置实例" class="headerlink" title="NFS 普通配置实例"></a>NFS 普通配置实例</h2><h3 id="◆NFS-服务端配置◆"><a href="#◆NFS-服务端配置◆" class="headerlink" title="◆NFS 服务端配置◆"></a>◆NFS 服务端配置◆</h3><p>1.在配置NFS共享文件之前,我们先来放行NFS的几个常用服务,并将防火墙默认设置为拒绝状态.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --add-service=nfs</span></span><br><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --add-service=mountd</span></span><br><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --add-service=rpc-bind</span></span><br><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --add-service=nfs --permanent</span></span><br><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --add-service=mountd --permanent</span></span><br><span class="line">[root@localhost ~]<span class="comment"># firewall-cmd --add-service=rpc-bind --permanent</span></span><br></pre></td></tr></table></figure></p>
+<p>2.通过YUM仓库快速安装NFS相关的软件包.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y rpcbind nfs-utils*</span></span><br><span class="line"></span><br><span class="line">Package rpcbind-0.2.0-47.el7.x86_64 already installed and latest version</span><br><span class="line">Package 1:nfs-utils-1.3.0-0.61.el7.x86_64 already installed and latest version</span><br><span class="line">Nothing to <span class="keyword">do</span></span><br></pre></td></tr></table></figure></p>
+<p>3.创建需要共享的文件,并拷贝相关的文件内容,并设置SeLinux规则.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mkdir -p /public</span></span><br><span class="line">[root@localhost ~]<span class="comment"># chmod o+rw /public/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># chcon -R -t public_content_t /public/</span></span><br></pre></td></tr></table></figure></p>
+<p>4.修改NFS主配置文件,并写入要访问的主机列表.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/exports</span></span><br><span class="line"></span><br><span class="line">/public 192.168.1.0/24(rw,sync)</span><br><span class="line"><span class="comment">#-----------------------------------------------------------------</span></span><br><span class="line"><span class="comment"># 其他完整写法,可参考以下配置方式</span></span><br><span class="line"><span class="comment">#[共享目录]	[允许谁来访问][权限]	[可用主机名][权限]	[其他主机权限]</span></span><br><span class="line"><span class="comment">#/nfs		192.168.1.1(rw)		localhost(rw)		*(ro,sync)</span></span><br><span class="line"><span class="comment">#/nfs		192.168.1.0/24(rw)	localhost(rw)		*(ro,sync)</span></span><br></pre></td></tr></table></figure></p>
+<p>5.重启NFS服务,和守护进程,并设置开机自启动.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># systemctl restart nfs</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl restart rpcbind</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl enable nfs</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl enable rpcbind</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl restart nfs-server</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl enable nfs-server</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="◆NFS-客户端配置◆"><a href="#◆NFS-客户端配置◆" class="headerlink" title="◆NFS 客户端配置◆"></a>◆NFS 客户端配置◆</h3><p>1.通过YUM仓库快速安装NFS相关的软件包.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y rpcbind nfs-utils*</span></span><br><span class="line"></span><br><span class="line">Package rpcbind-0.2.0-47.el7.x86_64 already installed and latest version</span><br><span class="line">Package 1:nfs-utils-1.3.0-0.61.el7.x86_64 already installed and latest version</span><br><span class="line">Nothing to <span class="keyword">do</span></span><br></pre></td></tr></table></figure></p>
+<p>2.创建挂载点,并设置SeLinux规则.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># mkdir -p /mnt/nfsmount</span></span><br><span class="line">[root@localhost ~]<span class="comment"># chcon -R -t public_content_t /mnt/nfsmount</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>NFS挂载演示:</strong> 手动挂载目录,可通过<code>mount</code>命令来实现,具体的挂载参数如下.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment">#mount -t nfs -o 选项 服务主机:/服务器共享目录  /本地挂载没记录</span></span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># mount -t nfs -o rw,sync 192.168.1.5:/public /mnt/nfsmount</span></span><br><span class="line">[root@localhost ~]<span class="comment"># df -hT |grep "public"</span></span><br><span class="line"></span><br><span class="line">Filesystem              Type      Size  Used Avail Use% Mounted on</span><br><span class="line">192.168.1.5:/public     nfs4       17G  1.9G   16G  12% /mnt/nfsmount</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>具体的挂载详细参数如下:</p>
+<blockquote>
+<p>● Intr:当服务器宕机时终端NFS请求<br>● nfsvers=4:指定使用那个版本的协议<br>● noacl:关闭ACL,仅与老版本兼容<br>● nolock:关闭文件锁机制<br>● noexec:挂载时屏蔽二进制程序<br>● port=num:指定NFS服务器端口号<br>● rsize=num:设置最大数据块大小(读取)<br>● wsize=num:设置最大数据块大小(写入)<br>● tcp:使用TCP协议挂载<br>● udp:使用UDP协议挂载</p>
+</blockquote>
+</blockquote>
+<p><strong>nfsstat命令:</strong> NFS提供了查看NFS共享状态功能.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># nfsstat        #显示服务端与客户端状态</span></span><br><span class="line">[root@localhost ~]<span class="comment"># nfsstat -s     #只显示服务端状态</span></span><br><span class="line">[root@localhost ~]<span class="comment"># nfsstat -c     #只显示客户端状态</span></span><br><span class="line">[root@localhost ~]<span class="comment"># nfsstat -n     #仅显示NFS与RPC信息</span></span><br><span class="line">[root@localhost ~]<span class="comment"># nfsstat -m     #显示挂载信息</span></span><br><span class="line">[root@localhost ~]<span class="comment"># nfsstat -l     #以列表信息显示信息</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>rpcinfo命令:</strong> NFS生成RPC信息报表功能.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># rpcinfo -m 127.0.0.1   #显示指定主机rpcbind操作列表</span></span><br><span class="line">[root@localhost ~]<span class="comment"># rpcinfo -p 127.0.0.1   #显示指定主机RPC注册信息 </span></span><br><span class="line">[root@localhost ~]<span class="comment"># rpcinfo -s             #显示所有RPC注册信息</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>showmount命令:</strong> NFS使用shomount命令可以查看远程主机共享列表.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># showmount -e 127.0.0.1  #显示服务器可用资源</span></span><br><span class="line">[root@localhost ~]<span class="comment"># showmount -a 127.0.0.1  #查看所有客户链接信息</span></span><br><span class="line">[root@localhost ~]<span class="comment"># showmount -d 127.0.0.1  #只显示客户输出信息</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>exportfs命令:</strong> 此命令允许root在不重启NFS服务情况下,选择共享或取消共享文件.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># exportfs -a   #全部挂载或卸载配置文件中的内容</span></span><br><span class="line">[root@localhost ~]<span class="comment"># exportfs -r   #重新加载配置文件中的信息</span></span><br><span class="line">[root@localhost ~]<span class="comment"># exportfs -u   #停止单一目录的共享</span></span><br><span class="line">[root@localhost ~]<span class="comment"># exportfs -au  #停止所有服务端的共享</span></span><br><span class="line">[root@localhost ~]<span class="comment"># exportfs -ra  #重新共享所有目录</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>配置固定端口:</strong> 我们可以修改配置文件来实现配置固定的共享端口号.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/sysconfig/nfs</span></span><br><span class="line"></span><br><span class="line">RQUOTAD_PORT=5001               </span><br><span class="line">LOCKD_TCPPORT=5002            <span class="comment">#设置tcp的ockd程序端口号</span></span><br><span class="line">LOCKD_UDPPORT=5002            <span class="comment">#设置udp的lockd程序端口号</span></span><br><span class="line">MOUNTD_PORT=5003              <span class="comment">#设置mountd程序端口号</span></span><br><span class="line">STATD_PORT=5004               <span class="comment">#设置rpc.statd程序端口号</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>设置自动挂载:</strong> 修改自动挂载目录,写入以下内容即可实现自动挂载.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/fstab</span></span><br><span class="line"></span><br><span class="line">192.168.1.1:/public /mnt/nfsmount  nfs  default  0 0</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h2 id="NTP-时间同步-拓展"><a href="#NTP-时间同步-拓展" class="headerlink" title="NTP 时间同步(拓展)"></a>NTP 时间同步(拓展)</h2><h3 id="◆NTP服务端配置◆"><a href="#◆NTP服务端配置◆" class="headerlink" title="◆NTP服务端配置◆"></a>◆NTP服务端配置◆</h3><p>1.通过YUM仓库快速安装NTP服务的相关软件.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y ntp ntpdate autogen-libopts</span></span><br><span class="line"></span><br><span class="line">Package ntp-4.2.6p5-28.el7.centos.x86_64 already installed and latest version</span><br><span class="line">Package ntpdate-4.2.6p5-28.el7.centos.x86_64 already installed and latest version</span><br><span class="line">Package autogen-libopts-5.18-5.el7.x86_64 already installed and latest version</span><br><span class="line">Nothing to <span class="keyword">do</span></span><br></pre></td></tr></table></figure></p>
+<p>2.编辑NTP主配置文件,修改以下相关语句,注释掉网络同步源,并配置本机作为NTP服务器.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># vim /etc/ntp.conf</span></span><br><span class="line"></span><br><span class="line">19 <span class="comment"># Use public servers from the pool.ntp.org project.</span></span><br><span class="line">20 <span class="comment"># Please consider joining the pool (http://www.pool.ntp.org/join.html).</span></span><br><span class="line">21 <span class="comment">#server 0.centos.pool.ntp.org iburst				#注释掉,不使用网络同步</span></span><br><span class="line">22 <span class="comment">#server 1.centos.pool.ntp.org iburst				#注释掉,不使用网络同步</span></span><br><span class="line">23 <span class="comment">#server 2.centos.pool.ntp.org iburst				#注释掉,不使用网络同步</span></span><br><span class="line">24 <span class="comment">#server 3.centos.pool.ntp.org iburst				#注释掉,不使用网络同步</span></span><br><span class="line">25 </span><br><span class="line">26 restrict 192.168.1.0 mask 255.255.255.0 nomodify notrap   <span class="comment">#允许192.168.1.0/24网段来获取</span></span><br><span class="line">27 server 127.127.1.0                                        <span class="comment">#本服务器IP地址,地址反写</span></span><br><span class="line">28 fudge 127.127.1.0 stratum 10                              <span class="comment">#定义权威服务器,级别10</span></span><br></pre></td></tr></table></figure></p>
+<p>3.重启NTP服务,并设置开机自启动,如果有防火墙需要自行放行规则.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># systemctl restart ntpd</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl enable ntpd</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="◆NTP客户端配置◆"><a href="#◆NTP客户端配置◆" class="headerlink" title="◆NTP客户端配置◆"></a>◆NTP客户端配置◆</h3><p>1.通过YUM仓库快速安装NTP服务的相关软件.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># yum install -y ntp ntpdate autogen-libopts</span></span><br><span class="line"></span><br><span class="line">Package ntp-4.2.6p5-28.el7.centos.x86_64 already installed and latest version</span><br><span class="line">Package ntpdate-4.2.6p5-28.el7.centos.x86_64 already installed and latest version</span><br><span class="line">Package autogen-libopts-5.18-5.el7.x86_64 already installed and latest version</span><br><span class="line">Nothing to <span class="keyword">do</span></span><br></pre></td></tr></table></figure></p>
+<p>2.使用NTP命令同步时间数据,并写入计划任务,每20分钟同步一次.<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># ntpdate -u 192.168.1.1</span></span><br><span class="line">5 Jan 01:35:47 ntpdate[1645]: adjust time server 192.168.1.1 offset 0.000002 sec</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># crontab -u root -e</span></span><br><span class="line">crontab: installing new crontab</span><br><span class="line">[root@localhost ~]<span class="comment"># crontab -u root -l</span></span><br><span class="line">*/20 * * * * ntpdate -u 27.0.0.1 &amp;&gt;/dev/null</span><br><span class="line"></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl restart crond</span></span><br><span class="line">[root@localhost ~]<span class="comment"># systemctl enable crond</span></span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+
+      
+    </div>
+
+    
+
+<!--增加的底部版权代码-->
+<div>
+      
+        
+<div class="my_post_copyright">
+  <p><span>本文标题:</span><a href="/2018/11/13/Linux 服务配置/NFS实现Unix-like文件共享/">NFS实现Unix-like文件共享</a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 王瑞 的个人博客">王瑞</a></p>
+  <p><span>发布时间:</span>2018年11月13日 - 11:11</p>
+  <p><span>最后更新:</span>2019年04月16日 - 20:04</p>
+  <p><span>原始链接:</span><a href="/2018/11/13/Linux 服务配置/NFS实现Unix-like文件共享/" title="NFS实现Unix-like文件共享">https://www.mkdirs.com/2018/11/13/Linux 服务配置/NFS实现Unix-like文件共享/</a>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者</p>
+</div>
+
+      
+</div>
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux-服务配置/" rel="tag"> <i class="fa fa-tag"></i> Linux 服务配置</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/11/Linux 服务配置/Apache-Tomcat服务部署网站/" rel="next" title="Apache Tomcat服务部署网站">
+                <i class="fa fa-chevron-left"></i> Apache Tomcat服务部署网站
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/11/13/Linux 系统管理/Linux系统文件与目录管理-1/" rel="prev" title="Linux系统文件与目录管理(1)">
+                Linux系统文件与目录管理(1) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="王瑞">
+            
+              <p class="site-author-name" itemprop="name">王瑞</p>
+              <div class="site-description motion-element" itemprop="description">记录点滴技术成长之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/lyshark" title="GitHub &rarr; https://github.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="mailto:1181506874@qq.com" title="E-Mail &rarr; mailto:1181506874@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://plus.google.com/lyshark" title="Google &rarr; https://plus.google.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://twitter.com/lyshark" title="Twitter &rarr; https://twitter.com/lyshark" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" title="QQ &rarr; http://wpa.qq.com/msgrd?v=3&uin=1181506874&site=hupaiyule&menu=yes" rel="noopener" target="_blank"><i class="fa fa-fw fa-qq"></i></a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <a href="https://weixin.qq.com" title="Wechat &rarr; https://weixin.qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-weixin"></i></a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#NFS-普通配置实例"><span class="nav-text">NFS 普通配置实例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆NFS-服务端配置◆"><span class="nav-text">◆NFS 服务端配置◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆NFS-客户端配置◆"><span class="nav-text">◆NFS 客户端配置◆</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NTP-时间同步-拓展"><span class="nav-text">NTP 时间同步(拓展)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#◆NTP服务端配置◆"><span class="nav-text">◆NTP服务端配置◆</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#◆NTP客户端配置◆"><span class="nav-text">◆NTP客户端配置◆</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+
+<!-- 屏蔽版权开始 -->
+&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">王瑞</span>
+<!-- 屏蔽版权结束 -->
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
